@@ -1,10 +1,11 @@
 # Matter v1 compatibility and validation boundary
 
 MAT-002 implements the structural contract version `1.0` and the independent
-encoding version `matter-json-v1`. It does not implement schema negotiation,
-database migrations, a persistent engine, or semantic evaluator qualification.
-Those remain separate tickets, including [MAT-003](../../tickets/MAT-003.md),
-[MAT-012](../../tickets/MAT-012.md), and [MAT-074](../../tickets/MAT-074.md).
+encoding version `matter-json-v1`. MAT-003 adds the separate
+[durable storage and migration boundary](../storage.md) without changing those
+wire versions. Schema negotiation, business operation handlers, and semantic
+evaluator qualification retain their own tickets, including
+[MAT-012](../../tickets/MAT-012.md) and [MAT-074](../../tickets/MAT-074.md).
 
 The authoritative field inventory is [schema-inventory.md](schema-inventory.md).
 The exact byte encoding and digest preimage are in [canonical.md](canonical.md).

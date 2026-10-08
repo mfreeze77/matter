@@ -6,7 +6,7 @@ Matter is a shared foundation for following a continuing subject, preserving its
 
 ## Current status
 
-This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 adds the executable structural boundary for later engine work: twelve record kinds, sixteen command variants, explicit success/failure results, and portable byte/digest fixtures. The full production engine, provider adapter, persistent store, native integrations, and empirical qualification are planned in the backlog.
+This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, sixteen command variants, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. Business operation handlers, provider adapters, native integrations, and empirical qualification remain planned in the backlog.
 
 The walkthroughs are deliberately small: their fixtures already contain host-supplied associations and classifications. They demonstrate selected continuity and delivery rules; they do not infer semantic meaning, execute an agent hook, call JEV, train a speaker model, or establish production correctness.
 
@@ -59,6 +59,22 @@ node tests/fixtures/canonical/verify.mjs
 
 See the [schema inventory](docs/contracts/schema-inventory.md), [compatibility matrix and API boundary](docs/contracts/compatibility.md), and [MAT-002 validation receipt](docs/validation/MAT-002.md) for the supported shapes and executed evidence.
 
+## Use durable storage
+
+`matter.storage.SQLiteStore` accepts a host-authorized scope and a synchronous
+command handler. Each command atomically commits its checked record/projection
+writes, operation receipt, and exact result. An identical retry returns the
+original result, including after process restart. A competing stale writer
+receives `E_REVISION_CONFLICT`; an unavailable database produces an explicit
+storage error.
+
+The installed package includes its SQLite migrations and receipt schema. See
+the [storage API and executable example](docs/storage.md) for transactions,
+historical reads, projection watches, and new-file backup/restore. The
+[MAT-003 validation receipt](docs/validation/MAT-003.md) records crash,
+concurrency, migration, and restore evidence. The storage port does not supply
+the later domain operation rules or host authentication.
+
 ## Read the specification
 
 | Document | Responsibility |
@@ -68,6 +84,7 @@ See the [schema inventory](docs/contracts/schema-inventory.md), [compatibility m
 | [Executable schemas](docs/contracts/schema-inventory.md) | Implemented record, command, and result shapes with conditional references |
 | [Canonical encoding](docs/contracts/canonical.md) | Exact normalized bytes, digest framing, and portable golden vectors |
 | [Compatibility](docs/contracts/compatibility.md) | Version acceptance, unknown-time handling, errors, and API boundaries |
+| [Durable storage](docs/storage.md) | Transaction API, exact retries, revision history, migrations, backup, and restore |
 | [Rule contract](docs/contracts/rules.md) | Meaning, outcomes, qualification, dependencies, and composition |
 | [Lifecycle contract](docs/contracts/lifecycle.md) | Reassessment, resolution, reopening, attention, and delivery |
 | [JEV design](docs/jev.md) | Replaceable semantic execution and question/version handling |
@@ -79,6 +96,7 @@ See the [schema inventory](docs/contracts/schema-inventory.md), [compatibility m
 | [Requirement coverage](docs/COVERAGE.md) | Traceability from the requirement inventory to tickets |
 | [Scaffold validation receipt](docs/validation.md) | What was executed for MAT-001 |
 | [Core contract validation receipt](docs/validation/MAT-002.md) | What was executed for MAT-002 |
+| [Storage validation receipt](docs/validation/MAT-003.md) | What was executed for MAT-003 |
 
 ## What this repo owns
 
