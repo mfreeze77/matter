@@ -97,6 +97,36 @@ records, not newly established external observations or independent support,
 and do not execute MAT-016 assessment invalidation. See the
 [field inventory](schema-inventory.md) for result-array and receipt distinctions.
 
+MAT-008 adds `publish_association_candidates` and `decide_association`, bringing
+the portable inventory to twenty-one operations and forty-two successful
+operation/outcome pairs. It adds an explicit `evaluation_failed` result for
+`propose_association`. The twelve core record kinds, `1.0` envelope version and
+`matter-json-v1` encoding remain unchanged. The package also adds five private
+schemas for candidate catalogs, evaluation/decision receipts, persistent
+dispositions and membership projections; those are separately digest-bound
+resources, not additional core record kinds.
+
+Existing proposal/acceptance commands, records and success bodies gain optional
+catalog, evaluation, policy, decision and capability fields. Updated structural
+readers still accept earlier v1 fixtures without those fields. Earlier closed
+readers must update their bundled schemas before accepting the new fields,
+operations or result outcome. There is no automatic operation negotiation,
+downcast, or fallback from a failed evaluation to no match.
+
+The runtime's stronger acceptance boundary does not make old structural
+fixtures executable associations. `AssociationService` requires its published
+candidate-set snapshot and verified receipt/index bindings; it checks current
+catalog members, the host-injected actor/authority allowlist, relationship
+capability and persisted pair dispositions. The admitted authority must be an
+actual host-origin receipt at the authority stage. Semantic acceptance means
+explicit host review when allowed by policy, not qualification inferred from
+a reported score or certificate. An explicit release additionally requires
+correction permission. New proposal IDs and relationship versions do not erase
+rejection/protection history, and replaying a historical success never undoes
+a later revocation. Matter merges, general control epochs and transitive
+invalidation remain separate work. The [association API](../associations.md)
+defines the executable boundary.
+
 ## Four independent versions and identities
 
 The schema version identifies the structure and interpretation of an envelope.

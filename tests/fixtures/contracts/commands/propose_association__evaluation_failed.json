@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.0",
+  "operation": "propose_association",
+  "command_id": "command-propose_association",
+  "idempotency_key": "idempotency-propose_association",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [
+    {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    }
+  ],
+  "body": {
+    "subject": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "observation",
+      "id": "observation-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "candidates": [
+      {
+        "candidate": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "matter",
+          "id": "matter-1",
+          "revision": 1
+        },
+        "basis": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "observation",
+            "id": "observation-1",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ]
+      }
+    ],
+    "matching_rule": {
+      "namespace": "example",
+      "id": "exact-key",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "evidence": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "observation",
+        "id": "observation-1",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "assessed_as_of": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "candidate_set": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.association_candidates",
+      "record_type": "matter:projection",
+      "id": "candidate-set-1",
+      "revision": 1
+    },
+    "evaluation": {
+      "producer": {
+        "namespace": "example",
+        "id": "synthetic-evaluator",
+        "version": "1.0",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "outcome": "evaluation_failed",
+      "selected": [],
+      "uncertainty": {
+        "schema": {
+          "namespace": "example",
+          "id": "synthetic-value",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "value": {
+          "status": "deterministic"
+        }
+      },
+      "qualification": {
+        "status": "not_required",
+        "reason": "The synthetic exact-key comparison has no learned judgment."
+      },
+      "reason": "Synthetic evaluator did not finish.",
+      "missing_evidence": []
+    }
+  }
+}

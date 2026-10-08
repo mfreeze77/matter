@@ -1,6 +1,6 @@
 # Core information and operation contract
 
-Status: governing specification. MAT-002 implements the [version 1.0 structural schemas](schema-inventory.md) and [canonical encoding](canonical.md). MAT-003 implements the [transactional storage port](../storage.md), qualified by its own [acceptance evidence](../validation/MAT-003.md). MAT-004 implements [immutable observation intake](../observations.md). MAT-005 implements [continuing matter identity and revisioned metadata](../matters.md). MAT-006 implements [explicit occurrence membership and provenance-group counts](../occurrences.md). MAT-007 implements [immutable scoped claims, cited evidence, and acceptance history](../claims.md). Semantic identity association, assessment, lifecycle, and delivery remain tracked by MAT-008 through MAT-025. Each implemented component has bounded acceptance evidence; it does not qualify those later guarantees. A ticket is complete only with its own recorded acceptance evidence.
+Status: governing specification. MAT-002 implements the [version 1.0 structural schemas](schema-inventory.md) and [canonical encoding](canonical.md). MAT-003 implements the [transactional storage port](../storage.md), qualified by its own [acceptance evidence](../validation/MAT-003.md). MAT-004 implements [immutable observation intake](../observations.md). MAT-005 implements [continuing matter identity and revisioned metadata](../matters.md). MAT-006 implements [explicit occurrence membership and provenance-group counts](../occurrences.md). MAT-007 implements [immutable scoped claims, cited evidence, and acceptance history](../claims.md). MAT-008 implements [bounded candidate proposals and authorized association decisions](../associations.md). Semantic ranking, equivalence merges, general host control epochs, assessment, lifecycle, and delivery remain tracked by their later tickets. Each implemented component has bounded acceptance evidence; it does not qualify those later guarantees. A ticket is complete only with its own recorded acceptance evidence.
 
 ## Purpose and sources
 
@@ -100,6 +100,10 @@ Exact identifiers may nominate candidates only within their declared source, ent
 
 A proposal MUST retain candidate IDs and revisions, alternatives considered, matching rule/version, supporting evidence, and any qualification. Acceptance is a separate compare-and-set operation using current candidate revisions and host/profile authority. A policy may permit high-quality automated attachment without permitting matter merge.
 
+MAT-008 implements a bounded host-published candidate registry. Each candidate-set revision binds the query, declared catalog, exact candidate and evidence pins, and coverage. Exact-key proposals compare adapter catalog keys; semantic proposals preserve an external declaration without running a provider. No-match, ambiguity, insufficient evidence, and evaluation failure remain separate. Acceptance requires the proposal's still-current candidate set and every catalog member, an admitted actor and actual host-origin authority receipt, and the configured relationship policy. A new matching candidate must be published in that catalog to invalidate earlier uniqueness; the service does not discover external candidates.
+
+Rejection and protection are durable pair dispositions independent of proposal IDs and relationship versions. They may atomically revoke a prior active attachment. A later authorized release preserves the decision history and requires a fresh acceptance; retrying an earlier success cannot reactivate a revoked edge. Attachment and relatedness never merge member identities. A protected non-merge disposition does not prohibit separately authorized attachment. The policy's semantic-acceptance flag represents explicit host review, not evaluator qualification. The [association API](../associations.md) defines this boundary; merge execution, general control epochs, and transitive invalidation remain separate work.
+
 Merging two matters is a separate operation that requires explicit merge authority and an auditable equivalence basis. It MUST:
 
 1. Verify scopes, expected revisions, rejection/undo dispositions, and permissions.
@@ -151,8 +155,10 @@ Every mutation requires a command ID, idempotency key, scope, actor/authority re
 | create_matter | Scope and identity policy; no run-only identity | created, existing, identity_conflict |
 | update_matter_metadata | Current matter dependency, scope, bounded display metadata | updated, unchanged, stale, forbidden |
 | commit_occurrence_grouping | Exact event keys, pinned memberships, declared root provenance, authority, affected dependencies | committed, unchanged, stale, forbidden, association_conflict |
-| propose_association | Valid candidate references and evidence | proposal, no_match, ambiguous, insufficient_evidence |
-| accept_association | Candidate revisions, declared authority | accepted, stale, forbidden, association_conflict |
+| publish_association_candidates | Admitted host authority, declared query/catalog, coverage, previous candidate-set revision | published, unchanged, stale, forbidden |
+| propose_association | Current candidate-set and member references, evidence, matching rule, declared evaluation | proposal, no_match, ambiguous, insufficient_evidence, evaluation_failed |
+| accept_association | Current candidate set and members, host capability, persistent pair dispositions | accepted, stale, forbidden, association_conflict |
+| decide_association | Host authority, exact pair and prior disposition, explicit correction permission for release | applied, unchanged, stale, forbidden, association_conflict |
 | append_claim / relate_evidence | Claim scope, proposition version, locator | appended, duplicate, invalid_evidence |
 | revise_evidence_acceptance | Exact relation revision, bounded acceptance, same-scope authority, cited receipt | updated, unchanged, stale, forbidden, invalid_evidence |
 | link_matters | Relationship schema, scope, no forbidden cycles | linked, relation_conflict |

@@ -781,6 +781,168 @@
       "schema": "command",
       "valid": false,
       "description": "An acceptance revision cannot change the cited proposition target."
+    },
+    {
+      "path": "commands/publish_association_candidates.json",
+      "schema": "command",
+      "valid": true,
+      "description": "A scoped host-published exact-key catalog declares its bounded coverage."
+    },
+    {
+      "path": "commands/publish_association_candidates__semantic.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Semantic catalog publication names prior exact projection and carries no exact query keys."
+    },
+    {
+      "path": "commands/propose_association__catalog.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Frozen proposal input binds an exact catalog snapshot and external output without granting authority."
+    },
+    {
+      "path": "commands/propose_association__evaluation_failed.json",
+      "schema": "command",
+      "valid": true,
+      "description": "An explicit failed evaluator declaration can be preserved as evidence, never as a match."
+    },
+    {
+      "path": "commands/accept_association__catalog.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Acceptance separately names candidate-set revision, relation, policy, and decision time."
+    },
+    {
+      "path": "commands/decide_association.json",
+      "schema": "command",
+      "valid": true,
+      "description": "A bounded protected disposition is separate from candidate evaluation."
+    },
+    {
+      "path": "commands/decide_association__release.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Release explicitly names the prior disposition snapshot; it does not accept a proposal."
+    },
+    {
+      "path": "records/association_proposal__catalog.json",
+      "schema": "record",
+      "valid": true,
+      "description": "An immutable proposal retains the catalog, coverage, time, and exact evaluation receipt."
+    },
+    {
+      "path": "records/association_proposal__evaluation_failed.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Failed evaluation is retained without a selected candidate."
+    },
+    {
+      "path": "records/accepted_association__decision.json",
+      "schema": "record",
+      "valid": true,
+      "description": "An accepted attachment retains independent host decision and candidate-set dependencies."
+    },
+    {
+      "path": "results/publish_association_candidates__published.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Candidate publication returns the exact current catalog and explicit local dependency changes."
+    },
+    {
+      "path": "results/publish_association_candidates__unchanged.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Candidate publication returns the exact current catalog and explicit local dependency changes."
+    },
+    {
+      "path": "results/decide_association__applied.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Disposition result names durable decision, current disposition, and any affected accepted edges."
+    },
+    {
+      "path": "results/decide_association__unchanged.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Disposition result names durable decision, current disposition, and any affected accepted edges."
+    },
+    {
+      "path": "results/propose_association__proposal__catalog.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Every proposal conclusion can preserve the immutable proposal and catalog snapshot."
+    },
+    {
+      "path": "results/propose_association__no_match__catalog.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Every proposal conclusion can preserve the immutable proposal and catalog snapshot."
+    },
+    {
+      "path": "results/propose_association__ambiguous__catalog.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Every proposal conclusion can preserve the immutable proposal and catalog snapshot."
+    },
+    {
+      "path": "results/propose_association__insufficient_evidence__catalog.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Every proposal conclusion can preserve the immutable proposal and catalog snapshot."
+    },
+    {
+      "path": "results/propose_association__evaluation_failed.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Recording an evaluator failure succeeds without asserting a semantic match or hiding a storage failure."
+    },
+    {
+      "path": "invalid/association_exact_query_without_keys.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An exact-key catalog must declare at least one scoped identity key."
+    },
+    {
+      "path": "invalid/association_semantic_query_with_keys.json",
+      "schema": "command",
+      "valid": false,
+      "description": "Semantic catalog mode cannot silently claim exact-key semantics."
+    },
+    {
+      "path": "invalid/association_catalog_is_matter.json",
+      "schema": "command",
+      "valid": false,
+      "description": "A catalog dependency is an exact typed projection, not a matter snapshot."
+    },
+    {
+      "path": "invalid/association_failed_evaluation_selects_candidate.json",
+      "schema": "command",
+      "valid": false,
+      "description": "Failed evaluation cannot carry a selected candidate."
+    },
+    {
+      "path": "invalid/association_acceptance_claims_merge.json",
+      "schema": "record",
+      "valid": false,
+      "description": "Accepted association capability cannot represent equivalence merge authority."
+    },
+    {
+      "path": "invalid/association_failure_without_proposal.json",
+      "schema": "result",
+      "valid": false,
+      "description": "A recorded evaluator failure retains exact proposal and catalog dependencies."
+    },
+    {
+      "path": "invalid/association_release_without_revision.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An explicit disposition dependency must pin a snapshot."
+    },
+    {
+      "path": "invalid/association_unchanged_with_changes.json",
+      "schema": "result",
+      "valid": false,
+      "description": "Unchanged disposition cannot claim dependency mutations."
     }
   ]
 }

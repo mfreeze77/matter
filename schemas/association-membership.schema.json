@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/association-membership.schema.json",
+  "title": "Matter accepted association lookup projection v1",
+  "description": "Current accepted edge revision and stable scoped subject/target identity. Runtime checks the full projection against its accepted record and exact watch keys; this projection changes no occurrence membership or matter identity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scope_id",
+    "association",
+    "subject",
+    "target",
+    "relation",
+    "capability"
+  ],
+  "properties": {
+    "scope_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "association": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/accepted_association_dependency"
+    },
+    "subject": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_member_ref"
+    },
+    "target": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_member_ref"
+    },
+    "relation": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    },
+    "capability": {
+      "enum": [
+        "attach",
+        "relate"
+      ]
+    }
+  }
+}

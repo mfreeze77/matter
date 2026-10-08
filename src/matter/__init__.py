@@ -8,7 +8,9 @@ immutable source intake and payloads live in ``matter.observations`` and
 and evidence dependence live in ``matter.occurrences`` and
 ``matter.provenance_groups``. Immutable scoped assertions and cited relations
 live in ``matter.claims``, ``matter.evidence_relations`` and ``matter.citations``.
-Semantic identity association, assessment, and integrations remain backlog work.
+Host-published candidate sets and authorized association decisions live in
+``matter.associations``, ``matter.candidate_sets`` and ``matter.association_policy``.
+Semantic ranking, equivalence merges, assessment, and integrations remain backlog work.
 """
 
-__version__ = "0.1.0.dev6"
+__version__ = "0.1.0.dev7"

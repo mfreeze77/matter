@@ -6,7 +6,7 @@ Matter is a shared foundation for following a continuing subject, preserving its
 
 ## Current status
 
-This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, explicit occurrence grouping, scoped claims and citations, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata. MAT-006 separates reports, happenings, and declared provenance groups with atomic membership corrections and covered counts. MAT-007 adds immutable claim corrections, component-scoped evidence relations, exact citation validation, and revisioned acceptance; the command inventory now contains nineteen variants. Semantic identity association, assessment, provider integrations, and native host integrations remain planned in the backlog.
+This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, explicit occurrence grouping, scoped claims and citations, authorized association decisions, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata. MAT-006 separates reports, happenings, and declared provenance groups with atomic membership corrections and covered counts. MAT-007 adds immutable claim corrections, component-scoped evidence relations, exact citation validation, and revisioned acceptance. MAT-008 adds explicit candidate catalogs, exact-key and external proposals, currentness checks, and authorized attachment and rejection decisions; the command inventory now contains twenty-one variants. Semantic ranking, provider qualification, equivalence merges, general host control epochs, transitive assessment invalidation, and native integrations remain planned in the backlog.
 
 The walkthroughs are deliberately small: their fixtures already contain host-supplied associations and classifications. They demonstrate selected continuity and delivery rules; they do not infer semantic meaning, execute an agent hook, call JEV, train a speaker model, or establish production correctness.
 
@@ -160,6 +160,34 @@ and adapter contracts. Run its complete installed-package example with:
 python examples/claim_evidence.py
 ```
 
+## Propose associations and authorize acceptance
+
+`matter.associations.AssociationService` uses a host-published candidate catalog
+with an explicit query, candidate revisions, source evidence, and coverage.
+Exact-key matching and externally supplied semantic proposals retain their
+alternatives and distinguish no match, ambiguity, insufficient evidence, and
+evaluation failure. Publishing a new matching candidate or changing a catalog
+member prevents acceptance of a stale proposal; external discovery and ranking
+remain the adapter's responsibility.
+
+`AssociationPolicy` binds the host's admitted actors, actual host-origin
+authority receipts, matching rules, and relationship capabilities. A confidence
+score or claimed qualification does not grant permission. `allow_semantic`
+permits explicit host-reviewed acceptance, without qualifying a provider.
+Attachment and relatedness preserve member identity; this policy never permits
+matter merges.
+
+Rejections and protected separations persist across new proposals and restarts.
+They can revoke an existing attachment atomically; an explicit release requires
+correction authority and preserves the prior decisions. Exact retry returns its
+historical result without undoing a later rejection. These bounded decisions do
+not implement the general control-epoch or assessment-invalidation engines.
+See the [association API](docs/associations.md) and run the synthetic example:
+
+```bash
+python examples/association_acceptance.py
+```
+
 ## Read the specification
 
 | Document | Responsibility |
@@ -174,6 +202,7 @@ python examples/claim_evidence.py
 | [Matter identity](docs/matters.md) | Persistent scoped subject keys, conflicts, metadata revisions, and continuity across runs |
 | [Occurrences and provenance](docs/occurrences.md) | Exact happenings, accepted memberships, correction history, dependence declarations, and covered counts |
 | [Claims and citations](docs/claims.md) | Immutable assertion branches, component-scoped evidence, exact locator receipts, and acceptance history |
+| [Association proposals and decisions](docs/associations.md) | Explicit candidate catalogs, revision checks, host authority, persistent rejection, and authorized correction |
 | [Rule contract](docs/contracts/rules.md) | Meaning, outcomes, qualification, dependencies, and composition |
 | [Lifecycle contract](docs/contracts/lifecycle.md) | Reassessment, resolution, reopening, attention, and delivery |
 | [JEV design](docs/jev.md) | Replaceable semantic execution and question/version handling |
@@ -190,6 +219,7 @@ python examples/claim_evidence.py
 | [Matter identity validation receipt](docs/validation/MAT-005.md) | What was executed for MAT-005 |
 | [Occurrence validation receipt](docs/validation/MAT-006.md) | What was executed for MAT-006 |
 | [Claim and citation validation receipt](docs/validation/MAT-007.md) | What was executed for MAT-007 |
+| [Association validation receipt](docs/validation/MAT-008.md) | What was executed for MAT-008 |
 
 ## What this repo owns
 

@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/association-evaluation.schema.json",
+  "title": "Matter immutable association evaluation details v1",
+  "description": "Frozen subject, candidate catalog, complete considered alternatives, evidence, and evaluator output. Evaluation failure remains inspectable and confers no acceptance authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scope_id",
+    "subject",
+    "candidate_set",
+    "candidates",
+    "matching_rule",
+    "evidence",
+    "assessed_as_of",
+    "evaluation",
+    "mode",
+    "coverage",
+    "outcome",
+    "selected"
+  ],
+  "properties": {
+    "scope_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "subject": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_member_dependency"
+    },
+    "candidate_set": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/candidate"
+      }
+    },
+    "matching_rule": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+      }
+    },
+    "assessed_as_of": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+    },
+    "evaluation": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_evaluation"
+    },
+    "mode": {
+      "enum": [
+        "exact_keys",
+        "semantic"
+      ]
+    },
+    "coverage": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/coverage"
+    },
+    "outcome": {
+      "enum": [
+        "matched",
+        "no_match",
+        "ambiguous",
+        "insufficient_evidence",
+        "evaluation_failed"
+      ]
+    },
+    "selected": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_member_dependency"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "matched"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "selected": {
+            "minItems": 1,
+            "maxItems": 1
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "selected": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "ambiguous"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "candidates": {
+            "minItems": 2
+          }
+        }
+      }
+    }
+  ]
+}

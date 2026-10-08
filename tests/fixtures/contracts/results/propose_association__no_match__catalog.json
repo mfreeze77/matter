@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "operation": "propose_association",
+  "operation_id": "operation-propose_association",
+  "status": "success",
+  "outcome": "no_match",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "candidates": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "matter",
+        "id": "matter-1",
+        "revision": 1
+      }
+    ],
+    "coverage": {
+      "status": "complete",
+      "snapshot": {
+        "namespace": "example",
+        "id": "snapshot",
+        "version": "1.0",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    "evidence": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "observation",
+        "id": "observation-1",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "selected": [],
+    "proposal": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "association_proposal",
+      "id": "association_proposal-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "candidate_set": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.association_candidates",
+      "record_type": "matter:projection",
+      "id": "candidate-set-1",
+      "revision": 1
+    },
+    "changes": [
+      {
+        "cause": "association_correction",
+        "before": [],
+        "after": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "association_proposal",
+            "id": "association_proposal-1",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ]
+      }
+    ]
+  }
+}

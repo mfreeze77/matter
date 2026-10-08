@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "operation": "publish_association_candidates",
+  "operation_id": "command-publish_association_candidates",
+  "status": "success",
+  "outcome": "published",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "candidate_set": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.association_candidates",
+      "record_type": "matter:projection",
+      "id": "candidate-set-1",
+      "revision": 1
+    },
+    "changes": [
+      {
+        "cause": "association_correction",
+        "before": [],
+        "after": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "matter.association_candidates",
+            "record_type": "matter:projection",
+            "id": "candidate-set-1",
+            "revision": 1
+          }
+        ]
+      }
+    ]
+  }
+}
