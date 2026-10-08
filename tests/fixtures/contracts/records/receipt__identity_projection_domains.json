@@ -1,0 +1,228 @@
+{
+  "schema_version": "1.0",
+  "record_type": "receipt",
+  "scope_id": "synthetic:mat002",
+  "namespace": "example",
+  "id": "synthetic-identity-projection-domains",
+  "creation_receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "receipt-1"
+  },
+  "provenance": {
+    "origin": "system",
+    "producer": {
+      "namespace": "example",
+      "id": "fixture-producer",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "parents": []
+  },
+  "body": {
+    "stage": "creation",
+    "operation_id": "operation-1",
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "outcome": "matter:committed",
+    "evidence": [],
+    "details": {
+      "schema": {
+        "namespace": "example",
+        "id": "receipt-details",
+        "version": "1.0",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "value": {
+        "synthetic": true
+      }
+    }
+  },
+  "extensions": {
+    "example:identity-group": {
+      "schema": {
+        "namespace": "matter",
+        "id": "identity-group",
+        "version": "1.0",
+        "digest": "5ccb10debe5486c42c530ba5820c142ed434e45ccefffd6e4aa3be0e1dcec375"
+      },
+      "value": {
+        "scope_id": "synthetic:mat002",
+        "member": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "matter",
+          "id": "matter-2"
+        },
+        "survivor": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "matter",
+          "id": "matter-1"
+        },
+        "members": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-1"
+          },
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-2"
+          }
+        ],
+        "decision": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "receipt",
+          "id": "synthetic-identity-decision",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "example:identity-separation": {
+      "schema": {
+        "namespace": "matter",
+        "id": "identity-separation",
+        "version": "1.0",
+        "digest": "38634e6214287a743a2647ef93a85844dc7170cf3ef2791d554daf76b8bae8a0"
+      },
+      "value": {
+        "scope_id": "synthetic:mat002",
+        "members": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-1"
+          },
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-2"
+          }
+        ],
+        "status": "protected",
+        "decision": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "receipt",
+          "id": "synthetic-identity-decision",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "previous": null
+      }
+    },
+    "example:identity-dependency": {
+      "schema": {
+        "namespace": "matter",
+        "id": "identity-dependency",
+        "version": "1.0",
+        "digest": "312184b06ec528aa5e59898e507b956bb1d3b18a406e62dcfc583e8635a7a924"
+      },
+      "value": {
+        "scope_id": "synthetic:mat002",
+        "reference": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "assessment",
+          "id": "assessment-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "original_matters": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-1"
+          },
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-2"
+          }
+        ],
+        "dependencies": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-1",
+            "revision": 2
+          },
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-2",
+            "revision": 2
+          },
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "matter.identity_groups",
+            "record_type": "matter:projection",
+            "id": "synthetic-group-matter-1",
+            "revision": 1
+          },
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "matter.identity_groups",
+            "record_type": "matter:projection",
+            "id": "synthetic-group-matter-2",
+            "revision": 1
+          }
+        ],
+        "status": "current",
+        "invalidation": null
+      }
+    },
+    "example:matter-link-index": {
+      "schema": {
+        "namespace": "matter",
+        "id": "matter-link-index",
+        "version": "1.0",
+        "digest": "4e98a6c48e2a8c40ba1d9511b12324ac82f43e10779c7418c7975085d33477c3"
+      },
+      "value": {
+        "scope_id": "synthetic:mat002",
+        "relation": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "matter_relation",
+          "id": "matter_relation-1",
+          "revision": 1
+        },
+        "rule": {
+          "kind": "example:related_to",
+          "namespace": "example",
+          "id": "synthetic-related-to",
+          "version": "1.0",
+          "directed": false,
+          "allow_self": false,
+          "acyclic": false
+        },
+        "authority": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "receipt",
+          "id": "authority-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    }
+  }
+}

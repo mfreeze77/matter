@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/identity-dependency.schema.json",
+  "title": "Matter registered identity dependency validity v1",
+  "description": "Host-registered derived assessment/projection validity, indexed by original matter identities. Identity changes invalidate it in the same transaction; transitive and delivery engines are separate.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scope_id",
+    "reference",
+    "original_matters",
+    "dependencies",
+    "status",
+    "invalidation"
+  ],
+  "properties": {
+    "scope_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "reference": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+    },
+    "original_matters": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_ref"
+      },
+      "minItems": 1
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+      },
+      "minItems": 1
+    },
+    "status": {
+      "enum": [
+        "current",
+        "invalidated"
+      ]
+    },
+    "invalidation": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+        }
+      ]
+    }
+  }
+}

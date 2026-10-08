@@ -36,6 +36,7 @@
     "link_matters",
     "merge_matters",
     "correct_merge",
+    "release_identity_separations",
     "record_control",
     "commit_assessment",
     "invalidate_dependents",
@@ -128,6 +129,9 @@
     "decide_association": [
       "applied",
       "unchanged"
+    ],
+    "release_identity_separations": [
+      "released"
     ]
   },
   "error_codes": [

@@ -196,6 +196,9 @@ neutral core. No code or deployment in the source repository was changed.
 The [MAT-005 validation receipt](validation/MAT-005.md) maps executed continuity,
 scope, conflict, metadata, concurrency, crash, packaging, and restore checks to
 the ticket's acceptance criteria. These establish the exact-key reference
-implementation on local SQLite. Semantic clustering, association (MAT-008),
-guarded merges and identity repair (MAT-009), assessment execution (MAT-015),
-lifecycle (MAT-017), and purpose/audience engines (MAT-018) remain separate work.
+implementation on local SQLite. Association decisions are implemented by
+[MAT-008](associations.md); guarded identity groups, corrected partitions and
+redirect-aware exact-key resolution are implemented by [MAT-009](identity-corrections.md).
+Original key bindings remain intact. Semantic clustering, assessment execution
+(MAT-015), lifecycle (MAT-017), and purpose/audience engines (MAT-018) remain
+separate work.

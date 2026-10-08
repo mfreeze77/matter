@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "operation": "correct_merge",
+  "operation_id": "operation-correct_merge",
+  "status": "success",
+  "outcome": "committed",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "matters": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "matter",
+        "id": "matter-1",
+        "revision": 2
+      },
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "matter",
+        "id": "matter-2",
+        "revision": 2
+      }
+    ],
+    "correction_receipt": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "correction-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "identity_views": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "matter.identity_groups",
+        "record_type": "matter:projection",
+        "id": "synthetic-group-matter-1",
+        "revision": 1
+      },
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "matter.identity_groups",
+        "record_type": "matter:projection",
+        "id": "synthetic-group-matter-2",
+        "revision": 1
+      }
+    ],
+    "changes": [
+      {
+        "cause": "association_correction",
+        "before": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-1",
+            "revision": 1
+          },
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-2",
+            "revision": 1
+          }
+        ],
+        "after": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-1",
+            "revision": 2
+          },
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-2",
+            "revision": 2
+          },
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "matter.identity_groups",
+            "record_type": "matter:projection",
+            "id": "synthetic-group-matter-1",
+            "revision": 1
+          },
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "matter.identity_groups",
+            "record_type": "matter:projection",
+            "id": "synthetic-group-matter-2",
+            "revision": 1
+          }
+        ]
+      }
+    ]
+  }
+}

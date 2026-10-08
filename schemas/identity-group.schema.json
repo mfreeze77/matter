@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/identity-group.schema.json",
+  "title": "Matter current identity group mirror v1",
+  "description": "One direct survivor and complete original matter partition, mirrored at every member. Original keys and child endpoints remain unchanged; runtime verifies all mirrors and the immutable identity decision.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scope_id", "member", "survivor", "members", "decision"],
+  "properties": {
+    "scope_id": {"$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"},
+    "member": {"$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_ref"},
+    "survivor": {"$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_ref"},
+    "members": {
+      "type": "array", "minItems": 1, "maxItems": 4096, "uniqueItems": true,
+      "items": {"$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_ref"}
+    },
+    "decision": {"$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"}
+  }
+}

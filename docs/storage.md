@@ -162,10 +162,12 @@ projections; replacing a projection atomically replaces its registrations.
 pins. The writer transaction prevents another writer from inserting a phantom
 registration during that command.
 
-The store does not resolve aliases, interpret negative-evidence predicates, or
-invalidate downstream assessments. MAT-009, MAT-010, and MAT-016 supply those
-rules. The restore tests establish that stored alias values and registrations
-survive, not that merge or absence semantics are already implemented.
+The storage port does not interpret identity or negative-evidence predicates.
+[MAT-009](identity-corrections.md) builds verified identity groups and atomic
+registered-validity hooks on this port. MAT-010 and MAT-016 retain their temporal
+and transitive invalidation responsibilities. Storage restore tests prove that
+values and registrations survive; each domain service has separate behavioral
+acceptance evidence.
 
 ## Receipts and explicit failures
 

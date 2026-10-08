@@ -1,0 +1,208 @@
+{
+  "schema_version": "1.0",
+  "record_type": "receipt",
+  "scope_id": "synthetic:mat002",
+  "namespace": "example",
+  "id": "synthetic-identity-release-receipt",
+  "creation_receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "receipt-1"
+  },
+  "provenance": {
+    "origin": "host",
+    "producer": {
+      "namespace": "example",
+      "id": "fixture-producer",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "parents": []
+  },
+  "body": {
+    "stage": "authority",
+    "operation_id": "operation-1",
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "outcome": "matter:identity_release",
+    "evidence": [],
+    "details": {
+      "schema": {
+        "namespace": "matter",
+        "id": "identity-release",
+        "version": "1.0",
+        "digest": "22fede4ef3e15a8e72d90089f56ffc366d03d3ed0d61c2c385af05511dd7f85c"
+      },
+      "value": {
+        "scope_id": "synthetic:mat002",
+        "actor": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example:host",
+          "id": "actor-1"
+        },
+        "authority": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "receipt",
+          "id": "authority-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "policy": {
+          "namespace": "example",
+          "id": "merge-policy",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "policy_definition": {
+          "scope_id": "synthetic:mat002",
+          "actors": [
+            {
+              "scope_id": "synthetic:mat002",
+              "namespace": "example:host",
+              "id": "actor-1"
+            }
+          ],
+          "authorities": [
+            {
+              "scope_id": "synthetic:mat002",
+              "namespace": "example",
+              "record_type": "receipt",
+              "id": "authority-1",
+              "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ],
+          "allow_correction": true,
+          "capability": "merge"
+        },
+        "basis": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "observation",
+            "id": "observation-1",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "as_of": {
+          "state": "known",
+          "value": "2026-10-08T16:00:00Z",
+          "precision": "second"
+        },
+        "reason": "Synthetic explicit host reconsideration; structural fixture does not grant runtime authority.",
+        "separations": [
+          {
+            "before": {
+              "scope_id": "synthetic:mat002",
+              "namespace": "matter.identity_separations",
+              "record_type": "matter:projection",
+              "id": "synthetic-separation-1",
+              "revision": 1
+            },
+            "after": {
+              "scope_id": "synthetic:mat002",
+              "namespace": "matter.identity_separations",
+              "record_type": "matter:projection",
+              "id": "synthetic-separation-1",
+              "revision": 2
+            },
+            "members": [
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-1"
+              },
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-2"
+              }
+            ],
+            "protected_by": {
+              "scope_id": "synthetic:mat002",
+              "namespace": "example",
+              "record_type": "receipt",
+              "id": "synthetic-identity-decision",
+              "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          }
+        ],
+        "changes": [
+          {
+            "cause": "disposition_change",
+            "before": [
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "matter.identity_separations",
+                "record_type": "matter:projection",
+                "id": "synthetic-separation-1",
+                "revision": 1
+              }
+            ],
+            "after": [
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "matter.identity_separations",
+                "record_type": "matter:projection",
+                "id": "synthetic-separation-1",
+                "revision": 2
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "extensions": {
+    "example:released-separation": {
+      "schema": {
+        "namespace": "matter",
+        "id": "identity-separation",
+        "version": "1.0",
+        "digest": "38634e6214287a743a2647ef93a85844dc7170cf3ef2791d554daf76b8bae8a0"
+      },
+      "value": {
+        "scope_id": "synthetic:mat002",
+        "members": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-1"
+          },
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-2"
+          }
+        ],
+        "status": "released",
+        "decision": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "receipt",
+          "id": "synthetic-release-receipt",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "previous": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "matter.identity_separations",
+          "record_type": "matter:projection",
+          "id": "synthetic-separation-1",
+          "revision": 1
+        }
+      }
+    }
+  }
+}
