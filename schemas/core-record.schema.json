@@ -1131,6 +1131,9 @@
         },
         "next_check_at": {
           "$ref": "#/$defs/known_time"
+        },
+        "assessed_as_of": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
         }
       },
       "anyOf": [
@@ -1519,7 +1522,9 @@
         "purpose_change",
         "audience_change",
         "disposition_change",
-        "temporal_transition"
+        "temporal_transition",
+        "coverage_change",
+        "negative_scope_arrival"
       ]
     },
     "assessed_proposition": {
@@ -4259,6 +4264,76 @@
         }
       ],
       "description": "Frozen matching output recorded in an immutable evaluation receipt. Producer, confidence, and qualification are evidence about evaluation, never permission to accept, override, or merge."
+    },
+    "coverage_specification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "query",
+        "eligible_sources",
+        "observed_interval"
+      ],
+      "properties": {
+        "query": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
+        },
+        "eligible_sources": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identity_key"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        },
+        "observed_interval": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_interval"
+        }
+      }
+    },
+    "coverage_member_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference",
+        "ownership"
+      ],
+      "properties": {
+        "reference": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+        },
+        "ownership": {
+          "enum": [
+            "machine",
+            "operator",
+            "reviewed",
+            "rejected"
+          ]
+        }
+      }
+    },
+    "coverage_source_baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "observations",
+        "history_complete"
+      ],
+      "properties": {
+        "source": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identity_key"
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/observation_dependency"
+          },
+          "maxItems": 4096
+        },
+        "history_complete": {
+          "const": true
+        }
+      }
     }
   }
 }

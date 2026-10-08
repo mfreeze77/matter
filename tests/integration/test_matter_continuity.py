@@ -100,7 +100,7 @@ class MatterContinuityTests(MatterTestCase):
             evidence = reopened.get(message["evidence"]["body"]["observation"])
             self.assertEqual(evidence["provenance"]["run_id"], "run:new-process")
             self.assertEqual(stored["provenance"], original["body"]["matter"]["provenance"])
-        self.assertEqual(self.record_counts(), {"matter": 1, "matter:projection": 2, "observation": 1, "receipt": 3})
+        self.assertEqual(self.record_counts(), {"matter": 1, "matter:projection": 3, "observation": 1, "receipt": 3})
 
     def test_all_new_keys_commit_one_matter_and_each_key_binding_with_one_receipt(self):
         keys = [identity_key("subject-a"), identity_key("registry-a", "example:registry")]
@@ -497,7 +497,7 @@ class MatterContinuityTests(MatterTestCase):
         result = observations.ingest(observations.prepare(command), payload=PAYLOAD)
         self.assertEqual(result["outcome"], "committed")
         self.assertIsNone(self.service.resolve([identity_key()]))
-        self.assertEqual(self.record_counts(), {"observation": 1, "matter:projection": 1, "receipt": 1})
+        self.assertEqual(self.record_counts(), {"observation": 1, "matter:projection": 2, "receipt": 1})
 
     def test_unavailable_storage_does_not_turn_resolution_into_no_match(self):
         self._new()

@@ -6,7 +6,7 @@ Matter is a shared foundation for following a continuing subject, preserving its
 
 ## Current status
 
-This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, explicit occurrence grouping, scoped claims and citations, authorized association decisions, typed relationships and reversible identity correction, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata. MAT-006 separates reports, happenings, and declared provenance groups with atomic membership corrections and covered counts. MAT-007 adds immutable claim corrections, component-scoped evidence relations, exact citation validation, and revisioned acceptance. MAT-008 adds explicit candidate catalogs, exact-key and external proposals, currentness checks, and authorized attachment and rejection decisions. MAT-009 adds typed relationship constraints, complete guarded identity groups, retained evidence/conflicts, protected undo/split, explicit separation release, and atomic registered-dependency invalidation; the command inventory now contains twenty-two variants. Semantic ranking, provider qualification, general host control epochs, transitive assessment invalidation, and native integrations remain planned in the backlog.
+This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, explicit occurrence grouping, scoped claims and citations, authorized association decisions, typed relationships, reversible identity correction, temporal coverage and negative evidence scopes, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata. MAT-006 separates reports, happenings, and declared provenance groups with atomic membership corrections and covered counts. MAT-007 adds immutable claim corrections, component-scoped evidence relations, exact citation validation, and revisioned acceptance. MAT-008 adds explicit candidate catalogs, exact-key and external proposals, currentness checks, and authorized attachment and rejection decisions. MAT-009 adds typed relationship constraints, complete guarded identity groups, retained evidence/conflicts, protected undo/split, explicit separation release, and atomic registered-dependency invalidation. MAT-010 adds nanosecond-preserving time views, explicit source catalogs and historical initialization, protected complete-scope replacement, and atomic negative watches for previously unknown observation IDs; the command inventory now contains twenty-four variants. Semantic ranking, provider qualification, general host control epochs, transitive assessment invalidation, and native integrations remain planned in the backlog.
 
 The walkthroughs are deliberately small: their fixtures already contain host-supplied associations and classifications. They demonstrate selected continuity and delivery rules; they do not infer semantic meaning, execute an agent hook, call JEV, train a speaker model, or establish production correctness.
 
@@ -212,6 +212,35 @@ and run the complete installed-package example:
 python examples/identity_corrections.py
 ```
 
+## Preserve knowledge time and covered absence
+
+`matter.time` separates what was available at a knowledge cut from when a
+proposition applies. Late-discovered evidence can revise today's understanding
+of yesterday while remaining excluded from yesterday's knowledge view.
+Unknown event times stay unknown, and comparisons preserve nanoseconds.
+
+`matter.coverage.CoverageService` records explicit source/query/interval
+snapshots, collection failures, historical initialization, and exact catalog
+populations. Only adequate complete replacement can establish covered absence
+or retire its own machine-owned membership under an admitted host policy.
+Partial collection and incremental silence retain previous state; operator,
+reviewed and rejected members remain protected.
+
+Negative watches bind the actual coverage proof, host derivative, original
+knowledge boundary, and expiry or next-check. New matching observations
+invalidate every affected current watch atomically with ingestion, including
+observations whose IDs were unknown when the watch was created. Unrelated
+arrivals leave narrow watches usable. Clock progression reports due or expired
+work without inventing events or resolving matters.
+
+See the [time and coverage API](docs/time-coverage.md) for source initialization,
+typed predicates, historical views, direct validity gates and qualification
+limits. Run the complete installed-package example with:
+
+```bash
+python examples/time_coverage.py
+```
+
 ## Read the specification
 
 | Document | Responsibility |
@@ -228,6 +257,7 @@ python examples/identity_corrections.py
 | [Claims and citations](docs/claims.md) | Immutable assertion branches, component-scoped evidence, exact locator receipts, and acceptance history |
 | [Association proposals and decisions](docs/associations.md) | Explicit candidate catalogs, revision checks, host authority, persistent rejection, and authorized correction |
 | [Identity corrections](docs/identity-corrections.md) | Typed links, guarded complete-group merges, retained conflicts, protected correction/release, and atomic validity hooks |
+| [Time and coverage](docs/time-coverage.md) | Explicit temporal views, source-history initialization, complete-scope replacement and negative watches |
 | [Rule contract](docs/contracts/rules.md) | Meaning, outcomes, qualification, dependencies, and composition |
 | [Lifecycle contract](docs/contracts/lifecycle.md) | Reassessment, resolution, reopening, attention, and delivery |
 | [JEV design](docs/jev.md) | Replaceable semantic execution and question/version handling |
@@ -246,6 +276,7 @@ python examples/identity_corrections.py
 | [Claim and citation validation receipt](docs/validation/MAT-007.md) | What was executed for MAT-007 |
 | [Association validation receipt](docs/validation/MAT-008.md) | What was executed for MAT-008 |
 | [Identity correction validation receipt](docs/validation/MAT-009.md) | What was executed for MAT-009 |
+| [Time and coverage validation receipt](docs/validation/MAT-010.md) | What was executed for MAT-010 |
 
 ## What this repo owns
 

@@ -10,7 +10,6 @@ text, authorize host controls, or infer absence from an empty source history.
 from __future__ import annotations
 
 from copy import deepcopy
-from datetime import datetime
 from functools import lru_cache
 from importlib.resources import files
 import json
@@ -24,6 +23,7 @@ from .contracts import ContractError, command_digest, schema_for, validate_comma
 from .payloads import PayloadRead, PayloadStore
 from .storage import PROJECTION_TYPE, Snapshot, Storage, StorageError, Transaction, entity_ref, pin
 from .storage.base import _validate_fragment
+from .time import known_time_key as _known_time_key, validate_interval
 
 
 INDEX_NAMESPACE = "matter.observations"
@@ -148,17 +148,6 @@ def _command(value: dict[str, Any]) -> dict[str, Any]:
     return command
 
 
-def _known_time_key(value: dict[str, Any]) -> tuple[str, str]:
-    value = _validate_fragment(value, "known_time")
-    stamp = value["value"]
-    try:
-        datetime.strptime(stamp[:19], "%Y-%m-%dT%H:%M:%S")
-    except ValueError:
-        raise StorageError("E_SCHEMA_INVALID") from None
-    # Keep all nine fractional digits; datetime would truncate nanoseconds.
-    return stamp[:19], stamp[20:-1].ljust(9, "0") if "." in stamp else "000000000"
-
-
 class ObservationIngestor:
     """A trusted host's source-data handler, bound to one readable scope.
 
@@ -234,6 +223,15 @@ class ObservationIngestor:
             # pins; the transaction turns them into durable revision refusals.
             for reference in observation["provenance"]["parents"] + observation.get("supersedes", []):
                 include(reference)
+            # The source bucket covers future event IDs. Both catalog reads and
+            # watch discovery are repeated under the write transaction, so a
+            # first arrival/registration cannot pass an older prepared command.
+            from .occurrences import _ReadCollector
+            from .source_catalogs import read_catalog, source_key
+            from .negative_dependencies import collect_arrival_watches
+            guarded = _ReadCollector(view, include)
+            read_catalog(guarded, self.scope_id, source_key(observation["body"]["source_identity"]["namespace"]))
+            collect_arrival_watches(guarded, self.scope_id, observation)
         return validate_command(command)
 
     def ingest(self, command: dict[str, Any], *, payload: bytes | None = None) -> dict[str, Any]:
@@ -256,8 +254,10 @@ class ObservationIngestor:
         observation = command["body"]["observation"]
         source = observation["body"]["source_identity"]
         content = observation["body"]["content"]
-        if observation["namespace"] == INDEX_NAMESPACE:
-            raise StorageError("E_SCOPE_FORBIDDEN", "The observation source-index namespace is reserved.")
+        if observation["namespace"] in {INDEX_NAMESPACE, "matter.source_catalogs", "matter.coverage", "matter.negative_dependencies"}:
+            raise StorageError("E_SCOPE_FORBIDDEN", "The observation service namespaces are reserved.")
+        if "occurred_interval" in observation["body"]:
+            validate_interval(observation["body"]["occurred_interval"])
         if payload is not None:
             if type(payload) is not bytes:
                 raise StorageError("E_SCHEMA_INVALID", "Original payloads must be bytes.")
@@ -331,9 +331,16 @@ class ObservationIngestor:
         if not validator.is_valid(value):
             raise StorageError("E_SCHEMA_INVALID")
         tx.put_projection(source_index_ref(self.scope_id, source), {"schema": descriptor, "value": value})
-        return tx.success("committed", {
+        from .source_catalogs import append_observation
+        from .negative_dependencies import record_arrival
+        append_observation(tx, stored)
+        changes = record_arrival(tx, stored)
+        result_body = {
             "observation": pin(stored), "observation_receipt": stored["creation_receipt"],
-        })
+        }
+        if changes:
+            result_body["changes"] = changes
+        return tx.success("committed", result_body)
 
     def revisions(
         self, source_identity: dict[str, Any], *, as_of: dict[str, Any] | None = None,

@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "operation": "register_negative_watch",
+  "command_id": "command-register_negative_watch",
+  "idempotency_key": "idempotency-register_negative_watch",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [],
+  "body": {
+    "id": "watch-1",
+    "reference": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example:derived",
+      "record_type": "matter:projection",
+      "id": "output-1",
+      "revision": 1
+    },
+    "coverage": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.coverage",
+      "record_type": "matter:projection",
+      "id": "coverage-1",
+      "revision": 1
+    },
+    "as_of": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "previous": null,
+    "coverage_policy": {
+      "namespace": "example",
+      "id": "coverage-policy",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "expires_at": {
+      "state": "known",
+      "value": "2026-10-09T00:00:00Z",
+      "precision": "second"
+    }
+  }
+}

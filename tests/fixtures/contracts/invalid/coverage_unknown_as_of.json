@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.0",
+  "operation": "publish_coverage",
+  "command_id": "command-publish_coverage",
+  "idempotency_key": "idempotency-publish_coverage",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [],
+  "body": {
+    "specification": {
+      "query": {
+        "schema": {
+          "namespace": "matter",
+          "id": "observation-predicate",
+          "version": "1.0",
+          "digest": "d4c26e822417c3c576f0b525c00eb31a13159409a035b70301f66f90fee8140a"
+        },
+        "value": {
+          "record_type": "observation",
+          "clauses": [
+            {
+              "field": "origin",
+              "equals": "source"
+            }
+          ]
+        }
+      },
+      "eligible_sources": [
+        {
+          "namespace": "example:source",
+          "value": "synthetic-feed"
+        }
+      ],
+      "observed_interval": {
+        "start": {
+          "state": "known",
+          "value": "2026-10-01T00:00:00Z",
+          "precision": "second"
+        },
+        "end": {
+          "state": "known",
+          "value": "2026-10-08T15:00:00Z",
+          "precision": "second"
+        },
+        "bounds": "closed_open"
+      }
+    },
+    "catalog": {
+      "namespace": "example",
+      "id": "snapshot",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "coverage": {
+      "status": "complete",
+      "snapshot": {
+        "namespace": "example",
+        "id": "snapshot",
+        "version": "1.0",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    "as_of": {
+      "state": "unknown",
+      "reason": "not_recorded"
+    },
+    "mode": "replacement",
+    "members": [
+      {
+        "reference": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example:derived",
+          "record_type": "matter:projection",
+          "id": "output-1",
+          "revision": 1
+        },
+        "ownership": "machine"
+      }
+    ],
+    "source_baselines": [
+      {
+        "source": {
+          "namespace": "example:source",
+          "value": "synthetic-feed"
+        },
+        "observations": [],
+        "history_complete": true
+      }
+    ],
+    "previous": null,
+    "adapter": {
+      "namespace": "example",
+      "id": "coverage-adapter",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "coverage_policy": {
+      "namespace": "example",
+      "id": "coverage-policy",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  }
+}

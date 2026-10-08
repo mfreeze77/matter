@@ -28,6 +28,7 @@ from .canonical import canonical_bytes, canonical_digest, source_digest
 from .contracts import ContractError, command_digest, schema_for, validate_command, validate_record
 from .storage import PROJECTION_TYPE, Snapshot, Storage, StorageError, Transaction, entity_ref, pin
 from .storage.base import STORAGE_NAMESPACE, _validate_fragment, _validate_projection
+from .time import validate_interval
 
 
 INDEX_NAMESPACE = "matter.claims"
@@ -81,16 +82,7 @@ def validate_applicability(interval: dict[str, Any]) -> dict[str, Any]:
     nine fractional digits avoids converting nanosecond boundaries to a lower
     precision datetime. Unknown endpoints never receive inferred dates.
     """
-    value = _validate_fragment(interval, "time_interval")
-
-    def key(time: dict[str, Any]) -> tuple[str, str]:
-        stamp = time["value"]
-        return stamp[:19], stamp[20:-1].ljust(9, "0") if "." in stamp else "000000000"
-
-    start, end = value["start"], value["end"]
-    if start["state"] == end["state"] == "known" and key(start) > key(end):
-        raise _invalid("A known applicability end cannot precede its start.")
-    return value
+    return validate_interval(interval)
 
 
 def _reference(scope_id: str, reference: dict[str, Any]) -> dict[str, Any]:

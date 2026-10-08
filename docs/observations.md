@@ -217,8 +217,15 @@ digests, and optional revision IDs. Its exact schema digest is recorded in each
 projection. History reads validate the index against immutable records and fail
 explicitly if its content cannot be verified.
 
-This is a bounded source-history facility. MAT-010 still owns general temporal
-dependencies, completeness, coverage, negative evidence, and retirement rules;
-The [matter identity](matters.md) and [occurrence grouping](occurrences.md)
-services supply their bounded MAT-005 and MAT-006 behavior; MAT-007 still owns
-claim and evidence-relation semantics.
+MAT-010 also maintains a revisioned source-namespace catalog on every fresh
+intake. The same transaction checks explicitly registered negative scopes and
+invalidates all affected current watches. A successful fresh intake includes
+`changes` when watches were affected; a duplicate emits no arrival changes.
+The source-family and namespace indexes preserve their separate responsibilities.
+An empty catalog does not certify older history until an authorized host
+declares its baseline. See [time and coverage](time-coverage.md) for admission
+revisions, completeness, protected replacement and current-use checks.
+
+The [matter identity](matters.md), [occurrence grouping](occurrences.md), and
+[claims and citations](claims.md) services supply their separately verified
+identity, membership and evidence-relation behavior.

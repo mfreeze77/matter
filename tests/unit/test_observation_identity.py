@@ -3,6 +3,7 @@
 from copy import deepcopy
 
 from matter.observations import ObservationIngestor, source_index_ref
+from matter.source_catalogs import source_catalog_ref, source_key
 from matter.payloads import FilePayloadStore
 from matter.storage import StorageError, entity_ref, pin
 
@@ -64,7 +65,9 @@ class ObservationIdentityTests(ObservationTestCase):
         self.assertEqual(self.ingestor.heads(source), [stored])
         self.assertEqual(self.storage.get(index_ref), original_index)
         self.assertEqual(self.storage.history(index_ref), [original_index])
-        self.assertEqual(self.record_counts(), {"observation": 1, "matter:projection": 1, "receipt": 101})
+        # One immutable source family and one namespace catalog; redelivery
+        # creates neither another observation nor another indexed population.
+        self.assertEqual(self.record_counts(), {"observation": 1, "matter:projection": 2, "receipt": 101})
         self.assertEqual(self.storage.command_receipt(first_prepared["idempotency_key"])["result"], first)
 
     def test_changed_evidence_metadata_is_not_discarded_as_delivery_metadata(self):
@@ -118,7 +121,9 @@ class ObservationIdentityTests(ObservationTestCase):
         prepared = self.ingestor.prepare(fresh)
         self.assertEqual(fresh, before)
         self.assertEqual(prepared["expected_revisions"][0], pin(record))
-        self.assertEqual(len(prepared["expected_revisions"]), 2)
+        self.assertEqual(len(prepared["expected_revisions"]), 3)
+        catalog = self.storage.get(source_catalog_ref(SCOPE, source_key(record["body"]["source_identity"]["namespace"])))
+        self.assertIn(pin(catalog), prepared["expected_revisions"])
         prepared["body"]["observation"]["body"]["content"]["digest"] = "f" * 64
         self.assertEqual(fresh, before)
 
@@ -135,4 +140,4 @@ class ObservationIdentityTests(ObservationTestCase):
         _, result = self.submit(command, payload)
         self.assertEqual(result["outcome"], "committed")
         self.assertEqual(self.ingestor.read_payload(result["body"]["observation"]).data, payload)
-        self.assertEqual(self.record_counts(), {"observation": 1, "matter:projection": 1, "receipt": 1})
+        self.assertEqual(self.record_counts(), {"observation": 1, "matter:projection": 2, "receipt": 1})

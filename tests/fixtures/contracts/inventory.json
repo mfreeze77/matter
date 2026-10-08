@@ -43,7 +43,9 @@
     "request_transition",
     "prepare_delivery",
     "dispatch",
-    "assess"
+    "assess",
+    "publish_coverage",
+    "register_negative_watch"
   ],
   "success_outcomes": {
     "ingest_observation": [
@@ -132,6 +134,12 @@
     ],
     "release_identity_separations": [
       "released"
+    ],
+    "publish_coverage": [
+      "published"
+    ],
+    "register_negative_watch": [
+      "registered"
     ]
   },
   "error_codes": [

@@ -42,7 +42,9 @@
         "request_transition",
         "prepare_delivery",
         "dispatch",
-        "assess"
+        "assess",
+        "publish_coverage",
+        "register_negative_watch"
       ]
     },
     "command_id": {
@@ -1177,6 +1179,155 @@
                 "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
               }
             }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "publish_coverage"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "specification",
+              "catalog",
+              "coverage",
+              "as_of",
+              "mode",
+              "members",
+              "source_baselines",
+              "previous",
+              "adapter",
+              "coverage_policy"
+            ],
+            "properties": {
+              "specification": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/coverage_specification"
+              },
+              "catalog": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "coverage": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/coverage"
+              },
+              "as_of": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+              },
+              "mode": {
+                "enum": [
+                  "incremental",
+                  "replacement"
+                ]
+              },
+              "members": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/coverage_member_input"
+                },
+                "maxItems": 4096
+              },
+              "source_baselines": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/coverage_source_baseline"
+                },
+                "maxItems": 64
+              },
+              "previous": {
+                "oneOf": [
+                  {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "adapter": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "coverage_policy": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "register_negative_watch"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "reference",
+              "coverage",
+              "as_of",
+              "previous",
+              "coverage_policy"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+              },
+              "reference": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+              },
+              "coverage": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+              },
+              "as_of": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+              },
+              "previous": {
+                "oneOf": [
+                  {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "coverage_policy": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "expires_at": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+              },
+              "next_check_at": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+              }
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "expires_at"
+                ]
+              },
+              {
+                "required": [
+                  "next_check_at"
+                ]
+              }
+            ]
           }
         }
       }

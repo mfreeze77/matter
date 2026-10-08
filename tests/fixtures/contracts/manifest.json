@@ -1081,6 +1081,144 @@
       "schema": "record",
       "valid": true,
       "description": "Synthetic immutable release domain and revised separation domain, with explicit prior protection pins. Structural placeholders do not assert admitted authority or an executed release."
+    },
+    {
+      "path": "commands/publish_coverage.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic MAT-010 structural fixture; no source completeness, authority, or executed outcome is asserted."
+    },
+    {
+      "path": "commands/publish_coverage__partial_replacement.json",
+      "schema": "command",
+      "valid": true,
+      "description": "An incomplete empty replacement is structurally explicit; the runtime must preserve previously owned members rather than infer absence or retirement."
+    },
+    {
+      "path": "commands/publish_coverage__failed_replacement.json",
+      "schema": "command",
+      "valid": true,
+      "description": "An incomplete empty replacement is structurally explicit; the runtime must preserve previously owned members rather than infer absence or retirement."
+    },
+    {
+      "path": "commands/publish_coverage__not_expected_yet.json",
+      "schema": "command",
+      "valid": true,
+      "description": "An incomplete empty replacement is structurally explicit; the runtime must preserve previously owned members rather than infer absence or retirement."
+    },
+    {
+      "path": "commands/register_negative_watch.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic MAT-010 structural fixture; no source completeness, authority, or executed outcome is asserted."
+    },
+    {
+      "path": "results/publish_coverage__published.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-010 structural fixture; no source completeness, authority, or executed outcome is asserted."
+    },
+    {
+      "path": "results/register_negative_watch__registered.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-010 structural fixture; no source completeness, authority, or executed outcome is asserted."
+    },
+    {
+      "path": "results/ingest_observation__coverage_changes.json",
+      "schema": "result",
+      "valid": true,
+      "description": "A newly committed observation may carry exact negative-scope change notices; the duplicate result shape does not admit arrival notices."
+    },
+    {
+      "path": "results/publish_coverage__failure_storage_unavailable.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Unavailable persistence is an explicit failure without a successful empty-coverage conclusion."
+    },
+    {
+      "path": "records/receipt__coverage_domains.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Four closed private domain examples carried as opaque receipt extensions; private shapes are validated separately with exact packaged schema digests. Placeholder references are not executed absence proofs."
+    },
+    {
+      "path": "records/assessment__dated_negative_watch.json",
+      "schema": "record",
+      "valid": true,
+      "description": "The optional additive assessed_as_of field retains a negative scope knowledge boundary without changing prior assessment fixture validity."
+    },
+    {
+      "path": "invalid/coverage_no_sources.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An explicit temporal/coverage contract field is invalid or missing."
+    },
+    {
+      "path": "invalid/coverage_unknown_as_of.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An explicit temporal/coverage contract field is invalid or missing."
+    },
+    {
+      "path": "invalid/coverage_unpinned_member.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An explicit temporal/coverage contract field is invalid or missing."
+    },
+    {
+      "path": "invalid/coverage_missing_mode.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An explicit temporal/coverage contract field is invalid or missing."
+    },
+    {
+      "path": "invalid/coverage_incomplete_without_reason.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An explicit temporal/coverage contract field is invalid or missing."
+    },
+    {
+      "path": "invalid/coverage_baseline_partial_history.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An explicit temporal/coverage contract field is invalid or missing."
+    },
+    {
+      "path": "invalid/negative_watch_no_expiry.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An explicit temporal/coverage contract field is invalid or missing."
+    },
+    {
+      "path": "invalid/negative_watch_unpinned_coverage.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An explicit temporal/coverage contract field is invalid or missing."
+    },
+    {
+      "path": "invalid/negative_watch_missing_knowledge_boundary.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An explicit temporal/coverage contract field is invalid or missing."
+    },
+    {
+      "path": "invalid/coverage_result_without_changes.json",
+      "schema": "result",
+      "valid": false,
+      "description": "An explicit temporal/coverage contract field is invalid or missing."
+    },
+    {
+      "path": "invalid/negative_watch_result_unpinned_registration.json",
+      "schema": "result",
+      "valid": false,
+      "description": "An explicit temporal/coverage contract field is invalid or missing."
+    },
+    {
+      "path": "invalid/ingest_duplicate_with_coverage_changes.json",
+      "schema": "result",
+      "valid": false,
+      "description": "A duplicate observation cannot claim a new negative-scope arrival change."
     }
   ]
 }

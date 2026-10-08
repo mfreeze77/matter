@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "operation": "register_negative_watch",
+  "operation_id": "command-register_negative_watch",
+  "status": "success",
+  "outcome": "registered",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "registration": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.negative_dependencies",
+      "record_type": "matter:projection",
+      "id": "registration-1"
+    },
+    "changes": [
+      {
+        "cause": "coverage_change",
+        "before": [],
+        "after": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "matter.negative_dependencies",
+            "record_type": "matter:projection",
+            "id": "registration-1"
+          }
+        ]
+      }
+    ]
+  }
+}
