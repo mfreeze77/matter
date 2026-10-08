@@ -1,0 +1,381 @@
+**Yes—and I think the right foundation is a common matter model with interchangeable rule sets.** We can make the machinery independent of the subject, programming language, application, or AI model, while giving each use case precise rules for interpreting its evidence.
+
+The distinction I would build around is:
+
+> **The matter represents what we are following. An assessment represents what it means under a particular set of rules, for a particular purpose, at a particular time.**
+
+That separation is what lets the same underlying design work for agent sessions, civic developments, sales opportunities, research questions, or operational problems.
+
+And as an engineering principle, I would describe it this way:
+
+> **Give concerns continuity, preserve their evidence, make judgments traceable, and spend attention on meaningful developments.**
+
+Let’s work through what that would mean.
+
+## 1. A matter should have an identity before it has an importance level
+
+Suppose we are following:
+
+> “The county’s proposed access-control replacement.”
+
+That matter could accumulate an agenda reference, a budget discussion, an approved allocation, a purchasing notice, and a cancellation.
+
+Its identity can remain stable through all those developments. Its status, interpretation, and importance change.
+
+The same is true of:
+
+> “The unresolved validation problem in this development task.”
+
+It can accumulate failed commands, suspected causes, repair attempts, and successful verification.
+
+**We should not require a concern to become important before giving it somewhere to accumulate history.** It can exist quietly from its first relevant observation.
+
+A general matter therefore needs a small set of common concepts:
+
+| Common concept | What it means |
+|---|---|
+| **Identity** | Which continuing subject or concern are we following? |
+| **Scope** | Which project, organization, task, jurisdiction, or other boundary does it belong to? |
+| **Evidence** | What observations or records are associated with it? |
+| **History** | What changed, and when did we learn about it? |
+| **Relationships** | What other matters, people, resources, or objectives does it relate to? |
+| **Assessments** | What do particular rules conclude from the available evidence? |
+| **Decisions and dispositions** | What has someone decided, acknowledged, deferred, or rejected? |
+
+Fields such as `bill_number`, `compiler_error`, or `contract_value` can live in extensions defined by the relevant domain.
+
+The general engine does not need to understand those fields directly. It needs to know which adapter and rules understand them.
+
+One other refinement: **a matter can represent an opportunity or an unanswered question, as well as a problem.** That keeps us from baking a warning system into the foundation.
+
+## 2. Importance belongs to an assessment of the matter
+
+This is probably the most consequential design choice.
+
+“Important” is incomplete until we ask:
+
+- Important **to whom**?
+- Important **for which objective**?
+- Important **at what time**?
+- Important **under which rules**?
+- Important enough to **do what**?
+
+Imagine the access-control project above. These are hypothetical assessments of the same matter:
+
+| Audience or purpose | Possible assessment |
+|---|---|
+| A salesperson covering that territory | Worth monitoring; potential future opportunity |
+| The person preparing the procurement | Action needed on the upcoming purchasing milestone |
+| A customer outside that territory | No current relevance |
+| A researcher studying capital spending | Useful supporting evidence for a later report |
+
+The underlying source facts remain the same. The practical significance differs.
+
+Inside an agent session, the same concern might warrant:
+
+- A quiet record for you.
+- A corrective hint for the working agent.
+- A note in the next handoff.
+- A direct question when your decision is actually required.
+
+**Something needing work does not automatically mean it needs Michael’s attention.**
+
+Conceptually, the operation becomes:
+
+```text
+Assess:
+  this matter revision
+  using this policy revision
+  for this purpose and audience
+  as of this time
+```
+
+The result contains a conclusion, supporting evidence, uncertainty, and a proposed attention treatment.
+
+Changing your preferences should create a new assessment. It should not rewrite what happened or manufacture a new identity for the matter.
+
+## 3. What should be uniform?
+
+I would make the **core guarantees and the rule interface** uniform.
+
+These are the engineering pillars I would preserve across every application.
+
+### Evidence retains its origin
+
+An observation remains connected to the source event, document, result, or statement that produced it.
+
+A summary, translation, or model interpretation is a derived record with its own provenance. It does not replace the original evidence.
+
+### Repetition has an explicit meaning
+
+The engine distinguishes:
+
+- A retry delivering the same event again.
+- A different event reporting the same occurrence.
+- A genuinely new occurrence of the same problem.
+- Independent evidence supporting a conclusion.
+
+Those distinctions matter everywhere.
+
+Ten copies of a failed test result add no new corroboration. Ten separate failed runs can establish recurrence and growing operational cost, even while the cause remains uncertain.
+
+### Uncertainty stays explicit
+
+“Unknown,” “not applicable,” “contradictory,” and “the evaluator failed” are different outcomes.
+
+A rule that could not evaluate should not quietly become a rule that found nothing important.
+
+### Changes remain explainable
+
+An assessment should be able to answer:
+
+> “What changed since the previous assessment, and which evidence or rule caused this conclusion to change?”
+
+That includes changes caused by a new policy. The source facts might be unchanged while the evaluation changes.
+
+### Attention and authority remain separate
+
+A matter can deserve attention without establishing a fact or authorizing an action.
+
+Your existing Oil resolver already preserves a related boundary: model inferences and review findings cannot supersede accepted intent. That is a useful invariant to retain in the general design. [Source: Oil’s trust resolver](https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/kernel/resolver.py)
+
+### Identity survives rewording
+
+A new description of an existing concern should not automatically create a new matter.
+
+At the same time, a similar description should not automatically merge two matters. The system needs a way to preserve ambiguous associations and correct mistaken ones.
+
+**Those guarantees can be almost completely uniform.** They describe how the system treats information, regardless of the information’s subject.
+
+## 4. Different rule families are the easier, more useful approach
+
+I agree with your instinct here. We can create a common collection of rule families, then assemble them differently for different uses.
+
+I would start with these:
+
+| Rule family | General question | What a domain supplies |
+|---|---|---|
+| **Identity and association** | Does this observation belong to this matter? | Identifiers, scope, matching criteria, conflict rules |
+| **Evidence** | What does this information justify concluding? | Source requirements, proof requirements, relevant counterevidence |
+| **Change** | Has the situation changed meaningfully? | Which fields, relationships, or outcomes constitute a material change |
+| **Persistence and recurrence** | Has a condition continued or happened again? | Relevant windows, distinct occurrences, progress and recovery criteria |
+| **Consequence and dependency** | What objectives or other matters are affected? | Impact definitions, dependencies, commitments |
+| **Time** | Is something approaching, overdue, expired, or stale? | Deadlines, expected events, calendars, freshness requirements |
+| **Resolution** | What establishes that this concern is handled? | Matching success, an authoritative decision, withdrawal, replacement, or other qualifying evidence |
+| **Attention** | Who needs an update, when, and in what form? | Responsibility, active goals, prior delivery, preferences, interruption cost |
+
+The reusable part is the structure of these questions and the way results are represented.
+
+The domain supplies the meaning.
+
+For example, a general **resolution rule** can require evidence that addresses the same matter and is newer than the unresolved condition. The domain then defines the qualifying evidence:
+
+- For a development failure: a relevant successful operation under the required conditions.
+- For a research question: evidence that answers the question to the declared standard.
+- For a purchasing opportunity: a recorded disposition such as awarded, canceled, or withdrawn.
+- For a pending decision: a decision from someone authorized to make it.
+
+We should allow those differences directly.
+
+### A rule can be uniform without producing a number
+
+Some rules naturally produce:
+
+- A supported conclusion.
+- A contradiction.
+- A deadline.
+- A missing prerequisite.
+- A ranked candidate.
+- An unresolved question.
+- A reason to surface something.
+
+Forcing every result into an importance score would throw away useful distinctions.
+
+A priority score could still help order a queue within a defined policy. Its meaning should be local to that policy, with the reasons preserved alongside it.
+
+## 5. Compose profiles from rules
+
+I would let a matter reference a **policy profile**: a named, versioned selection of rules and parameters.
+
+For instance:
+
+### Agent-work profile
+
+It could combine:
+
+- Task and operation identity.
+- Accepted-constraint checks.
+- Failure persistence.
+- Recovery matching.
+- Evidence changes.
+- Delivery at useful work boundaries.
+
+### Civic-monitoring profile
+
+It could combine:
+
+- Civic record identity.
+- Source and authority requirements.
+- Stage changes.
+- Related documents and matters.
+- Deadlines.
+- Relevance to an approved monitoring purpose.
+
+### Opportunity-monitoring profile
+
+It could combine:
+
+- Project identity.
+- Location and service fit.
+- Funding and purchasing-stage evidence.
+- New decision-maker or procurement information.
+- Relevant dates.
+- Audience-specific delivery.
+
+Those profiles can reuse rule families. Each profile supplies the conditions and semantics appropriate to its work.
+
+There can also be a separate audience profile:
+
+> “Give the working agent actionable updates at task boundaries. Give me a question only when my decision is needed.”
+
+Or:
+
+> “Include early developments in a digest. Surface a new deadline promptly.”
+
+That keeps personal delivery preferences from changing the underlying factual assessment.
+
+### Rule composition needs a defined order
+
+Otherwise we risk replacing scattered application logic with a confusing collection of interacting rules.
+
+I would organize evaluation approximately like this:
+
+1. **Establish scope and permitted evidence.**
+2. **Resolve identity or record ambiguity.**
+3. **Evaluate what the evidence supports.**
+4. **Evaluate consequences for the stated purpose.**
+5. **Determine what changed for the intended audience.**
+6. **Choose a permitted delivery or action proposal.**
+
+A delivery preference can influence timing. It cannot make an unsupported claim become supported.
+
+Two rules can also disagree. The engine should preserve that conflict and apply an explicit conflict policy. The answer should not depend on whichever rule happened to execute last.
+
+This separation has a practical precedent in policy engines such as Open Policy Agent, which separates policy decisions from the applications that enforce them and lets policy be managed independently. That supports the architectural direction; it does not mean we need to adopt OPA immediately. [Open Policy Agent](https://www.openpolicyagent.org/docs/philosophy?utm_source=chatgpt.com)
+
+## 6. What “agnostic” would mean in practice
+
+There are several kinds of independence here, and we can design for each deliberately.
+
+| Kind of independence | How we achieve it |
+|---|---|
+| **Subject independence** | The core uses matters, evidence, relationships, assessments, and policies; domain extensions supply specialized concepts |
+| **Programming-language independence** | Define data and operation contracts that any language can implement or call |
+| **Source independence** | Adapters convert tool events, documents, transcripts, APIs, or other sources into the common observation contract |
+| **AI-model independence** | Evaluators return a declared result contract; deterministic code and different models can fill different evaluator roles |
+| **Storage independence** | Persistence sits behind defined operations, with required behavior and consistency guarantees |
+| **Presentation independence** | The same assessment can support an agent hint, dashboard, digest, report, or user question |
+
+The agnostic core still needs precise contracts. Otherwise each adapter would assign different meanings to the same fields.
+
+For example, an incoming observation could carry:
+
+- Its event identity and source.
+- When it occurred and when it was observed.
+- The relevant subject and scope.
+- Its payload type and schema.
+- Evidence references.
+- Its derivation history, if it was produced from other material.
+
+We have an existing standard worth borrowing here: **CloudEvents** defines a common event envelope while allowing domain-specific payloads. Its separation of event identity, source, subject, and data is particularly relevant. It also explicitly distinguishes the event instance from the subject being updated. [GitHub](https://github.com/cloudevents/spec/blob/main/cloudevents/spec.md?utm_source=chatgpt.com)
+
+For the data contracts, **JSON Schema** provides a way to describe and validate JSON structures. We could use it to define valid observation and assessment shapes. The behavioral rules—what constitutes recovery, identity, or material change—would still need their own specification. [What is JSON Schema?](https://json-schema.org/overview/what-is-jsonschema?utm_source=chatgpt.com)
+
+An initial implementation could be written in Python and remain usable from TypeScript or another language through the same neutral contract. We would not need multiple implementations immediately.
+
+If we later build another implementation, shared conformance examples should establish that both interpret the same inputs and policies consistently.
+
+### Supporting a new content type requires an interpreter
+
+The core can preserve a reference to an image, audio recording, source file, or document without understanding its contents.
+
+To evaluate that material, an adapter must expose relevant observations with their evidence.
+
+That is where your existing extraction, transcription, retrieval, and code-analysis capabilities would connect. Their job is to supply the meaning that the general matter machinery needs, while retaining the source relationship.
+
+## 7. The same general rule can apply across very different work
+
+Consider this rule in plain English:
+
+> **When new evidence changes a matter in a way that affects an active objective, make that change eligible for the appropriate audience’s attention.**
+
+Its structure can remain the same.
+
+The concrete meanings vary:
+
+| Component | Coding session | Civic monitoring | Sales opportunity |
+|---|---|---|---|
+| **Matter** | Unresolved validation problem | Proposed public project | Potential system replacement |
+| **New evidence** | A relevant run fails differently | A new official document changes the project | A purchasing notice supplies a deadline |
+| **Active objective** | Complete the task correctly | Follow this project’s development | Pursue matching work in the territory |
+| **Material change** | The current repair approach is invalidated | The project’s supported status or scope changes | The opportunity becomes actionable |
+| **Attention** | Update the agent before its next approach | Update the subscriber’s monitored matter | Surface the next useful business action |
+
+These are examples of one rule pattern using different domain predicates.
+
+We could develop a small collection of similarly reusable patterns:
+
+- A relevant state changed.
+- A condition persisted beyond its allowed window.
+- An expected event is missing, with adequate observation coverage.
+- Evidence contradicts an active assumption.
+- A dependency changed.
+- A deadline became relevant.
+- Resolution was established.
+- A previously delivered assessment changed materially.
+
+That is a much more manageable foundation than trying to teach one evaluator everything about every possible matter.
+
+## 8. The matter should retain learning without accumulating bureaucracy
+
+Your original motivation matters here: Oil becomes annoying when maintaining the system competes with doing the work.
+
+So I would make quiet, automatic maintenance a design requirement.
+
+A matter can collect observations without producing a visible update. Its assessment can be reused while the relevant evidence and policy remain valid. Duplicate events should take a cheap path. Expensive interpretation should run when there is a reason to reconsider the matter.
+
+A matter also does not need a human-created ticket or a formal review process just to exist.
+
+Some observations can remain lightweight until there is a continuing subject worth tracking. Once a matter exists, its ongoing maintenance should come from the ordinary evidence stream.
+
+The StateCivics importer already demonstrates part of this discipline: it compares content and evidence so an unchanged snapshot does not automatically rewrite the derived record. Its claim importer also preserves source statements separately from established matter state. Those are useful behaviors to extract into a general contract. [Sources: matter importer](https://github.com/mfreeze77/state-civics-ai/blob/a34fcec27f353187e7a23d54788b203d13ac87c1/services/local-accountability/sar_tracker/core_import/matters.py), [claim importer](https://github.com/mfreeze77/state-civics-ai/blob/a34fcec27f353187e7a23d54788b203d13ac87c1/services/local-accountability/sar_tracker/core_import/claims.py)
+
+We should preserve a way to inspect:
+
+> “Why is this matter open?”  
+> “Why did it become important?”  
+> “Why did you show it to me?”  
+> “Why has it stayed quiet?”  
+> “What evidence would resolve it?”
+
+Those questions are useful across all the domains we have discussed. They can become part of the common interface.
+
+## 9. The engineering pillar I would choose
+
+I would make the shared foundation responsible for:
+
+**Continuity:** Keep the same matter coherent as information arrives.
+
+**Evidence discipline:** Preserve sources, distinguish observations from interpretations, and retain uncertainty.
+
+**Explicit policy:** Make the rules for assessment and attention identifiable, versioned, and explainable.
+
+**Contextual importance:** Evaluate significance relative to an objective, audience, and time.
+
+**Proportional attention:** Surface developments when they improve a decision, with the appropriate urgency and detail.
+
+Oil and StateCivics could then become consumers of that foundation, each contributing its own adapters and policy profiles. The general component would have a clear job even if neither application existed.
+
+**My recommendation is a uniform core, reusable rule families, and specialized policy profiles.** That gives us a common way to handle matters while allowing the rules to respect what is actually inside them.
+
+The strongest version of your idea is that **a matter can carry a long, complicated history while presenting a small, timely, well-supported reason to care.** That is an engineering principle we can apply well beyond coding agents.
