@@ -23,6 +23,7 @@
       "enum": [
         "ingest_observation",
         "create_matter",
+        "update_matter_metadata",
         "propose_association",
         "accept_association",
         "append_claim",
@@ -115,6 +116,48 @@
               },
               "identity_policy": {
                 "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "update_matter_metadata"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "matter",
+              "metadata"
+            ],
+            "properties": {
+              "matter": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_dependency"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "title": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+                  },
+                  "description": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+                  },
+                  "extensions": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/extensions"
+                  }
+                },
+                "description": "Complete replacement of the optional title, description, and record extensions only. Omitted fields are removed; an empty object clears all three. Identity, provenance, lifecycle, and other record fields are preserved."
               }
             }
           }

@@ -140,6 +140,15 @@ class Snapshot(Protocol):
         """Read current state, or a historical snapshot when a pin is supplied."""
         ...
 
+    def lookup_identity(self, reference: dict[str, Any]) -> dict[str, Any]:
+        """Read the current occupant of a bare scoped identity, regardless of kind.
+
+        The reference's kind is the proposed kind, not a lookup filter. The
+        returned snapshot carries its actual kind. Revision/digest pins are
+        not accepted; use get for a typed or historical lookup.
+        """
+        ...
+
     def history(self, reference: dict[str, Any]) -> list[dict[str, Any]]:
         """Read all snapshots in storage revision order; absence is E_NOT_FOUND."""
         ...
@@ -168,6 +177,15 @@ class Transaction(Protocol):
 
     def get(self, reference: dict[str, Any]) -> dict[str, Any]:
         """Read current state; preexisting reads must have declared pins."""
+        ...
+
+    def lookup_identity(self, reference: dict[str, Any]) -> dict[str, Any]:
+        """Read a bare identity's occupant using its actual declared read pin.
+
+        An existing occupant requires its own exact pin unless written by
+        this transaction. A missing identity is audited using the supplied
+        bare reference. The operation never adds a discovered read pin.
+        """
         ...
 
     def watchers(self, watch_key: str) -> list[dict[str, Any]]: ...
@@ -212,6 +230,8 @@ class Storage(Protocol):
     def snapshot(self) -> AbstractContextManager[Snapshot]: ...
 
     def get(self, reference: dict[str, Any]) -> dict[str, Any]: ...
+
+    def lookup_identity(self, reference: dict[str, Any]) -> dict[str, Any]: ...
 
     def history(self, reference: dict[str, Any]) -> list[dict[str, Any]]: ...
 

@@ -6,7 +6,7 @@ Matter is a shared foundation for following a continuing subject, preserving its
 
 ## Current status
 
-This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, sixteen command variants, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. Matter identity, occurrence grouping, association, assessment, provider adapters, and native integrations remain planned in the backlog.
+This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata; its bounded metadata operation brings the command inventory to seventeen variants. Occurrence grouping, association, assessment, provider adapters, and native integrations remain planned in the backlog.
 
 The walkthroughs are deliberately small: their fixtures already contain host-supplied associations and classifications. They demonstrate selected continuity and delivery rules; they do not infer semantic meaning, execute an agent hook, call JEV, train a speaker model, or establish production correctness.
 
@@ -94,6 +94,25 @@ backup boundaries. Run the complete synthetic API example with:
 python examples/observation_intake.py
 ```
 
+## Preserve continuing matter identity
+
+`matter.matters.MatterService` creates questions, opportunities, and problems
+under adapter-declared exact subject keys. The same scoped key resolves the
+same persistent ID after a new processing run or restart. Titles, audiences,
+purposes, and assessment policies do not establish identity. Conflicting keys
+produce an explicit conflict; all keys for a new matter commit atomically.
+
+`update_matter_metadata` revisions the title, description, and namespaced
+extensions while preserving identity, provenance, and previous snapshots.
+An unchanged replacement keeps its current revision. Competing stale edits
+receive a revision conflict, and exact command retries retain their original
+results. See the [matter identity API](docs/matters.md) for policy configuration,
+replacement semantics, scopes, and the boundaries for future identity changes.
+
+```bash
+python examples/matter_identity.py
+```
+
 ## Read the specification
 
 | Document | Responsibility |
@@ -105,6 +124,7 @@ python examples/observation_intake.py
 | [Compatibility](docs/contracts/compatibility.md) | Version acceptance, unknown-time handling, errors, and API boundaries |
 | [Durable storage](docs/storage.md) | Transaction API, exact retries, revision history, migrations, backup, and restore |
 | [Observation intake](docs/observations.md) | Source identity, immutable payloads, duplicate/conflict receipts, corrections, and knowledge-time views |
+| [Matter identity](docs/matters.md) | Persistent scoped subject keys, conflicts, metadata revisions, and continuity across runs |
 | [Rule contract](docs/contracts/rules.md) | Meaning, outcomes, qualification, dependencies, and composition |
 | [Lifecycle contract](docs/contracts/lifecycle.md) | Reassessment, resolution, reopening, attention, and delivery |
 | [JEV design](docs/jev.md) | Replaceable semantic execution and question/version handling |
@@ -118,6 +138,7 @@ python examples/observation_intake.py
 | [Core contract validation receipt](docs/validation/MAT-002.md) | What was executed for MAT-002 |
 | [Storage validation receipt](docs/validation/MAT-003.md) | What was executed for MAT-003 |
 | [Observation validation receipt](docs/validation/MAT-004.md) | What was executed for MAT-004 |
+| [Matter identity validation receipt](docs/validation/MAT-005.md) | What was executed for MAT-005 |
 
 ## What this repo owns
 

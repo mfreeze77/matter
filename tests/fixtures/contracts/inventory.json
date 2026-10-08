@@ -24,6 +24,7 @@
   "operations": [
     "ingest_observation",
     "create_matter",
+    "update_matter_metadata",
     "propose_association",
     "accept_association",
     "append_claim",
@@ -47,6 +48,10 @@
     "create_matter": [
       "created",
       "existing"
+    ],
+    "update_matter_metadata": [
+      "updated",
+      "unchanged"
     ],
     "propose_association": [
       "proposal",

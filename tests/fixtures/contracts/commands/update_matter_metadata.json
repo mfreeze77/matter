@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "operation": "update_matter_metadata",
+  "command_id": "command-update_matter_metadata",
+  "idempotency_key": "idempotency-update_matter_metadata",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [
+    {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    }
+  ],
+  "body": {
+    "matter": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    },
+    "metadata": {
+      "title": "Updated synthetic continuing opportunity",
+      "description": "A revised description preserves the original subject identity.",
+      "extensions": {
+        "example:display": {
+          "schema": {
+            "namespace": "example",
+            "id": "display-metadata",
+            "version": "1.0",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "value": {
+            "category": "synthetic"
+          }
+        }
+      }
+    }
+  }
+}

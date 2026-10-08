@@ -88,6 +88,13 @@ class _Snapshot:
             raise StorageError("E_SCOPE_FORBIDDEN")
         return result
 
+    def _checked_identity_ref(self, reference: dict[str, Any]) -> dict[str, Any]:
+        self._ensure_active()
+        result = _reference(reference)  # This lookup accepts bare references only.
+        if result["scope_id"] != self._store.scope_id:
+            raise StorageError("E_SCOPE_FORBIDDEN")
+        return result
+
     def _row(self, reference: dict[str, Any], *, current: bool = False) -> sqlite3.Row:
         ref = self._checked_ref(reference)
         args: tuple[Any, ...] = _identity(ref)
@@ -133,6 +140,20 @@ class _Snapshot:
     def get(self, reference: dict[str, Any]) -> dict[str, Any]:
         try:
             return self._decode(self._row(reference))
+        except sqlite3.Error:
+            raise _unavailable() from None
+
+    def lookup_identity(self, reference: dict[str, Any]) -> dict[str, Any]:
+        ref = self._checked_identity_ref(reference)
+        try:
+            row = self._db.execute(
+                "SELECT v.* FROM heads h JOIN versions v USING(scope_id,namespace,id,version) "
+                "WHERE h.scope_id=? AND h.namespace=? AND h.id=?",
+                _identity(ref),
+            ).fetchone()
+            if row is None:
+                raise StorageError("E_NOT_FOUND")
+            return self._decode(row)
         except sqlite3.Error:
             raise _unavailable() from None
 
@@ -293,6 +314,21 @@ class _Transaction(_Snapshot):
                 raise StorageError("E_REVISION_CONFLICT", "A current dependency pin is required for this read.")
         if ("revision" in ref or "digest" in ref) and not self._matches(ref, record):
             raise StorageError("E_REVISION_CONFLICT")
+        return record
+
+    def lookup_identity(self, reference: dict[str, Any]) -> dict[str, Any]:
+        ref = self._checked_identity_ref(reference)
+        identity = _identity(ref)
+        try:
+            record = super().lookup_identity(ref)
+        except StorageError as exc:
+            if exc.code == "E_NOT_FOUND":
+                self._absent_reads[identity] = ref
+            raise
+        if identity not in self._writes:
+            expected = self._expected.get(identity)
+            if expected is None or not self._matches(expected, record):
+                raise StorageError("E_REVISION_CONFLICT", "A current dependency pin is required for this read.")
         return record
 
     def watchers(self, watch_key: str) -> list[dict[str, Any]]:
@@ -568,6 +604,10 @@ class SQLiteStore:
     def get(self, reference: dict[str, Any]) -> dict[str, Any]:
         with self.snapshot() as view:
             return view.get(reference)
+
+    def lookup_identity(self, reference: dict[str, Any]) -> dict[str, Any]:
+        with self.snapshot() as view:
+            return view.lookup_identity(reference)
 
     def history(self, reference: dict[str, Any]) -> list[dict[str, Any]]:
         with self.snapshot() as view:

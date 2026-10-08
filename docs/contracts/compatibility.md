@@ -46,6 +46,17 @@ this addition does not provide automatic forward compatibility. The built-in
 ingest handler always emits it to identify the observation's original creation
 receipt separately from the current command's top-level `receipt`.
 
+MAT-005 adds `update_matter_metadata` as the seventeenth operation under the
+same `1.0` envelope version, with `updated` and `unchanged` success outcomes.
+The updated command and result schemas continue to accept all earlier v1
+fixtures. Earlier readers reject this unknown operation until their bundled
+schemas are updated; there is no silent fallback to `create_matter` or
+automatic operation negotiation. No stored record kind or encoding changes.
+The new operation's required `metadata` object completely replaces only the
+optional title, description, and namespaced extensions. Omitted fields are
+removed, including when the supplied object is empty. Identity and lifecycle
+fields cannot be written through this operation.
+
 ## Four independent versions and identities
 
 The schema version identifies the structure and interpretation of an envelope.
