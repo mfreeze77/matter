@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "operation": "propose_association",
+  "operation_id": "command-propose_association",
+  "status": "success",
+  "outcome": "evaluation_failed",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "reason": "Synthetic evaluation failed; no candidate was accepted.",
+    "proposal": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "association_proposal",
+      "id": "association_proposal-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "candidate_set": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.association_candidates",
+      "record_type": "matter:projection",
+      "id": "candidate-set-1",
+      "revision": 1
+    },
+    "changes": []
+  }
+}

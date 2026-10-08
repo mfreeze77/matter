@@ -27,6 +27,18 @@ envelopes. Their exact descriptors bind the runtime's validation declarations
 and index values; an arbitrary `domain_value` admitted by the core is not
 automatically valid under one of these specialized contracts.
 
+MAT-008 adds the [candidate-set snapshot](../../schemas/candidate-set.schema.json),
+[association evaluation](../../schemas/association-evaluation.schema.json),
+[association decision](../../schemas/association-decision.schema.json),
+[persistent disposition](../../schemas/association-disposition.schema.json), and
+[membership lookup](../../schemas/association-membership.schema.json) contracts.
+The package now contains **21 JSON Schema resources**: the three portable
+families, fifteen runtime-specific resources, and three repository-tooling
+schemas. These five new schemas bind host-published catalogs, immutable
+evaluation/decision receipt details,
+and current projections; they do not define a provider-ranking protocol or
+a matter-merge engine.
+
 ## Common record envelope
 
 All 12 stored record kinds require `schema_version`, `record_type`, `scope_id`, `namespace`, `id`, `creation_receipt`, `provenance`, and a typed `body`. Core objects are closed to undeclared fields. Optional `extensions` and `supersedes` are explicit.
@@ -44,8 +56,8 @@ A creation receipt is a typed receipt reference. A receipt may refer to itself a
 | `matter` | Mutable aggregate; revision required | Namespaced domain kind and at least one scoped identity key. Title and description are optional. A lifecycle projection, if supplied, requires its profile, namespaced state, and transition receipt. |
 | `claim` | Immutable proposition version | Referenced or schema-bound subject, namespaced predicate, typed value and qualifiers, temporal applicability, attributed evidence dependencies, and proposition version. Optional namespaced components identify scoped parts of this exact proposition. |
 | `evidence_relation` | Mutable aggregate; revision required | Pinned claim and evidence, one declared relation kind, whole-proposition or component target, exact/whole/unavailable locator, temporal applicability, and explicit acceptance state and rationale. Optional quotation preserves exact source wording; optional locator-validation receipt pins the adapter's recorded check. |
-| `association_proposal` | Immutable proposal | Pinned subject and candidates, selection outcome, selected references, matching rule, evidence, evaluator receipt, schema-bound uncertainty, and qualification state. |
-| `accepted_association` | Mutable aggregate; revision required | Pinned proposal, observation/occurrence/matter membership, exact relationship definition, active/revoked/superseded state, and authority receipt. |
+| `association_proposal` | Immutable proposal | Pinned subject and candidates, selection outcome, selected references, matching rule, evidence, evaluator receipt, schema-bound uncertainty, and qualification state. Optional candidate-set, coverage, assessment time and evaluation-receipt fields bind the MAT-008 decision. |
+| `accepted_association` | Mutable aggregate; revision required | Pinned proposal, observation/occurrence/matter membership, exact relationship definition, active/revoked/superseded state, and authority receipt. Optional candidate-set, policy, decision-receipt and capability fields record MAT-008 acceptance. |
 | `matter_relation` | Mutable aggregate; revision required | Two pinned matters, namespaced relationship kind, relationship schema, evidence basis, authority receipt, and active/revoked/superseded state. |
 | `judgment` | Immutable execution result | Exact rule, input digest and artifact availability, evaluator, execution interval/state, raw result availability, qualification, cited evidence with locators, limitations, dependency manifest, attempt receipts, and proposed consequences. Completion and failure have disjoint conditional fields. |
 | `assessment` | Immutable assessment result | Pinned matter, profile, purpose, optional relevant audience, knowledge boundary, input artifact, evidence selection/omissions/coverage, dependency manifest, judgment dependencies, assessed propositions, change causes, consequences/material changes/gaps, resource use, stop reason, completeness, proposals, and limitations. |
@@ -158,7 +170,7 @@ Every assessment supplies a `stop_reason`: `completed`, `incomplete`, `execution
 
 Every command requires `schema_version`, `operation`, `command_id`, `idempotency_key`, `scope_id`, `actor`, `authority`, `expected_revisions`, and a closed operation-specific `body`. Optional extensions follow the same explicit namespace contract. Actor references do not replace authority receipt references. Expected reads are pinned references and may include an immutable digest.
 
-Creation operations embed typed `*_input` records. These preserve the source/proposition fields but omit the stored record's creation receipt and aggregate revision. The future host/store assigns the receipt and initial revision atomically. Supplying an input does not establish that a stored record was created.
+Creation operations embed typed `*_input` records. These preserve the source/proposition fields but omit the stored record's creation receipt and aggregate revision. The host/store assigns the receipt and initial revision atomically. Supplying an input does not establish that a stored record was created.
 
 | Operation | Required request content | Permitted successful result outcomes |
 |---|---|---|
@@ -166,8 +178,10 @@ Creation operations embed typed `*_input` records. These preserve the source/pro
 | `create_matter` | Proposed matter input and identity policy. | `created`, `existing` |
 | `update_matter_metadata` | Pinned matter and complete replacement of optional title, description, and namespaced extensions. | `updated`, `unchanged` |
 | `commit_occurrence_grouping` | Batch occurrence creations, pinned membership replacements, explicit root provenance assignments, grouping policy, and schema-bound basis. | `committed`, `unchanged` |
-| `propose_association` | Subject, candidate set, matching rule, evidence, and knowledge boundary. | `proposal`, `no_match`, `ambiguous`, `insufficient_evidence` |
-| `accept_association` | Pinned proposal/candidates and acceptance policy. | `accepted` |
+| `publish_association_candidates` | Query, complete declared catalog entries, coverage, evidence, as-of time, and previous set pin or explicit null. | `published`, `unchanged` |
+| `propose_association` | Subject, considered candidates, matching rule, evidence and knowledge boundary; optional candidate-set pin and external evaluation declaration. | `proposal`, `no_match`, `ambiguous`, `insufficient_evidence`, `evaluation_failed` |
+| `accept_association` | Pinned proposal/candidates and acceptance policy; optional candidate set, relationship and capability. | `accepted` |
+| `decide_association` | Pinned pair, relationship/capability, reject/protect/release decision, previous disposition or null, reason, as-of time and policy. | `applied`, `unchanged` |
 | `append_claim` | Proposed claim input. | `appended`, `duplicate` |
 | `relate_evidence` | Proposed evidence-relation input; optional schema-bound frozen adapter validation declaration. | `appended`, `duplicate` |
 | `revise_evidence_acceptance` | Pinned evidence relation and a complete replacement acceptance descriptor. | `updated`, `unchanged` |
@@ -182,7 +196,7 @@ Creation operations embed typed `*_input` records. These preserve the source/pro
 | `dispatch` | Intent, lease token, epoch, delivery key, audience, and baseline. | `delivered`, `withheld` |
 | `assess` | Matter, profile/purpose, explicit evidence selection or query, knowledge boundary, resource budget, and control epoch. | `assessed`, `incomplete` |
 
-These are 19 command variants and 37 successful operation/outcome pairs. MAT-005 adds the bounded `update_matter_metadata` operation, MAT-006 adds `commit_occurrence_grouping`, and MAT-007 adds `revise_evidence_acceptance` to the initial 16-operation inventory. The `assess` operation comes from the rule contract in addition to the core operation table. `no_match` preserves the considered candidate set, requires an empty `selected` array, and declares adequate coverage. A nonempty considered set can yield no match when every candidate is rejected; the fixture preserves that history. `ambiguous` returns multiple candidates. Insufficient evidence remains explicit. Association subjects, candidates, selected references, and accepted membership all use the same typed observation/occurrence/matter dependency union. A claim, control, judgment, or receipt cannot become an association member. Candidate existence, completeness, independence, allowed transitions, and actual query results are later runtime checks.
+These are 21 command variants and 42 successful operation/outcome pairs. MAT-005 adds the bounded `update_matter_metadata` operation, MAT-006 adds `commit_occurrence_grouping`, MAT-007 adds `revise_evidence_acceptance`, and MAT-008 adds `publish_association_candidates` and `decide_association` to the initial 16-operation inventory. MAT-008 also adds the explicit `evaluation_failed` proposal outcome. The `assess` operation comes from the rule contract in addition to the core operation table. `no_match` preserves the considered candidate set, requires an empty `selected` array, and declares adequate coverage. A nonempty considered set can yield no match when every candidate is rejected; the fixture preserves that history. `ambiguous` returns multiple candidates. Insufficient evidence remains explicit. Association subjects, candidates, selected references, and accepted membership all use the same typed observation/occurrence/matter dependency union. A claim, control, judgment, or receipt cannot become an association member. MAT-008 verifies candidate existence and currentness within the declared catalog and preserves its coverage. External discovery, actual source completeness, independent-source qualification and allowed domain transitions remain separate responsibilities.
 
 For `ingest_observation`, both successful bodies require a pinned `observation` and permit an optional `observation_receipt`, a typed bare receipt reference to that observation's original creation receipt. The MAT-004 handler supplies both fields. The top-level `receipt` always identifies the current command's operation receipt: it matches the observation receipt for a new commit and differs for a duplicate submitted under a new command. Structural validation checks the reference type, not that either receipt exists or that their relationship is correct. Existing v1 results without the optional field remain valid; [compatibility.md](compatibility.md) describes the reader-update requirement.
 
@@ -203,6 +217,60 @@ Both successful `append_claim` and `relate_evidence` bodies permit `changes`. If
 `revise_evidence_acceptance` requires exactly `relation` and `acceptance` in the body. The relation reference carries its current revision or snapshot digest; the shared acceptance object completely replaces only acceptance state, rationale, authority, and any evaluator reference. It cannot rewrite claim, evidence, relation kind, target, locator, quotation, validation receipt, applicability, original provenance, extensions, or creation receipt. `updated` requires current `relation`, `previous`, and nonempty `changes`; `unchanged` requires current `relation` and empty `changes`, with no `previous` field. Each has its own command receipt. Scope, authorization, exact receipt bindings, and current revisions remain runtime checks.
 
 The shared `$defs.dependency_change` is a closed object containing `cause`, `before`, and `after`. Both reference arrays contain exact pinned snapshots, and at least one array must be nonempty. It reuses the existing change-cause vocabulary. MAT-007 emits `new_evidence` for a newly recorded claim or relation, `evidence_correction` for explicit claim supersession, and `disposition_change` for an acceptance revision. These are changes to typed model records; they do not assert a newly observed external event, independent corroboration, or claim truth. Previous references remain readable history. Notices do not themselves invalidate assessments, traverse dependent graphs, or cancel delivery; those effects belong to MAT-016.
+
+## Bounded association publication and decisions
+
+`publish_association_candidates` completely publishes the declared query's
+catalog. Its query binds a source component, bare scoped subject, candidate
+type, exact-key or semantic mode, matching-rule component, typed selector, and
+query keys. Exact-key mode requires at least one key; semantic mode omits keys
+or supplies an empty key list. Each entry contains a candidate pin, catalog keys and basis
+pins. `previous` is explicit null for creation or the exact current projection
+pin for replacement. The stored private snapshot also binds the current
+subject, host policy and authority. Both success outcomes return `candidate_set`.
+
+The existing proposal command retains its portable required fields and gains
+optional `candidate_set` and `evaluation` fields. The MAT-008 handler requires
+the candidate-set pin and verifies the full considered matching list against
+it. The exact matcher uses any equal namespace/value key in the declared
+catalog; it does not rewrite continuing matter identity keys. An external
+semantic declaration contains producer, outcome, selected pins, uncertainty,
+qualification, reason and missing-evidence descriptions. It is preserved in a
+service-generated evaluation receipt, without running or qualifying a provider.
+Every runtime proposal result identifies the immutable `proposal` and its
+`candidate_set`, including no-match, ambiguous, insufficient and failed
+outcomes. Existing result fields and outcome distinctions remain intact.
+
+Acceptance retains required proposal, candidate list and policy fields. The
+runtime additionally requires `candidate_set`, `relation`, and `capability`.
+The candidate list includes all considered candidates, not just the selected
+one. The handler requires a single matched selection, a current catalog and
+member pins, the configured host authority, and no blocking pair disposition.
+Both revision and immutable snapshot digest pins are supported for mutable
+records. `attach` and `relate` preserve identity; the serialized `merge`
+capability is representable but always refused by this bounded host policy.
+Accepted runtime records retain their candidate-set, acceptance-policy,
+authority decision and capability. Confidence and claimed qualification never
+supply acceptance permission.
+
+`decide_association` records `reject`, `protect`, or explicit `release` for a
+scoped pair and capability. Stable protection keys retain the relationship's
+namespace and ID across version changes; merge protection is symmetric, while
+attachment and relatedness are ordered. The complete disposition and decision
+receipt commit atomically with any revocation of an active association.
+Release requires correction authority and the current prior disposition;
+it does not itself reactivate an attachment. The result contains `disposition`,
+`decision`, affected `associations`, and `changes`. The schema permits `applied`
+with nonempty changes and `unchanged` with no changes. Current runtime decisions
+append an explicit decision; exact command retry returns its saved result.
+A later new acceptance may reactivate a released pair while retaining history.
+
+New proposal/accepted-record fields remain optional in portable v1 schemas so
+older fixtures remain structurally readable. The runtime requires and verifies
+its own receipt/index bindings; structural admission alone does not make a
+legacy record executable. Generic controls, control epochs, equivalence merges,
+provider qualification and transitive assessment invalidation are not supplied
+by this association handler. See the [association API](../associations.md).
 
 ## Operation results and error codes
 
@@ -241,7 +309,7 @@ A delivered result names the observed transport milestone; it does not assert co
 
 ## Fixtures, verification, and remaining boundaries
 
-The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares the validity of standalone record, command, result, and intentionally invalid examples. The [inventory](../../tests/fixtures/contracts/inventory.json) lists the supported kinds, operations, outcome pairs, and error codes. All examples are synthetic. Their zero-valued digest placeholders establish shape only and are not evidence that source bytes or referenced schemas exist.
+The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares the validity of standalone record, command, result, and intentionally invalid examples. The [inventory](../../tests/fixtures/contracts/inventory.json) lists the supported kinds, operations, outcome pairs, and error codes. The current manifest contains **157 fixtures: 123 valid and 34 intentionally invalid**. All examples are synthetic. Their zero-valued digest placeholders establish shape only and are not evidence that source bytes or referenced schemas exist.
 
 The examples cover every record kind, every command, every permitted success pair, every semantic error code, and additional unknown-time, failed/unknown/qualified judgment cases. Invalid examples include storage failure disguised as `no_match`, embedded execution failure in a semantic success, empty scope, unknown time with an invented value, failed judgment with a conclusion, absent qualification certificate, unsafe revision, missing dependency pin, malformed source digest, undeclared command fields, incompatible availability/locator declarations, ineligible association members, newline-suffixed digests or scope identifiers, missing reproducibility fields, fabricated digests for unproduced outputs, missing evidence locators, and negative resource ceilings.
 

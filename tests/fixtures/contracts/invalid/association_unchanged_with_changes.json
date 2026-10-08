@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "operation": "decide_association",
+  "operation_id": "command-decide_association",
+  "status": "success",
+  "outcome": "unchanged",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "disposition": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.association_dispositions",
+      "record_type": "matter:projection",
+      "id": "disposition-1",
+      "revision": 1
+    },
+    "decision": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "association-decision-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "associations": [],
+    "changes": [
+      {
+        "cause": "association_correction",
+        "before": [],
+        "after": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "matter.association_candidates",
+            "record_type": "matter:projection",
+            "id": "candidate-set-1",
+            "revision": 1
+          }
+        ]
+      }
+    ]
+  }
+}

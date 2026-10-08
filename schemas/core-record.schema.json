@@ -2367,7 +2367,8 @@
             "matched",
             "no_match",
             "ambiguous",
-            "insufficient_evidence"
+            "insufficient_evidence",
+            "evaluation_failed"
           ]
         },
         "candidates": {
@@ -2402,6 +2403,18 @@
         },
         "qualification": {
           "$ref": "#/$defs/qualification"
+        },
+        "candidate_set": {
+          "$ref": "#/$defs/projection_dependency"
+        },
+        "coverage": {
+          "$ref": "#/$defs/coverage"
+        },
+        "assessed_as_of": {
+          "$ref": "#/$defs/known_time"
+        },
+        "evaluation": {
+          "$ref": "#/$defs/receipt_dependency"
         }
       },
       "allOf": [
@@ -2431,7 +2444,8 @@
                 "enum": [
                   "no_match",
                   "ambiguous",
-                  "insufficient_evidence"
+                  "insufficient_evidence",
+                  "evaluation_failed"
                 ]
               }
             }
@@ -2592,6 +2606,21 @@
         },
         "authority": {
           "$ref": "#/$defs/receipt_ref"
+        },
+        "candidate_set": {
+          "$ref": "#/$defs/projection_dependency"
+        },
+        "acceptance_policy": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "decision": {
+          "$ref": "#/$defs/receipt_dependency"
+        },
+        "capability": {
+          "enum": [
+            "attach",
+            "relate"
+          ]
         }
       }
     },
@@ -3997,6 +4026,239 @@
         }
       ],
       "description": "A local model-record dependency notice. Before references remain historical evidence; notices do not delete records, assert new independent sources, or execute transitive invalidation."
+    },
+    "association_member_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entity_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "enum": [
+                "observation",
+                "occurrence",
+                "matter"
+              ]
+            }
+          }
+        }
+      ],
+      "description": "Bare scoped identity of an observation, occurrence, or matter; it asserts no revision, membership, or authority."
+    },
+    "projection_dependency": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "matter:projection"
+            }
+          }
+        }
+      ],
+      "description": "An exact service-owned projection snapshot. Its schema and namespace are admitted by the consuming service, not by this generic reference."
+    },
+    "association_query": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "subject",
+        "candidate_type",
+        "mode",
+        "matching_rule",
+        "selector"
+      ],
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "subject": {
+          "$ref": "#/$defs/association_member_ref"
+        },
+        "candidate_type": {
+          "enum": [
+            "observation",
+            "occurrence",
+            "matter"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "exact_keys",
+            "semantic"
+          ]
+        },
+        "matching_rule": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "selector": {
+          "$ref": "#/$defs/domain_value"
+        },
+        "keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identity_key"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "exact_keys"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "keys"
+            ],
+            "properties": {
+              "keys": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "semantic"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "keys": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ],
+      "description": "A declared host-published catalog query. Complete coverage is bounded by this source, selector, subject, candidate type, and matching rule; no global discovery or continuing-identity assignment is implied."
+    },
+    "association_candidate_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate",
+        "keys",
+        "basis"
+      ],
+      "properties": {
+        "candidate": {
+          "$ref": "#/$defs/association_member_dependency"
+        },
+        "keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identity_key"
+          }
+        },
+        "basis": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          }
+        }
+      }
+    },
+    "association_evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "producer",
+        "outcome",
+        "selected",
+        "uncertainty",
+        "qualification",
+        "reason",
+        "missing_evidence"
+      ],
+      "properties": {
+        "producer": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "outcome": {
+          "enum": [
+            "matched",
+            "no_match",
+            "ambiguous",
+            "insufficient_evidence",
+            "evaluation_failed"
+          ]
+        },
+        "selected": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/association_member_dependency"
+          }
+        },
+        "uncertainty": {
+          "$ref": "#/$defs/domain_value"
+        },
+        "qualification": {
+          "$ref": "#/$defs/qualification"
+        },
+        "reason": {
+          "$ref": "#/$defs/text"
+        },
+        "missing_evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "matched"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "selected": {
+                "minItems": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "selected": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "insufficient_evidence"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "missing_evidence": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ],
+      "description": "Frozen matching output recorded in an immutable evaluation receipt. Producer, confidence, and qualification are evidence about evaluation, never permission to accept, override, or merge."
     }
   }
 }

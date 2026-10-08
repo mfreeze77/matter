@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "operation": "decide_association",
+  "command_id": "command-decide_association",
+  "idempotency_key": "idempotency-decide_association",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [
+    {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    }
+  ],
+  "body": {
+    "subject": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "observation",
+      "id": "observation-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "target": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    },
+    "relation": {
+      "namespace": "example",
+      "id": "report-attachment",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "capability": "attach",
+    "decision": "protect",
+    "previous": null,
+    "reason": "Synthetic host separation decision.",
+    "as_of": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "acceptance_policy": {
+      "namespace": "example",
+      "id": "exact-key",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  }
+}

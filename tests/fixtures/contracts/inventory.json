@@ -26,8 +26,10 @@
     "create_matter",
     "update_matter_metadata",
     "commit_occurrence_grouping",
+    "publish_association_candidates",
     "propose_association",
     "accept_association",
+    "decide_association",
     "append_claim",
     "relate_evidence",
     "revise_evidence_acceptance",
@@ -63,7 +65,8 @@
       "proposal",
       "no_match",
       "ambiguous",
-      "insufficient_evidence"
+      "insufficient_evidence",
+      "evaluation_failed"
     ],
     "accept_association": [
       "accepted"
@@ -117,6 +120,14 @@
     "assess": [
       "assessed",
       "incomplete"
+    ],
+    "publish_association_candidates": [
+      "published",
+      "unchanged"
+    ],
+    "decide_association": [
+      "applied",
+      "unchanged"
     ]
   },
   "error_codes": [

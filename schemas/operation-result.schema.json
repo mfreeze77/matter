@@ -26,8 +26,10 @@
             "create_matter",
             "update_matter_metadata",
             "commit_occurrence_grouping",
+            "publish_association_candidates",
             "propose_association",
             "accept_association",
+            "decide_association",
             "append_claim",
             "relate_evidence",
             "revise_evidence_acceptance",
@@ -331,6 +333,15 @@
               "properties": {
                 "proposal": {
                   "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_proposal_dependency"
+                },
+                "candidate_set": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  }
                 }
               }
             }
@@ -389,6 +400,18 @@
                   },
                   "minItems": 0,
                   "maxItems": 0
+                },
+                "proposal": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_proposal_dependency"
+                },
+                "candidate_set": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  }
                 }
               },
               "description": "candidates preserves the considered set, including rejected candidates. selected is empty because no candidate matched. Candidate-set completeness and evidence admission remain runtime responsibilities."
@@ -420,6 +443,18 @@
                 },
                 "reason": {
                   "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+                },
+                "proposal": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_proposal_dependency"
+                },
+                "candidate_set": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  }
                 }
               }
             }
@@ -450,6 +485,18 @@
                 },
                 "coverage": {
                   "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/coverage"
+                },
+                "proposal": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_proposal_dependency"
+                },
+                "candidate_set": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  }
                 }
               }
             }
@@ -472,6 +519,12 @@
               "properties": {
                 "association": {
                   "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/accepted_association_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  }
                 }
               }
             }
@@ -1167,6 +1220,184 @@
               }
             }
           }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "propose_association"
+            },
+            "outcome": {
+              "const": "evaluation_failed"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reason",
+                "proposal",
+                "candidate_set"
+              ],
+              "properties": {
+                "reason": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+                },
+                "proposal": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_proposal_dependency"
+                },
+                "candidate_set": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "publish_association_candidates"
+            },
+            "outcome": {
+              "const": "published"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "candidate_set",
+                "changes"
+              ],
+              "properties": {
+                "candidate_set": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  },
+                  "minItems": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "publish_association_candidates"
+            },
+            "outcome": {
+              "const": "unchanged"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "candidate_set",
+                "changes"
+              ],
+              "properties": {
+                "candidate_set": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  },
+                  "maxItems": 0
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "decide_association"
+            },
+            "outcome": {
+              "const": "applied"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "disposition",
+                "decision",
+                "associations",
+                "changes"
+              ],
+              "properties": {
+                "disposition": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "decision": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+                },
+                "associations": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/accepted_association_dependency"
+                  }
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  },
+                  "minItems": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "decide_association"
+            },
+            "outcome": {
+              "const": "unchanged"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "disposition",
+                "decision",
+                "associations",
+                "changes"
+              ],
+              "properties": {
+                "disposition": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "decision": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+                },
+                "associations": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/accepted_association_dependency"
+                  }
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  },
+                  "maxItems": 0
+                }
+              }
+            }
+          }
         }
       ]
     },
@@ -1190,8 +1421,10 @@
             "create_matter",
             "update_matter_metadata",
             "commit_occurrence_grouping",
+            "publish_association_candidates",
             "propose_association",
             "accept_association",
+            "decide_association",
             "append_claim",
             "relate_evidence",
             "revise_evidence_acceptance",

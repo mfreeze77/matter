@@ -25,8 +25,10 @@
         "create_matter",
         "update_matter_metadata",
         "commit_occurrence_grouping",
+        "publish_association_candidates",
         "propose_association",
         "accept_association",
+        "decide_association",
         "append_claim",
         "relate_evidence",
         "revise_evidence_acceptance",
@@ -318,6 +320,12 @@
               },
               "assessed_as_of": {
                 "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+              },
+              "candidate_set": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+              },
+              "evaluation": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_evaluation"
               }
             }
           }
@@ -355,6 +363,22 @@
               },
               "acceptance_policy": {
                 "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "candidate_set": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+              },
+              "relation": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "capability": {
+                "enum": [
+                  "attach",
+                  "relate",
+                  "merge"
+                ]
+              },
+              "as_of": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
               }
             }
           }
@@ -960,6 +984,136 @@
                 }
               }
             ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "publish_association_candidates"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "query",
+              "entries",
+              "coverage",
+              "evidence",
+              "as_of",
+              "previous"
+            ],
+            "properties": {
+              "query": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_query"
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_candidate_entry"
+                }
+              },
+              "coverage": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/coverage"
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+                }
+              },
+              "as_of": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+              },
+              "previous": {
+                "oneOf": [
+                  {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "decide_association"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "subject",
+              "target",
+              "relation",
+              "capability",
+              "decision",
+              "previous",
+              "reason",
+              "as_of",
+              "acceptance_policy"
+            ],
+            "properties": {
+              "subject": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_member_dependency"
+              },
+              "target": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_member_dependency"
+              },
+              "relation": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "capability": {
+                "enum": [
+                  "attach",
+                  "relate",
+                  "merge"
+                ]
+              },
+              "decision": {
+                "enum": [
+                  "reject",
+                  "protect",
+                  "release"
+                ]
+              },
+              "previous": {
+                "oneOf": [
+                  {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "reason": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+              },
+              "as_of": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+              },
+              "acceptance_policy": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              }
+            }
           }
         }
       }

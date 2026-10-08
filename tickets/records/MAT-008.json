@@ -4,7 +4,7 @@
   "track": "core",
   "phase": 1,
   "priority": "P0",
-  "status": "planned",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "associations",
@@ -52,7 +52,21 @@
   "artifacts": [
     "src/matter/associations.py",
     "tests/unit/test_association_outcomes.py",
-    "tests/integration/test_association_acceptance.py"
+    "tests/integration/test_association_acceptance.py",
+    "src/matter/association_policy.py",
+    "src/matter/candidate_sets.py",
+    "schemas/candidate-set.schema.json",
+    "schemas/association-evaluation.schema.json",
+    "schemas/association-decision.schema.json",
+    "schemas/association-disposition.schema.json",
+    "schemas/association-membership.schema.json",
+    "tests/unit/test_candidate_sets.py",
+    "tests/unit/test_association_integrity.py",
+    "tests/integration/test_association_atomicity.py",
+    "tests/contract/test_association_contracts.py",
+    "docs/associations.md",
+    "docs/validation/MAT-008.md",
+    "examples/association_acceptance.py"
   ],
   "tests": [
     "A new matching candidate invalidates prior uniqueness.",
@@ -74,7 +88,20 @@
     "matterjevmesh"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "2026-10-08: implemented from merged MAT-007 main commit 1566f34312326110370ac4acd8068127a3f35134. Inspected governing contracts, association/occurrence distinctions, and pinned StateCivics Matters.find, rejected, conflict paths and merge_blocker. Reused Matter canonical encoding, scoped records, transactional guards, private projections, watches, immutable receipts and backup/restore; no new storage backend or provider client.",
+      "2026-10-08, recorded 20:15 UTC: python -m unittest discover -s tests -v passed 494 tests in 265.390 seconds on Python 3.12.14 and SQLite 3.53.1. One final first-protection-after-prepare regression passed separately in 3.727 seconds without runtime changes. All 495 final cases are covered locally: 427 prior tests plus 68 additions. CI executes all final cases together; the local full-run count is 494.",
+      "AC-1: complete empty candidate catalogs yield no_match; two exact matching nominees yield ambiguous; incomplete coverage or unavailable declared evidence yields insufficient_evidence. Each outcome retains an immutable proposal and exact evaluation receipt. External evaluation_failed and actual storage errors stay distinct from no-match or absence evidence.",
+      "AC-2: a newly published matching candidate invalidates an earlier unique proposal. Selected and nonmatching member revision updates also refuse old acceptance. Subject, catalog, every candidate and evidence/basis pin are current guards; both revision and mutable snapshot-digest forms work without refreshing a prior proposal.",
+      "AC-3: high-confidence semantic proposals create no attachment and cannot bypass a disallowed host policy or protected pair. Actor and actual host-stage authority receipts are independently checked. Attachment acceptance coexists with merge refusal and merge-only protection, leaving existing matter IDs, keys and complete snapshots unchanged.",
+      "18 candidate helper tests and 13 outcome tests passed: canonical query bindings, exact key and selector distinctions, duplicate/self/foreign/unknown members, wrong record kinds, explicit coverage, unavailable declared evidence, complete retained catalogs, projection/schema/watch integrity, detached values and unchanged storage-error propagation.",
+      "18 acceptance integration cases passed across the recorded runs: publishing and member races, all considered alternatives, matching/nonmatching candidates, stable pair rejection across new proposal IDs and relation versions, historical retry without reactivation, scope/capability checks, authorized and stale releases, reopen, and two independent competing writers. The final first-protection race confirms an absent-to-present disposition causes durable E_REVISION_CONFLICT and no edge or membership index; a fresh attempt is E_ASSOCIATION_CONFLICT.",
+      "Four independent integrity regressions passed after fixes: contradictory submitted/effective proof and a catalog-outsider selection are refused; every historical association revision is checked; old immutable evidence remains inspectable and revocable after mutable inputs advance, and explicit release does not itself reactivate membership.",
+      "Four atomicity methods passed using nine actual spawned-process os._exit interruptions before receipt, before commit and after commit for proposal, acceptance and protection. Receipts, records, disposition changes and indexes roll back or recover together; lost acknowledgements replay exact journals without rerunning handlers, and protected decisions survive restart and verified new-file restore.",
+      "2026-10-08: isolated 0.1.0.dev7 wheel verification passed outside the checkout. All 25 Python source files, 21 schemas and migration SQL matched tested bytes. All 157 copied contract fixtures retained declared validity (123 valid/34 invalid), and all five copied standalone examples passed, including association acceptance and correction.",
+      "2026-10-08: render --check, repository validation, all three lifecycle walkthroughs, git diff --check and JavaScript 26 canonical plus 8 exact-source vectors passed. Portable inventory: 12 record kinds, 21 operations, 42 success pairs, unchanged 19 errors. Validation reports 80 tickets, 104 requirements, 21 schemas and zero errors. Final recording and CI evidence are described in docs/validation/MAT-008.md and the PR.",
+      "Qualification is bounded to explicitly published local host candidate catalogs and synthetic declarations. Hosts must publish membership changes; no external discovery, provider accuracy qualification, equivalence merge, general control epoch, transitive invalidation or downstream integration is claimed."
+    ]
   }
 }
