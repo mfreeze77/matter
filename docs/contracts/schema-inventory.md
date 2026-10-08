@@ -32,12 +32,19 @@ MAT-008 adds the [candidate-set snapshot](../../schemas/candidate-set.schema.jso
 [association decision](../../schemas/association-decision.schema.json),
 [persistent disposition](../../schemas/association-disposition.schema.json), and
 [membership lookup](../../schemas/association-membership.schema.json) contracts.
-The package now contains **21 JSON Schema resources**: the three portable
-families, fifteen runtime-specific resources, and three repository-tooling
-schemas. These five new schemas bind host-published catalogs, immutable
-evaluation/decision receipt details,
-and current projections; they do not define a provider-ranking protocol or
-a matter-merge engine.
+These five schemas bind host-published catalogs, immutable evaluation/decision
+receipt details and current association projections.
+
+MAT-009 adds the [typed-link index](../../schemas/matter-link-index.schema.json),
+[complete identity-group mirror](../../schemas/identity-group.schema.json),
+[immutable identity decision](../../schemas/identity-decision.schema.json),
+[protected separation history](../../schemas/identity-separation.schema.json),
+[explicit separation release](../../schemas/identity-release.schema.json), and
+[registered identity validity](../../schemas/identity-dependency.schema.json).
+The package now contains **27 JSON Schema resources**: three portable families,
+twenty-one runtime-specific resources and three repository-tooling schemas.
+These new resources preserve original evidence and exact historical partitions;
+they do not supply semantic equivalence proof or a transitive assessment engine.
 
 ## Common record envelope
 
@@ -187,7 +194,8 @@ Creation operations embed typed `*_input` records. These preserve the source/pro
 | `revise_evidence_acceptance` | Pinned evidence relation and a complete replacement acceptance descriptor. | `updated`, `unchanged` |
 | `link_matters` | Pinned matters, relationship kind/schema, and basis. | `linked` |
 | `merge_matters` | Survivor, losing matter revisions, equivalence basis, and merge policy. | `committed` |
-| `correct_merge` | Merge receipt, undo/split intent, partitions, and basis. | `committed` |
+| `correct_merge` | Merge receipt, undo/split intent, explicit original identity partitions and retained children, basis and optional as-of time. | `committed` |
+| `release_identity_separations` | Exact current protected separation pins, basis, explicit reason, merge policy and optional as-of time. | `released` |
 | `record_control` | Proposed accepted host-effect input. | `applied`, `duplicate` |
 | `commit_assessment` | Proposed assessment input and its dependency manifest. | `committed` |
 | `invalidate_dependents` | Nonempty changed positive references or negative scopes and change cause. | `affected`, `no_op` |
@@ -196,7 +204,7 @@ Creation operations embed typed `*_input` records. These preserve the source/pro
 | `dispatch` | Intent, lease token, epoch, delivery key, audience, and baseline. | `delivered`, `withheld` |
 | `assess` | Matter, profile/purpose, explicit evidence selection or query, knowledge boundary, resource budget, and control epoch. | `assessed`, `incomplete` |
 
-These are 21 command variants and 42 successful operation/outcome pairs. MAT-005 adds the bounded `update_matter_metadata` operation, MAT-006 adds `commit_occurrence_grouping`, MAT-007 adds `revise_evidence_acceptance`, and MAT-008 adds `publish_association_candidates` and `decide_association` to the initial 16-operation inventory. MAT-008 also adds the explicit `evaluation_failed` proposal outcome. The `assess` operation comes from the rule contract in addition to the core operation table. `no_match` preserves the considered candidate set, requires an empty `selected` array, and declares adequate coverage. A nonempty considered set can yield no match when every candidate is rejected; the fixture preserves that history. `ambiguous` returns multiple candidates. Insufficient evidence remains explicit. Association subjects, candidates, selected references, and accepted membership all use the same typed observation/occurrence/matter dependency union. A claim, control, judgment, or receipt cannot become an association member. MAT-008 verifies candidate existence and currentness within the declared catalog and preserves its coverage. External discovery, actual source completeness, independent-source qualification and allowed domain transitions remain separate responsibilities.
+These are 22 command variants and 43 successful operation/outcome pairs. MAT-009 adds the explicit separation-release operation. MAT-005 adds the bounded `update_matter_metadata` operation, MAT-006 adds `commit_occurrence_grouping`, MAT-007 adds `revise_evidence_acceptance`, and MAT-008 adds `publish_association_candidates` and `decide_association` to the initial 16-operation inventory. MAT-008 also adds the explicit `evaluation_failed` proposal outcome. The `assess` operation comes from the rule contract in addition to the core operation table. `no_match` preserves the considered candidate set, requires an empty `selected` array, and declares adequate coverage. A nonempty considered set can yield no match when every candidate is rejected; the fixture preserves that history. `ambiguous` returns multiple candidates. Insufficient evidence remains explicit. Association subjects, candidates, selected references, and accepted membership all use the same typed observation/occurrence/matter dependency union. A claim, control, judgment, or receipt cannot become an association member. MAT-008 verifies candidate existence and currentness within the declared catalog and preserves its coverage. External discovery, actual source completeness, independent-source qualification and allowed domain transitions remain separate responsibilities.
 
 For `ingest_observation`, both successful bodies require a pinned `observation` and permit an optional `observation_receipt`, a typed bare receipt reference to that observation's original creation receipt. The MAT-004 handler supplies both fields. The top-level `receipt` always identifies the current command's operation receipt: it matches the observation receipt for a new commit and differs for a duplicate submitted under a new command. Structural validation checks the reference type, not that either receipt exists or that their relationship is correct. Existing v1 results without the optional field remain valid; [compatibility.md](compatibility.md) describes the reader-update requirement.
 
@@ -272,6 +280,31 @@ legacy record executable. Generic controls, control epochs, equivalence merges,
 provider qualification and transitive assessment invalidation are not supplied
 by this association handler. See the [association API](../associations.md).
 
+## Identity merge, correction and release fields
+
+`correct_merge.partitions[].identity_members` is an additive array of exact
+matter dependencies; it is separate from child `members`. Runtime partitions
+must cover every original identity once, preserve each child in all of its
+original owners' partitions, and contain their representative. Merge/correction
+accept an optional known `as_of` and emit exact `identity_views` projection pins
+plus nonempty dependency `changes`. Older success fixtures without these
+optional fields remain readable. The runtime always provides them.
+
+`release_identity_separations` requires current projection dependencies in
+`separations`, a nonempty `basis`, explicit `reason` and `merge_policy`; optional
+`as_of` uses the same known UTC contract. Its `released` result requires exact
+new separation pins, an immutable `release_receipt` and nonempty changes.
+Release does not change identity groups or imply merge acceptance.
+
+Private separation values distinguish protected/released status, name the exact
+`previous` projection or initial null, and retain their immutable decision.
+Re-protection after an authorized release advances that same projection again.
+The identity and release proof schemas preserve full policy admission, authority,
+before/after partitions or barriers, child routing and changes. Shape alone
+proves neither currentness nor that the declared receipt actually committed
+those snapshots; the runtime verifies those bindings. See the
+[identity API](../identity-corrections.md).
+
 ## Operation results and error codes
 
 All results require `schema_version`, `operation`, `operation_id`, and `status`. The two branches are disjoint:
@@ -309,7 +342,7 @@ A delivered result names the observed transport milestone; it does not assert co
 
 ## Fixtures, verification, and remaining boundaries
 
-The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares the validity of standalone record, command, result, and intentionally invalid examples. The [inventory](../../tests/fixtures/contracts/inventory.json) lists the supported kinds, operations, outcome pairs, and error codes. The current manifest contains **157 fixtures: 123 valid and 34 intentionally invalid**. All examples are synthetic. Their zero-valued digest placeholders establish shape only and are not evidence that source bytes or referenced schemas exist.
+The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares the validity of standalone record, command, result, and intentionally invalid examples. The [inventory](../../tests/fixtures/contracts/inventory.json) lists the supported kinds, operations, outcome pairs, and error codes. The current manifest contains **180 fixtures: 134 valid and 46 intentionally invalid**. All examples are synthetic. Their zero-valued digest placeholders establish shape only and are not evidence that source bytes or referenced schemas exist.
 
 The examples cover every record kind, every command, every permitted success pair, every semantic error code, and additional unknown-time, failed/unknown/qualified judgment cases. Invalid examples include storage failure disguised as `no_match`, embedded execution failure in a semantic success, empty scope, unknown time with an invented value, failed judgment with a conclusion, absent qualification certificate, unsafe revision, missing dependency pin, malformed source digest, undeclared command fields, incompatible availability/locator declarations, ineligible association members, newline-suffixed digests or scope identifiers, missing reproducibility fields, fabricated digests for unproduced outputs, missing evidence locators, and negative resource ceilings.
 

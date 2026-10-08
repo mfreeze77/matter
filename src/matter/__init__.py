@@ -10,7 +10,10 @@ and evidence dependence live in ``matter.occurrences`` and
 live in ``matter.claims``, ``matter.evidence_relations`` and ``matter.citations``.
 Host-published candidate sets and authorized association decisions live in
 ``matter.associations``, ``matter.candidate_sets`` and ``matter.association_policy``.
-Semantic ranking, equivalence merges, assessment, and integrations remain backlog work.
+Typed links and guarded equivalence/correction live in ``matter.relations``,
+``matter.identity_groups`` and ``matter.identity_corrections``. Explicit host
+derivatives use the atomic ``matter.identity_dependencies`` validity hook.
+Semantic ranking, assessment execution and integrations remain backlog work.
 """
 
-__version__ = "0.1.0.dev7"
+__version__ = "0.1.0.dev8"

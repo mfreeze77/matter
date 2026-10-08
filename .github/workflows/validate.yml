@@ -35,7 +35,7 @@ jobs:
         run: node tests/fixtures/canonical/verify.mjs
       - name: Run synthetic lifecycle walkthroughs
         run: python -m matter demo all
-      - name: Verify installed contracts, storage, evidence, identity, occurrences, claims, and associations outside the checkout
+      - name: Verify installed contracts, evidence, identity, associations, and corrections outside the checkout
         run: |
           python -m pip wheel . --no-deps --wheel-dir "$RUNNER_TEMP/matter-wheel"
           python -m pip install --force-reinstall --no-deps "$RUNNER_TEMP"/matter-wheel/*.whl
@@ -45,6 +45,7 @@ jobs:
           cp examples/occurrence_grouping.py "$RUNNER_TEMP/matter-occurrences.py"
           cp examples/claim_evidence.py "$RUNNER_TEMP/matter-claims.py"
           cp examples/association_acceptance.py "$RUNNER_TEMP/matter-associations.py"
+          cp examples/identity_corrections.py "$RUNNER_TEMP/matter-identity-corrections.py"
           cd "$RUNNER_TEMP"
           python - <<'PY'
           from importlib.resources import files
@@ -68,6 +69,9 @@ jobs:
               assert files("matter._schemas").joinpath(name + ".schema.json").is_file()
           for name in ("candidate-set", "association-evaluation", "association-decision",
                        "association-disposition", "association-membership"):
+              assert files("matter._schemas").joinpath(name + ".schema.json").is_file()
+          for name in ("identity-group", "identity-decision", "identity-separation",
+                       "identity-dependency", "identity-release", "matter-link-index"):
               assert files("matter._schemas").joinpath(name + ".schema.json").is_file()
           command = decode_command(Path("matter-create.json").read_bytes())
 
@@ -100,3 +104,4 @@ jobs:
           python matter-occurrences.py
           python matter-claims.py
           python matter-associations.py
+          python matter-identity-corrections.py

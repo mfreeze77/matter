@@ -223,7 +223,262 @@ def _command(value, operation=None):
     return command
 
 
-class AssociationService:
+class AssociationReader:
+    """Read and verify accepted edges and decisions without granting write authority.
+
+    Identity correction reuses the same frozen proof checks as acceptance and
+    history. Reading a host decision never authorizes a new decision.
+    """
+
+    def __init__(self, scope_id):
+        self._scope_id = _validate_fragment(scope_id, "identifier")
+
+    @property
+    def scope_id(self):
+        return self._scope_id
+
+    def for_member(self, view, member):
+        """Verify both endpoint watches, including durable merge protections.
+
+        The supplied view owns consistency and revision guards. A transaction
+        re-enumerates these watches so a first new attachment or disposition
+        after preparation cannot disappear from a frozen identity plan.
+        """
+        reference = _scoped(self.scope_id, entity_ref(member), "association_member_ref")
+        associations, dispositions, indexes = {}, {}, {}
+        for role in ("subject", "target"):
+            found = view.watchers(_watch(reference, role))
+            if type(found) is not list:
+                raise _invalid()
+            for raw in found:
+                try:
+                    watched = _validate_projection(raw)
+                except (ValueError, TypeError, KeyError, RecursionError):
+                    raise _invalid() from None
+                if watched["namespace"] == DISPOSITION_NAMESPACE:
+                    body = _value("association-disposition", watched["value"])
+                    checked = self._read_disposition(view, body["subject"], body["target"],
+                                                     body["relation"], body["capability"])
+                    if checked is None or not _same(checked, watched) or body[role] != reference:
+                        raise _invalid()
+                    dispositions[_identity(checked)] = checked
+                elif watched["namespace"] == MEMBERSHIP_NAMESPACE:
+                    body = _value("association-membership", watched["value"])
+                    record = self._read_association(view, entity_ref(body["association"]))
+                    if (record is None or body[role] != reference
+                            or not matches(record, body["association"])
+                            or entity_ref(watched) != _membership_ref(record)
+                            or not _same(watched, _lookup(view, _membership_ref(record)))):
+                        raise _invalid()
+                    associations[_identity(record)] = record
+                    indexes[_identity(watched)] = watched
+                else:
+                    raise _invalid()
+        return {"associations": sorted(associations.values(), key=lambda item: canonical_bytes(entity_ref(item))),
+                "dispositions": sorted(dispositions.values(), key=lambda item: canonical_bytes(entity_ref(item))),
+                "indexes": sorted(indexes.values(), key=lambda item: canonical_bytes(entity_ref(item)))}
+
+    @staticmethod
+    def _evaluation_parents(details):
+        refs = [details["subject"], details["candidate_set"], *details["evidence"]]
+        for candidate in details["candidates"]:
+            refs.extend([candidate["candidate"], *candidate["basis"]])
+        return sorted({canonical_bytes(ref): ref for ref in refs}.values(), key=canonical_bytes)
+
+
+    def _read_proposal(self, view, reference):
+        record = _record(view, self.scope_id, reference, "association_proposal")
+        body = record["body"]
+        if any(key not in body for key in ("evaluation", "candidate_set", "coverage", "assessed_as_of")):
+            raise _invalid("The stored proposal does not contain a frozen candidate decision.")
+        receipt, details = _receipt(view, self.scope_id, body["evaluation"], "association-evaluation", "evaluation")
+        self._verify_frozen_evaluation(details)
+        expected = {key: deepcopy(details[key]) for key in (
+            "subject", "candidate_set", "outcome", "candidates", "selected", "matching_rule", "evidence", "coverage", "assessed_as_of")}
+        expected.update(evaluator_receipt=entity_ref(receipt), evaluation=pin(receipt),
+                        uncertainty=details["evaluation"]["uncertainty"], qualification=details["evaluation"]["qualification"])
+        parents = self._evaluation_parents(details)
+        if (not _same(body, expected) or "supersedes" in record
+                or entity_ref(record) != _record_ref(self.scope_id, receipt["body"]["operation_id"], "proposal")
+                or record["creation_receipt"] != receipt["creation_receipt"]
+                or record["provenance"] != {"origin": "system", "producer": _ENGINE,
+                    "recorded_at": details["assessed_as_of"], "parents": [pin(receipt)]}
+                or receipt["body"]["stage"] != "evaluation" or receipt["body"]["outcome"] != "matter:" + details["outcome"]
+                or receipt["body"]["recorded_at"] != details["assessed_as_of"]
+                or receipt["provenance"] != {"origin": "system", "producer": _ENGINE,
+                    "recorded_at": details["assessed_as_of"], "parents": parents}
+                or not _same(receipt["body"]["evidence"], parents)):
+            raise _invalid()
+        return record, details
+
+
+    def _verify_frozen_evaluation(self, details):
+        """Check immutable proof coherence without refreshing its old inputs."""
+        scope, evaluation = self.scope_id, details["evaluation"]
+        _scoped(scope, details["subject"], "association_member_dependency")
+        _scoped(scope, details["candidate_set"], "projection_dependency")
+        for reference in details["evidence"]:
+            _scoped(scope, reference)
+        if len({_identity(ref) for ref in details["evidence"]}) != len(details["evidence"]):
+            raise _invalid()
+        identities = set()
+        for candidate in details["candidates"]:
+            reference = _scoped(scope, candidate["candidate"], "association_member_dependency")
+            identity = _identity(reference)
+            if identity in identities or identity == _identity(details["subject"]):
+                raise _invalid()
+            identities.add(identity)
+            for basis in candidate["basis"]:
+                _scoped(scope, basis)
+            if len({_identity(ref) for ref in candidate["basis"]}) != len(candidate["basis"]):
+                raise _invalid()
+        for selected in [*details["selected"], *evaluation["selected"]]:
+            _scoped(scope, selected, "association_member_dependency")
+            if _identity(selected) not in identities:
+                raise _invalid()
+        outcome, reported = details["outcome"], evaluation["outcome"]
+        if reported == "matched" and len(evaluation["selected"]) != 1:
+            raise _invalid()
+        if reported == "ambiguous" and len(details["candidates"]) < 2:
+            raise _invalid()
+        if outcome != reported and not (outcome == "insufficient_evidence" and reported != "evaluation_failed"):
+            raise _invalid("Effective association outcomes must preserve the submitted decision or an evidence refusal.")
+        if outcome == "matched" and (
+            reported != "matched" or len(details["selected"]) != 1
+            or entity_ref(details["selected"][0]) != entity_ref(evaluation["selected"][0])
+        ):
+            raise _invalid()
+        if outcome in {"matched", "no_match", "ambiguous"} and details["coverage"]["status"] != "complete":
+            raise _invalid()
+        if details["mode"] == "exact_keys":
+            if (outcome != reported or not _same(details["selected"], evaluation["selected"])
+                    or evaluation["producer"] != _ENGINE
+                    or (outcome == "matched" and len(details["candidates"]) != 1)
+                    or (outcome == "no_match" and details["candidates"])
+                    or outcome == "evaluation_failed"):
+                raise _invalid()
+
+
+    def _read_disposition(self, view, subject, target, relation, capability):
+        reference = disposition_ref(self.scope_id, subject, target, relation, capability)
+        stored = _lookup(view, reference)
+        if stored is None:
+            return None
+        try:
+            record = _validate_projection(stored)
+        except (ValueError, TypeError, KeyError, RecursionError):
+            raise _invalid() from None
+        body = _value("association-disposition", record["value"])
+        if (entity_ref(record) != reference or body["scope_id"] != self.scope_id
+                or disposition_ref(self.scope_id, body["subject"], body["target"], body["relation"], body["capability"]) != reference
+                or record["creation_receipt"]["scope_id"] != self.scope_id
+                or record["watch_keys"] != list(_watches(body["subject"], body["target"]))
+                or body["status"] != ("released" if body["kind"] == "release" else "blocked")):
+            raise _invalid()
+        receipt, detail = self._read_decision(view, body["decision"])
+        expected = {key: deepcopy(body[key]) for key in (
+            "scope_id", "subject", "target", "relation", "capability", "reason", "authority", "policy", "previous", "as_of")}
+        expected.update(decision=body["kind"], proposal=None)
+        if not _same(detail, expected):
+            raise _invalid()
+        if body["previous"] is not None and entity_ref(body["previous"]) != reference:
+            raise _invalid()
+        return record
+
+
+    def _read_decision(self, view, reference):
+        receipt, detail = _receipt(view, self.scope_id, reference, "association-decision", "decision")
+        _scoped(self.scope_id, detail["subject"], "association_member_ref")
+        _scoped(self.scope_id, detail["target"], "association_member_ref")
+        _scoped(self.scope_id, detail["authority"], "receipt_ref")
+        expected_disposition = disposition_ref(self.scope_id, detail["subject"], detail["target"],
+                                                detail["relation"], detail["capability"])
+        if detail["previous"] is not None:
+            _scoped(self.scope_id, detail["previous"], "projection_dependency")
+            if entity_ref(detail["previous"]) != expected_disposition:
+                raise _invalid()
+        if detail["proposal"] is not None:
+            _scoped(self.scope_id, detail["proposal"], "association_proposal_dependency")
+        if ((detail["decision"] == "accept") != (detail["proposal"] is not None)
+                or (detail["decision"] == "accept" and detail["capability"] == "merge")
+                or (detail["decision"] == "release" and detail["previous"] is None)):
+            raise _invalid()
+        parents = [detail["previous"]] if detail["previous"] is not None else []
+        if detail["proposal"] is not None:
+            parents.append(detail["proposal"])
+        if (receipt["body"]["stage"] != "authority" or receipt["body"]["outcome"] != "matter:association_" + detail["decision"]
+                or receipt["body"]["recorded_at"] != detail["as_of"]
+                or receipt["provenance"] != {"origin": "host", "producer": _ENGINE,
+                    "recorded_at": detail["as_of"], "parents": parents}
+                or not _same(receipt["body"]["evidence"], parents)):
+            raise _invalid()
+        return receipt, detail
+
+
+    def _verify_association_snapshot(self, view, stored):
+        try:
+            record = validate_record(stored)
+            body = record["body"]
+            if (record["record_type"] != "accepted_association" or len(body["members"]) != 2
+                    or any(key not in body for key in ("capability", "decision", "candidate_set", "acceptance_policy"))
+                    or body["capability"] not in {"attach", "relate"} or "supersedes" in record
+                    or record["creation_receipt"]["scope_id"] != self.scope_id
+                    or entity_ref(record) != association_ref(self.scope_id, *body["members"], body["relation"], body["capability"])):
+                raise _invalid()
+        except (ValueError, TypeError, KeyError, RecursionError):
+            raise _invalid() from None
+        proposal, _ = self._read_proposal(view, body["proposal"])
+        _, decision = self._read_decision(view, body["decision"])
+        if (proposal["body"]["outcome"] != "matched" or len(proposal["body"]["selected"]) != 1
+                or not _same(body["members"], [proposal["body"]["subject"], proposal["body"]["selected"][0]])
+                or not _same(body["candidate_set"], proposal["body"]["candidate_set"])
+                or decision["subject"] != entity_ref(body["members"][0]) or decision["target"] != entity_ref(body["members"][1])
+                or decision["relation"] != body["relation"] or decision["capability"] != body["capability"]
+                or decision["authority"] != body["authority"] or decision["policy"] != body["acceptance_policy"]
+                or (body["status"] == "active" and (decision["decision"] != "accept" or decision["proposal"] != body["proposal"]))
+                or (body["status"] == "revoked" and decision["decision"] not in {"reject", "protect"})
+                or body["status"] == "superseded"):
+            raise _invalid()
+        provenance = record["provenance"]
+        if (provenance["origin"] != "host" or provenance["producer"] != _ENGINE
+                or set(provenance) != {"origin", "producer", "recorded_at", "parents"}
+                or len(provenance["parents"]) != 2):
+            raise _invalid()
+        original_proposal, _ = self._read_proposal(view, provenance["parents"][0])
+        original_receipt, original_decision = self._read_decision(view, provenance["parents"][1])
+        if (original_decision["decision"] != "accept" or original_decision["proposal"] != pin(original_proposal)
+                or original_receipt["creation_receipt"] != record["creation_receipt"]
+                or original_decision["as_of"] != provenance["recorded_at"]
+                or original_decision["subject"] != entity_ref(body["members"][0])
+                or original_decision["target"] != entity_ref(body["members"][1])
+                or association_ref(self.scope_id, original_decision["subject"], original_decision["target"],
+                    original_decision["relation"], original_decision["capability"]) != entity_ref(record)):
+            raise _invalid()
+        return record
+
+
+    def _read_association(self, view, reference):
+        stored = _lookup(view, reference)
+        if stored is None:
+            return None
+        record = self._verify_association_snapshot(view, stored)
+        body = record["body"]
+        index = _lookup(view, _membership_ref(record))
+        if index is None:
+            raise _invalid()
+        try:
+            index = _validate_projection(index)
+        except (ValueError, TypeError, KeyError, RecursionError):
+            raise _invalid() from None
+        if (entity_ref(index) != _membership_ref(record) or index["revision"] != record["revision"]
+                or index["creation_receipt"] != record["creation_receipt"]
+                or not _same(index["value"], _membership(record))
+                or index["watch_keys"] != list(_watches(*body["members"]))):
+            raise _invalid()
+        return record
+
+
+class AssociationService(AssociationReader):
     def __init__(self, storage, *, policy: AssociationPolicy):
         if not isinstance(policy, AssociationPolicy):
             raise StorageError("E_POLICY_INVALID")
@@ -407,198 +662,12 @@ class AssociationService:
             result["reason"] = details["evaluation"]["reason"]
         return tx.success("proposal" if outcome == "matched" else outcome, result)
 
-    @staticmethod
-    def _evaluation_parents(details):
-        refs = [details["subject"], details["candidate_set"], *details["evidence"]]
-        for candidate in details["candidates"]:
-            refs.extend([candidate["candidate"], *candidate["basis"]])
-        return sorted({canonical_bytes(ref): ref for ref in refs}.values(), key=canonical_bytes)
 
-    def _read_proposal(self, view, reference):
-        record = _record(view, self.scope_id, reference, "association_proposal")
-        body = record["body"]
-        if any(key not in body for key in ("evaluation", "candidate_set", "coverage", "assessed_as_of")):
-            raise _invalid("The stored proposal does not contain a frozen candidate decision.")
-        receipt, details = _receipt(view, self.scope_id, body["evaluation"], "association-evaluation", "evaluation")
-        self._verify_frozen_evaluation(details)
-        expected = {key: deepcopy(details[key]) for key in (
-            "subject", "candidate_set", "outcome", "candidates", "selected", "matching_rule", "evidence", "coverage", "assessed_as_of")}
-        expected.update(evaluator_receipt=entity_ref(receipt), evaluation=pin(receipt),
-                        uncertainty=details["evaluation"]["uncertainty"], qualification=details["evaluation"]["qualification"])
-        parents = self._evaluation_parents(details)
-        if (not _same(body, expected) or "supersedes" in record
-                or entity_ref(record) != _record_ref(self.scope_id, receipt["body"]["operation_id"], "proposal")
-                or record["creation_receipt"] != receipt["creation_receipt"]
-                or record["provenance"] != {"origin": "system", "producer": _ENGINE,
-                    "recorded_at": details["assessed_as_of"], "parents": [pin(receipt)]}
-                or receipt["body"]["stage"] != "evaluation" or receipt["body"]["outcome"] != "matter:" + details["outcome"]
-                or receipt["body"]["recorded_at"] != details["assessed_as_of"]
-                or receipt["provenance"] != {"origin": "system", "producer": _ENGINE,
-                    "recorded_at": details["assessed_as_of"], "parents": parents}
-                or not _same(receipt["body"]["evidence"], parents)):
-            raise _invalid()
-        return record, details
 
-    def _verify_frozen_evaluation(self, details):
-        """Check immutable proof coherence without refreshing its old inputs."""
-        scope, evaluation = self.scope_id, details["evaluation"]
-        _scoped(scope, details["subject"], "association_member_dependency")
-        _scoped(scope, details["candidate_set"], "projection_dependency")
-        for reference in details["evidence"]:
-            _scoped(scope, reference)
-        if len({_identity(ref) for ref in details["evidence"]}) != len(details["evidence"]):
-            raise _invalid()
-        identities = set()
-        for candidate in details["candidates"]:
-            reference = _scoped(scope, candidate["candidate"], "association_member_dependency")
-            identity = _identity(reference)
-            if identity in identities or identity == _identity(details["subject"]):
-                raise _invalid()
-            identities.add(identity)
-            for basis in candidate["basis"]:
-                _scoped(scope, basis)
-            if len({_identity(ref) for ref in candidate["basis"]}) != len(candidate["basis"]):
-                raise _invalid()
-        for selected in [*details["selected"], *evaluation["selected"]]:
-            _scoped(scope, selected, "association_member_dependency")
-            if _identity(selected) not in identities:
-                raise _invalid()
-        outcome, reported = details["outcome"], evaluation["outcome"]
-        if reported == "matched" and len(evaluation["selected"]) != 1:
-            raise _invalid()
-        if reported == "ambiguous" and len(details["candidates"]) < 2:
-            raise _invalid()
-        if outcome != reported and not (outcome == "insufficient_evidence" and reported != "evaluation_failed"):
-            raise _invalid("Effective association outcomes must preserve the submitted decision or an evidence refusal.")
-        if outcome == "matched" and (
-            reported != "matched" or len(details["selected"]) != 1
-            or entity_ref(details["selected"][0]) != entity_ref(evaluation["selected"][0])
-        ):
-            raise _invalid()
-        if outcome in {"matched", "no_match", "ambiguous"} and details["coverage"]["status"] != "complete":
-            raise _invalid()
-        if details["mode"] == "exact_keys":
-            if (outcome != reported or not _same(details["selected"], evaluation["selected"])
-                    or evaluation["producer"] != _ENGINE
-                    or (outcome == "matched" and len(details["candidates"]) != 1)
-                    or (outcome == "no_match" and details["candidates"])
-                    or outcome == "evaluation_failed"):
-                raise _invalid()
 
-    def _read_disposition(self, view, subject, target, relation, capability):
-        reference = disposition_ref(self.scope_id, subject, target, relation, capability)
-        stored = _lookup(view, reference)
-        if stored is None:
-            return None
-        try:
-            record = _validate_projection(stored)
-        except (ValueError, TypeError, KeyError, RecursionError):
-            raise _invalid() from None
-        body = _value("association-disposition", record["value"])
-        if (entity_ref(record) != reference or body["scope_id"] != self.scope_id
-                or disposition_ref(self.scope_id, body["subject"], body["target"], body["relation"], body["capability"]) != reference
-                or record["creation_receipt"]["scope_id"] != self.scope_id
-                or record["watch_keys"] != list(_watches(body["subject"], body["target"]))
-                or body["status"] != ("released" if body["kind"] == "release" else "blocked")):
-            raise _invalid()
-        receipt, detail = self._read_decision(view, body["decision"])
-        expected = {key: deepcopy(body[key]) for key in (
-            "scope_id", "subject", "target", "relation", "capability", "reason", "authority", "policy", "previous", "as_of")}
-        expected.update(decision=body["kind"], proposal=None)
-        if not _same(detail, expected):
-            raise _invalid()
-        if body["previous"] is not None and entity_ref(body["previous"]) != reference:
-            raise _invalid()
-        return record
 
-    def _read_decision(self, view, reference):
-        receipt, detail = _receipt(view, self.scope_id, reference, "association-decision", "decision")
-        _scoped(self.scope_id, detail["subject"], "association_member_ref")
-        _scoped(self.scope_id, detail["target"], "association_member_ref")
-        _scoped(self.scope_id, detail["authority"], "receipt_ref")
-        expected_disposition = disposition_ref(self.scope_id, detail["subject"], detail["target"],
-                                                detail["relation"], detail["capability"])
-        if detail["previous"] is not None:
-            _scoped(self.scope_id, detail["previous"], "projection_dependency")
-            if entity_ref(detail["previous"]) != expected_disposition:
-                raise _invalid()
-        if detail["proposal"] is not None:
-            _scoped(self.scope_id, detail["proposal"], "association_proposal_dependency")
-        if ((detail["decision"] == "accept") != (detail["proposal"] is not None)
-                or (detail["decision"] == "accept" and detail["capability"] == "merge")
-                or (detail["decision"] == "release" and detail["previous"] is None)):
-            raise _invalid()
-        parents = [detail["previous"]] if detail["previous"] is not None else []
-        if detail["proposal"] is not None:
-            parents.append(detail["proposal"])
-        if (receipt["body"]["stage"] != "authority" or receipt["body"]["outcome"] != "matter:association_" + detail["decision"]
-                or receipt["body"]["recorded_at"] != detail["as_of"]
-                or receipt["provenance"] != {"origin": "host", "producer": _ENGINE,
-                    "recorded_at": detail["as_of"], "parents": parents}
-                or not _same(receipt["body"]["evidence"], parents)):
-            raise _invalid()
-        return receipt, detail
 
-    def _verify_association_snapshot(self, view, stored):
-        try:
-            record = validate_record(stored)
-            body = record["body"]
-            if (record["record_type"] != "accepted_association" or len(body["members"]) != 2
-                    or any(key not in body for key in ("capability", "decision", "candidate_set", "acceptance_policy"))
-                    or body["capability"] not in {"attach", "relate"} or "supersedes" in record
-                    or record["creation_receipt"]["scope_id"] != self.scope_id
-                    or entity_ref(record) != association_ref(self.scope_id, *body["members"], body["relation"], body["capability"])):
-                raise _invalid()
-        except (ValueError, TypeError, KeyError, RecursionError):
-            raise _invalid() from None
-        proposal, _ = self._read_proposal(view, body["proposal"])
-        _, decision = self._read_decision(view, body["decision"])
-        if (proposal["body"]["outcome"] != "matched" or len(proposal["body"]["selected"]) != 1
-                or not _same(body["members"], [proposal["body"]["subject"], proposal["body"]["selected"][0]])
-                or not _same(body["candidate_set"], proposal["body"]["candidate_set"])
-                or decision["subject"] != entity_ref(body["members"][0]) or decision["target"] != entity_ref(body["members"][1])
-                or decision["relation"] != body["relation"] or decision["capability"] != body["capability"]
-                or decision["authority"] != body["authority"] or decision["policy"] != body["acceptance_policy"]
-                or (body["status"] == "active" and (decision["decision"] != "accept" or decision["proposal"] != body["proposal"]))
-                or (body["status"] == "revoked" and decision["decision"] not in {"reject", "protect"})
-                or body["status"] == "superseded"):
-            raise _invalid()
-        provenance = record["provenance"]
-        if (provenance["origin"] != "host" or provenance["producer"] != _ENGINE
-                or set(provenance) != {"origin", "producer", "recorded_at", "parents"}
-                or len(provenance["parents"]) != 2):
-            raise _invalid()
-        original_proposal, _ = self._read_proposal(view, provenance["parents"][0])
-        original_receipt, original_decision = self._read_decision(view, provenance["parents"][1])
-        if (original_decision["decision"] != "accept" or original_decision["proposal"] != pin(original_proposal)
-                or original_receipt["creation_receipt"] != record["creation_receipt"]
-                or original_decision["as_of"] != provenance["recorded_at"]
-                or original_decision["subject"] != entity_ref(body["members"][0])
-                or original_decision["target"] != entity_ref(body["members"][1])
-                or association_ref(self.scope_id, original_decision["subject"], original_decision["target"],
-                    original_decision["relation"], original_decision["capability"]) != entity_ref(record)):
-            raise _invalid()
-        return record
 
-    def _read_association(self, view, reference):
-        stored = _lookup(view, reference)
-        if stored is None:
-            return None
-        record = self._verify_association_snapshot(view, stored)
-        body = record["body"]
-        index = _lookup(view, _membership_ref(record))
-        if index is None:
-            raise _invalid()
-        try:
-            index = _validate_projection(index)
-        except (ValueError, TypeError, KeyError, RecursionError):
-            raise _invalid() from None
-        if (entity_ref(index) != _membership_ref(record) or index["revision"] != record["revision"]
-                or index["creation_receipt"] != record["creation_receipt"]
-                or not _same(index["value"], _membership(record))
-                or index["watch_keys"] != list(_watches(*body["members"]))):
-            raise _invalid()
-        return record
 
     def _acceptance_state(self, view, command):
         body, scope = command["body"], self.scope_id

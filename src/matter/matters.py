@@ -3,8 +3,9 @@
 Prepare a command once and retain it for exact retries. Identity is scoped and
 durable; titles, processing runs, audiences, and assessment policies do not
 establish it. This service creates subjects and revisions their display
-metadata. It does not cluster evidence, add aliases, merge subjects, associate
-observations, or apply lifecycle transitions.
+metadata. Explicit identity decisions can redirect resolution through verified
+groups; original subject keys remain anchored to their original records. This
+service does not decide equivalence or apply lifecycle transitions.
 """
 
 from __future__ import annotations
@@ -18,13 +19,14 @@ from .identity_keys import (
     INDEX_NAMESPACE, ExactIdentityPolicy, binding_value, identity_key_ref,
     read_binding,
 )
+from .identity_groups import GROUP_NAMESPACE, read_group
 from .storage import Snapshot, Storage, StorageError, Transaction, entity_ref, pin
 from .storage.base import STORAGE_NAMESPACE, _validate_fragment
 
 
 _OPERATIONS = frozenset({"create_matter", "update_matter_metadata"})
 # Built-in persistence namespaces are implementation-owned, not subject IDs.
-_RESERVED_NAMESPACES = frozenset({STORAGE_NAMESPACE, INDEX_NAMESPACE, "matter.observations"})
+_RESERVED_NAMESPACES = frozenset({STORAGE_NAMESPACE, INDEX_NAMESPACE, GROUP_NAMESPACE, "matter.observations"})
 
 
 def _identity(value: dict[str, Any]) -> tuple[str, str, str]:
@@ -102,15 +104,27 @@ def _bindings(
 
 def _resolved(
     indexes: list[dict[str, Any] | None], records: list[dict[str, Any]],
-    domain_kind: str | None = None,
+    domain_kind: str | None = None, *, view: Snapshot | Transaction, scope_id: str,
 ) -> dict[str, Any] | None:
     if not records:
         return None
     # A partially bound key set is not permission to attach its unbound keys.
     # Applying the same rule to reads prevents a lookup from implying aliases.
-    if len(records) != 1 or any(index is None for index in indexes):
+    if any(index is None for index in indexes):
         raise _conflict(records)
-    record = records[0]
+    if domain_kind is not None and any(record["body"]["domain_kind"] != domain_kind for record in records):
+        raise _conflict(records)
+    survivors = {}
+    covered = set()
+    for record in records:
+        if _identity(record) in covered:
+            continue
+        group = read_group(view, scope_id, entity_ref(record))
+        survivors[_identity(group["survivor"])] = group["survivor"]
+        covered.update(_identity(member) for member in group["members"])
+    if len(survivors) != 1:
+        raise _conflict(records)
+    record = next(iter(survivors.values()))
     if domain_kind is not None and record["body"]["domain_kind"] != domain_kind:
         raise _conflict(records)
     return record
@@ -179,6 +193,27 @@ class MatterService:
                 expected.append(deepcopy(reference))
                 identities.add(identity)
 
+        class GroupReads:
+            def __init__(self, snapshot):
+                self.snapshot = snapshot
+
+            def lookup_identity(self, reference):
+                record = self.snapshot.lookup_identity(reference)
+                include(pin(record))
+                return record
+
+            def get(self, reference):
+                record = self.snapshot.get(reference)
+                include(reference if "revision" in reference or "digest" in reference else pin(record))
+                return record
+
+        def include_groups(view, records):
+            covered = set()
+            for record in records:
+                if _identity(record) not in covered:
+                    group = read_group(GroupReads(view), self.scope_id, entity_ref(record))
+                    covered.update(_identity(member) for member in group["members"])
+
         with self._storage.snapshot() as view:
             try:
                 journal = view.command_receipt(command["idempotency_key"])
@@ -199,6 +234,7 @@ class MatterService:
                         include(pin(index))
                 for record in records:
                     include(pin(record))
+                include_groups(view, records)
                 occupied = _lookup(view, entity_ref(matter))
                 if occupied is not None:
                     include(pin(occupied))
@@ -218,6 +254,7 @@ class MatterService:
                             include(pin(index))
                     for record in records:
                         include(pin(record))
+                    include_groups(view, records)
         return validate_command(command)
 
     def create(self, command: dict[str, Any]) -> dict[str, Any]:
@@ -237,10 +274,13 @@ class MatterService:
             raise StorageError("E_POLICY_INVALID", "Matter creation cannot apply lifecycle or replacement decisions.")
 
         indexes, records = _bindings(tx, self.scope_id, keys)
-        current = _resolved(indexes, records, proposed["body"]["domain_kind"])
+        current = _resolved(indexes, records, proposed["body"]["domain_kind"], view=tx, scope_id=self.scope_id)
         occupied = _lookup(tx, entity_ref(proposed))
         if occupied is not None and (
-            current is None or entity_ref(occupied) != entity_ref(current)
+            current is None or (
+                entity_ref(occupied) != entity_ref(current)
+                and _identity(occupied) not in {_identity(record) for record in records}
+            )
         ):
             raise _conflict([occupied])
         if current is not None:
@@ -275,9 +315,9 @@ class MatterService:
         indexes, records = _bindings(tx, self.scope_id, keys)
         if any(index is None for index in indexes):
             raise _integrity_error()
-        resolved = _resolved(indexes, records)
+        resolved = _resolved(indexes, records, view=tx, scope_id=self.scope_id)
         if resolved is None or entity_ref(resolved) != entity_ref(current):
-            raise _integrity_error()
+            raise StorageError("E_MERGE_CONFLICT", "Metadata edits must target the current surviving matter.")
 
         changed = deepcopy(current)
         metadata = command["body"]["metadata"]
@@ -310,4 +350,4 @@ class MatterService:
             _validate_fragment(domain_kind, "namespaced_name")
         with self._storage.snapshot() as view:
             indexes, records = _bindings(view, self.scope_id, keys)
-            return _resolved(indexes, records, domain_kind)
+            return _resolved(indexes, records, domain_kind, view=view, scope_id=self.scope_id)

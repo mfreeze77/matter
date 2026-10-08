@@ -24,7 +24,11 @@ outside the checkout, without loading test fixtures:
 |---|---|
 | [Observation intake](observation_intake.py) | Exact payloads, duplicate delivery, explicit corrections, evidence history, and restart |
 | [Matter identity](matter_identity.py) | Persistent exact subject keys, new-run continuity, revisioned metadata, scope isolation, exact retries, and backup/restore |
+| [Occurrence grouping](occurrence_grouping.py) | Exact occurrence keys, retained observation membership, provenance roots, regrouping, and historical retry |
+| [Claim evidence](claim_evidence.py) | Attributed claims, verified source citations, supporting and conflicting evidence, retained history, and restore |
+| [Association acceptance](association_acceptance.py) | Explicit candidate catalogs, proposals, guarded host acceptance, rejection, authorized release, and replay |
+| [Identity corrections](identity_corrections.py) | Typed links, guarded merges, preserved evidence and conflicts, historical assessment, atomic validity, protected undo, explicit separation release, re-protection, and restore |
 
-Run `python examples/observation_intake.py` and `python examples/matter_identity.py`.
-Both use synthetic host authority references. They do not establish domain
+Run any example with `python examples/<filename>.py`.
+All use synthetic inputs and host authority declarations. They do not establish domain
 authority, semantic identity, or a qualified assessment engine.

@@ -1,0 +1,299 @@
+{
+  "schema_version": "1.0",
+  "record_type": "receipt",
+  "scope_id": "synthetic:mat002",
+  "namespace": "example",
+  "id": "synthetic-identity-decision",
+  "creation_receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "receipt-1"
+  },
+  "provenance": {
+    "origin": "host",
+    "producer": {
+      "namespace": "example",
+      "id": "fixture-producer",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "parents": []
+  },
+  "body": {
+    "stage": "authority",
+    "operation_id": "operation-1",
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "outcome": "matter:identity_merge",
+    "evidence": [],
+    "details": {
+      "schema": {
+        "namespace": "matter",
+        "id": "identity-decision",
+        "version": "1.0",
+        "digest": "af11c98bba91ca3132cf8001296501fc8bead6dbd28803d8ea80428f87289fad"
+      },
+      "value": {
+        "scope_id": "synthetic:mat002",
+        "kind": "merge",
+        "authority": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "receipt",
+          "id": "authority-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "policy": {
+          "namespace": "example",
+          "id": "merge-policy",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "basis": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "observation",
+            "id": "observation-1",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "as_of": {
+          "state": "known",
+          "value": "2026-10-08T16:00:00Z",
+          "precision": "second"
+        },
+        "previous": null,
+        "before": [
+          {
+            "survivor": {
+              "scope_id": "synthetic:mat002",
+              "namespace": "example",
+              "record_type": "matter",
+              "id": "matter-1",
+              "revision": 1
+            },
+            "members": [
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-1",
+                "revision": 1
+              }
+            ],
+            "indexes": []
+          },
+          {
+            "survivor": {
+              "scope_id": "synthetic:mat002",
+              "namespace": "example",
+              "record_type": "matter",
+              "id": "matter-2",
+              "revision": 1
+            },
+            "members": [
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-2",
+                "revision": 1
+              }
+            ],
+            "indexes": []
+          }
+        ],
+        "after": [
+          {
+            "survivor": {
+              "scope_id": "synthetic:mat002",
+              "namespace": "example",
+              "record_type": "matter",
+              "id": "matter-1",
+              "revision": 2
+            },
+            "members": [
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-1",
+                "revision": 2
+              },
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-2",
+                "revision": 2
+              }
+            ],
+            "indexes": [
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "matter.identity_groups",
+                "record_type": "matter:projection",
+                "id": "synthetic-group-matter-1",
+                "revision": 1
+              },
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "matter.identity_groups",
+                "record_type": "matter:projection",
+                "id": "synthetic-group-matter-2",
+                "revision": 1
+              }
+            ]
+          }
+        ],
+        "children": [
+          {
+            "reference": {
+              "scope_id": "synthetic:mat002",
+              "namespace": "example",
+              "record_type": "observation",
+              "id": "observation-1",
+              "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "original_matters": [
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-2"
+              }
+            ],
+            "before": [
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-2"
+              }
+            ],
+            "after": [
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-1"
+              }
+            ],
+            "action": "moved",
+            "record_action": "retained"
+          }
+        ],
+        "conflicts": [
+          {
+            "kind": "metadata_difference",
+            "references": [
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-1",
+                "revision": 1
+              },
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-2",
+                "revision": 1
+              }
+            ],
+            "reason": "Synthetic metadata overlap for portable structural testing only."
+          }
+        ],
+        "protections": [],
+        "changes": [
+          {
+            "cause": "association_correction",
+            "before": [
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-1",
+                "revision": 1
+              },
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-2",
+                "revision": 1
+              }
+            ],
+            "after": [
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-1",
+                "revision": 2
+              },
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "example",
+                "record_type": "matter",
+                "id": "matter-2",
+                "revision": 2
+              },
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "matter.identity_groups",
+                "record_type": "matter:projection",
+                "id": "synthetic-group-matter-1",
+                "revision": 1
+              },
+              {
+                "scope_id": "synthetic:mat002",
+                "namespace": "matter.identity_groups",
+                "record_type": "matter:projection",
+                "id": "synthetic-group-matter-2",
+                "revision": 1
+              }
+            ]
+          }
+        ],
+        "actor": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example:host",
+          "id": "actor-1"
+        },
+        "policy_definition": {
+          "scope_id": "synthetic:mat002",
+          "actors": [
+            {
+              "scope_id": "synthetic:mat002",
+              "namespace": "example:host",
+              "id": "actor-1"
+            }
+          ],
+          "authorities": [
+            {
+              "scope_id": "synthetic:mat002",
+              "namespace": "example",
+              "record_type": "receipt",
+              "id": "authority-1",
+              "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ],
+          "allow_correction": true,
+          "capability": "merge"
+        }
+      }
+    }
+  }
+}

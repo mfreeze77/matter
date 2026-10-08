@@ -65,7 +65,7 @@ member's identity. `merge` always returns `E_AUTHORITY_REQUIRED` at acceptance.
 The host may record a protected `merge` disposition for the later identity
 correction engine, but MAT-008 never performs a merge, creates a redirect, moves
 children, or grants permission for an indirect merge. Those operations and
-full merged-group protection belong to MAT-009.
+full merged-group protection are supplied by the separate [MAT-009 service](identity-corrections.md).
 
 ## Publish the candidate universe explicitly
 
@@ -264,7 +264,7 @@ query changes, and relation version/digest changes cannot evade it. Attachment
 and relatedness are directional. Merge separation is symmetric across the
 pair. A merge-only protection does not block an attachment; a protection
 against `attach` applies to that declared relation and direction. General
-transitive protection across merged groups is a separate MAT-009 operation.
+transitive protection across merged groups is implemented by the separate [MAT-009 service](identity-corrections.md).
 
 Releasing a disposition requires `allow_correction=True`, its current
 `previous` pin, an admitted host command, and an explicit reason. A stale

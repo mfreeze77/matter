@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "operation": "correct_merge",
+  "command_id": "synthetic-identity-undo",
+  "idempotency_key": "synthetic-identity-undo-key",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [
+    {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    }
+  ],
+  "body": {
+    "merge_receipt": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "merge-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "correction_kind": "undo",
+    "partitions": [
+      {
+        "matter": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "matter",
+          "id": "matter-1"
+        },
+        "members": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "observation",
+            "id": "observation-1",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "identity_members": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "observation",
+            "id": "observation-1",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ]
+      },
+      {
+        "matter": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "matter",
+          "id": "matter-2"
+        },
+        "members": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "observation",
+            "id": "observation-2",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "identity_members": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-2",
+            "revision": 2
+          }
+        ]
+      }
+    ],
+    "basis": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "observation",
+        "id": "observation-1",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "as_of": {
+      "state": "known",
+      "value": "2026-10-08T16:00:00Z",
+      "precision": "second"
+    }
+  }
+}

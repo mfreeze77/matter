@@ -127,6 +127,31 @@ a later revocation. Matter merges, general control epochs and transitive
 invalidation remain separate work. The [association API](../associations.md)
 defines the executable boundary.
 
+MAT-009 adds `release_identity_separations`, bringing the portable inventory to
+twenty-two operations and forty-three successful operation/outcome pairs. The
+runtime also implements the existing `link_matters`, `merge_matters` and
+`correct_merge` shapes. It adds six private schemas for typed-link indexes,
+complete identity-group mirrors, immutable identity decisions, protected
+separation/release history, and registered dependency validity. Core record
+kinds, wire version, canonical encoding and SQLite migration remain unchanged.
+
+Correction partitions gain optional structural `identity_members` containing
+exact matter dependencies, separate from the existing retained child `members`.
+MAT-009 runtime requires the complete explicit identity-member plan; legacy
+structural fixtures do not imply an executable correction. Merge/correction
+commands permit a known `as_of`, and their success bodies add exact
+`identity_views` and nonempty `changes`. Earlier fixtures remain valid; earlier
+closed-schema readers must update before admitting the new fields or operation.
+No automatic version negotiation or operation fallback is introduced.
+
+The release operation requires exact current protected separation pins, a
+nonempty basis, explicit reason and merge policy, with correction permission.
+It preserves the original protection and changes no matter or group. Subsequent
+merge/correction and release retries respect the complete current barrier
+history. Registered derivative validity changes atomically with identity
+changes; general transitive invalidation remains a separate engine. See the
+[identity correction API](../identity-corrections.md) for its exact bounds.
+
 ## Four independent versions and identities
 
 The schema version identifies the structure and interpretation of an envelope.

@@ -34,7 +34,7 @@ def _invalid() -> StorageError:
     return StorageError("E_EVIDENCE_INVALID", "The citation validation binding is invalid.")
 
 
-@lru_cache(maxsize=3)
+@lru_cache(maxsize=32)
 def _contract(name: str) -> tuple[dict[str, str], Draft202012Validator]:
     try:
         data = files("matter._schemas").joinpath(name + ".schema.json").read_bytes()
@@ -46,7 +46,7 @@ def _contract(name: str) -> tuple[dict[str, str], Draft202012Validator]:
             "namespace": "matter", "id": name, "version": "1.0", "digest": source_digest(data),
         }, Draft202012Validator(schema, registry=registry, format_checker=_FORMAT_CHECKER)
     except (OSError, ValueError, TypeError, KeyError, SchemaError):
-        raise StorageError("E_STORAGE_UNAVAILABLE", "The installed citation schema is unavailable.") from None
+        raise StorageError("E_STORAGE_UNAVAILABLE", "The installed runtime schema is unavailable.") from None
 
 
 def _domain(name: str, body: dict[str, Any]) -> dict[str, Any]:

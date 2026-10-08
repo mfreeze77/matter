@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/matter-link-index.schema.json",
+  "title": "Matter frozen typed relationship index v1",
+  "description": "One current typed link and its original host-admitted graph semantics. These rules remain binding when later identity merges project endpoints onto survivors.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scope_id",
+    "relation",
+    "rule",
+    "authority"
+  ],
+  "properties": {
+    "scope_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "relation": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_relation_dependency"
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "namespace",
+        "id",
+        "version",
+        "directed",
+        "allow_self",
+        "acyclic"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespaced_name"
+        },
+        "namespace": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+        },
+        "version": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+        },
+        "directed": {
+          "type": "boolean"
+        },
+        "allow_self": {
+          "type": "boolean"
+        },
+        "acyclic": {
+          "type": "boolean"
+        }
+      }
+    },
+    "authority": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+    }
+  }
+}

@@ -6,7 +6,7 @@ Matter is a shared foundation for following a continuing subject, preserving its
 
 ## Current status
 
-This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, explicit occurrence grouping, scoped claims and citations, authorized association decisions, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata. MAT-006 separates reports, happenings, and declared provenance groups with atomic membership corrections and covered counts. MAT-007 adds immutable claim corrections, component-scoped evidence relations, exact citation validation, and revisioned acceptance. MAT-008 adds explicit candidate catalogs, exact-key and external proposals, currentness checks, and authorized attachment and rejection decisions; the command inventory now contains twenty-one variants. Semantic ranking, provider qualification, equivalence merges, general host control epochs, transitive assessment invalidation, and native integrations remain planned in the backlog.
+This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, explicit occurrence grouping, scoped claims and citations, authorized association decisions, typed relationships and reversible identity correction, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata. MAT-006 separates reports, happenings, and declared provenance groups with atomic membership corrections and covered counts. MAT-007 adds immutable claim corrections, component-scoped evidence relations, exact citation validation, and revisioned acceptance. MAT-008 adds explicit candidate catalogs, exact-key and external proposals, currentness checks, and authorized attachment and rejection decisions. MAT-009 adds typed relationship constraints, complete guarded identity groups, retained evidence/conflicts, protected undo/split, explicit separation release, and atomic registered-dependency invalidation; the command inventory now contains twenty-two variants. Semantic ranking, provider qualification, general host control epochs, transitive assessment invalidation, and native integrations remain planned in the backlog.
 
 The walkthroughs are deliberately small: their fixtures already contain host-supplied associations and classifications. They demonstrate selected continuity and delivery rules; they do not infer semantic meaning, execute an agent hook, call JEV, train a speaker model, or establish production correctness.
 
@@ -188,6 +188,30 @@ See the [association API](docs/associations.md) and run the synthetic example:
 python examples/association_acceptance.py
 ```
 
+## Link subjects and correct mistaken identity
+
+`matter.relations.RelationService` records typed links under host-declared
+self-link, direction and cycle rules. Relatedness keeps each original identity;
+a merge requires separate `MergePolicy` authority and an auditable basis.
+
+`matter.identity_corrections.IdentityCorrectionService` merges complete current
+groups into direct redirects, preserving original keys, claims, source evidence
+and every prior snapshot. Immutable receipts record retained conflicts and
+before/after child ownership. Undo and split restore explicit complete
+partitions and protect every separated original pair across later indirect
+merges. A narrowly authorized release can correct a mistaken protection;
+a fresh merge still has to pass all remaining guards.
+
+Registered assessments and host projections become invalidated in the same
+transaction as identity changes. Their former merged views remain readable
+through exact historical dependencies. The general transitive invalidation and
+delivery engines remain later tickets. See the [identity correction API](docs/identity-corrections.md)
+and run the complete installed-package example:
+
+```bash
+python examples/identity_corrections.py
+```
+
 ## Read the specification
 
 | Document | Responsibility |
@@ -203,6 +227,7 @@ python examples/association_acceptance.py
 | [Occurrences and provenance](docs/occurrences.md) | Exact happenings, accepted memberships, correction history, dependence declarations, and covered counts |
 | [Claims and citations](docs/claims.md) | Immutable assertion branches, component-scoped evidence, exact locator receipts, and acceptance history |
 | [Association proposals and decisions](docs/associations.md) | Explicit candidate catalogs, revision checks, host authority, persistent rejection, and authorized correction |
+| [Identity corrections](docs/identity-corrections.md) | Typed links, guarded complete-group merges, retained conflicts, protected correction/release, and atomic validity hooks |
 | [Rule contract](docs/contracts/rules.md) | Meaning, outcomes, qualification, dependencies, and composition |
 | [Lifecycle contract](docs/contracts/lifecycle.md) | Reassessment, resolution, reopening, attention, and delivery |
 | [JEV design](docs/jev.md) | Replaceable semantic execution and question/version handling |
@@ -220,6 +245,7 @@ python examples/association_acceptance.py
 | [Occurrence validation receipt](docs/validation/MAT-006.md) | What was executed for MAT-006 |
 | [Claim and citation validation receipt](docs/validation/MAT-007.md) | What was executed for MAT-007 |
 | [Association validation receipt](docs/validation/MAT-008.md) | What was executed for MAT-008 |
+| [Identity correction validation receipt](docs/validation/MAT-009.md) | What was executed for MAT-009 |
 
 ## What this repo owns
 

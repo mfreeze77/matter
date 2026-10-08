@@ -943,6 +943,144 @@
       "schema": "result",
       "valid": false,
       "description": "Unchanged disposition cannot claim dependency mutations."
+    },
+    {
+      "path": "commands/merge_matters__identity_time.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic merge wire shape with an explicit known decision time; no runtime authorization or receipt is asserted."
+    },
+    {
+      "path": "commands/correct_merge__identity_partitions.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Original matter identity members are current typed pins, independently of retained child evidence members; structural fixture only."
+    },
+    {
+      "path": "commands/correct_merge__split_partitions.json",
+      "schema": "command",
+      "valid": true,
+      "description": "An explicit identity partition can retain zero child members; complete partition and host permission are runtime checks."
+    },
+    {
+      "path": "results/merge_matters__identity_views.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic committed result with exact identity mirror pins and typed dependency changes; reference existence is not claimed."
+    },
+    {
+      "path": "results/correct_merge__identity_views.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic committed result with exact identity mirror pins and typed dependency changes; reference existence is not claimed."
+    },
+    {
+      "path": "records/receipt__identity_decision.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Synthetic receipt carrying the private identity-decision domain shape. Placeholder refs and policy are not an admitted runtime authority or verified merge proof."
+    },
+    {
+      "path": "records/receipt__identity_projection_domains.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Standalone synthetic private projection-domain examples carried as opaque receipt extensions for portable transport. These domains are tested separately and do not claim a mutually consistent runtime history."
+    },
+    {
+      "path": "invalid/identity_partition_unpinned_matter.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An explicit original identity member requires a matter snapshot pin."
+    },
+    {
+      "path": "invalid/identity_partition_wrong_kind.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An observation child cannot occupy the separate matter identity partition field."
+    },
+    {
+      "path": "invalid/identity_partition_typo.json",
+      "schema": "command",
+      "valid": false,
+      "description": "Closed partition objects reject a misspelled identity_members field."
+    },
+    {
+      "path": "invalid/identity_merge_unknown_as_of.json",
+      "schema": "command",
+      "valid": false,
+      "description": "A supplied identity decision time must be a known UTC instant."
+    },
+    {
+      "path": "invalid/identity_views_unpinned.json",
+      "schema": "result",
+      "valid": false,
+      "description": "Identity view results must pin exact projection snapshots."
+    },
+    {
+      "path": "invalid/identity_views_wrong_kind.json",
+      "schema": "result",
+      "valid": false,
+      "description": "A matter pin cannot substitute for an identity projection pin."
+    },
+    {
+      "path": "invalid/identity_change_missing_after.json",
+      "schema": "result",
+      "valid": false,
+      "description": "Each dependency change explicitly includes before and after reference arrays."
+    },
+    {
+      "path": "invalid/identity_empty_changes.json",
+      "schema": "result",
+      "valid": false,
+      "description": "If present, committed identity dependency changes cannot be empty."
+    },
+    {
+      "path": "commands/release_identity_separations.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Explicit release names exact prior separation snapshots, evidence basis, reason and merge policy; host authority is validated by the runtime."
+    },
+    {
+      "path": "results/release_identity_separations__released.json",
+      "schema": "result",
+      "valid": true,
+      "description": "A synthetic separation release revisions a protection and records an immutable receipt and dependency changes; it does not merge matters."
+    },
+    {
+      "path": "results/release_identity_separations__failure_revision_conflict.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Stale release fails explicitly without a release outcome or changed identity state."
+    },
+    {
+      "path": "invalid/identity_release_unpinned_separation.json",
+      "schema": "command",
+      "valid": false,
+      "description": "Release must name an exact separation snapshot, not a bare protection identity."
+    },
+    {
+      "path": "invalid/identity_release_missing_reason.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An explicit host release requires a reason."
+    },
+    {
+      "path": "invalid/identity_release_unpinned_receipt.json",
+      "schema": "result",
+      "valid": false,
+      "description": "A release result retains an exact immutable authority receipt dependency."
+    },
+    {
+      "path": "invalid/identity_release_missing_changes.json",
+      "schema": "result",
+      "valid": false,
+      "description": "A released result cannot claim no dependency changes."
+    },
+    {
+      "path": "records/receipt__identity_release.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Synthetic immutable release domain and revised separation domain, with explicit prior protection pins. Structural placeholders do not assert admitted authority or an executed release."
     }
   ]
 }

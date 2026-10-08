@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "operation": "release_identity_separations",
+  "operation_id": "synthetic-release-separation",
+  "status": "failure",
+  "error": {
+    "code": "E_REVISION_CONFLICT",
+    "operation_id": "synthetic-release-separation",
+    "retriable": false,
+    "affected_references": [],
+    "detail": "Synthetic safe failure detail."
+  }
+}

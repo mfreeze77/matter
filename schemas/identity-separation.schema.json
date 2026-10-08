@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/identity-separation.schema.json",
+  "title": "Matter protected identity partition v1",
+  "description": "Universal symmetric identity separation and explicit release. Every revision binds its exact prior projection and immutable correction/release decision; release does not merge identities.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scope_id",
+    "members",
+    "status",
+    "decision",
+    "previous"
+  ],
+  "properties": {
+    "scope_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "members": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_ref"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "status": {
+      "enum": [
+        "protected",
+        "released"
+      ]
+    },
+    "decision": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+    },
+    "previous": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+        }
+      ]
+    }
+  }
+}

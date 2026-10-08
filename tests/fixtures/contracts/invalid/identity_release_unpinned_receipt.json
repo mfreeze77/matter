@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "operation": "release_identity_separations",
+  "operation_id": "synthetic-release-separation",
+  "status": "success",
+  "outcome": "released",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "separations": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "matter.identity_separations",
+        "record_type": "matter:projection",
+        "id": "synthetic-separation-1",
+        "revision": 2
+      }
+    ],
+    "release_receipt": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "synthetic-release-receipt"
+    },
+    "changes": [
+      {
+        "cause": "disposition_change",
+        "before": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "matter.identity_separations",
+            "record_type": "matter:projection",
+            "id": "synthetic-separation-1",
+            "revision": 1
+          }
+        ],
+        "after": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "matter.identity_separations",
+            "record_type": "matter:projection",
+            "id": "synthetic-separation-1",
+            "revision": 2
+          }
+        ]
+      }
+    ]
+  }
+}
