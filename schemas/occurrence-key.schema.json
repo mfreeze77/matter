@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/occurrence-key.schema.json",
+  "title": "Matter exact occurrence-key binding v1",
+  "description": "An internal binding from a scoped adapter execution/event key to all declared occurrence candidates. Runtime reads verify each current candidate and refuse ambiguity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scope_id", "key", "occurrences"],
+  "properties": {
+    "scope_id": {"$ref": "core-record.schema.json#/$defs/identifier"},
+    "key": {"$ref": "core-record.schema.json#/$defs/identity_key"},
+    "occurrences": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"$ref": "core-record.schema.json#/$defs/occurrence_ref"}
+    }
+  }
+}

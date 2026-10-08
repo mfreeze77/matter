@@ -13,8 +13,8 @@
     "rules": 7
   },
   "counts_by_status": {
-    "done": 5,
-    "planned": 75
+    "done": 6,
+    "planned": 74
   },
   "tickets": [
     {
@@ -108,7 +108,7 @@
       "track": "core",
       "phase": 1,
       "priority": "P0",
-      "status": "planned",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-004",
@@ -117,7 +117,7 @@
       "requirements": [
         "CORE-05"
       ],
-      "readiness": "ready",
+      "readiness": "done",
       "path": "records/MAT-006.json"
     },
     {
@@ -136,7 +136,7 @@
       "requirements": [
         "CORE-06"
       ],
-      "readiness": "waiting",
+      "readiness": "ready",
       "path": "records/MAT-007.json"
     },
     {

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/occurrence-membership.schema.json",
+  "title": "Matter accepted occurrence membership projection v1",
+  "description": "A revisioned projection of one authoritative occurrence snapshot. The lineage digest binds the selected observations, verified provenance dependencies, declared groups and unresolved coverage. Runtime checks exact direct-membership and ancestry watches against the current snapshot.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scope_id", "occurrence", "dependencies", "lineage_digest"],
+  "properties": {
+    "scope_id": {"$ref": "core-record.schema.json#/$defs/identifier"},
+    "occurrence": {"$ref": "core-record.schema.json#/$defs/occurrence_dependency"},
+    "dependencies": {
+      "type": "array", "uniqueItems": true,
+      "items": {"$ref": "core-record.schema.json#/$defs/pinned_ref"}
+    },
+    "lineage_digest": {"$ref": "core-record.schema.json#/$defs/sha256"}
+  }
+}

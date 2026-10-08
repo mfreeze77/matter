@@ -22,7 +22,7 @@ flowchart TD
     U["Direct user controls"] --> H
 ```
 
-This is a target architecture. The scaffold provides planning tools and a limited deterministic walkthrough; MAT-002 adds the [portable structural and encoding boundary](contracts/schema-inventory.md), MAT-003 adds [transactional persistence](storage.md), MAT-004 adds [immutable observation intake](observations.md), and MAT-005 adds [persistent matter identity and revisioned metadata](matters.md). These components do not implement the whole graph.
+This is a target architecture. The scaffold provides planning tools and a limited deterministic walkthrough; MAT-002 adds the [portable structural and encoding boundary](contracts/schema-inventory.md), MAT-003 adds [transactional persistence](storage.md), MAT-004 adds [immutable observation intake](observations.md), MAT-005 adds [persistent matter identity and revisioned metadata](matters.md), and MAT-006 adds [explicit occurrence grouping and provenance counts](occurrences.md). These components do not implement the whole graph.
 
 ## Boundaries
 

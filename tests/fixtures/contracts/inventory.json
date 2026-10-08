@@ -25,6 +25,7 @@
     "ingest_observation",
     "create_matter",
     "update_matter_metadata",
+    "commit_occurrence_grouping",
     "propose_association",
     "accept_association",
     "append_claim",
@@ -51,6 +52,10 @@
     ],
     "update_matter_metadata": [
       "updated",
+      "unchanged"
+    ],
+    "commit_occurrence_grouping": [
+      "committed",
       "unchanged"
     ],
     "propose_association": [

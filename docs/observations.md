@@ -219,4 +219,6 @@ explicitly if its content cannot be verified.
 
 This is a bounded source-history facility. MAT-010 still owns general temporal
 dependencies, completeness, coverage, negative evidence, and retirement rules;
-MAT-005 through MAT-007 own continuing matter identity, occurrences, and claims.
+The [matter identity](matters.md) and [occurrence grouping](occurrences.md)
+services supply their bounded MAT-005 and MAT-006 behavior; MAT-007 still owns
+claim and evidence-relation semantics.

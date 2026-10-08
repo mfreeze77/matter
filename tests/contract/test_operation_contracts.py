@@ -25,6 +25,7 @@ SUCCESS_OUTCOMES = {
     "ingest_observation": {"committed", "duplicate"},
     "create_matter": {"created", "existing"},
     "update_matter_metadata": {"updated", "unchanged"},
+    "commit_occurrence_grouping": {"committed", "unchanged"},
     "propose_association": {"proposal", "no_match", "ambiguous", "insufficient_evidence"},
     "accept_association": {"accepted"},
     "append_claim": {"appended", "duplicate"},
@@ -44,6 +45,9 @@ COMMAND_BODY_REQUIRED = {
     "ingest_observation": ("observation",),
     "create_matter": ("matter", "identity_policy"),
     "update_matter_metadata": ("matter", "metadata"),
+    "commit_occurrence_grouping": (
+        "creates", "replacements", "provenance_assignments", "grouping_policy", "basis",
+    ),
     "propose_association": ("subject", "candidates", "matching_rule", "evidence", "assessed_as_of"),
     "accept_association": ("proposal", "candidates", "acceptance_policy"),
     "append_claim": ("claim",),
@@ -273,6 +277,137 @@ class OperationContractTests(unittest.TestCase):
         failure = fixture("results/update_matter_metadata__failure_revision_conflict.json")
         self.assertEqual(validate_result(failure), failure)
         self.assertEqual(failure["error"]["code"], "E_REVISION_CONFLICT")
+
+    def test_grouping_requires_a_change_but_accepts_each_individual_change_family(self):
+        base = command("commit_occurrence_grouping")
+        fields = ("creates", "replacements", "provenance_assignments")
+        for retained in fields:
+            with self.subTest(retained=retained):
+                value = deepcopy(base)
+                for field in fields:
+                    if field != retained:
+                        value["body"][field] = []
+                self.assertEqual(validate_command(value), value)
+                self.assertEqual(decode_command(json.dumps(value)), value)
+        value = deepcopy(base)
+        for field in fields:
+            value["body"][field] = []
+        self.assert_invalid(value, kind="command")
+        unknown = fixture("commands/commit_occurrence_grouping__unknown_assignment.json")
+        self.assertEqual(validate_command(unknown), unknown)
+        for field in fields:
+            for invalid in (None, {}, "all"):
+                with self.subTest(field=field, invalid=invalid):
+                    value = deepcopy(base)
+                    value["body"][field] = invalid
+                    self.assert_invalid(value, kind="command")
+
+    def test_grouping_creation_cannot_supply_computed_groups_or_committed_record_fields(self):
+        base = command("commit_occurrence_grouping")
+        self.assertEqual(base["body"]["creates"][0]["body"]["provenance_groups"], [])
+        value = deepcopy(base)
+        value["body"]["creates"][0]["body"]["provenance_groups"] = [
+            {"namespace": "example:lineage", "value": "claimed-new-group"},
+        ]
+        self.assert_invalid(value, kind="command")
+        for field, content in (("revision", 1), ("creation_receipt", deepcopy(base["authority"]))):
+            with self.subTest(field=field):
+                value = deepcopy(base)
+                value["body"]["creates"][0][field] = content
+                self.assert_invalid(value, kind="command")
+        value = deepcopy(base)
+        value["body"]["creates"][0]["record_type"] = "matter"
+        self.assert_invalid(value, kind="command")
+
+    def test_grouping_replacements_are_pinned_membership_changes_only(self):
+        base = command("commit_occurrence_grouping")
+        value = deepcopy(base)
+        value["body"]["replacements"][0]["observations"] = []
+        self.assertEqual(validate_command(value), value)
+        for missing in ("occurrence", "observations"):
+            value = deepcopy(base)
+            del value["body"]["replacements"][0][missing]
+            self.assert_invalid(value, kind="command")
+        for extra in ("kind", "identity_keys", "provenance_groups", "occurred_at", "lifecycle"):
+            value = deepcopy(base)
+            value["body"]["replacements"][0][extra] = []
+            self.assert_invalid(value, kind="command")
+        value = deepcopy(base)
+        del value["body"]["replacements"][0]["occurrence"]["revision"]
+        self.assert_invalid(value, kind="command")
+        value = deepcopy(base)
+        value["body"]["replacements"][0]["occurrence"]["record_type"] = "matter"
+        self.assert_invalid(value, kind="command")
+        value = deepcopy(base)
+        value["body"]["replacements"][0]["observations"][0]["record_type"] = "receipt"
+        self.assert_invalid(value, kind="command")
+
+    def test_grouping_assignments_distinguish_declared_groups_from_explicit_unknown(self):
+        base = command("commit_occurrence_grouping")
+        declared, unknown = deepcopy(base["body"]["provenance_assignments"])
+        cases = [
+            {key: item for key, item in declared.items() if key != "group"},
+            {**declared, "reason": "Also unknown"},
+            {key: item for key, item in unknown.items() if key != "reason"},
+            {**unknown, "group": declared["group"]},
+            {**unknown, "reason": ""},
+            {**declared, "status": "independent"},
+            {**declared, "confidence": "1.0"},
+            {**declared, "group": "unscoped-group"},
+            {**declared, "group": {"namespace": "example:lineage"}},
+        ]
+        for assignment in cases:
+            with self.subTest(assignment=assignment):
+                value = deepcopy(base)
+                value["body"]["provenance_assignments"] = [assignment]
+                self.assert_invalid(value, kind="command")
+        for wrong_kind in ("occurrence", "matter", "judgment"):
+            value = deepcopy(base)
+            value["body"]["provenance_assignments"][0]["observation"]["record_type"] = wrong_kind
+            self.assert_invalid(value, kind="command")
+        value = deepcopy(base)
+        del value["body"]["provenance_assignments"][0]["observation"]["digest"]
+        self.assert_invalid(value, kind="command")
+
+    def test_grouping_results_type_current_previous_and_assignment_pins_separately(self):
+        for outcome in ("committed", "unchanged"):
+            base = success("commit_occurrence_grouping", outcome)
+            self.assertEqual(validate_result(base), base)
+            for field in ("occurrences", "previous", "provenance_assignments"):
+                value = deepcopy(base)
+                del value["body"][field]
+                self.assert_invalid(value)
+            value = deepcopy(base)
+            value["body"]["occurrences"][0]["record_type"] = "matter"
+            self.assert_invalid(value)
+            for field, content in (("namespace", "another:namespace"), ("record_type", "occurrence")):
+                value = deepcopy(base)
+                value["body"]["provenance_assignments"][0][field] = content
+                self.assert_invalid(value)
+            value = deepcopy(base)
+            del value["body"]["provenance_assignments"][0]["revision"]
+            self.assert_invalid(value)
+            value = deepcopy(base)
+            value["body"]["independent_corroboration"] = 2
+            self.assert_invalid(value)
+        value = success("commit_occurrence_grouping", "unchanged")
+        value["body"]["previous"] = deepcopy(value["body"]["occurrences"])
+        self.assert_invalid(value)
+        value = success("commit_occurrence_grouping", "committed")
+        value["body"]["previous"][0]["record_type"] = "matter"
+        self.assert_invalid(value)
+
+    def test_grouping_dependency_failures_are_not_successful_unchanged_results(self):
+        for code in ("E_REVISION_CONFLICT", "E_SCOPE_FORBIDDEN", "E_AUTHORITY_REQUIRED",
+                     "E_EVIDENCE_UNAVAILABLE", "E_STORAGE_UNAVAILABLE"):
+            with self.subTest(code=code):
+                value = error_result("commit_occurrence_grouping", "grouping-1", code)
+                self.assertEqual(validate_result(value), value)
+                self.assertNotIn("outcome", value)
+                self.assertNotIn("receipt", value)
+        stale = fixture("results/commit_occurrence_grouping__failure_revision_conflict.json")
+        self.assertEqual(validate_result(stale), stale)
+        self.assertEqual(stale["error"]["code"], "E_REVISION_CONFLICT")
 
     def test_new_operation_names_and_unscoped_fields_are_not_silently_accepted(self):
         self.assert_invalid(command("create_matter") | {"operation": "execute_anything"}, kind="command")

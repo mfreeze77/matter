@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "operation": "commit_occurrence_grouping",
+  "operation_id": "operation-grouping-stale",
+  "status": "failure",
+  "error": {
+    "code": "E_REVISION_CONFLICT",
+    "operation_id": "operation-grouping-stale",
+    "retriable": false,
+    "affected_references": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "occurrence",
+        "id": "occurrence-1"
+      }
+    ],
+    "detail": "Synthetic safe failure detail."
+  }
+}

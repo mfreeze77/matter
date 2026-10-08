@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "operation": "commit_occurrence_grouping",
+  "command_id": "command-grouping-assignment-only",
+  "idempotency_key": "idempotency-grouping-assignment-only",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [
+    {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "observation",
+      "id": "observation-2",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "body": {
+    "creates": [],
+    "replacements": [],
+    "provenance_assignments": [
+      {
+        "observation": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "observation",
+          "id": "observation-2",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "status": "unknown",
+        "reason": "Source dependence has not been established.",
+        "group": {
+          "namespace": "example:lineage",
+          "value": "invented-group"
+        }
+      }
+    ],
+    "grouping_policy": {
+      "namespace": "example",
+      "id": "host-occurrence-grouping",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "basis": {
+      "schema": {
+        "namespace": "example",
+        "id": "grouping-basis",
+        "version": "1.0",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "value": {
+        "reason": "Synthetic explicit grouping correction; no semantic inference."
+      }
+    }
+  }
+}
