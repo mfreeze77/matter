@@ -1,0 +1,149 @@
+# Matter v1 compatibility and validation boundary
+
+MAT-002 implements the structural contract version `1.0` and the independent
+encoding version `matter-json-v1`. It does not implement schema negotiation,
+database migrations, a persistent engine, or semantic evaluator qualification.
+Those remain separate tickets, including [MAT-003](../../tickets/MAT-003.md),
+[MAT-012](../../tickets/MAT-012.md), and [MAT-074](../../tickets/MAT-074.md).
+
+The authoritative field inventory is [schema-inventory.md](schema-inventory.md).
+The exact byte encoding and digest preimage are in [canonical.md](canonical.md).
+The governing [core](core.md), [rule](rules.md), and [lifecycle](lifecycle.md)
+contracts continue to define the behavior that later implementations must prove.
+
+## Reader and writer compatibility
+
+| Incoming value or change | v1 reader behavior | Required producer behavior |
+|---|---|---|
+| Supported record, command, or result with `schema_version: "1.0"` | Validate encoding and the appropriate schema | Supply every required field and the correct discriminated body |
+| Missing version or wrong version type | Reject with `E_SCHEMA_INVALID` | Supply the exact version string |
+| Another version, including `"1.1"` or `"2.0"` | Reject with `E_VERSION_UNSUPPORTED` | Do not silently downcast or relabel the value |
+| Unknown record type or operation in version 1.0 | Reject with `E_SCHEMA_INVALID` | Introduce a reviewed contract revision before using the new kind |
+| Undeclared core field | Reject with `E_SCHEMA_INVALID` | Keep specialized data in the declared extension or schema-linked payload field |
+| Unknown optional metadata under a valid extension namespace | Preserve its value through decode, validation, and canonical encoding | Treat it as opaque metadata until an appropriate profile understands it |
+| New required semantic feature | No automatic negotiation or execution | Use an explicit supported profile/binding, or a future compatible reader and contract version |
+| Reordered object keys or different valid JSON escaping | Decode to the same value and produce the same canonical bytes | Hash normalized contract bytes with the declared digest kind |
+| Reordered arrays | Preserve the new order; the digest can change | Do not sort evidence, candidates, dependencies, or other arrays implicitly |
+| Unicode composed/decomposed forms | Preserve each form; their digests can differ | Do not normalize original source bytes or normalized envelopes silently |
+| Floating token, unsafe integer, duplicate key, or invalid Unicode | Reject before interpreting the schema | Encode an exact decimal using a schema-declared string field |
+| Non-UTC timestamp or a precision/value mismatch | Reject rather than normalize | Supply the supported UTC representation with explicit precision |
+| Unknown event time | Preserve its reason and absence of a timestamp | Do not copy ingestion or publication time into the event time |
+| Rule meaning changes while result JSON shape stays the same | Shape validation alone cannot detect the changed meaning | Change the rule/binding version and requalify when the rule contract requires it |
+
+An optional extension must not redefine core fields, claim host authentication,
+grant cross-scope access, or establish a conclusion. A producer needing one of
+those semantics must use the corresponding explicit contract and host checks.
+Accepting an extension's structure does not mean the reader understood it.
+
+## Four independent versions and identities
+
+The schema version identifies the structure and interpretation of an envelope.
+The encoding version identifies how a normalized value becomes bytes. A rule
+version identifies what a question and its outputs mean. A record revision or
+immutable digest identifies the exact state read by a later operation. None is
+an interchangeable substitute for another.
+
+Record references carry `scope_id`, `namespace`, `record_type`, and `id` so
+identical IDs in different namespaces do not alias. A revision-pinned reference
+adds exactly one bounded positive `revision` or an immutable `digest`. Immutable
+core kinds require a digest pin; mutable kinds may use a revision or a digest of
+an immutable snapshot. A pinned reference does not prove that the target exists,
+is readable, or is current.
+
+Mutable record kinds require revisions. Immutable record kinds reject a mutable
+revision field; later correction must produce a new record and an explicit
+relationship. Structural validation cannot enforce append-only storage or
+monotonic updates across multiple operations. Those are runtime responsibilities.
+
+The helper `record_digest` binds the kind `record.<record_type>.v1` and the full
+validated record. `command_digest` binds `command.<operation>.v1` and the full
+validated command. Both use `matter-json-v1` framing. They provide hashable
+identities for later persistence work; they do not create a command journal or
+establish that an operation was committed.
+
+## Timestamp interoperability
+
+A known time carries a UTC `Z` timestamp and a precision of `second`,
+`millisecond`, `microsecond`, or `nanosecond`. These require zero, three, six,
+or nine fractional digits respectively. Values are never rounded on decode.
+An unknown time has `state: "unknown"` and a reason, with no invented `value`.
+
+Version 1.0 supports Gregorian years 0001 through 9999 and seconds 00 through
+59. Leap-second timestamps and offsets such as `+00:00` are rejected at this
+normalized boundary. An adapter can retain them in its original source bytes
+and apply a separately specified conversion before constructing an envelope.
+Unknown time is different from a known instant with low precision.
+
+The schemas carry a `matter-utc-time` format annotation and precision-specific
+patterns. The Python validator enables a calendar-aware checker for that format.
+Consumers in another language must implement the same check: a regular
+expression alone does not reject an impossible date such as February 30.
+JSON Schema's default format behavior is an annotation, so merely loading the
+schema into a generic validator is insufficient for this check. See the
+[Draft 2020-12 validation specification](https://json-schema.org/draft/2020-12/json-schema-validation).
+
+The Python entry points enable only `matter-utc-time` so optional format
+libraries cannot silently change validation across installations. Locator `uri`
+annotations remain metadata at this boundary; exact URI/selector validation and
+source availability checks belong to the adapter boundary in MAT-007.
+
+## Success, uncertainty, and failure
+
+An operation result has an explicit `success` or `failure` branch. A success has
+an operation-specific outcome and body plus a receipt reference. A failure has
+an error code, operation identity, retriable flag, affected readable references,
+and safe detail. A failure cannot carry a success outcome or successful body.
+
+For judgments, completed execution, evaluation status, semantic output, and
+qualification are separate fields. A completed evaluation may remain unknown,
+ambiguous, or unsupported by sufficient evidence. Failed execution cannot carry
+a completed semantic answer. A structurally valid qualification reference is
+not a verified certificate; the binding and certificate checks belong to the
+rule engine.
+
+`E_STORAGE_UNAVAILABLE` means durable persistence could not be established. It
+does not mean no record matched. `E_SCOPE_FORBIDDEN` does not disclose whether a
+restricted record exists. `E_DELIVERY_UNKNOWN` does not mean delivery succeeded
+or failed. A host must keep these distinctions when mapping errors to HTTP,
+exceptions, CLI exit codes, or user-facing behavior.
+
+`error_result` uses static, safe default detail strings. The host remains
+responsible for filtering affected references to the caller's readable scope
+and for sanitizing any custom detail. The helper does not inspect credentials,
+authorize access, retry an operation, or send a message.
+
+## Python API and portable consumption
+
+`matter.contracts` exports `validate_record`, `validate_command`,
+`validate_result`, their strict `decode_*` JSON entry points, `schema_for`,
+`record_digest`, `command_digest`, and `error_result`. Validation returns a
+defensive copy without altering source values. Invalid input raises
+`ContractError` with a stable `code` and safe `detail`; rejected payloads are
+not inserted into the error message.
+
+Use `decode_*` on the original JSON bytes at an untrusted boundary. A permissive
+parser can discard duplicate keys or turn exponent notation into an integer
+before `validate_*` ever sees the value. In-memory validation cannot recover
+syntax that another parser already discarded.
+
+The inner `error.operation_id` must equal the result envelope's `operation_id`.
+The Python API checks this relationship after schema validation. Other-language
+consumers must perform the same explicit comparison: standard Draft 2020-12
+schemas cannot compare arbitrary sibling values for equality.
+
+All three schemas are included in the Python distribution from the canonical
+`schemas/` directory. Validation works outside a repository checkout. The
+existing ticket, render, and demo CLI commands still require repository assets.
+No second generated copy of the schemas is maintained in the source tree.
+
+Other implementations should register the three bundled schemas by their
+`$id` values in an offline Draft 2020-12 registry and apply the strict value
+and timestamp rules before admitting records. `$id` and evidence locator URLs
+are identifiers; validation does not fetch them. The Python implementation
+uses the supported [jsonschema referencing registry](https://python-jsonschema.readthedocs.io/en/stable/referencing/).
+
+Passing schema vectors and matching canonical hashes establish this structural
+and encoding boundary. They do not establish durable idempotency, correct
+association, authorization, fresh assessment commits, provider accuracy, or
+safe external delivery. Each of those claims needs its own implementation and
+acceptance evidence.

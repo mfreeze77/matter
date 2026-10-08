@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0",
+  "record_type": "accepted_association",
+  "scope_id": "synthetic:mat002",
+  "namespace": "example",
+  "id": "accepted_association-1",
+  "creation_receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "receipt-1"
+  },
+  "provenance": {
+    "origin": "system",
+    "producer": {
+      "namespace": "example",
+      "id": "fixture-producer",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "parents": []
+  },
+  "body": {
+    "proposal": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "association_proposal",
+      "id": "association_proposal-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "members": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "observation",
+        "id": "observation-1",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "matter",
+        "id": "matter-1",
+        "revision": 1
+      }
+    ],
+    "relation": {
+      "namespace": "example",
+      "id": "attachment",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "status": "active",
+    "authority": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "authority-1"
+    }
+  },
+  "revision": 1
+}

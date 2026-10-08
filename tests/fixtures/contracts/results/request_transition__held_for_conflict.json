@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "operation": "request_transition",
+  "operation_id": "operation-request_transition",
+  "status": "success",
+  "outcome": "held_for_conflict",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "reason": "Synthetic evidence does not currently authorize this edge.",
+    "evidence": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "observation",
+        "id": "observation-1",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ]
+  }
+}

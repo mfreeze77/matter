@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "operation": "propose_association",
+  "operation_id": "operation-propose_association",
+  "status": "success",
+  "outcome": "proposal",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "proposal": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "association_proposal",
+      "id": "association_proposal-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  }
+}

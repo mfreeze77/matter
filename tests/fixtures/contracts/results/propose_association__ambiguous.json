@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "operation": "propose_association",
+  "operation_id": "operation-propose_association",
+  "status": "success",
+  "outcome": "ambiguous",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "candidates": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "matter",
+        "id": "matter-1",
+        "revision": 1
+      },
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "matter",
+        "id": "matter-2",
+        "revision": 1
+      }
+    ],
+    "reason": "Two synthetic candidates remain plausible."
+  }
+}

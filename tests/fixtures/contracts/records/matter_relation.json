@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "record_type": "matter_relation",
+  "scope_id": "synthetic:mat002",
+  "namespace": "example",
+  "id": "matter_relation-1",
+  "creation_receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "receipt-1"
+  },
+  "provenance": {
+    "origin": "system",
+    "producer": {
+      "namespace": "example",
+      "id": "fixture-producer",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "parents": []
+  },
+  "body": {
+    "from_matter": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    },
+    "to_matter": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-2",
+      "revision": 1
+    },
+    "relation_kind": "matter:related_to",
+    "relationship_schema": {
+      "namespace": "example",
+      "id": "matter-relation",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "basis": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "observation",
+        "id": "observation-1",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "authority": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "authority-1"
+    },
+    "status": "active"
+  },
+  "revision": 1
+}

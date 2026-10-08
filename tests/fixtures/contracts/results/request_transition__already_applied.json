@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "operation": "request_transition",
+  "operation_id": "operation-request_transition",
+  "status": "success",
+  "outcome": "already_applied",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "matter": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    },
+    "transition_receipt": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "transition-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "state": "example:resolved"
+  }
+}

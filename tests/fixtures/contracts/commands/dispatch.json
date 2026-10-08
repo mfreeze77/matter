@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "operation": "dispatch",
+  "command_id": "command-dispatch",
+  "idempotency_key": "idempotency-dispatch",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [
+    {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    }
+  ],
+  "body": {
+    "intent": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "outbox-intent-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "lease_token": "lease-1",
+    "control_epoch": 0,
+    "delivery_key": "delivery-1",
+    "audience": {
+      "namespace": "example",
+      "id": "audience",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "baseline": null
+  }
+}

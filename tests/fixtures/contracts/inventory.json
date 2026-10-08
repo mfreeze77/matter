@@ -1,0 +1,128 @@
+{
+  "schema_version": "1.0",
+  "record_kinds": [
+    "observation",
+    "occurrence",
+    "matter",
+    "claim",
+    "evidence_relation",
+    "association_proposal",
+    "accepted_association",
+    "matter_relation",
+    "judgment",
+    "assessment",
+    "control",
+    "receipt"
+  ],
+  "mutable_record_kinds": [
+    "accepted_association",
+    "evidence_relation",
+    "matter",
+    "matter_relation",
+    "occurrence"
+  ],
+  "operations": [
+    "ingest_observation",
+    "create_matter",
+    "propose_association",
+    "accept_association",
+    "append_claim",
+    "relate_evidence",
+    "link_matters",
+    "merge_matters",
+    "correct_merge",
+    "record_control",
+    "commit_assessment",
+    "invalidate_dependents",
+    "request_transition",
+    "prepare_delivery",
+    "dispatch",
+    "assess"
+  ],
+  "success_outcomes": {
+    "ingest_observation": [
+      "committed",
+      "duplicate"
+    ],
+    "create_matter": [
+      "created",
+      "existing"
+    ],
+    "propose_association": [
+      "proposal",
+      "no_match",
+      "ambiguous",
+      "insufficient_evidence"
+    ],
+    "accept_association": [
+      "accepted"
+    ],
+    "append_claim": [
+      "appended",
+      "duplicate"
+    ],
+    "relate_evidence": [
+      "appended",
+      "duplicate"
+    ],
+    "link_matters": [
+      "linked"
+    ],
+    "merge_matters": [
+      "committed"
+    ],
+    "correct_merge": [
+      "committed"
+    ],
+    "record_control": [
+      "applied",
+      "duplicate"
+    ],
+    "commit_assessment": [
+      "committed"
+    ],
+    "invalidate_dependents": [
+      "affected",
+      "no_op"
+    ],
+    "request_transition": [
+      "applied",
+      "already_applied",
+      "held_for_evidence",
+      "held_for_conflict"
+    ],
+    "prepare_delivery": [
+      "ready",
+      "withheld"
+    ],
+    "dispatch": [
+      "delivered",
+      "withheld"
+    ],
+    "assess": [
+      "assessed",
+      "incomplete"
+    ]
+  },
+  "error_codes": [
+    "E_SCHEMA_INVALID",
+    "E_VERSION_UNSUPPORTED",
+    "E_SCOPE_FORBIDDEN",
+    "E_NOT_FOUND",
+    "E_IDEMPOTENCY_CONFLICT",
+    "E_SOURCE_IDENTITY_CONFLICT",
+    "E_REVISION_CONFLICT",
+    "E_ASSOCIATION_CONFLICT",
+    "E_MERGE_CONFLICT",
+    "E_EVIDENCE_INVALID",
+    "E_EVIDENCE_UNAVAILABLE",
+    "E_DEPENDENCY_STALE",
+    "E_POLICY_INVALID",
+    "E_RULE_CONFLICT",
+    "E_AUTHORITY_REQUIRED",
+    "E_BUDGET_EXHAUSTED",
+    "E_CANCELLED",
+    "E_STORAGE_UNAVAILABLE",
+    "E_DELIVERY_UNKNOWN"
+  ]
+}

@@ -22,7 +22,7 @@ flowchart TD
     U["Direct user controls"] --> H
 ```
 
-This is a target architecture. The scaffold provides planning tools and a limited deterministic walkthrough; it does not implement the whole graph.
+This is a target architecture. The scaffold provides planning tools and a limited deterministic walkthrough; MAT-002 adds the [portable structural and encoding boundary](contracts/schema-inventory.md). These components do not implement the whole graph.
 
 ## Boundaries
 

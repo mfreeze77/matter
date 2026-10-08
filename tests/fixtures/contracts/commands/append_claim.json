@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0",
+  "operation": "append_claim",
+  "command_id": "command-append_claim",
+  "idempotency_key": "idempotency-append_claim",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [
+    {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    }
+  ],
+  "body": {
+    "claim": {
+      "schema_version": "1.0",
+      "record_type": "claim",
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "id": "claim-1",
+      "provenance": {
+        "origin": "system",
+        "producer": {
+          "namespace": "example",
+          "id": "fixture-producer",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "recorded_at": {
+          "state": "known",
+          "value": "2026-10-08T15:00:00Z",
+          "precision": "second"
+        },
+        "parents": []
+      },
+      "body": {
+        "subject": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "matter",
+          "id": "matter-1"
+        },
+        "predicate": "example:has_condition",
+        "value": {
+          "schema": {
+            "namespace": "example",
+            "id": "synthetic-value",
+            "version": "1.0",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "value": "pending"
+        },
+        "qualifiers": [],
+        "applicability": {
+          "start": {
+            "state": "unknown",
+            "reason": "not_reported"
+          },
+          "end": {
+            "state": "unknown",
+            "reason": "not_reported"
+          },
+          "bounds": "closed_open"
+        },
+        "attribution": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "observation",
+            "id": "observation-1",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "proposition_version": "1.0"
+      }
+    }
+  }
+}

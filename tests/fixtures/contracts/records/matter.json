@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "record_type": "matter",
+  "scope_id": "synthetic:mat002",
+  "namespace": "example",
+  "id": "matter-1",
+  "creation_receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "receipt-1"
+  },
+  "provenance": {
+    "origin": "system",
+    "producer": {
+      "namespace": "example",
+      "id": "fixture-producer",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "parents": []
+  },
+  "body": {
+    "domain_kind": "example:opportunity",
+    "identity_keys": [
+      {
+        "namespace": "example:subject",
+        "value": "subject-1"
+      }
+    ],
+    "title": "Synthetic continuing opportunity"
+  },
+  "revision": 1
+}

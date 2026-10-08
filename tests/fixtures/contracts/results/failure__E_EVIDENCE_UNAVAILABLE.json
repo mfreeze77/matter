@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "operation": "propose_association",
+  "operation_id": "operation-failure",
+  "status": "failure",
+  "error": {
+    "code": "E_EVIDENCE_UNAVAILABLE",
+    "operation_id": "operation-failure",
+    "retriable": false,
+    "affected_references": [],
+    "detail": "Synthetic safe failure detail."
+  }
+}

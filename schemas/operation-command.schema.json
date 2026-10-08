@@ -1,0 +1,781 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/operation-command.schema.json",
+  "title": "Matter operation commands v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "operation",
+    "command_id",
+    "idempotency_key",
+    "scope_id",
+    "actor",
+    "authority",
+    "expected_revisions",
+    "body"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "operation": {
+      "enum": [
+        "ingest_observation",
+        "create_matter",
+        "propose_association",
+        "accept_association",
+        "append_claim",
+        "relate_evidence",
+        "link_matters",
+        "merge_matters",
+        "correct_merge",
+        "record_control",
+        "commit_assessment",
+        "invalidate_dependents",
+        "request_transition",
+        "prepare_delivery",
+        "dispatch",
+        "assess"
+      ]
+    },
+    "command_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "idempotency_key": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "scope_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "actor": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/actor_ref"
+    },
+    "authority": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_ref"
+    },
+    "expected_revisions": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+      },
+      "minItems": 0
+    },
+    "body": {},
+    "extensions": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/extensions"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "ingest_observation"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "observation"
+            ],
+            "properties": {
+              "observation": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/observation_input"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "create_matter"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "matter",
+              "identity_policy"
+            ],
+            "properties": {
+              "matter": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_input"
+              },
+              "identity_policy": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "propose_association"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "subject",
+              "candidates",
+              "matching_rule",
+              "evidence",
+              "assessed_as_of"
+            ],
+            "properties": {
+              "subject": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_member_dependency"
+              },
+              "candidates": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/candidate"
+                },
+                "minItems": 0
+              },
+              "matching_rule": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+                },
+                "minItems": 0
+              },
+              "assessed_as_of": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "accept_association"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "proposal",
+              "candidates",
+              "acceptance_policy"
+            ],
+            "properties": {
+              "proposal": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_proposal_dependency"
+              },
+              "candidates": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/association_member_dependency"
+                },
+                "minItems": 1
+              },
+              "acceptance_policy": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "append_claim"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "claim"
+            ],
+            "properties": {
+              "claim": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/claim_input"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "relate_evidence"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "relation"
+            ],
+            "properties": {
+              "relation": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/evidence_relation_input"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "link_matters"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "from_matter",
+              "to_matter",
+              "relation_kind",
+              "relationship_schema",
+              "basis"
+            ],
+            "properties": {
+              "from_matter": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_dependency"
+              },
+              "to_matter": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_dependency"
+              },
+              "relation_kind": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespaced_name"
+              },
+              "relationship_schema": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "basis": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+                },
+                "minItems": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "merge_matters"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "survivor",
+              "merged",
+              "equivalence_basis",
+              "merge_policy"
+            ],
+            "properties": {
+              "survivor": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_dependency"
+              },
+              "merged": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_dependency"
+                },
+                "minItems": 1
+              },
+              "equivalence_basis": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+                },
+                "minItems": 1
+              },
+              "merge_policy": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "correct_merge"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "merge_receipt",
+              "correction_kind",
+              "partitions",
+              "basis"
+            ],
+            "properties": {
+              "merge_receipt": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+              },
+              "correction_kind": {
+                "enum": [
+                  "undo",
+                  "split"
+                ]
+              },
+              "partitions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "matter",
+                    "members"
+                  ],
+                  "properties": {
+                    "matter": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_ref"
+                    },
+                    "members": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+                      },
+                      "minItems": 0
+                    }
+                  }
+                },
+                "minItems": 2
+              },
+              "basis": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+                },
+                "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "record_control"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "control"
+            ],
+            "properties": {
+              "control": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_input"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "commit_assessment"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "assessment"
+            ],
+            "properties": {
+              "assessment": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/assessment_input"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "invalidate_dependents"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "changed_references",
+              "changed_negative_scopes",
+              "cause"
+            ],
+            "properties": {
+              "changed_references": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+                },
+                "minItems": 0
+              },
+              "changed_negative_scopes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "scope_id",
+                    "watch_id",
+                    "revision"
+                  ],
+                  "properties": {
+                    "scope_id": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+                    },
+                    "watch_id": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+                    },
+                    "revision": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/revision"
+                    }
+                  }
+                },
+                "minItems": 0
+              },
+              "cause": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/change_cause"
+              }
+            },
+            "anyOf": [
+              {
+                "properties": {
+                  "changed_references": {
+                    "minItems": 1
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "changed_negative_scopes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "request_transition"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "matter",
+              "lifecycle_revision",
+              "profile_edge",
+              "evidence",
+              "assessment",
+              "effective_at"
+            ],
+            "properties": {
+              "matter": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_dependency"
+              },
+              "lifecycle_revision": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/revision"
+              },
+              "profile_edge": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+                },
+                "minItems": 1
+              },
+              "assessment": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/assessment_dependency"
+              },
+              "effective_at": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "prepare_delivery"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "assessment",
+              "audience",
+              "purpose",
+              "baseline",
+              "control_epoch",
+              "treatment",
+              "content_digest",
+              "dependency_manifest_digest",
+              "delivery_key"
+            ],
+            "properties": {
+              "assessment": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/assessment_dependency"
+              },
+              "audience": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "purpose": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "baseline": {
+                "oneOf": [
+                  {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "control_epoch": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+              },
+              "treatment": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/attention_treatment"
+              },
+              "content_digest": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+              },
+              "dependency_manifest_digest": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+              },
+              "delivery_key": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "dispatch"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "intent",
+              "lease_token",
+              "control_epoch",
+              "delivery_key",
+              "audience",
+              "baseline"
+            ],
+            "properties": {
+              "intent": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+              },
+              "lease_token": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+              },
+              "control_epoch": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+              },
+              "delivery_key": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+              },
+              "audience": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "baseline": {
+                "oneOf": [
+                  {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "assess"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "matter",
+              "profile",
+              "purpose",
+              "assessed_as_of",
+              "budget",
+              "control_epoch"
+            ],
+            "properties": {
+              "matter": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_dependency"
+              },
+              "profile": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "purpose": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "audience": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "evidence": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/evidence_selection"
+              },
+              "query": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
+              },
+              "assessed_as_of": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+              },
+              "budget": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/resource_limits"
+              },
+              "control_epoch": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+              }
+            },
+            "oneOf": [
+              {
+                "required": [
+                  "evidence"
+                ],
+                "not": {
+                  "required": [
+                    "query"
+                  ]
+                }
+              },
+              {
+                "required": [
+                  "query"
+                ],
+                "not": {
+                  "required": [
+                    "evidence"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

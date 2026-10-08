@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "operation": "create_matter",
+  "operation_id": "operation-create_matter",
+  "status": "success",
+  "outcome": "created",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "matter": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    }
+  }
+}

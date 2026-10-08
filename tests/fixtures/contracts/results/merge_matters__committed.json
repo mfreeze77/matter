@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "operation": "merge_matters",
+  "operation_id": "operation-merge_matters",
+  "status": "success",
+  "outcome": "committed",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "survivor": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    },
+    "redirects": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "matter",
+        "id": "matter-2"
+      }
+    ],
+    "merge_receipt": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "merge-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  }
+}

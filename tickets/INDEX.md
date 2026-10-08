@@ -7,8 +7,8 @@ Future work in another repository remains owned by that repository. This scaffol
 | Ticket | Track | Phase | Priority | Status | Readiness | Depends on |
 |---|---|---:|---|---|---|---|
 | [MAT-001: Establish the governing scaffold and validated implementation backlog](MAT-001.md) | foundation | 0 | P0 | done | done | — |
-| [MAT-002: Define interoperable record schemas, canonical encoding, and error results](MAT-002.md) | core | 0 | P0 | planned | ready | MAT-001 |
-| [MAT-003: Implement durable transactional storage and revision-checked commands](MAT-003.md) | core | 0 | P0 | planned | waiting | MAT-002 |
+| [MAT-002: Define interoperable record schemas, canonical encoding, and error results](MAT-002.md) | core | 0 | P0 | done | done | MAT-001 |
+| [MAT-003: Implement durable transactional storage and revision-checked commands](MAT-003.md) | core | 0 | P0 | planned | ready | MAT-002 |
 | [MAT-004: Ingest immutable observations with source-aware deduplication](MAT-004.md) | core | 1 | P0 | planned | waiting | MAT-002, MAT-003 |
 | [MAT-005: Implement persistent matter identity and scope continuity](MAT-005.md) | core | 1 | P0 | planned | waiting | MAT-003, MAT-004 |
 | [MAT-006: Track occurrences and evidence dependence separately from observations](MAT-006.md) | core | 1 | P0 | planned | waiting | MAT-004, MAT-005 |

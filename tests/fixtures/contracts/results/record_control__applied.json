@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "operation": "record_control",
+  "operation_id": "operation-record_control",
+  "status": "success",
+  "outcome": "applied",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "control": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "control",
+      "id": "control-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "control_epoch": 1
+  }
+}
