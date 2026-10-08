@@ -162,6 +162,12 @@ cycle. New records and successful results reference the same receipt; mutable
 replacement snapshots retain their initial creation receipt while version
 metadata identifies the new operation receipt.
 
+An ingest result may also identify an existing observation's creation receipt
+in `body.observation_receipt`. For a duplicate submitted under a new command,
+that body field retains the original observation receipt while the top-level
+`receipt` names the newly journaled command's receipt. The storage check that
+a successful result references its own command receipt remains unchanged.
+
 Receipt evidence includes verified durable read pins and committed write pins.
 A failed command never cites its rolled-back children as committed evidence.
 Its details bind the command digest, result digest, declared read set, absent

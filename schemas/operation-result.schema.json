@@ -75,6 +75,10 @@
               "properties": {
                 "observation": {
                   "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/observation_dependency"
+                },
+                "observation_receipt": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_ref",
+                  "description": "The referenced observation's original creation receipt. The top-level receipt identifies the current command's operation receipt."
                 }
               }
             }
@@ -97,6 +101,10 @@
               "properties": {
                 "observation": {
                   "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/observation_dependency"
+                },
+                "observation_receipt": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_ref",
+                  "description": "The duplicate observation's original creation receipt. The top-level receipt identifies this redelivery command's operation receipt."
                 }
               }
             }

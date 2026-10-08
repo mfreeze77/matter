@@ -17,7 +17,7 @@ from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
 from ..canonical import CanonicalError, canonical_bytes, canonical_digest
-from ..contracts import ContractError, error_result, record_digest, schema_for
+from ..contracts import ContractError, _FORMAT_CHECKER, error_result, record_digest, schema_for
 
 
 PROJECTION_TYPE = "matter:projection"
@@ -56,7 +56,9 @@ class StorageError(ContractError):
 def _fragment_validator(name: str) -> Draft202012Validator:
     core = schema_for("record")
     registry = Registry().with_resource(core["$id"], Resource.from_contents(core))
-    return Draft202012Validator({"$ref": f"{_CORE_ID}#/$defs/{name}"}, registry=registry)
+    return Draft202012Validator(
+        {"$ref": f"{_CORE_ID}#/$defs/{name}"}, registry=registry, format_checker=_FORMAT_CHECKER,
+    )
 
 
 def _validate_fragment(value: Any, name: str) -> Any:
@@ -201,6 +203,9 @@ class Storage(Protocol):
     journaled without writes. Storage outages are explicit and may leave a
     committed outcome uncertain: retry the EXACT command to retrieve it.
     """
+
+    @property
+    def scope_id(self) -> str: ...
 
     def execute(self, command: dict[str, Any], handler: CommandHandler) -> dict[str, Any]: ...
 

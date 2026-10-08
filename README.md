@@ -6,7 +6,7 @@ Matter is a shared foundation for following a continuing subject, preserving its
 
 ## Current status
 
-This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, sixteen command variants, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. Business operation handlers, provider adapters, native integrations, and empirical qualification remain planned in the backlog.
+This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, sixteen command variants, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. Matter identity, occurrence grouping, association, assessment, provider adapters, and native integrations remain planned in the backlog.
 
 The walkthroughs are deliberately small: their fixtures already contain host-supplied associations and classifications. They demonstrate selected continuity and delivery rules; they do not infer semantic meaning, execute an agent hook, call JEV, train a speaker model, or establish production correctness.
 
@@ -75,6 +75,25 @@ historical reads, projection watches, and new-file backup/restore. The
 concurrency, migration, and restore evidence. The storage port does not supply
 the later domain operation rules or host authentication.
 
+## Ingest immutable observations
+
+`matter.observations.ObservationIngestor` preserves evidence under a scoped source
+namespace and event ID. Repeated deliveries return the original observation and
+creation receipt. Changed content under the same source revision yields an
+auditable conflict; an explicit revision or correction appends evidence without
+changing old bytes or availability. Observations can remain unassociated.
+
+Prepare each new command once to capture its dependency pins, then execute and
+retry that exact prepared command. `matter.payloads.FilePayloadStore` preserves
+original bytes in immutable, scope-separated blobs and reports unavailable or
+withheld payloads explicitly. The [observation API](docs/observations.md) describes
+command retries, source duplicates, lineage, correction history, and payload
+backup boundaries. Run the complete synthetic API example with:
+
+```bash
+python examples/observation_intake.py
+```
+
 ## Read the specification
 
 | Document | Responsibility |
@@ -85,6 +104,7 @@ the later domain operation rules or host authentication.
 | [Canonical encoding](docs/contracts/canonical.md) | Exact normalized bytes, digest framing, and portable golden vectors |
 | [Compatibility](docs/contracts/compatibility.md) | Version acceptance, unknown-time handling, errors, and API boundaries |
 | [Durable storage](docs/storage.md) | Transaction API, exact retries, revision history, migrations, backup, and restore |
+| [Observation intake](docs/observations.md) | Source identity, immutable payloads, duplicate/conflict receipts, corrections, and knowledge-time views |
 | [Rule contract](docs/contracts/rules.md) | Meaning, outcomes, qualification, dependencies, and composition |
 | [Lifecycle contract](docs/contracts/lifecycle.md) | Reassessment, resolution, reopening, attention, and delivery |
 | [JEV design](docs/jev.md) | Replaceable semantic execution and question/version handling |
@@ -97,6 +117,7 @@ the later domain operation rules or host authentication.
 | [Scaffold validation receipt](docs/validation.md) | What was executed for MAT-001 |
 | [Core contract validation receipt](docs/validation/MAT-002.md) | What was executed for MAT-002 |
 | [Storage validation receipt](docs/validation/MAT-003.md) | What was executed for MAT-003 |
+| [Observation validation receipt](docs/validation/MAT-004.md) | What was executed for MAT-004 |
 
 ## What this repo owns
 

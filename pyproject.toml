@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "matter-foundation"
-version = "0.1.0.dev2"
-description = "Portable contracts and durable storage for evidence-backed, domain-neutral matter assessments"
+version = "0.1.0.dev3"
+description = "Portable contracts, durable storage, and immutable evidence intake for domain-neutral matter assessments"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"

@@ -3,8 +3,9 @@
 MAT-002 implements the structural contract version `1.0` and the independent
 encoding version `matter-json-v1`. MAT-003 adds the separate
 [durable storage and migration boundary](../storage.md) without changing those
-wire versions. Schema negotiation, business operation handlers, and semantic
-evaluator qualification retain their own tickets, including
+wire versions. MAT-004 adds the [observation intake handler](../observations.md)
+and the result field described below. Schema negotiation, later business
+operations, and semantic evaluator qualification retain their own tickets, including
 [MAT-012](../../tickets/MAT-012.md) and [MAT-074](../../tickets/MAT-074.md).
 
 The authoritative field inventory is [schema-inventory.md](schema-inventory.md).
@@ -35,6 +36,15 @@ An optional extension must not redefine core fields, claim host authentication,
 grant cross-scope access, or establish a conclusion. A producer needing one of
 those semantics must use the corresponding explicit contract and host checks.
 Accepting an extension's structure does not mean the reader understood it.
+
+MAT-004 adds optional `body.observation_receipt` to the `committed` and
+`duplicate` results of `ingest_observation`, retaining schema version `1.0`.
+The updated reader accepts earlier v1 result bodies without this field, so
+existing journals and structural fixtures remain valid. Earlier closed-schema
+readers reject the new field until their bundled result schema is updated;
+this addition does not provide automatic forward compatibility. The built-in
+ingest handler always emits it to identify the observation's original creation
+receipt separately from the current command's top-level `receipt`.
 
 ## Four independent versions and identities
 

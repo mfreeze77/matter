@@ -12,6 +12,12 @@ The three canonical resources are:
 
 Every family requires the exact `schema_version: "1.0"`. The URLs identify schemas; validation registers all three local resources and does not fetch those URLs. The core schema contains shared `$defs`. Commands and results reference those definitions instead of maintaining alternative copies. The supported value domain, encoding, and compatibility decisions are documented in [compatibility.md](compatibility.md).
 
+Implementation-specific resources also ship with the package:
+[storage receipt details](../../schemas/storage-receipt-details.schema.json)
+and the [observation source-index value](../../schemas/observation-source-index.schema.json).
+They bind receipt details and internal projection values to exact schema digests;
+they do not introduce additional core record kinds or wire operations.
+
 ## Common record envelope
 
 All 12 stored record kinds require `schema_version`, `record_type`, `scope_id`, `namespace`, `id`, `creation_receipt`, `provenance`, and a typed `body`. Core objects are closed to undeclared fields. Optional `extensions` and `supersedes` are explicit.
@@ -159,6 +165,8 @@ Creation operations embed typed `*_input` records. These preserve the source/pro
 | `assess` | Matter, profile/purpose, explicit evidence selection or query, knowledge boundary, resource budget, and control epoch. | `assessed`, `incomplete` |
 
 These are 16 command variants and 31 successful operation/outcome pairs. The `assess` operation comes from the rule contract in addition to the core operation table. `no_match` preserves the considered candidate set, requires an empty `selected` array, and declares adequate coverage. A nonempty considered set can yield no match when every candidate is rejected; the fixture preserves that history. `ambiguous` returns multiple candidates. Insufficient evidence remains explicit. Association subjects, candidates, selected references, and accepted membership all use the same typed observation/occurrence/matter dependency union. A claim, control, judgment, or receipt cannot become an association member. Candidate existence, completeness, independence, allowed transitions, and actual query results are later runtime checks.
+
+For `ingest_observation`, both successful bodies require a pinned `observation` and permit an optional `observation_receipt`, a typed bare receipt reference to that observation's original creation receipt. The MAT-004 handler supplies both fields. The top-level `receipt` always identifies the current command's operation receipt: it matches the observation receipt for a new commit and differs for a duplicate submitted under a new command. Structural validation checks the reference type, not that either receipt exists or that their relationship is correct. Existing v1 results without the optional field remain valid; [compatibility.md](compatibility.md) describes the reader-update requirement.
 
 ## Operation results and error codes
 
