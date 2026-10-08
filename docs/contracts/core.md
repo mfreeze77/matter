@@ -1,6 +1,6 @@
 # Core information and operation contract
 
-Status: governing specification. MAT-002 implements the [version 1.0 structural schemas](schema-inventory.md) and [canonical encoding](canonical.md). MAT-003 implements the [transactional storage port](../storage.md), qualified by its own [acceptance evidence](../validation/MAT-003.md). Business operations, association, assessment, lifecycle, and delivery remain tracked by MAT-004 through MAT-025. Structural validation and storage commits alone do not qualify those later guarantees. A ticket is complete only with its own recorded acceptance evidence.
+Status: governing specification. MAT-002 implements the [version 1.0 structural schemas](schema-inventory.md) and [canonical encoding](canonical.md). MAT-003 implements the [transactional storage port](../storage.md), qualified by its own [acceptance evidence](../validation/MAT-003.md). MAT-004 implements [immutable observation intake](../observations.md). Continuing matter identity, occurrence grouping, association, assessment, lifecycle, and delivery remain tracked by MAT-005 through MAT-025. Structural validation, storage commits, and observation intake alone do not qualify those later guarantees. A ticket is complete only with its own recorded acceptance evidence.
 
 ## Purpose and sources
 
@@ -71,6 +71,8 @@ The ingest operation accepts an observation envelope, original content reference
 - conflict: the same source identity or idempotency key carries incompatible content;
 - rejected: invalid contract, unauthorized scope, unsupported source contract, or invalid provenance;
 - unavailable: persistence could not establish a durable outcome.
+
+The result's top-level `receipt` identifies the current ingest command's operation receipt. Its `body.observation` pins the committed or previously stored observation, and `body.observation_receipt` identifies that observation's original creation receipt. A duplicate redelivery under a new command has a new command receipt while retaining the original observation and observation receipt. Retrying the exact same command returns its prior result and both receipt identities unchanged. The structural schema keeps `observation_receipt` optional to admit earlier v1 results; the MAT-004 ingest implementation supplies it for both successful outcomes.
 
 A changed payload under an existing source event ID MUST NOT silently replace the old evidence. The adapter may submit an explicit revision or the operator may resolve an identity conflict. Neither path deletes the original conflicting submission's audit receipt.
 

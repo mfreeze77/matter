@@ -155,6 +155,49 @@ class OperationContractTests(unittest.TestCase):
                 with self.subTest(operation=operation, incompatible=outcome):
                     self.assert_invalid(base | {"outcome": outcome})
 
+    def test_ingest_results_preserve_both_receipt_roles_and_accept_earlier_bodies(self):
+        for outcome in ("committed", "duplicate"):
+            with self.subTest(outcome=outcome):
+                value = success("ingest_observation", outcome)
+                self.assertNotIn("observation_receipt", value["body"])
+                self.assertEqual(validate_result(value), value)
+                original_receipt = deepcopy(value["receipt"])
+                original_receipt["id"] = "original-observation-receipt"
+                value["body"]["observation_receipt"] = original_receipt
+                self.assertNotEqual(value["receipt"], original_receipt)
+                self.assertEqual(validate_result(value), value)
+                self.assertEqual(decode_result(json.dumps(value)), value)
+                del value["receipt"]
+                self.assert_invalid(value)
+
+    def test_ingest_observation_receipt_is_a_closed_typed_bare_reference(self):
+        for outcome in ("committed", "duplicate"):
+            valid = success("ingest_observation", outcome)
+            receipt = deepcopy(valid["receipt"])
+            invalid_refs = [None, "receipt-1", {}, deepcopy(valid["body"]["observation"])]
+            invalid_refs.extend(
+                {**receipt, "record_type": kind}
+                for kind in ("observation", "matter", "judgment")
+            )
+            invalid_refs.extend(
+                {key: value for key, value in receipt.items() if key != field}
+                for field in ("scope_id", "namespace", "record_type", "id")
+            )
+            invalid_refs.extend(({**receipt, "digest": "a" * 64}, {**receipt, "revision": 1}))
+            for reference in invalid_refs:
+                with self.subTest(outcome=outcome, reference=reference):
+                    value = deepcopy(valid)
+                    value["body"]["observation_receipt"] = reference
+                    self.assert_invalid(value)
+
+    def test_observation_receipt_is_not_an_undeclared_field_on_other_results(self):
+        value = success("create_matter", "existing")
+        value["body"]["observation_receipt"] = deepcopy(value["receipt"])
+        self.assert_invalid(value)
+        failure = error_result("ingest_observation", "operation-1", "E_SOURCE_IDENTITY_CONFLICT")
+        failure["observation_receipt"] = deepcopy(value["receipt"])
+        self.assert_invalid(failure)
+
     def test_new_operation_names_and_unscoped_fields_are_not_silently_accepted(self):
         self.assert_invalid(command("create_matter") | {"operation": "execute_anything"}, kind="command")
         self.assert_invalid(success("create_matter", "created") | {"operation": "execute_anything"})
