@@ -1,0 +1,105 @@
+{
+  "id": "MAT-055",
+  "title": "Learn versioned jurisdiction and committee fingerprints",
+  "track": "diat",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "research",
+  "owner_repo": "mfreeze77/statecivicsai-diat",
+  "component": "experiments.meeting_matter.institution_profiles",
+  "depends_on": [
+    "MAT-001",
+    "MAT-013",
+    "MAT-037",
+    "MAT-046",
+    "MAT-051",
+    "MAT-052",
+    "MAT-054",
+    "MAT-063"
+  ],
+  "requirements": [
+    "DIAT-05",
+    "DIAT-06",
+    "DIAT-07",
+    "DIAT-13",
+    "DIAT-15",
+    "DIAT-17"
+  ],
+  "summary": "Learn descriptive procedural and interaction regularities for a jurisdiction/body/meeting type while preserving source/profile versions, applicability, uncertain support and temporal regimes. These fingerprints guide experiments; they do not establish authority or verified identity.",
+  "in_scope": [
+    "Recognition/motion/vote/agenda style summaries",
+    "Body/type/time-specific profile versions",
+    "Inherited profile and jurisdiction override references",
+    "Training support/coverage/drift metadata"
+  ],
+  "out_of_scope": [
+    "Universal institution-to-person fingerprints",
+    "Replacing reviewed crawler rules with learned regularities",
+    "Training on the held-out meeting or future role changes"
+  ],
+  "implementation": [
+    "Define fingerprint manifests with jurisdiction/body/meeting-type, source profile digest, cohort/provenance groups, cutoff, feature/extractor versions and supporting spans.",
+    "Aggregate anonymous procedural patterns across eligible meetings with group-balanced support, keeping per-feature coverage and variability instead of a single certainty score.",
+    "Compare a generic meeting profile, a sourced local-rule profile, and an empirically learned profile on the same frozen cohort; preserve unknown profiles as a valid condition.",
+    "Detect chair/rule/meeting-mode regime changes; propose a new profile version with effective and availability times instead of rewriting historical profile behavior.",
+    "Export descriptive profile references and qualified applicability only, leaving legal capability and person assignment to their separate owners."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A fingerprint cannot contain test-meeting/future evidence or silently cross body/jurisdiction scope.",
+      "verification": "Run train/test/source-group contamination sentinels and validate rejected profile manifests."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Changing the chair or meeting type creates a separately applicable regime instead of retroactively changing old assessments.",
+      "verification": "Replay profile versions over chronological meetings with an explicit transition source."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Learned regularities and reviewed procedural rules remain distinct in packets and reports.",
+      "verification": "Inspect profile fields, provider-visible state and assessment explanations in a paired comparison."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "A no-profile or unsupported-profile case is reported and remains evaluable.",
+      "verification": "Run missing/ambiguous institution controls without dropping their query segments."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/statecivicsai-diat:src/speaker_identity/experiments/meeting_matter/institution_profiles.py (proposed)",
+    "mfreeze77/statecivicsai-diat:data/meeting-matter/fingerprints/institutions/<digest>/ (private)",
+    "mfreeze77/statecivicsai-diat:docs/research/institution-fingerprints.md (proposed)"
+  ],
+  "tests": [
+    "Same county, distinct committees",
+    "New chair changes recognition formula",
+    "Different meeting type with shared participants",
+    "Profile trained on a re-encoded copy of held-out hearing",
+    "Unknown procedure profile"
+  ],
+  "risks": [
+    "Institutional scripts may dominate individual behavior signals.",
+    "Small repeated-participant corpora can overfit meeting production practices."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/src/speaker_identity/behavior/profiles.py",
+      "application": "Reuse group-balanced descriptive aggregation concepts without converting them into identity probability."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/src/civic_crawler/jurisdictions/ks/ks_county_wyandotte/minutes.json",
+      "application": "Keep local sourced conventions as a separate baseline/profile reference."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/identity-context-evaluation.md",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

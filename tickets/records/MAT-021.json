@@ -1,0 +1,84 @@
+{
+  "id": "MAT-021",
+  "title": "Deliver through a freshness-checked outbox with independent outcome receipts",
+  "track": "core",
+  "phase": 3,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "delivery",
+  "depends_on": [
+    "MAT-003",
+    "MAT-011",
+    "MAT-016",
+    "MAT-019",
+    "MAT-020"
+  ],
+  "requirements": [
+    "CORE-20"
+  ],
+  "summary": "Implement a neutral delivery port and durable outbox. Refuse known stale advice at a declared dispatch boundary while describing external transport uncertainty honestly instead of claiming universal exactly-once sending.",
+  "in_scope": [
+    "Outbox, lease/fencing, and baseline checks",
+    "Transport capability and idempotency contract",
+    "Independent outcome receipts"
+  ],
+  "out_of_scope": [
+    "Email, Slack, or agent transport adapters",
+    "Automatic acknowledgement or causal attribution"
+  ],
+  "implementation": [
+    "Prepare immutable intents with context/dependency snapshots and permitted destination authority.",
+    "Fence dispatch with final freshness, recovery, baseline, epoch, permission, and budget checks.",
+    "Represent transport idempotency/query capabilities and explicit delivery_unknown after ambiguous failure.",
+    "Advance baseline only on the declared observed success milestone; append later outcomes independently."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Recovery or cancellation before dispatch prevents sending queued advice.",
+      "verification": "Block a fake transport boundary and mutate state."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Ambiguous send outcomes cannot fabricate success or blind duplicate-free retry.",
+      "verification": "Test transports with and without idempotency or receipt lookup."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Competing equivalent intents cannot repeat the same delivered delta.",
+      "verification": "Race workers and inspect fencing, reservations, and baseline receipts."
+    }
+  ],
+  "artifacts": [
+    "src/matter/outbox.py",
+    "src/matter/delivery.py",
+    "tests/integration/test_dispatch_races.py",
+    "tests/integration/test_delivery_unknown.py"
+  ],
+  "tests": [
+    "Withheld intents do not advance baseline.",
+    "Audience change before dispatch invalidates intent.",
+    "Delivered does not imply consumption, repair, or usefulness.",
+    "Cancellation after completed send preserves actual transport history."
+  ],
+  "risks": [
+    "A local transaction cannot make arbitrary external transport exactly-once."
+  ],
+  "reuse": [
+    {
+      "source": "matterjevmesh",
+      "application": "Use independent outcome stages and immediate dispatch freshness checks."
+    }
+  ],
+  "sources": [
+    "docs/contracts/lifecycle.md",
+    "docs/contracts/core.md",
+    "matterjevmesh"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "id": "MAT-032",
+  "title": "Integrate an optional TypeSafe transport adapter",
+  "track": "jev",
+  "phase": 3,
+  "priority": "P1",
+  "status": "planned",
+  "type": "integration",
+  "owner_repo": "mfreeze77/matter",
+  "component": "semantic/providers/typesafe",
+  "depends_on": [
+    "MAT-026",
+    "MAT-027",
+    "MAT-028",
+    "MAT-030",
+    "MAT-031"
+  ],
+  "requirements": [
+    "JEV-01",
+    "JEV-02",
+    "JEV-07",
+    "JEV-13"
+  ],
+  "summary": "Add one optional provider path that satisfies the same neutral contracts as offline fixtures. Inspect and choose the existing OIL arbitrary-question transport or the documented TypeSafe SDK boundary, then qualify the exact chosen adapter instead of adding competing transport implementations.",
+  "in_scope": [
+    "Optional dependency/transport decision, typed normalization and instrumentation",
+    "Explicit provider selection, retry limits, deadlines and model resolution"
+  ],
+  "out_of_scope": [
+    "Provider calls in default tests",
+    "New provider subscriptions or production deployment"
+  ],
+  "implementation": [
+    "Record an adapter decision comparing OIL ask(state, questions) with a pinned SDK surface, including dependencies, licensing and error behavior.",
+    "Project canonical specifications into actual Choice, ordered Score and Noul request shapes without losing criteria or field references.",
+    "Normalize HTTP and selected SDK representations through the strict validator, preserving raw answers and trusted precision assumptions.",
+    "Add explicit model, credential, timeout and retry configuration; count each attempted call against the host budget and redact secrets from faults.",
+    "Capture requested/resolved model, response usage and observable bytes; a missing model or selected adapter is an explicit error, not a synthetic fallback.",
+    "Capture raw HTTP numeric lexemes before SDK normalization; parse and validate with exact decimal arithmetic, emit canonical core decimal strings, and record precision unavailability when an SDK exposes only rounded binary floats without recoverable wire evidence."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "No provider dependency or network access is needed for core imports and default tests.",
+      "verification": "Run the suite with provider extra absent and a network-denying test transport."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "The selected adapter preserves all three native shapes and rejects malformed responses.",
+      "verification": "Feed documented HTTP and SDK-shaped fixtures, including integer Score indices, through one conformance suite."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Timeouts, rate limits and model-resolution failures consume recorded attempts and remain unqualified.",
+      "verification": "Use injected transport failures to inspect retry limits, receipts and admission status."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "The transport bridge preserves wire numeric precision through validation, normalization, and receipt hashing.",
+      "verification": "Feed raw HTTP high-precision Noul and fractional Score/distribution/confidence fixtures through the adapter and back through the core encoder; compare bytes, exact decimals, residuals, and digests. Exercise a binary-float-only SDK response and require explicit unqualified precision status rather than silent rounding."
+    }
+  ],
+  "artifacts": [
+    "src/matter/semantic/providers/typesafe.py",
+    "tests/semantic/test_typesafe_adapter.py",
+    "docs/reuse/semantic-evaluation.md"
+  ],
+  "tests": [
+    "Noul has no invented vendor confidence.",
+    "A response cannot choose a wider precision tolerance.",
+    "A keyless explicitly selected provider run reports missing configuration.",
+    "Raw HTTP to normalized receipt round-trip preserves exact decimal lexemes; a float-only SDK path without original wire evidence cannot silently qualify or masquerade as an exact response."
+  ],
+  "risks": [
+    "SDK/HTTP shape differences can silently alter Score indexing.",
+    "Two independent transports can drift unless they share conformance tests."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/system_one_http.py",
+      "application": "Inspect the arbitrary-set transport before introducing new HTTP infrastructure."
+    },
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/jev.py",
+      "application": "Reuse lazy SDK dependency and injected-client patterns."
+    }
+  ],
+  "sources": [
+    "docs/jev.md",
+    "https://docs.typesafe.ai/primitives",
+    "https://docs.typesafe.ai/primitives/choice",
+    "https://docs.typesafe.ai/primitives/score",
+    "https://docs.typesafe.ai/primitives/noul",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/system_one_http.py"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

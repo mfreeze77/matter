@@ -1,0 +1,83 @@
+{
+  "id": "MAT-016",
+  "title": "Invalidate dependencies transitively including absence and candidate scopes",
+  "track": "core",
+  "phase": 2,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "invalidation",
+  "depends_on": [
+    "MAT-003",
+    "MAT-009",
+    "MAT-010",
+    "MAT-015"
+  ],
+  "requirements": [
+    "CORE-15"
+  ],
+  "summary": "Keep results current without reevaluating everything. Negative and candidate watches must detect new evidence whose identity did not exist when the original assessment ran.",
+  "in_scope": [
+    "Positive and negative manifests",
+    "Transitive invalidation and projections",
+    "Freshness tokens for downstream work"
+  ],
+  "out_of_scope": [
+    "Distributed event bus",
+    "Reclassification of unrelated evidence"
+  ],
+  "implementation": [
+    "Index revision reads and typed query/coverage/candidate-set watches.",
+    "Emit changes from core operations and match affected dependencies by scope.",
+    "Invalidate transitively with deduplicated reasons while preserving history.",
+    "Expose commit/dispatch freshness tokens and fence recomputations racing further changes."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Later evidence invalidates an absence conclusion without a prior object ID.",
+      "verification": "Compare matching and unrelated arrivals against an empty-scope assessment."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Association correction invalidates recurrence, claims, and queued descendants.",
+      "verification": "Inspect the exact transitive affected graph after regrouping."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Unrelated audience changes leave independent evidence judgments current.",
+      "verification": "Compare manifests and affected IDs for two contexts."
+    }
+  ],
+  "artifacts": [
+    "src/matter/dependencies.py",
+    "src/matter/invalidation.py",
+    "tests/integration/test_dependency_invalidation.py"
+  ],
+  "tests": [
+    "New candidate invalidates previous uniqueness.",
+    "Source access loss invalidates required readable evidence.",
+    "Repeated change notices do not duplicate recomputation.",
+    "A recomputation racing correction cannot publish as fresh."
+  ],
+  "risks": [
+    "Object-ID-only tracking misses new evidence and invalid negative conclusions."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_store.py",
+      "application": "Reuse read-version/transitive invalidation patterns after inspection without application state dependencies."
+    }
+  ],
+  "sources": [
+    "docs/contracts/rules.md",
+    "docs/contracts/core.md",
+    "docs/contracts/lifecycle.md",
+    "matterjevmesh"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

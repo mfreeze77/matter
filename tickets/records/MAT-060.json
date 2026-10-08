@@ -1,0 +1,104 @@
+{
+  "id": "MAT-060",
+  "title": "Align agenda items and procedural phases to experimental turns",
+  "track": "diat",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "research",
+  "owner_repo": "mfreeze77/statecivicsai-diat",
+  "component": "experiments.meeting_matter.agenda_alignment",
+  "depends_on": [
+    "MAT-001",
+    "MAT-010",
+    "MAT-027",
+    "MAT-028",
+    "MAT-051",
+    "MAT-052",
+    "MAT-053",
+    "MAT-063"
+  ],
+  "requirements": [
+    "DIAT-05",
+    "DIAT-07",
+    "DIAT-12",
+    "DIAT-13",
+    "DIAT-15"
+  ],
+  "summary": "Associate allowed agenda and source context with diarized turns and procedural intervals while preserving uncertain boundaries and historical availability. Scheduled order is context, not proof that an item was heard or that a particular person spoke.",
+  "in_scope": [
+    "Bounded agenda/item candidate association",
+    "Original-clock phase intervals",
+    "Causal/as-of and retrospective alignment modes",
+    "Cross-item/consent/reopened-item cases"
+  ],
+  "out_of_scope": [
+    "Using final minutes or later names in a causal earlier prediction",
+    "Inferring heard/disposition solely from scheduled agenda order",
+    "Assigning a person from item ownership or topical familiarity"
+  ],
+  "implementation": [
+    "Prepare copied agenda/item/source references with publication/availability times, scoped IDs and neutral allowed text; link source coverage rather than requiring a new crawl.",
+    "Generate bounded candidate item associations from explicit item calls and permitted semantic cues; retain multiple or no candidate when evidence is insufficient.",
+    "Align procedural intervals to turns with exact source clocks and boundary uncertainty, including items out of order, consent grouping, recess and reopened items.",
+    "Separate causal inference from retrospective smoothing with a declared lookahead; exclude later minutes/corrections and identity-bearing fields from early packets.",
+    "Compare procedure-only, agenda-only and combined evidence variants with identical frozen acoustic/query inputs and report association quality separately from identity outcomes."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A scheduled but unheard item does not become an observed occurrence.",
+      "verification": "Run agenda-only, explicit item-call and canceled-item controls and compare source-claim states."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Future minutes or names cannot enter a causal alignment packet.",
+      "verification": "Place sentinel later disclosures in copied sources and verify availability filtering before candidate ranking."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Reordered/reopened/consent items retain correct scoped alternatives and source intervals.",
+      "verification": "Compare outputs to independent interval labels including uncertain boundaries."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Agenda alignment benefit is reported independently from speaker or identity accuracy.",
+      "verification": "Generate a paired report with item/phase metrics and separate candidate-decision results."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/statecivicsai-diat:src/speaker_identity/experiments/meeting_matter/agenda_alignment.py (proposed)",
+    "mfreeze77/statecivicsai-diat:data/meeting-matter/agenda/<run>/ (private)",
+    "mfreeze77/statecivicsai-diat:docs/research/agenda-alignment.md (proposed)"
+  ],
+  "tests": [
+    "Consent item removed for separate debate",
+    "Agenda item called out of scheduled order",
+    "Unheard item after adjournment",
+    "Later minutes name a speaker absent from early evidence",
+    "One turn spans two meeting/agenda intervals"
+  ],
+  "risks": [
+    "Agenda topic can reveal identity indirectly through a habitual presenter.",
+    "Late corrected minutes make retrospective evaluation easier than the intended causal use."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/src/speaker_identity/meeting_package.py",
+      "application": "Use original-clock meeting/turn overlaps and artifact references."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/src/civic_crawler/diat_export.py",
+      "application": "Use already exported roster/meeting context only where explicitly permitted."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/identity-context-evaluation.md",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

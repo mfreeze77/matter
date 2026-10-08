@@ -1,0 +1,109 @@
+{
+  "id": "MAT-063",
+  "title": "Enforce temporal, source-group and identity leakage gates",
+  "track": "diat",
+  "phase": 4,
+  "priority": "P0",
+  "status": "planned",
+  "type": "qualification",
+  "owner_repo": "mfreeze77/statecivicsai-diat",
+  "component": "experiments.meeting_matter.eligibility",
+  "depends_on": [
+    "MAT-001",
+    "MAT-006",
+    "MAT-010",
+    "MAT-036",
+    "MAT-037",
+    "MAT-051",
+    "MAT-052"
+  ],
+  "requirements": [
+    "DIAT-01",
+    "DIAT-03",
+    "DIAT-04",
+    "DIAT-08",
+    "DIAT-12",
+    "DIAT-14",
+    "DIAT-15",
+    "DIAT-18"
+  ],
+  "summary": "Extend the existing identity-context eligibility and label firewall to procedural, institution, roster and longitudinal feature evidence. Strict historical replay must reflect source and identity-link availability; retrospective smoothing and unknown chronology remain explicitly separate.",
+  "in_scope": [
+    "Eligibility before ranking/truncation",
+    "Hearing/provenance/equivalence exclusions",
+    "Evidence and identity-link clocks",
+    "Model-visible allowlists and causal/lookahead contracts"
+  ],
+  "out_of_scope": [
+    "Assuming an old media date proves historical availability",
+    "Treating exact file hashes as complete re-encode detection",
+    "Using ground truth or later machine corrections to build candidate/profile packets"
+  ],
+  "implementation": [
+    "Reuse current source/provenance/equivalence maps and exclusions; build connected groups before person/feature filtering so aliases through unenrolled recordings remain excluded.",
+    "Require strict-historical cutoff witnesses for query evidence, acoustic candidates, enrollments, profiles and any person-conditioned evidence links; unknown chronology refuses that mode.",
+    "Add profile-training membership and procedural/agenda lookahead checks, including later recognition, future chair role, final minutes and corrected source labels.",
+    "Keep original transcripts/upstream results private and allow only explicitly approved neutral fields into each condition; detect sentinel labels in titles, names, filenames and source-derived summaries.",
+    "Create adversarial fixtures and production-caller mutation tests for each gate; report exclusions and effective coverage without upgrading empty retrieval to evidence of absence."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "All known query/hearing/provenance aliases are excluded before top-K or candidate conditioning.",
+      "verification": "Use a transitive alias bridge through an unenrolled recording plus re-encoded-equivalence metadata; compare eligible/ranked lists."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Future or unknown evidence/identity-link availability cannot enter strict historical packets.",
+      "verification": "Run independent clock perturbations on source, enrollment and person association and assert named refusal/exclusion."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Gold identities and upstream machine names are absent from blind build/inference views.",
+      "verification": "Inject sentinels into reviewer labels, result files, original transcript metadata and derived summaries; scan actual packet bytes."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Causal and retrospective modes record distinct permitted context and cannot be mislabeled.",
+      "verification": "Run a later-turn disambiguation case under zero and bounded lookahead; verify manifest/report mode and available input differences."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/statecivicsai-diat:src/speaker_identity/experiments/meeting_matter/eligibility.py (proposed)",
+    "mfreeze77/statecivicsai-diat:tests/test_meeting_matter_leakage.py (proposed)",
+    "mfreeze77/statecivicsai-diat:docs/research/meeting-leakage-controls.md (proposed)",
+    "mfreeze77/statecivicsai-diat:data/meeting-matter/eligibility/<run>/ (private)"
+  ],
+  "tests": [
+    "Same hearing in candidate history under a different recording ID",
+    "Identity link verified after query cutoff",
+    "Late minutes reveal a previously unknown name",
+    "Roster filename embeds a gold identity",
+    "Future chair announcement",
+    "Candidate-less or chronology-unknown query still accounted for"
+  ],
+  "risks": [
+    "A package can validate structurally while retaining identity-bearing source text.",
+    "Unknown provenance and availability may require a smaller evaluable corpus rather than invented certainty."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/identity-context-evaluation.md",
+      "application": "Reuse strict historical versus retrospective modes and independent identity-link clocks."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/src/speaker_identity/identity_context_evaluation.py",
+      "application": "Extend existing eligibility-before-ranking and build/report label firewall."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/meeting-handoff.md",
+    "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/src/speaker_identity/behavior/profiles.py",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

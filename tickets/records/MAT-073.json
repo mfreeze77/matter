@@ -1,0 +1,80 @@
+{
+  "id": "MAT-073",
+  "title": "Implement retention, revocation and auditable archival",
+  "track": "operations",
+  "phase": 3,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "implement-retention,-revocation-and-auditable-archival",
+  "depends_on": [
+    "MAT-003",
+    "MAT-007",
+    "MAT-016",
+    "MAT-021",
+    "MAT-072"
+  ],
+  "requirements": [
+    "OPS-02"
+  ],
+  "summary": "Bound retained observations and receipts while preserving enough provenance to explain decisions. Withdrawal, deletion and access revocation must invalidate dependent current uses without rewriting historical delivery claims or inventing resolution.",
+  "in_scope": [
+    "Retention classes, immutable reference receipts and source withdrawal.",
+    "Compaction and archive interfaces with reconstruction guarantees."
+  ],
+  "out_of_scope": [
+    "Deploying or modifying a downstream project as part of this planning ticket without that implementation task.",
+    "Treating synthetic checks as evidence of live provider or user outcomes."
+  ],
+  "implementation": [
+    "Define retention rules per record class and host scope, including what may remain as a hash or tombstone.",
+    "Implement compaction that retains dependency and delivery provenance needed for the declared audit horizon.",
+    "Invalidate current conclusions when required evidence becomes unavailable and report reconstruction limits honestly."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Archived records can reconstruct the declared historical assessment within its retention contract.",
+      "verification": "Archive a multi-revision episode, restore permitted evidence, and compare canonical receipts and current stale flags."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Withdrawing evidence cannot silently preserve a qualified current conclusion that depends on it.",
+      "verification": "Withdraw a decisive source and assert dependent assessments and pending deliveries are reconsidered."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Ordinary maintenance stays bounded and does not require a person to close routine matters.",
+      "verification": "Run a long synthetic stream with configured retention and measure retained counts and maintenance work."
+    }
+  ],
+  "artifacts": [
+    "src/matter/retention.py",
+    "tests/integration/test_retention.py"
+  ],
+  "tests": [
+    "Deletion of one source in a multi-source derived passage.",
+    "Delivered receipt retained when its evidence body must be removed.",
+    "Archive unavailable during an audit query."
+  ],
+  "risks": [
+    "Compaction can erase the distinction between what was known then and corrected later.",
+    "Retention limits must match host obligations and source permissions."
+  ],
+  "reuse": [
+    {
+      "source": "matterbrainstormspec and matterjevmesh",
+      "application": "Preserve the explicit scope, provenance, qualification, and evidence boundaries in the governing contracts."
+    }
+  ],
+  "sources": [
+    "matterbrainstormspec",
+    "matterjevmesh",
+    "docs/architecture.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

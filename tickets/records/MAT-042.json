@@ -1,0 +1,87 @@
+{
+  "id": "MAT-042",
+  "title": "Compare matter outcomes and audit justified silence",
+  "track": "evaluation",
+  "phase": 4,
+  "priority": "P0",
+  "status": "planned",
+  "type": "qualification",
+  "owner_repo": "mfreeze77/matter",
+  "component": "evaluation/outcomes",
+  "depends_on": [
+    "MAT-033",
+    "MAT-034",
+    "MAT-039",
+    "MAT-040",
+    "MAT-041",
+    "MAT-019",
+    "MAT-021"
+  ],
+  "requirements": [
+    "EVAL-03",
+    "EVAL-08",
+    "EVAL-13",
+    "JEV-11"
+  ],
+  "summary": "Evaluate the user-visible purpose of the substrate: better continuity and timely contributions with less repeated interruption. Use paired episodes and independently reviewed expected outcomes, and inspect quiet cases so an all-silent system cannot appear successful by emitting nothing.",
+  "in_scope": [
+    "Paired A/B outcome scoring and error exemplars",
+    "Quietness sampling, missed-event review and delivery-stage denominators"
+  ],
+  "out_of_scope": [
+    "Calling offline eligibility observed live usefulness",
+    "Optimizing a single notification-count metric"
+  ],
+  "implementation": [
+    "Score association errors, unsupported claims, false recovery, stale advice, repeated interventions, important misses and late contributions against declared episode labels.",
+    "Report paired differences and episode-aware uncertainty together with counts and denominators; retain separate family and end-to-end results.",
+    "Audit a declared stratified sample of quiet outcomes plus all severe labeled misses, distinguishing intentional deferral from absent observations or failed evaluation.",
+    "Track eligibility, enqueue, delivery, consumption, action and verified outcome separately; mark unobserved live stages unrun rather than inferred.",
+    "Produce concrete disagreement and failure examples, identifying whether evidence, association, policy, qualification or timing caused the error."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A candidate that suppresses every update fails episodes requiring a timely useful contribution.",
+      "verification": "Run an all-silent fixture arm and inspect missed-event counts and gate failure."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Quietness from an observer gap is not scored as a correct no-change decision.",
+      "verification": "Replay a disconnected interval containing a labeled important event and inspect coverage versus attention errors."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Every reported improvement is paired to the same eligible baseline episode and evidence.",
+      "verification": "Reconcile arm manifests, excluded cases, labels, counts and uncertainty inputs."
+    }
+  ],
+  "artifacts": [
+    "src/matter/evaluation/outcomes.py",
+    "src/matter/evaluation/silence_audit.py",
+    "tests/evaluation/test_outcomes.py"
+  ],
+  "tests": [
+    "Fewer notifications with more severe misses is visible as a tradeoff.",
+    "A delivered hint without consumption has no claimed user response.",
+    "Correct recovery clears only matching pending advice."
+  ],
+  "risks": [
+    "Human usefulness labels can be biased by seeing the model arm.",
+    "Aggregate wins can obscure catastrophic false closures."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_store.py",
+      "application": "Use dependency and invalidation boundaries to attribute stale-output failures precisely."
+    }
+  ],
+  "sources": [
+    "matterjevmesh §§5,8–10",
+    "docs/evaluation.md — End-to-end measures"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

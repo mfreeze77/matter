@@ -1,0 +1,87 @@
+{
+  "id": "MAT-033",
+  "title": "Add shadow association and claim-evidence question families",
+  "track": "jev",
+  "phase": 3,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "semantic/families/evidence",
+  "depends_on": [
+    "MAT-027",
+    "MAT-028",
+    "MAT-029",
+    "MAT-031",
+    "MAT-007",
+    "MAT-008"
+  ],
+  "requirements": [
+    "JEV-09",
+    "JEV-10",
+    "JEV-14",
+    "JEV-15"
+  ],
+  "summary": "Implement a small original family catalogue for ambiguous observation association and claim-relative evidence interpretation. The family produces shadow judgments over frozen candidate packets; it must preserve uncertain associations and cannot change identity or provenance merely because text is similar.",
+  "in_scope": [
+    "Same/related/different/insufficient matter relations",
+    "Support, contradiction, qualification and asserted-versus-established evidence"
+  ],
+  "out_of_scope": [
+    "Automatic merges or confirmed speaker identity",
+    "Replacing deterministic exact identifiers with model scores"
+  ],
+  "implementation": [
+    "Define a fixed outcome set for each bounded candidate comparison with scope and identifiers resolved before semantic evaluation.",
+    "Define separate claim-relative predicates for support, contradiction and qualification, allowing compatible dimensions to coexist.",
+    "Bind each result to claim, candidate, packet, occurrence lineage and question revision, preserving the original observations.",
+    "Emit proposed associations and unresolved reasons for the core association policy; do not write accepted merges directly.",
+    "Add synthetic and labeled episode cases distinguishing shared topics, the same continuing matter, a repeated occurrence and independent corroboration."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Topic similarity cannot automatically establish same matter, same occurrence or shared person identity.",
+      "verification": "Evaluate fixtures with identical wording across different tasks, executions and people and inspect proposed relations."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "A source assertion is distinguished from evidence that the asserted event occurred.",
+      "verification": "Compare planned funding with an authoritative award document under the same claim."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Support and qualification can coexist without an invalid exclusive-choice collapse.",
+      "verification": "Use a passing unit test that supports one behavior but leaves integration verification unresolved."
+    }
+  ],
+  "artifacts": [
+    "src/matter/semantic/families/evidence.py",
+    "tests/semantic/test_evidence_families.py",
+    "tests/fixtures/semantic/evidence_families.json"
+  ],
+  "tests": [
+    "Two notices at one location have different project identifiers.",
+    "A model summary inherits its source lineage.",
+    "An ambiguous alias stays unresolved rather than becoming enrollment."
+  ],
+  "risks": [
+    "Premature merges destroy the continuity that matters are meant to preserve.",
+    "A corroboration classifier cannot prove source independence."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/libingzheren/Jev-Mem/blob/7ab0c73c6d8f4f611ad252c1e6ba8083f8df0e44/memory/jev_questions.py",
+      "application": "Adapt novelty, contradiction, explicit-update and relevance distinctions using original Matter questions."
+    }
+  ],
+  "sources": [
+    "matterjevmesh §3",
+    "https://github.com/libingzheren/Jev-Mem/blob/7ab0c73c6d8f4f611ad252c1e6ba8083f8df0e44/memory/jev_questions.py",
+    "jevinmatter — procedural evidence is a soft contextual example"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

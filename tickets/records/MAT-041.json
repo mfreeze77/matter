@@ -1,0 +1,85 @@
+{
+  "id": "MAT-041",
+  "title": "Evaluate label, order, changed-question and coherence sensitivity",
+  "track": "evaluation",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "qualification",
+  "owner_repo": "mfreeze77/matter",
+  "component": "evaluation/question_sensitivity",
+  "depends_on": [
+    "MAT-027",
+    "MAT-037",
+    "MAT-039"
+  ],
+  "requirements": [
+    "EVAL-07",
+    "EVAL-14",
+    "JEV-03",
+    "JEV-09"
+  ],
+  "summary": "Create controlled probes that expose whether a semantic family follows its declared meaning and how much ordinary call variation affects the comparison. Separate intended invariance from deliberate meaning changes, and report failures without treating cross-question agreement as ground-truth correctness.",
+  "in_scope": [
+    "Repeated calls, option-order remapping and label/definition controls",
+    "Changed-question pairs and logical-coherence diagnostics"
+  ],
+  "out_of_scope": [
+    "Assuming hosted-model internal architecture",
+    "Applying another model paper’s failure rate to Matter"
+  ],
+  "implementation": [
+    "Prepare repeated identical requests to estimate within-snapshot variation before comparing altered renderings.",
+    "Generate option-order permutations, neutral-label substitutions and meaningful-name-to-definition swaps with explicit semantic remapping to original outcomes.",
+    "Add paired topic/matter/occurrence questions on examples whose correct answers differ, so a model repeating an old answer fails meaning sensitivity.",
+    "Run complementary and equivalent propositions in separate and bundled requests; preserve contradictions and do not multiply their probabilities.",
+    "Produce a probe manifest and per-family qualification impact report including raw receipts, independent labels and affected specification revisions."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Order and label probes compare mapped semantic outcomes rather than raw option strings.",
+      "verification": "Use deliberately permuted fixture labels and verify the remapping against a known oracle."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Changed-question tests detect an evaluator that always returns the original answer.",
+      "verification": "Use paired same-topic/different-matter and same-matter/new-occurrence cases with fixed expected differences."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Observed inconsistency is reported relative to repeat variation and cannot become a joint probability.",
+      "verification": "Inspect complement/bundling output and test the composition boundary rejects unsupported probability products."
+    }
+  ],
+  "artifacts": [
+    "src/matter/evaluation/sensitivity.py",
+    "tests/evaluation/test_sensitivity.py",
+    "tests/fixtures/evaluation/question_variants.json"
+  ],
+  "tests": [
+    "A Noul and Choice about the same claim disagree.",
+    "A neutral label control changes spelling but not definition.",
+    "A missing state field causes rendering failure before a probe call."
+  ],
+  "risks": [
+    "A label permutation without semantic remapping creates a false failure.",
+    "Agreement can be high while all answers are wrong."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/libingzheren/Jev-Mem/blob/7ab0c73c6d8f4f611ad252c1e6ba8083f8df0e44/memory/jev_questions.py",
+      "application": "Use distinct relation definitions to construct changed-meaning cases, not unqualified copied templates."
+    }
+  ],
+  "sources": [
+    "https://arxiv.org/html/2609.33209v1",
+    "https://arxiv.org/abs/2609.33689",
+    "https://arxiv.org/abs/2609.26758v2",
+    "matterjevmesh §§6,8"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

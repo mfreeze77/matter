@@ -1,0 +1,87 @@
+{
+  "id": "MAT-023",
+  "title": "Expose consistent projections and decision explanations",
+  "track": "core",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "queries_explanations",
+  "depends_on": [
+    "MAT-003",
+    "MAT-007",
+    "MAT-009",
+    "MAT-015",
+    "MAT-016",
+    "MAT-017",
+    "MAT-019",
+    "MAT-021"
+  ],
+  "requirements": [
+    "CORE-22"
+  ],
+  "summary": "Provide read operations applications can render without rebuilding matter semantics in the UI. Explanations should distinguish current understanding, historical knowledge, unresolved evidence, and actual delivery outcomes.",
+  "in_scope": [
+    "Current/history projections and scoped pagination",
+    "Why and missing-evidence queries",
+    "Receipt reconstruction and unavailability"
+  ],
+  "out_of_scope": [
+    "Dashboard product or essay generator",
+    "Public sharing and account management"
+  ],
+  "implementation": [
+    "Define consistent scoped queries with as-of boundaries, redirects, and incomplete flags.",
+    "Compose explanations from actual rule decisions and operation receipts, retaining citations and disagreement.",
+    "Resolve immutable references once and expose unavailable retained material.",
+    "Prevent projections from combining incompatible identity, assessment, and delivery revisions during concurrent changes."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Quiet explanations distinguish already delivered from inadequate coverage.",
+      "verification": "Query fixtures with those different reason paths."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Historical explanation uses its original policy and knowable evidence.",
+      "verification": "Compare before and after correction."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Missing payload produces unavailable reconstruction rather than generated justification.",
+      "verification": "Remove a permitted test blob and inspect completeness."
+    }
+  ],
+  "artifacts": [
+    "src/matter/queries.py",
+    "src/matter/explain.py",
+    "tests/integration/test_explanation_queries.py"
+  ],
+  "tests": [
+    "A loser ID redirects while retaining its history.",
+    "Conflicting rules remain visible.",
+    "Pagination cannot leak another scope.",
+    "A concurrent split cannot yield mixed-revision projection."
+  ],
+  "risks": [
+    "Presentation code may derive a different status than the core."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/state-civics-ai/blob/a34fcec27f353187e7a23d54788b203d13ac87c1/services/local-accountability/sar_tracker/core_import/matters.py",
+      "application": "Use server-derived status and cited claims as a projection pattern without civic UI dependencies."
+    }
+  ],
+  "sources": [
+    "matterbrainstormspec",
+    "docs/contracts/core.md",
+    "docs/contracts/lifecycle.md",
+    "matterjevmesh"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

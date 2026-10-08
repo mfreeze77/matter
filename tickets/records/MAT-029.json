@@ -1,0 +1,85 @@
+{
+  "id": "MAT-029",
+  "title": "Plan independent batches and validated semantic stages",
+  "track": "jev",
+  "phase": 3,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "semantic/stages",
+  "depends_on": [
+    "MAT-026",
+    "MAT-027",
+    "MAT-028",
+    "MAT-014",
+    "MAT-020"
+  ],
+  "requirements": [
+    "JEV-05",
+    "JEV-09",
+    "JEV-13"
+  ],
+  "summary": "Execute independent questions together while representing actual data dependencies as separate stages. The stage plan must prevent sibling answers from becoming imaginary context, and must preserve why a dependent stage stopped when its prerequisite was invalid, stale, or unqualified.",
+  "in_scope": [
+    "Dependency graph validation, batching, explicit prerequisite gates",
+    "Stage-specific packet construction and cancellation"
+  ],
+  "out_of_scope": [
+    "A new general agent framework",
+    "Free-running model-generated plans"
+  ],
+  "implementation": [
+    "Define a stage graph whose edges name prior judgments, required qualification and the transformation needed to construct the next packet or alternatives.",
+    "Group renderable questions with identical packet identity and compatible execution budgets into one batch; retain conditional questions when their condition is already explicit.",
+    "Reject cycles, references to siblings in the same batch, and missing prerequisite outcomes before provider dispatch.",
+    "Apply a recorded stop or authorized alternate branch for invalid, uncertain or expired prerequisites, without inventing a default candidate.",
+    "Carry deadlines and cancellation through each stage and preserve parent receipt IDs for later replay."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Questions that share a complete fixed packet use one batch without artificial sequencing.",
+      "verification": "Inspect a planned support/contradiction example and assert one request."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "A stage needing fetched candidate details cannot run before the accepted selection and fetch complete.",
+      "verification": "Use controlled futures to inspect dispatch order and exact parent receipt binding."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Cycles, absent prerequisites and in-batch sibling dependencies fail clearly.",
+      "verification": "Submit three invalid plans and assert no provider calls and distinct validation reasons."
+    }
+  ],
+  "artifacts": [
+    "src/matter/semantic/stages.py",
+    "tests/semantic/test_stages.py",
+    "tests/fixtures/semantic/stage_plans.json"
+  ],
+  "tests": [
+    "Unqualified candidate selection stops the dependent recovery question.",
+    "Task cancellation before stage two prevents its dispatch.",
+    "A speculative same-packet question may be ignored without a second request."
+  ],
+  "risks": [
+    "Over-sequencing wastes latency and calls.",
+    "Hidden dependencies make apparently parallel questions logically incorrect."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/system_one_http.py",
+      "application": "Use the arbitrary question-set boundary and stage tracing as design references."
+    }
+  ],
+  "sources": [
+    "matterjevmesh §6",
+    "https://docs.typesafe.ai/primitives",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/system_one_http.py"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

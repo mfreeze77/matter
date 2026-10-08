@@ -1,0 +1,1967 @@
+{
+  "schema_version": "1.0",
+  "ticket_count": 80,
+  "counts_by_track": {
+    "civic": 5,
+    "core": 17,
+    "diat": 15,
+    "evaluation": 10,
+    "foundation": 1,
+    "jev": 10,
+    "oil": 6,
+    "operations": 9,
+    "rules": 7
+  },
+  "counts_by_status": {
+    "in_progress": 1,
+    "planned": 79
+  },
+  "tickets": [
+    {
+      "id": "MAT-001",
+      "title": "Establish the governing scaffold and validated implementation backlog",
+      "track": "foundation",
+      "phase": 0,
+      "priority": "P0",
+      "status": "in_progress",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [],
+      "requirements": [
+        "BOOT-01"
+      ],
+      "readiness": "in_progress",
+      "path": "records/MAT-001.json"
+    },
+    {
+      "id": "MAT-002",
+      "title": "Define interoperable record schemas, canonical encoding, and error results",
+      "track": "core",
+      "phase": 0,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-001"
+      ],
+      "requirements": [
+        "CORE-01"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-002.json"
+    },
+    {
+      "id": "MAT-003",
+      "title": "Implement durable transactional storage and revision-checked commands",
+      "track": "core",
+      "phase": 0,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-002"
+      ],
+      "requirements": [
+        "CORE-02"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-003.json"
+    },
+    {
+      "id": "MAT-004",
+      "title": "Ingest immutable observations with source-aware deduplication",
+      "track": "core",
+      "phase": 1,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-002",
+        "MAT-003"
+      ],
+      "requirements": [
+        "CORE-03"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-004.json"
+    },
+    {
+      "id": "MAT-005",
+      "title": "Implement persistent matter identity and scope continuity",
+      "track": "core",
+      "phase": 1,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-003",
+        "MAT-004"
+      ],
+      "requirements": [
+        "CORE-04"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-005.json"
+    },
+    {
+      "id": "MAT-006",
+      "title": "Track occurrences and evidence dependence separately from observations",
+      "track": "core",
+      "phase": 1,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-004",
+        "MAT-005"
+      ],
+      "requirements": [
+        "CORE-05"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-006.json"
+    },
+    {
+      "id": "MAT-007",
+      "title": "Model scoped claims and cited evidence relationships",
+      "track": "core",
+      "phase": 1,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-004",
+        "MAT-005",
+        "MAT-006"
+      ],
+      "requirements": [
+        "CORE-06"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-007.json"
+    },
+    {
+      "id": "MAT-008",
+      "title": "Separate association proposals from authorized acceptance",
+      "track": "core",
+      "phase": 1,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-005",
+        "MAT-006",
+        "MAT-007"
+      ],
+      "requirements": [
+        "CORE-07"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-008.json"
+    },
+    {
+      "id": "MAT-009",
+      "title": "Implement matter links, guarded merges, and reversible identity correction",
+      "track": "core",
+      "phase": 2,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-005",
+        "MAT-007",
+        "MAT-008"
+      ],
+      "requirements": [
+        "CORE-08"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-009.json"
+    },
+    {
+      "id": "MAT-010",
+      "title": "Represent time, source coverage, and explicit negative evidence scopes",
+      "track": "core",
+      "phase": 1,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-003",
+        "MAT-004",
+        "MAT-006",
+        "MAT-007"
+      ],
+      "requirements": [
+        "CORE-09"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-010.json"
+    },
+    {
+      "id": "MAT-011",
+      "title": "Route trusted controls immediately and preserve authority boundaries",
+      "track": "core",
+      "phase": 1,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-002",
+        "MAT-003",
+        "MAT-005"
+      ],
+      "requirements": [
+        "CORE-10"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-011.json"
+    },
+    {
+      "id": "MAT-012",
+      "title": "Implement provider-neutral rule and judgment interfaces",
+      "track": "rules",
+      "phase": 2,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-002",
+        "MAT-007",
+        "MAT-010",
+        "MAT-011"
+      ],
+      "requirements": [
+        "CORE-11"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-012.json"
+    },
+    {
+      "id": "MAT-013",
+      "title": "Version policy profiles and validate semantic compatibility",
+      "track": "rules",
+      "phase": 2,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-012"
+      ],
+      "requirements": [
+        "CORE-12"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-013.json"
+    },
+    {
+      "id": "MAT-014",
+      "title": "Execute staged rule graphs with explicit conflict composition",
+      "track": "rules",
+      "phase": 2,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-012",
+        "MAT-013"
+      ],
+      "requirements": [
+        "CORE-13"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-014.json"
+    },
+    {
+      "id": "MAT-015",
+      "title": "Commit revision-bound assessments and reusable semantic caches",
+      "track": "rules",
+      "phase": 2,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-003",
+        "MAT-008",
+        "MAT-010",
+        "MAT-013",
+        "MAT-014"
+      ],
+      "requirements": [
+        "CORE-14"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-015.json"
+    },
+    {
+      "id": "MAT-016",
+      "title": "Invalidate dependencies transitively including absence and candidate scopes",
+      "track": "core",
+      "phase": 2,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-003",
+        "MAT-009",
+        "MAT-010",
+        "MAT-015"
+      ],
+      "requirements": [
+        "CORE-15"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-016.json"
+    },
+    {
+      "id": "MAT-017",
+      "title": "Apply evidence-backed lifecycle transitions, resolution, and reopening",
+      "track": "core",
+      "phase": 3,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-007",
+        "MAT-009",
+        "MAT-010",
+        "MAT-011",
+        "MAT-013",
+        "MAT-015",
+        "MAT-016"
+      ],
+      "requirements": [
+        "CORE-16"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-017.json"
+    },
+    {
+      "id": "MAT-018",
+      "title": "Bind purposes, audiences, and dispositions independently",
+      "track": "rules",
+      "phase": 3,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-005",
+        "MAT-011",
+        "MAT-013",
+        "MAT-015",
+        "MAT-016"
+      ],
+      "requirements": [
+        "CORE-17"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-018.json"
+    },
+    {
+      "id": "MAT-019",
+      "title": "Evaluate attention eligibility against the last delivered baseline",
+      "track": "rules",
+      "phase": 3,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-015",
+        "MAT-016",
+        "MAT-017",
+        "MAT-018"
+      ],
+      "requirements": [
+        "CORE-18"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-019.json"
+    },
+    {
+      "id": "MAT-020",
+      "title": "Schedule temporal reevaluation with durable resource and attention budgets",
+      "track": "core",
+      "phase": 3,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-003",
+        "MAT-010",
+        "MAT-011",
+        "MAT-014",
+        "MAT-016",
+        "MAT-019"
+      ],
+      "requirements": [
+        "CORE-19"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-020.json"
+    },
+    {
+      "id": "MAT-021",
+      "title": "Deliver through a freshness-checked outbox with independent outcome receipts",
+      "track": "core",
+      "phase": 3,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-003",
+        "MAT-011",
+        "MAT-016",
+        "MAT-019",
+        "MAT-020"
+      ],
+      "requirements": [
+        "CORE-20"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-021.json"
+    },
+    {
+      "id": "MAT-022",
+      "title": "Support bounded evidence-gap investigation without forced human escalation",
+      "track": "rules",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-010",
+        "MAT-011",
+        "MAT-012",
+        "MAT-014",
+        "MAT-016",
+        "MAT-020"
+      ],
+      "requirements": [
+        "CORE-21"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-022.json"
+    },
+    {
+      "id": "MAT-023",
+      "title": "Expose consistent projections and decision explanations",
+      "track": "core",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-003",
+        "MAT-007",
+        "MAT-009",
+        "MAT-015",
+        "MAT-016",
+        "MAT-017",
+        "MAT-019",
+        "MAT-021"
+      ],
+      "requirements": [
+        "CORE-22"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-023.json"
+    },
+    {
+      "id": "MAT-024",
+      "title": "Build chronological replay and language-neutral conformance fixtures",
+      "track": "core",
+      "phase": 4,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-002",
+        "MAT-010",
+        "MAT-014",
+        "MAT-015",
+        "MAT-016",
+        "MAT-017",
+        "MAT-019",
+        "MAT-020",
+        "MAT-021",
+        "MAT-023"
+      ],
+      "requirements": [
+        "CORE-23"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-024.json"
+    },
+    {
+      "id": "MAT-025",
+      "title": "Qualify the neutral core through adversarial multi-audience episodes",
+      "track": "core",
+      "phase": 5,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-002",
+        "MAT-003",
+        "MAT-004",
+        "MAT-005",
+        "MAT-006",
+        "MAT-007",
+        "MAT-008",
+        "MAT-009",
+        "MAT-010",
+        "MAT-011",
+        "MAT-012",
+        "MAT-013",
+        "MAT-014",
+        "MAT-015",
+        "MAT-016",
+        "MAT-017",
+        "MAT-018",
+        "MAT-019",
+        "MAT-020",
+        "MAT-021",
+        "MAT-022",
+        "MAT-023",
+        "MAT-024"
+      ],
+      "requirements": [
+        "CORE-24",
+        "CORE-01",
+        "CORE-02",
+        "CORE-03",
+        "CORE-04",
+        "CORE-05",
+        "CORE-06",
+        "CORE-07",
+        "CORE-08",
+        "CORE-09",
+        "CORE-10",
+        "CORE-11",
+        "CORE-12",
+        "CORE-13",
+        "CORE-14",
+        "CORE-15",
+        "CORE-16",
+        "CORE-17",
+        "CORE-18",
+        "CORE-19",
+        "CORE-20",
+        "CORE-21",
+        "CORE-22",
+        "CORE-23"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-025.json"
+    },
+    {
+      "id": "MAT-026",
+      "title": "Define the provider-neutral typed executor",
+      "track": "jev",
+      "phase": 2,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-001",
+        "MAT-002",
+        "MAT-012"
+      ],
+      "requirements": [
+        "JEV-01",
+        "JEV-02",
+        "JEV-07",
+        "JEV-14"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-026.json"
+    },
+    {
+      "id": "MAT-027",
+      "title": "Implement versioned question specifications and rendering",
+      "track": "jev",
+      "phase": 2,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-026",
+        "MAT-007"
+      ],
+      "requirements": [
+        "JEV-02",
+        "JEV-03",
+        "JEV-08"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-027.json"
+    },
+    {
+      "id": "MAT-028",
+      "title": "Build bounded source-linked assessment packets",
+      "track": "jev",
+      "phase": 2,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-027",
+        "MAT-004",
+        "MAT-006",
+        "MAT-010"
+      ],
+      "requirements": [
+        "JEV-04",
+        "JEV-10",
+        "JEV-15",
+        "EVAL-01"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-028.json"
+    },
+    {
+      "id": "MAT-029",
+      "title": "Plan independent batches and validated semantic stages",
+      "track": "jev",
+      "phase": 3,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-026",
+        "MAT-027",
+        "MAT-028",
+        "MAT-014",
+        "MAT-020"
+      ],
+      "requirements": [
+        "JEV-05",
+        "JEV-09",
+        "JEV-13"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-029.json"
+    },
+    {
+      "id": "MAT-030",
+      "title": "Persist judgment receipts and exact execution reuse",
+      "track": "jev",
+      "phase": 3,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-026",
+        "MAT-029",
+        "MAT-003",
+        "MAT-015",
+        "MAT-016"
+      ],
+      "requirements": [
+        "JEV-06",
+        "JEV-07",
+        "JEV-13",
+        "JEV-15"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-030.json"
+    },
+    {
+      "id": "MAT-031",
+      "title": "Enforce qualification certificates at runtime admission",
+      "track": "jev",
+      "phase": 3,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-027",
+        "MAT-028",
+        "MAT-030",
+        "MAT-013"
+      ],
+      "requirements": [
+        "JEV-08",
+        "JEV-09",
+        "JEV-14",
+        "EVAL-14"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-031.json"
+    },
+    {
+      "id": "MAT-032",
+      "title": "Integrate an optional TypeSafe transport adapter",
+      "track": "jev",
+      "phase": 3,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-026",
+        "MAT-027",
+        "MAT-028",
+        "MAT-030",
+        "MAT-031"
+      ],
+      "requirements": [
+        "JEV-01",
+        "JEV-02",
+        "JEV-07",
+        "JEV-13"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-032.json"
+    },
+    {
+      "id": "MAT-033",
+      "title": "Add shadow association and claim-evidence question families",
+      "track": "jev",
+      "phase": 3,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-027",
+        "MAT-028",
+        "MAT-029",
+        "MAT-031",
+        "MAT-007",
+        "MAT-008"
+      ],
+      "requirements": [
+        "JEV-09",
+        "JEV-10",
+        "JEV-14",
+        "JEV-15"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-033.json"
+    },
+    {
+      "id": "MAT-034",
+      "title": "Add shadow change, recovery and audience-contribution families",
+      "track": "jev",
+      "phase": 3,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-027",
+        "MAT-028",
+        "MAT-029",
+        "MAT-031",
+        "MAT-017",
+        "MAT-018",
+        "MAT-019",
+        "MAT-021"
+      ],
+      "requirements": [
+        "JEV-09",
+        "JEV-11",
+        "JEV-14"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-034.json"
+    },
+    {
+      "id": "MAT-035",
+      "title": "Add bounded investigation judgments and stopping outcomes",
+      "track": "jev",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-028",
+        "MAT-029",
+        "MAT-031",
+        "MAT-033",
+        "MAT-034",
+        "MAT-022",
+        "MAT-040"
+      ],
+      "requirements": [
+        "JEV-04",
+        "JEV-09",
+        "JEV-12",
+        "JEV-14"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-035.json"
+    },
+    {
+      "id": "MAT-036",
+      "title": "Freeze episode corpora and independent label provenance",
+      "track": "evaluation",
+      "phase": 2,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-001",
+        "MAT-004",
+        "MAT-006",
+        "MAT-010"
+      ],
+      "requirements": [
+        "EVAL-01",
+        "EVAL-12",
+        "EVAL-13"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-036.json"
+    },
+    {
+      "id": "MAT-037",
+      "title": "Create grouped splits and comparable baseline manifests",
+      "track": "evaluation",
+      "phase": 4,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-036",
+        "MAT-024"
+      ],
+      "requirements": [
+        "EVAL-02",
+        "EVAL-03",
+        "EVAL-01"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-037.json"
+    },
+    {
+      "id": "MAT-038",
+      "title": "Build the deterministic offline evaluation harness",
+      "track": "evaluation",
+      "phase": 4,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-026",
+        "MAT-029",
+        "MAT-030",
+        "MAT-031",
+        "MAT-036",
+        "MAT-037"
+      ],
+      "requirements": [
+        "EVAL-03",
+        "EVAL-04",
+        "EVAL-13",
+        "EVAL-11"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-038.json"
+    },
+    {
+      "id": "MAT-039",
+      "title": "Run optional real-provider shadow replay with exact receipts",
+      "track": "evaluation",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-032",
+        "MAT-033",
+        "MAT-034",
+        "MAT-036",
+        "MAT-037",
+        "MAT-038"
+      ],
+      "requirements": [
+        "EVAL-05",
+        "EVAL-12",
+        "EVAL-13",
+        "JEV-13"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-039.json"
+    },
+    {
+      "id": "MAT-040",
+      "title": "Fit thresholds and issue support-aware qualification records",
+      "track": "evaluation",
+      "phase": 4,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-031",
+        "MAT-037",
+        "MAT-039"
+      ],
+      "requirements": [
+        "EVAL-06",
+        "EVAL-13",
+        "EVAL-14",
+        "JEV-08"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-040.json"
+    },
+    {
+      "id": "MAT-041",
+      "title": "Evaluate label, order, changed-question and coherence sensitivity",
+      "track": "evaluation",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-027",
+        "MAT-037",
+        "MAT-039"
+      ],
+      "requirements": [
+        "EVAL-07",
+        "EVAL-14",
+        "JEV-03",
+        "JEV-09"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-041.json"
+    },
+    {
+      "id": "MAT-042",
+      "title": "Compare matter outcomes and audit justified silence",
+      "track": "evaluation",
+      "phase": 4,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-033",
+        "MAT-034",
+        "MAT-039",
+        "MAT-040",
+        "MAT-041",
+        "MAT-019",
+        "MAT-021"
+      ],
+      "requirements": [
+        "EVAL-03",
+        "EVAL-08",
+        "EVAL-13",
+        "JEV-11"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-042.json"
+    },
+    {
+      "id": "MAT-043",
+      "title": "Qualify availability, latency and concurrent completion behavior",
+      "track": "evaluation",
+      "phase": 4,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-039",
+        "MAT-042",
+        "MAT-010",
+        "MAT-011",
+        "MAT-016",
+        "MAT-020",
+        "MAT-021",
+        "MAT-024"
+      ],
+      "requirements": [
+        "EVAL-09",
+        "EVAL-13",
+        "JEV-06",
+        "JEV-14"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-043.json"
+    },
+    {
+      "id": "MAT-044",
+      "title": "Measure overhead and qualify execution budgets",
+      "track": "evaluation",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-032",
+        "MAT-039",
+        "MAT-042",
+        "MAT-020"
+      ],
+      "requirements": [
+        "EVAL-10",
+        "EVAL-13",
+        "JEV-13"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-044.json"
+    },
+    {
+      "id": "MAT-045",
+      "title": "Assemble reproducible qualification and release evidence",
+      "track": "evaluation",
+      "phase": 5,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-035",
+        "MAT-040",
+        "MAT-041",
+        "MAT-042",
+        "MAT-043",
+        "MAT-044",
+        "MAT-025"
+      ],
+      "requirements": [
+        "EVAL-11",
+        "EVAL-14",
+        "EVAL-12",
+        "JEV-08"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-045.json"
+    },
+    {
+      "id": "MAT-046",
+      "title": "Define civic profile and authority-manifest contracts",
+      "track": "civic",
+      "phase": 2,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-001",
+        "MAT-002",
+        "MAT-012",
+        "MAT-013"
+      ],
+      "requirements": [
+        "CIV-01",
+        "CIV-02",
+        "CIV-05",
+        "CIV-08"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-046.json"
+    },
+    {
+      "id": "MAT-047",
+      "title": "Export crawler jurisdiction overrides and authority evidence",
+      "track": "civic",
+      "phase": 3,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivics-local-crawler",
+      "depends_on": [
+        "MAT-001",
+        "MAT-046",
+        "MAT-007",
+        "MAT-010",
+        "MAT-011"
+      ],
+      "requirements": [
+        "CIV-02",
+        "CIV-03",
+        "CIV-07",
+        "CIV-08"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-047.json"
+    },
+    {
+      "id": "MAT-048",
+      "title": "Adapt civic source claims and stages into neutral matter history",
+      "track": "civic",
+      "phase": 3,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-001",
+        "MAT-004",
+        "MAT-005",
+        "MAT-006",
+        "MAT-007",
+        "MAT-008",
+        "MAT-009",
+        "MAT-010",
+        "MAT-046",
+        "MAT-047"
+      ],
+      "requirements": [
+        "CIV-03",
+        "CIV-04",
+        "CIV-05",
+        "CIV-07",
+        "CIV-08",
+        "CIV-09"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-048.json"
+    },
+    {
+      "id": "MAT-049",
+      "title": "Assess civic developments by purpose and meaningful audience change",
+      "track": "civic",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-001",
+        "MAT-015",
+        "MAT-016",
+        "MAT-017",
+        "MAT-018",
+        "MAT-019",
+        "MAT-021",
+        "MAT-048"
+      ],
+      "requirements": [
+        "CIV-01",
+        "CIV-05",
+        "CIV-06",
+        "CIV-09"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-049.json"
+    },
+    {
+      "id": "MAT-050",
+      "title": "Qualify civic temporal, authority and receiver boundaries",
+      "track": "civic",
+      "phase": 5,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-001",
+        "MAT-024",
+        "MAT-025",
+        "MAT-037",
+        "MAT-042",
+        "MAT-048",
+        "MAT-049"
+      ],
+      "requirements": [
+        "CIV-02",
+        "CIV-03",
+        "CIV-04",
+        "CIV-05",
+        "CIV-07",
+        "CIV-08",
+        "CIV-09"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-050.json"
+    },
+    {
+      "id": "MAT-051",
+      "title": "Audit the private DIAT corpus and exported evidence views",
+      "track": "diat",
+      "phase": 0,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001"
+      ],
+      "requirements": [
+        "DIAT-01",
+        "DIAT-02",
+        "DIAT-03",
+        "DIAT-15",
+        "DIAT-18"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-051.json"
+    },
+    {
+      "id": "MAT-052",
+      "title": "Define source-linked formal-meeting procedural observations",
+      "track": "diat",
+      "phase": 2,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001",
+        "MAT-002",
+        "MAT-004",
+        "MAT-007",
+        "MAT-046",
+        "MAT-051"
+      ],
+      "requirements": [
+        "DIAT-01",
+        "DIAT-03",
+        "DIAT-05",
+        "DIAT-06",
+        "DIAT-13",
+        "DIAT-18"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-052.json"
+    },
+    {
+      "id": "MAT-053",
+      "title": "Implement an uncertain procedural state tracker",
+      "track": "diat",
+      "phase": 3,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001",
+        "MAT-012",
+        "MAT-014",
+        "MAT-015",
+        "MAT-016",
+        "MAT-017",
+        "MAT-052"
+      ],
+      "requirements": [
+        "DIAT-01",
+        "DIAT-05",
+        "DIAT-06",
+        "DIAT-13"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-053.json"
+    },
+    {
+      "id": "MAT-054",
+      "title": "Model anonymous floor, chair and role transitions",
+      "track": "diat",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001",
+        "MAT-051",
+        "MAT-052",
+        "MAT-053",
+        "MAT-063"
+      ],
+      "requirements": [
+        "DIAT-04",
+        "DIAT-05",
+        "DIAT-06",
+        "DIAT-08",
+        "DIAT-13"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-054.json"
+    },
+    {
+      "id": "MAT-055",
+      "title": "Learn versioned jurisdiction and committee fingerprints",
+      "track": "diat",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001",
+        "MAT-013",
+        "MAT-037",
+        "MAT-046",
+        "MAT-051",
+        "MAT-052",
+        "MAT-054",
+        "MAT-063"
+      ],
+      "requirements": [
+        "DIAT-05",
+        "DIAT-06",
+        "DIAT-07",
+        "DIAT-13",
+        "DIAT-15",
+        "DIAT-17"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-055.json"
+    },
+    {
+      "id": "MAT-056",
+      "title": "Build longitudinal roster and verified-reference research profiles",
+      "track": "diat",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001",
+        "MAT-006",
+        "MAT-010",
+        "MAT-051",
+        "MAT-063"
+      ],
+      "requirements": [
+        "DIAT-02",
+        "DIAT-04",
+        "DIAT-08",
+        "DIAT-15",
+        "DIAT-17"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-056.json"
+    },
+    {
+      "id": "MAT-057",
+      "title": "Evaluate prefix, suffix and grammar evidence without script leakage",
+      "track": "diat",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001",
+        "MAT-027",
+        "MAT-028",
+        "MAT-051",
+        "MAT-056",
+        "MAT-063"
+      ],
+      "requirements": [
+        "DIAT-04",
+        "DIAT-08",
+        "DIAT-09",
+        "DIAT-13",
+        "DIAT-14",
+        "DIAT-15"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-057.json"
+    },
+    {
+      "id": "MAT-058",
+      "title": "Evaluate acoustic prosody with room and microphone controls",
+      "track": "diat",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001",
+        "MAT-051",
+        "MAT-056",
+        "MAT-063"
+      ],
+      "requirements": [
+        "DIAT-03",
+        "DIAT-04",
+        "DIAT-10",
+        "DIAT-13",
+        "DIAT-14",
+        "DIAT-15"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-058.json"
+    },
+    {
+      "id": "MAT-059",
+      "title": "Evaluate pause, rhythm and interaction motifs across meetings",
+      "track": "diat",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001",
+        "MAT-051",
+        "MAT-052",
+        "MAT-054",
+        "MAT-056",
+        "MAT-063"
+      ],
+      "requirements": [
+        "DIAT-04",
+        "DIAT-06",
+        "DIAT-08",
+        "DIAT-11",
+        "DIAT-13",
+        "DIAT-14"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-059.json"
+    },
+    {
+      "id": "MAT-060",
+      "title": "Align agenda items and procedural phases to experimental turns",
+      "track": "diat",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001",
+        "MAT-010",
+        "MAT-027",
+        "MAT-028",
+        "MAT-051",
+        "MAT-052",
+        "MAT-053",
+        "MAT-063"
+      ],
+      "requirements": [
+        "DIAT-05",
+        "DIAT-07",
+        "DIAT-12",
+        "DIAT-13",
+        "DIAT-15"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-060.json"
+    },
+    {
+      "id": "MAT-061",
+      "title": "Compose conflict-aware DIAT matter assessments without identity mutation",
+      "track": "diat",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001",
+        "MAT-015",
+        "MAT-016",
+        "MAT-018",
+        "MAT-019",
+        "MAT-021",
+        "MAT-027",
+        "MAT-028",
+        "MAT-031",
+        "MAT-034",
+        "MAT-052",
+        "MAT-053",
+        "MAT-054",
+        "MAT-056",
+        "MAT-063"
+      ],
+      "requirements": [
+        "DIAT-01",
+        "DIAT-04",
+        "DIAT-05",
+        "DIAT-06",
+        "DIAT-13",
+        "DIAT-18"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-061.json"
+    },
+    {
+      "id": "MAT-062",
+      "title": "Run versioned meeting-feature ablations on identical frozen cohorts",
+      "track": "diat",
+      "phase": 4,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001",
+        "MAT-036",
+        "MAT-037",
+        "MAT-039",
+        "MAT-040",
+        "MAT-041",
+        "MAT-055",
+        "MAT-057",
+        "MAT-058",
+        "MAT-059",
+        "MAT-060",
+        "MAT-061",
+        "MAT-063",
+        "MAT-064"
+      ],
+      "requirements": [
+        "DIAT-02",
+        "DIAT-04",
+        "DIAT-07",
+        "DIAT-09",
+        "DIAT-10",
+        "DIAT-11",
+        "DIAT-12",
+        "DIAT-14",
+        "DIAT-15",
+        "DIAT-16"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-062.json"
+    },
+    {
+      "id": "MAT-063",
+      "title": "Enforce temporal, source-group and identity leakage gates",
+      "track": "diat",
+      "phase": 4,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001",
+        "MAT-006",
+        "MAT-010",
+        "MAT-036",
+        "MAT-037",
+        "MAT-051",
+        "MAT-052"
+      ],
+      "requirements": [
+        "DIAT-01",
+        "DIAT-03",
+        "DIAT-04",
+        "DIAT-08",
+        "DIAT-12",
+        "DIAT-14",
+        "DIAT-15",
+        "DIAT-18"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-063.json"
+    },
+    {
+      "id": "MAT-064",
+      "title": "Create independent meeting labels and useful-attention outcomes",
+      "track": "diat",
+      "phase": 2,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001",
+        "MAT-051",
+        "MAT-052"
+      ],
+      "requirements": [
+        "DIAT-02",
+        "DIAT-04",
+        "DIAT-05",
+        "DIAT-06",
+        "DIAT-13",
+        "DIAT-14",
+        "DIAT-16",
+        "DIAT-18"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-064.json"
+    },
+    {
+      "id": "MAT-065",
+      "title": "Maintain fingerprint qualification, drift and reference revocation",
+      "track": "diat",
+      "phase": 5,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/statecivicsai-diat",
+      "depends_on": [
+        "MAT-001",
+        "MAT-016",
+        "MAT-021",
+        "MAT-025",
+        "MAT-031",
+        "MAT-040",
+        "MAT-045",
+        "MAT-055",
+        "MAT-056",
+        "MAT-061",
+        "MAT-062",
+        "MAT-063",
+        "MAT-064"
+      ],
+      "requirements": [
+        "DIAT-01",
+        "DIAT-04",
+        "DIAT-07",
+        "DIAT-08",
+        "DIAT-13",
+        "DIAT-15",
+        "DIAT-17",
+        "DIAT-18"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-065.json"
+    },
+    {
+      "id": "MAT-066",
+      "title": "Capture complete Oil observations, check results and recovery events",
+      "track": "oil",
+      "phase": 5,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/oil",
+      "depends_on": [
+        "MAT-001",
+        "MAT-004",
+        "MAT-006",
+        "MAT-010",
+        "MAT-011",
+        "MAT-018",
+        "MAT-025"
+      ],
+      "requirements": [
+        "OIL-01",
+        "OIL-05",
+        "OIL-08",
+        "OIL-13"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-066.json"
+    },
+    {
+      "id": "MAT-067",
+      "title": "Implement Oil-owned durable matter state across cognition runs",
+      "track": "oil",
+      "phase": 5,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/oil",
+      "depends_on": [
+        "MAT-001",
+        "MAT-003",
+        "MAT-005",
+        "MAT-007",
+        "MAT-016",
+        "MAT-017",
+        "MAT-066"
+      ],
+      "requirements": [
+        "OIL-02",
+        "OIL-03",
+        "OIL-06",
+        "OIL-13"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-067.json"
+    },
+    {
+      "id": "MAT-068",
+      "title": "Adapt bounded claim-specific evidence and assessments into Matter",
+      "track": "oil",
+      "phase": 5,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/oil",
+      "depends_on": [
+        "MAT-001",
+        "MAT-007",
+        "MAT-010",
+        "MAT-012",
+        "MAT-014",
+        "MAT-015",
+        "MAT-027",
+        "MAT-028",
+        "MAT-029",
+        "MAT-032",
+        "MAT-066",
+        "MAT-067"
+      ],
+      "requirements": [
+        "OIL-04",
+        "OIL-06",
+        "OIL-11",
+        "OIL-13",
+        "OIL-14"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-068.json"
+    },
+    {
+      "id": "MAT-069",
+      "title": "Implement generic failure recurrence and recovery matter lifecycle",
+      "track": "oil",
+      "phase": 5,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/oil",
+      "depends_on": [
+        "MAT-001",
+        "MAT-008",
+        "MAT-009",
+        "MAT-011",
+        "MAT-013",
+        "MAT-016",
+        "MAT-017",
+        "MAT-019",
+        "MAT-020",
+        "MAT-034",
+        "MAT-066",
+        "MAT-067"
+      ],
+      "requirements": [
+        "OIL-03",
+        "OIL-05",
+        "OIL-06",
+        "OIL-07",
+        "OIL-11",
+        "OIL-14"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-069.json"
+    },
+    {
+      "id": "MAT-070",
+      "title": "Integrate native Oil controls, mailbox freshness and delivery receipts",
+      "track": "oil",
+      "phase": 5,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/oil",
+      "depends_on": [
+        "MAT-001",
+        "MAT-011",
+        "MAT-018",
+        "MAT-019",
+        "MAT-020",
+        "MAT-021",
+        "MAT-030",
+        "MAT-066",
+        "MAT-067",
+        "MAT-069"
+      ],
+      "requirements": [
+        "OIL-03",
+        "OIL-07",
+        "OIL-08",
+        "OIL-09",
+        "OIL-10",
+        "OIL-11"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-070.json"
+    },
+    {
+      "id": "MAT-071",
+      "title": "Qualify chronological and live Oil matter behavior against retained value",
+      "track": "oil",
+      "phase": 5,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/oil",
+      "depends_on": [
+        "MAT-001",
+        "MAT-024",
+        "MAT-025",
+        "MAT-036",
+        "MAT-037",
+        "MAT-038",
+        "MAT-039",
+        "MAT-040",
+        "MAT-041",
+        "MAT-042",
+        "MAT-043",
+        "MAT-044",
+        "MAT-045",
+        "MAT-066",
+        "MAT-067",
+        "MAT-068",
+        "MAT-069",
+        "MAT-070"
+      ],
+      "requirements": [
+        "OIL-10",
+        "OIL-11",
+        "OIL-12",
+        "OIL-13"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-071.json"
+    },
+    {
+      "id": "MAT-072",
+      "title": "Enforce host scope, access and provider egress contracts",
+      "track": "operations",
+      "phase": 2,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-002",
+        "MAT-003",
+        "MAT-007",
+        "MAT-011",
+        "MAT-028"
+      ],
+      "requirements": [
+        "OPS-01"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-072.json"
+    },
+    {
+      "id": "MAT-073",
+      "title": "Implement retention, revocation and auditable archival",
+      "track": "operations",
+      "phase": 3,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-003",
+        "MAT-007",
+        "MAT-016",
+        "MAT-021",
+        "MAT-072"
+      ],
+      "requirements": [
+        "OPS-02"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-073.json"
+    },
+    {
+      "id": "MAT-074",
+      "title": "Version schemas, migrations and cross-language conformance",
+      "track": "operations",
+      "phase": 4,
+      "priority": "P0",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-002",
+        "MAT-003",
+        "MAT-012",
+        "MAT-013",
+        "MAT-024"
+      ],
+      "requirements": [
+        "OPS-03"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-074.json"
+    },
+    {
+      "id": "MAT-075",
+      "title": "Expose neutral inspection and client operations",
+      "track": "operations",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-015",
+        "MAT-018",
+        "MAT-023",
+        "MAT-072",
+        "MAT-074"
+      ],
+      "requirements": [
+        "OPS-04"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-075.json"
+    },
+    {
+      "id": "MAT-076",
+      "title": "Validate and distribute immutable policy bundles",
+      "track": "operations",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-012",
+        "MAT-013",
+        "MAT-014",
+        "MAT-031",
+        "MAT-074"
+      ],
+      "requirements": [
+        "OPS-05"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-076.json"
+    },
+    {
+      "id": "MAT-077",
+      "title": "Harden package distribution, CI and reuse provenance",
+      "track": "operations",
+      "phase": 5,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-025",
+        "MAT-032",
+        "MAT-038",
+        "MAT-074"
+      ],
+      "requirements": [
+        "OPS-06"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-077.json"
+    },
+    {
+      "id": "MAT-078",
+      "title": "Instrument lifecycle outcomes and bounded audit reports",
+      "track": "operations",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-021",
+        "MAT-023",
+        "MAT-042",
+        "MAT-044",
+        "MAT-072"
+      ],
+      "requirements": [
+        "OPS-07"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-078.json"
+    },
+    {
+      "id": "MAT-079",
+      "title": "Define scoped rollout, rollback and recovery procedures",
+      "track": "operations",
+      "phase": 5,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-003",
+        "MAT-021",
+        "MAT-071",
+        "MAT-073",
+        "MAT-076"
+      ],
+      "requirements": [
+        "OPS-08"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-079.json"
+    },
+    {
+      "id": "MAT-080",
+      "title": "Qualify the integrated Matter release across profiles",
+      "track": "operations",
+      "phase": 5,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-025",
+        "MAT-045",
+        "MAT-050",
+        "MAT-071",
+        "MAT-074",
+        "MAT-077",
+        "MAT-078",
+        "MAT-079"
+      ],
+      "requirements": [
+        "OPS-09"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-080.json"
+    }
+  ]
+}

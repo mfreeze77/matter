@@ -1,0 +1,81 @@
+{
+  "id": "MAT-076",
+  "title": "Validate and distribute immutable policy bundles",
+  "track": "operations",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "validate-and-distribute-immutable-policy-bundles",
+  "depends_on": [
+    "MAT-012",
+    "MAT-013",
+    "MAT-014",
+    "MAT-031",
+    "MAT-074"
+  ],
+  "requirements": [
+    "OPS-05"
+  ],
+  "summary": "Package reusable profiles and rule definitions with stable meanings, dependencies and qualification references. Configuration changes should be validated before becoming effective and should invalidate only the conclusions they affect.",
+  "in_scope": [
+    "Profile namespace, version, conflict policy and applicability manifests.",
+    "Configuration validation and deterministic effective-policy receipts."
+  ],
+  "out_of_scope": [
+    "Deploying or modifying a downstream project as part of this planning ticket without that implementation task.",
+    "Treating synthetic checks as evidence of live provider or user outcomes."
+  ],
+  "implementation": [
+    "Define a bundle containing rule meanings, parameters, declared dependencies, outcome rubrics and compatible executor qualifications.",
+    "Validate composition conflicts, unsupported predicates and cyclic dependencies before activation.",
+    "Record effective configuration per assessment and schedule targeted invalidation on approved host configuration changes."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A malformed or conflicting bundle cannot partially become effective.",
+      "verification": "Attempt activation with missing rules, cycles and contradictory required effects and verify atomic rejection."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "An audience timing preference does not change underlying source claims or accepted authority.",
+      "verification": "Compare evidence conclusions before and after a delivery-only profile change."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "A changed question/rubric cannot inherit an inapplicable qualification solely by retaining its old ID.",
+      "verification": "Modify wording, options or preparation requirements and verify qualification mismatch is explicit."
+    }
+  ],
+  "artifacts": [
+    "src/matter/policy_registry.py",
+    "schemas/policy-bundle.schema.json",
+    "tests/contract/test_policy_bundles.py"
+  ],
+  "tests": [
+    "Duplicate names across application namespaces.",
+    "Profile rollback after a newer assessment was queued.",
+    "A timer-only change avoids unnecessary semantic calls."
+  ],
+  "risks": [
+    "Mutable aliases can conceal which policy produced an outcome.",
+    "Untrusted configuration must not become executable arbitrary code."
+  ],
+  "reuse": [
+    {
+      "source": "matterbrainstormspec and matterjevmesh",
+      "application": "Preserve the explicit scope, provenance, qualification, and evidence boundaries in the governing contracts."
+    }
+  ],
+  "sources": [
+    "matterbrainstormspec",
+    "matterjevmesh",
+    "docs/architecture.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

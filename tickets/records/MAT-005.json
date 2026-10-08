@@ -1,0 +1,79 @@
+{
+  "id": "MAT-005",
+  "title": "Implement persistent matter identity and scope continuity",
+  "track": "core",
+  "phase": 1,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "matters",
+  "depends_on": [
+    "MAT-003",
+    "MAT-004"
+  ],
+  "requirements": [
+    "CORE-04"
+  ],
+  "summary": "Create the durable continuing-subject aggregate for questions, opportunities, and problems. Keep domain extensions optional and identity independent from title, lifecycle projection, and contextual importance.",
+  "in_scope": [
+    "Stable matter creation and scoped key lookup",
+    "Revisioned descriptions and extensions",
+    "Cross-run identity conflicts"
+  ],
+  "out_of_scope": [
+    "Global semantic clustering",
+    "Merges and domain transitions"
+  ],
+  "implementation": [
+    "Implement opaque persistent matter IDs and adapter-owned identifier namespaces.",
+    "Resolve exact keys within scope while returning ambiguous mappings as conflicts.",
+    "Revision description changes without replacing identity or history.",
+    "Allow unassociated evidence and multiple assessments without requiring user-created tickets."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "One declared subject key resolves after run and process changes.",
+      "verification": "Restart storage and ingest later evidence with a new processing-run ID."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Changing title, purpose, or audience preserves matter identity.",
+      "verification": "Update display metadata and bind several contexts."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Scope collisions and ambiguous keys return explicit outcomes.",
+      "verification": "Test duplicate keys across scopes and conflicting mappings within one scope."
+    }
+  ],
+  "artifacts": [
+    "src/matter/matters.py",
+    "src/matter/identity_keys.py",
+    "tests/integration/test_matter_continuity.py"
+  ],
+  "tests": [
+    "Reworded description keeps the declared identity.",
+    "An opportunity lacking failure fields is valid.",
+    "Another scope cannot be read or linked without authority.",
+    "Unresolved intake may remain without a matter."
+  ],
+  "risks": [
+    "A run-local map can accidentally become the authoritative identity store."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/state-civics-ai/blob/a34fcec27f353187e7a23d54788b203d13ac87c1/services/local-accountability/sar_tracker/core_import/matters.py",
+      "application": "Inspect normalized identity resolution while leaving civic key schemes in adapters."
+    }
+  ],
+  "sources": [
+    "docs/contracts/core.md",
+    "matterbrainstormspec"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

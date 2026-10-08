@@ -1,0 +1,83 @@
+{
+  "id": "MAT-018",
+  "title": "Bind purposes, audiences, and dispositions independently",
+  "track": "rules",
+  "phase": 3,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "contexts",
+  "depends_on": [
+    "MAT-005",
+    "MAT-011",
+    "MAT-013",
+    "MAT-015",
+    "MAT-016"
+  ],
+  "requirements": [
+    "CORE-17"
+  ],
+  "summary": "Represent who a matter concerns and why without assigning global importance. Several audiences and objectives can share evidence while receiving different consequences and treatments.",
+  "in_scope": [
+    "Purpose/objective records and active intervals",
+    "Audience responsibility and preferences",
+    "Scoped dispositions and expiry"
+  ],
+  "out_of_scope": [
+    "External recipient-directory integration",
+    "User-facing settings product"
+  ],
+  "implementation": [
+    "Define independent purpose and audience revisions with effective intervals and responsibility scopes.",
+    "Bind assessments to the context components they consume.",
+    "Implement acknowledgement, deferral, rejection, and decision dispositions with authority and supersession.",
+    "Expose dependencies so delivery preference changes cannot reclassify unchanged facts."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "One matter supports different treatments with a shared evidence assessment.",
+      "verification": "Evaluate observer and responsible-actor audiences over fixed evidence."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "A disposition applies only within its declared scope and period.",
+      "verification": "Test deferral expiry and an unrelated audience."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Context changes preserve matter identity and old assessment bindings.",
+      "verification": "Change active objective and inspect historical references."
+    }
+  ],
+  "artifacts": [
+    "src/matter/contexts.py",
+    "src/matter/dispositions.py",
+    "tests/unit/test_context_scopes.py"
+  ],
+  "tests": [
+    "A host agent can own the next action while the human stays quiet.",
+    "Expired deferral triggers reconsideration.",
+    "Rejecting one proposal does not reject all future evidence.",
+    "Acknowledgement does not imply agreement or repair."
+  ],
+  "risks": [
+    "Broad disposition keys can suppress new developments or unrelated audiences."
+  ],
+  "reuse": [
+    {
+      "source": "matterbrainstormspec",
+      "application": "Implement purpose/audience-specific assessments and independent delivery preferences."
+    }
+  ],
+  "sources": [
+    "matterbrainstormspec",
+    "docs/contracts/rules.md",
+    "docs/contracts/lifecycle.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

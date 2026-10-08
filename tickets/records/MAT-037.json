@@ -1,0 +1,82 @@
+{
+  "id": "MAT-037",
+  "title": "Create grouped splits and comparable baseline manifests",
+  "track": "evaluation",
+  "phase": 4,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "evaluation/splits",
+  "depends_on": [
+    "MAT-036",
+    "MAT-024"
+  ],
+  "requirements": [
+    "EVAL-02",
+    "EVAL-03",
+    "EVAL-01"
+  ],
+  "summary": "Define repeatable episode-level data partitions and arm manifests that isolate the semantic contribution. Prevent duplicates, source-derived summaries and iterative question rewrites from leaking across tuning and final evaluation, and make evidence differences visible instead of attributing them to a model.",
+  "in_scope": [
+    "Deterministic grouped partitions and arm manifests",
+    "Frozen baseline/candidate inputs and declared ablations"
+  ],
+  "out_of_scope": [
+    "Selecting the best threshold on the final test split",
+    "Comparisons with unmatched evidence hidden behind aggregate metrics"
+  ],
+  "implementation": [
+    "Group all related observations, occurrences and derived summaries by episode/provenance before partitioning; retain the assignment seed and group keys.",
+    "Create distinct tuning, qualification and final evaluation partitions with a manifest that records when a reused held-out set became tuning data.",
+    "Define A as the deterministic policy and B as that same policy plus declared semantic families, using identical event streams and fixed packet profiles.",
+    "Reject incomparable arm manifests unless the changed retrieval or preparation is declared as a separate experiment with its own scope.",
+    "Emit leakage diagnostics, per-partition label/support counts and a reproducible paired case mapping."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "No source lineage or occurrence group appears in more than one partition.",
+      "verification": "Run a deliberate paraphrase/copy leakage fixture and assert a blocking split diagnostic."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "A and B resolve to exactly the same eligible cases and packet snapshots in the principal comparison.",
+      "verification": "Compare manifest hashes and reject a hidden candidate-only attachment."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Changing a tuning seed is reproducible and cannot silently replace a frozen final partition.",
+      "verification": "Generate twice with the same seed and require an explicit new manifest revision for a changed partition."
+    }
+  ],
+  "artifacts": [
+    "src/matter/evaluation/splits.py",
+    "src/matter/evaluation/arms.py",
+    "tests/evaluation/test_splits.py"
+  ],
+  "tests": [
+    "A late summary of an earlier episode stays in that group.",
+    "A retrieval-enhanced arm is labeled separately.",
+    "Repeated optimization against qualification data is recorded as tuning exposure."
+  ],
+  "risks": [
+    "Row-level random splitting overstates independence.",
+    "Provider improvements can be confused with better evidence preparation."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/check.py",
+      "application": "Follow explicit locked evaluation inputs while adding episode-level partitioning and a protected final split."
+    }
+  ],
+  "sources": [
+    "matterjevmesh §§8,10",
+    "docs/evaluation.md — Comparable arms and splits",
+    "https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/check.py"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

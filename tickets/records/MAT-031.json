@@ -1,0 +1,85 @@
+{
+  "id": "MAT-031",
+  "title": "Enforce qualification certificates at runtime admission",
+  "track": "jev",
+  "phase": 3,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "semantic/qualification",
+  "depends_on": [
+    "MAT-027",
+    "MAT-028",
+    "MAT-030",
+    "MAT-013"
+  ],
+  "requirements": [
+    "JEV-08",
+    "JEV-09",
+    "JEV-14",
+    "EVAL-14"
+  ],
+  "summary": "Make qualification an executable admission boundary rather than a report attached to a threshold. Even a well-formed confident answer remains unqualified when its model, semantic definition, evidence preparation, domain or validity period does not match the reviewed evaluation record.",
+  "in_scope": [
+    "Certificate schema, applicability matching, expiry/revocation and decisions",
+    "Separate affirmative/negative thresholds and abstention"
+  ],
+  "out_of_scope": [
+    "Declaring any model family universally safe",
+    "Automatic authority or speaker identity assignments"
+  ],
+  "implementation": [
+    "Define certificate identity over resolved model, question/rubric/options, renderer, preparation profile, eligible domain, measure, thresholds, support and evaluation artifacts.",
+    "Validate applicability before execution where possible and again before admission, retaining explicit missing, failed, expired, revoked and mismatched reasons.",
+    "Allow raw shadow observations without an applicable certificate while preventing them from producing consequential qualified judgments.",
+    "Evaluate positive and negative proposition decisions with separately declared regions and preserve disagreement or insufficient evidence.",
+    "Invalidate dependent current assessments when a certificate is revoked while keeping historical receipts and their then-applicable status."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A stored threshold from a failed held-out record cannot qualify an answer above that threshold.",
+      "verification": "Use a Jevcal-shaped failed record with a confident fixture answer and assert rejection."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Every identity-bearing mismatch and expiry produces a specific admission reason.",
+      "verification": "Run a certificate applicability matrix across model, wording, options, profile, scope and time."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Revocation removes current eligibility without rewriting historical evaluation evidence.",
+      "verification": "Admit, revoke, replay history and inspect both states and dependent invalidation."
+    }
+  ],
+  "artifacts": [
+    "src/matter/semantic/qualification.py",
+    "tests/semantic/test_qualification.py",
+    "tests/fixtures/semantic/certificates.json"
+  ],
+  "tests": [
+    "A floating alias with no resolved model stays shadow-only.",
+    "Noul 0.5 remains abstained under a declared undecided region.",
+    "An expired certificate cannot be revived by a cache hit."
+  ],
+  "risks": [
+    "Checking only confidence recreates the inspected Jevcal runtime gap.",
+    "Certificates can be overgeneralized to new evidence domains."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/runtime.py",
+      "application": "Use the observed threshold-only gate as a regression case, not the authority implementation."
+    }
+  ],
+  "sources": [
+    "matterjevmesh §8",
+    "https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/runtime.py",
+    "https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/check.py"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

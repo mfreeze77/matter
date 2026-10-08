@@ -1,0 +1,80 @@
+{
+  "id": "MAT-014",
+  "title": "Execute staged rule graphs with explicit conflict composition",
+  "track": "rules",
+  "phase": 2,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "composition",
+  "depends_on": [
+    "MAT-012",
+    "MAT-013"
+  ],
+  "requirements": [
+    "CORE-13"
+  ],
+  "summary": "Build a small typed rule planner and executor. Preserve dependencies between association, evidence, consequence, and attention while permitting bounded concurrency for genuinely independent work.",
+  "in_scope": [
+    "Validated acyclic rule graph",
+    "Conditional execution and blocked-path receipts",
+    "Deterministic conflict resolvers and shared budgets"
+  ],
+  "out_of_scope": [
+    "General workflow platform",
+    "Automatic joint-probability inference"
+  ],
+  "implementation": [
+    "Compile typed dependency edges and validate conditional cycles and accepted predecessor states.",
+    "Schedule independent nodes within shared limits and build dependent inputs only after qualification.",
+    "Record skipped, blocked, cancelled, and unresolved paths with actual input references.",
+    "Apply explicit conflict resolvers, preserving original disagreement and mandatory gates."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A recovery judgment receives the validated selected candidate.",
+      "verification": "Use a two-stage evaluator that asserts its input revision."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Independent completion order does not change deterministic composition.",
+      "verification": "Permute worker completion under fixed conflict policy."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Unqualified predecessors block required descendants without implying false conclusions.",
+      "verification": "Inject ambiguous, expired, and timed-out predecessors."
+    }
+  ],
+  "artifacts": [
+    "src/matter/planner.py",
+    "src/matter/executor.py",
+    "src/matter/conflicts.py",
+    "tests/unit/test_rule_dag.py"
+  ],
+  "tests": [
+    "Conditional cycles fail before evaluation.",
+    "Conflicting qualified answers remain inspectable when quiet.",
+    "Concurrent nodes share remaining call budget.",
+    "High impact cannot offset failed source coverage."
+  ],
+  "risks": [
+    "Batching dependent questions can produce plausible answers from inputs never supplied."
+  ],
+  "reuse": [
+    {
+      "source": "matterjevmesh",
+      "application": "Implement explicit dependent stages with logical composition in ordinary code."
+    }
+  ],
+  "sources": [
+    "docs/contracts/rules.md",
+    "matterjevmesh"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

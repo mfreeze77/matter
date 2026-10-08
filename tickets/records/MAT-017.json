@@ -1,0 +1,84 @@
+{
+  "id": "MAT-017",
+  "title": "Apply evidence-backed lifecycle transitions, resolution, and reopening",
+  "track": "core",
+  "phase": 3,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "lifecycle",
+  "depends_on": [
+    "MAT-007",
+    "MAT-009",
+    "MAT-010",
+    "MAT-011",
+    "MAT-013",
+    "MAT-015",
+    "MAT-016"
+  ],
+  "requirements": [
+    "CORE-16"
+  ],
+  "summary": "Implement domain projections separate from identity and attention. Ordinary recovery and reopening follow qualifying evidence automatically, with human decisions required only where the host assigns that authority.",
+  "in_scope": [
+    "Versioned edges and receipts",
+    "Matching resolution and reopening triggers",
+    "Correction and effective-time handling"
+  ],
+  "out_of_scope": [
+    "Built-in civic or agent rules",
+    "Mandatory closeout workflow"
+  ],
+  "implementation": [
+    "Validate profile edge, scope, current assessment, matching evidence, and authority.",
+    "Commit transition plus downstream invalidation atomically against revisions and epoch.",
+    "Handle late-discovered resolution with separate effective and knowledge time.",
+    "Reopen on declared recurrence or invalid resolution while retaining old transition history."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Only corresponding qualifying evidence resolves a condition.",
+      "verification": "Compare unrelated and matching success for two generic condition keys."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "New occurrence can reopen; old-event redelivery cannot.",
+      "verification": "Resolve, replay the original event, then add a distinct happening."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Retraction weakens support without proving the opposite.",
+      "verification": "Retract sole resolution evidence and inspect profile-defined unknown/reopened state."
+    }
+  ],
+  "artifacts": [
+    "src/matter/lifecycle.py",
+    "tests/integration/test_lifecycle_episodes.py"
+  ],
+  "tests": [
+    "High-confidence unauthorized edge stays forbidden.",
+    "Past-effective resolution preserves earlier knowledge.",
+    "Acknowledgement does not close the condition.",
+    "Ordinary recovery needs no user confirmation receipt."
+  ],
+  "risks": [
+    "Coupling lifecycle to attention would close quiet matters and resurrect old warnings."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/state-civics-ai/blob/a34fcec27f353187e7a23d54788b203d13ac87c1/services/local-accountability/sar_tracker/core_import/matters.py",
+      "application": "Adapt evidence/authority/outcome guards while leaving legal rules outside the core."
+    }
+  ],
+  "sources": [
+    "docs/contracts/lifecycle.md",
+    "docs/contracts/core.md",
+    "matterjevmesh"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

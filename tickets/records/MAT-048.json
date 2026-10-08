@@ -1,0 +1,109 @@
+{
+  "id": "MAT-048",
+  "title": "Adapt civic source claims and stages into neutral matter history",
+  "track": "civic",
+  "phase": 3,
+  "priority": "P1",
+  "status": "planned",
+  "type": "integration",
+  "owner_repo": "mfreeze77/matter",
+  "component": "adapters.civic.exports",
+  "depends_on": [
+    "MAT-001",
+    "MAT-004",
+    "MAT-005",
+    "MAT-006",
+    "MAT-007",
+    "MAT-008",
+    "MAT-009",
+    "MAT-010",
+    "MAT-046",
+    "MAT-047"
+  ],
+  "requirements": [
+    "CIV-03",
+    "CIV-04",
+    "CIV-05",
+    "CIV-07",
+    "CIV-08",
+    "CIV-09"
+  ],
+  "summary": "Consume copied crawler packages as observed source claims and occurrences, link them to continuing matters through scoped identifiers, and preserve civic stages as qualified claims. No parsed statement becomes accepted legal state merely because it is imported.",
+  "in_scope": [
+    "Read-only copied-package adapter",
+    "Stable matter/occurrence/instrument references",
+    "Claim-relative evidence and stage dimensions",
+    "Ambiguous associations, corrections and negative coverage"
+  ],
+  "out_of_scope": [
+    "Mutating existing receiver identities or matter tables",
+    "Title-only/case-number-only merges",
+    "Inferring approval, applicant identity or funding from topic overlap"
+  ],
+  "implementation": [
+    "Map existing source claims, agenda/item/motion IDs, raw case/instrument numbers and source spans to common observations and occurrences; retain issuer, jurisdiction, type and year scope.",
+    "Attach claims through explicit typed relationships; represent two reports of the same meeting as separate observations of one occurrence and a later hearing as a new occurrence.",
+    "Preserve motion intent, stated vote result, mechanics and body authority as independent inputs; calculate nothing when the required operands/rules are unknown.",
+    "Represent discussion, recommendation, funding, procurement, award, effective date and cancellation as independently supported domain predicates, including prerequisites and uncertainty.",
+    "Hash and checkpoint imported packages, record all unsupported/missing fields and propagate source withdrawal/correction into the existing dependency mechanism without rewriting original observations."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A repeated package creates no new occurrence or assessment while a new hearing of the same case does.",
+      "verification": "Replay duplicated and later-meeting fixtures and assert stable matters, distinct occurrence counts and source links."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Identifier collisions and distinct instruments remain unresolved or separate.",
+      "verification": "Use same-number different-year/jurisdiction fixtures and one case with multiple ordinances; verify no unscoped merge."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Failed approval and recommendation cannot become final adopted state.",
+      "verification": "Run claim/stage fixtures with known/unknown authority and thresholds and inspect all proposed assessment predicates."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Source corrections preserve the old observation and invalidate only dependent current views.",
+      "verification": "Replace one claim source revision, then compare historical/as-of and current assessments plus pending delivery eligibility."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/matter:src/matter/adapters/civic_exports.py",
+    "mfreeze77/matter:examples/civic/source-claims/",
+    "mfreeze77/matter:docs/profiles/civic-import-map.md",
+    "mfreeze77/matter:tests/integration/test_civic_exports.py"
+  ],
+  "tests": [
+    "Two minutes/agenda reports of one meeting",
+    "Recommendation followed by final decision in a different body",
+    "Failed approval; no second; unknown denominator",
+    "Applicant name in title only",
+    "Case number reused across years",
+    "Corrected minutes published after original assessment"
+  ],
+  "risks": [
+    "The existing loose producer schema may accept omissions that require explicit Matter refusal.",
+    "A single source can report multiple historical actions whose occurrences must not be conflated."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-090-matter-identity-case-parties-and-lifecycle-exports.md",
+      "application": "Reuse source-claim/continuing-case/agenda-appearance distinctions and unresolved identity cases."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/schemas/matter_source_claims.json.schema.json",
+      "application": "Build an explicit pinned adapter map rather than pretending the current schema is the new contract."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-087-source-backed-motion-intent-and-vote-mechanics.md",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

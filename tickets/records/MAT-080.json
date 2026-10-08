@@ -1,0 +1,84 @@
+{
+  "id": "MAT-080",
+  "title": "Qualify the integrated Matter release across profiles",
+  "track": "operations",
+  "phase": 5,
+  "priority": "P1",
+  "status": "planned",
+  "type": "qualification",
+  "owner_repo": "mfreeze77/matter",
+  "component": "qualify-the-integrated-matter-release-across-profiles",
+  "depends_on": [
+    "MAT-025",
+    "MAT-045",
+    "MAT-050",
+    "MAT-071",
+    "MAT-074",
+    "MAT-077",
+    "MAT-078",
+    "MAT-079"
+  ],
+  "requirements": [
+    "OPS-09"
+  ],
+  "summary": "Establish the evidence needed to release the shared Matter runtime and its first qualified integrations. The release claim must state which profiles, versions, workloads and operational boundaries were actually evaluated.",
+  "in_scope": [
+    "Integrated contract, deterministic, provider and host evidence matrix.",
+    "Documented release scope, remaining limitations and independent replay inputs."
+  ],
+  "out_of_scope": [
+    "Deploying or modifying a downstream project as part of this planning ticket without that implementation task.",
+    "Treating synthetic checks as evidence of live provider or user outcomes."
+  ],
+  "implementation": [
+    "Freeze supported versions, profile set, evaluation cohorts, metrics and acceptance limits before final scoring.",
+    "Run the same required lifecycle cases across at least the Oil and civic contract profiles, then the declared real-provider and host evaluations.",
+    "Publish a release receipt separating verified guarantees, experimentally supported behavior and unqualified extensions; include reproducible inputs and rollback evidence."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Every claimed release capability maps to an executed acceptance result with exact versions and inputs.",
+      "verification": "Audit the release matrix against ticket completion evidence and reject unsupported capabilities."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Cross-profile portability preserves the core guarantees without forcing shared domain meanings.",
+      "verification": "Compare common conformance cases plus profile-specific authority, time and resolution cases."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Failure, quiet-case misses, unresolved transport outcomes and measured overhead are disclosed against preregistered limits.",
+      "verification": "Independently recompute report aggregates and inspect negative cases and budget-exhausted episodes."
+    }
+  ],
+  "artifacts": [
+    "docs/releases/v0.1-qualification.md",
+    "qualification/release-manifest.json",
+    "tests/qualification/test_release_manifest.py"
+  ],
+  "tests": [
+    "One provider/model family remains unqualified while deterministic core passes.",
+    "A source correction after assessment but before dispatch.",
+    "Private DIAT research remains outside the public release claim."
+  ],
+  "risks": [
+    "A broad release label can overstate evidence from a narrow synthetic or provider-only test.",
+    "Training or tuning on held-out episodes can invalidate measured performance."
+  ],
+  "reuse": [
+    {
+      "source": "matterbrainstormspec and matterjevmesh",
+      "application": "Preserve the explicit scope, provenance, qualification, and evidence boundaries in the governing contracts."
+    }
+  ],
+  "sources": [
+    "matterbrainstormspec",
+    "matterjevmesh",
+    "docs/architecture.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

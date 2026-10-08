@@ -1,0 +1,68 @@
+{
+  "id": "MAT-999",
+  "title": "Template: describe one bounded outcome",
+  "track": "core",
+  "phase": 1,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "replace/with/owned/component",
+  "depends_on": [
+    "MAT-001"
+  ],
+  "requirements": [
+    "CORE-01"
+  ],
+  "summary": "Replace this template text with the concrete problem, the intended behavior and why this ticket is needed.",
+  "in_scope": [
+    "Replace with the bounded behavior this ticket implements."
+  ],
+  "out_of_scope": [
+    "Replace with the nearby work deliberately assigned to other tickets."
+  ],
+  "implementation": [
+    "Identify the existing contract and implementation to reuse.",
+    "Describe concrete implementation steps and observable outcomes."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Replace with one observable successful behavior.",
+      "verification": "Describe the exact check and evidence that establish success."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Replace with the relevant failure or invalidation behavior.",
+      "verification": "Describe an independent negative test and expected result."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Replace with compatibility, scope or outcome evidence.",
+      "verification": "Specify the verification method and where evidence is recorded."
+    }
+  ],
+  "artifacts": [
+    "proposed/path/to/implementation.py"
+  ],
+  "tests": [
+    "Replace with a meaningful nominal scenario.",
+    "Replace with a relevant negative or boundary scenario."
+  ],
+  "risks": [
+    "Describe the concrete remaining risk this ticket must resolve."
+  ],
+  "reuse": [
+    {
+      "source": "docs/contracts/core.md",
+      "application": "Identify the existing contract or code being reused and its limitations."
+    }
+  ],
+  "sources": [
+    "docs/contracts/core.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

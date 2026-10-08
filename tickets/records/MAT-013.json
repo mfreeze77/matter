@@ -1,0 +1,83 @@
+{
+  "id": "MAT-013",
+  "title": "Version policy profiles and validate semantic compatibility",
+  "track": "rules",
+  "phase": 2,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "profiles",
+  "depends_on": [
+    "MAT-012"
+  ],
+  "requirements": [
+    "CORE-12"
+  ],
+  "summary": "Assemble rule families into separate evidence, lifecycle, purpose, and audience components. Domain meaning belongs in profiles, not application-name branches or one universal score.",
+  "in_scope": [
+    "Profile registry and immutable revisions",
+    "Semantic fingerprints and compatibility",
+    "Required-output, capability, and budget validation"
+  ],
+  "out_of_scope": [
+    "Live policy editor",
+    "Automatic qualification transfer"
+  ],
+  "implementation": [
+    "Define profile components with immutable rule references and multiple assessments per matter.",
+    "Validate required paths, outcome implications, conflict resolvers, permissions, and budget feasibility.",
+    "Fingerprint labels, definitions, ordering, rendering, and preparation where they affect meaning.",
+    "Emit profile supersession changes without rewriting historical assessments."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Changing meaning with unchanged output shape changes the semantic binding.",
+      "verification": "Compare same-topic and same-matter Choice profiles."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Impossible or unauthorized profiles fail with a concrete path.",
+      "verification": "Test missing rule, undefined label, denied capability, and impossible call budget."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Audience cadence changes leave evidence fingerprints unchanged when independent.",
+      "verification": "Compare component fingerprints and dependency sets."
+    }
+  ],
+  "artifacts": [
+    "src/matter/profiles.py",
+    "schemas/policy-profile.schema.json",
+    "tests/unit/test_profile_validation.py"
+  ],
+  "tests": [
+    "Two profiles can assess one matter concurrently.",
+    "A certificate for one meaning cannot qualify another.",
+    "Historical references never silently resolve to latest.",
+    "Missing conflict policy cannot fall back to last writer."
+  ],
+  "risks": [
+    "Syntactically valid changes can alter behavior without triggering qualification."
+  ],
+  "reuse": [
+    {
+      "source": "matterbrainstormspec",
+      "application": "Implement reusable families and separate audience preferences."
+    },
+    {
+      "source": "matterjevmesh",
+      "application": "Bind qualification to actual question semantics and evidence preparation."
+    }
+  ],
+  "sources": [
+    "docs/contracts/rules.md",
+    "matterbrainstormspec",
+    "matterjevmesh"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

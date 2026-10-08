@@ -1,0 +1,84 @@
+{
+  "id": "MAT-020",
+  "title": "Schedule temporal reevaluation with durable resource and attention budgets",
+  "track": "core",
+  "phase": 3,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "scheduling_budgets",
+  "depends_on": [
+    "MAT-003",
+    "MAT-010",
+    "MAT-011",
+    "MAT-014",
+    "MAT-016",
+    "MAT-019"
+  ],
+  "requirements": [
+    "CORE-19"
+  ],
+  "summary": "Provide scheduling and budget primitives for assessment, investigation, and attention. Clock changes can matter without new evidence, but idle timers must not repeatedly call semantic evaluators or flood catch-up notices.",
+  "in_scope": [
+    "Durable next-check and idempotent firing",
+    "Atomic shared budget reservations",
+    "Restart, catch-up, and cancellation"
+  ],
+  "out_of_scope": [
+    "Distributed scheduling service",
+    "Domain business calendars"
+  ],
+  "implementation": [
+    "Persist timer scope, rule versions, dependencies, firing identity, and cancellation epoch.",
+    "Implement due-condition processing with scheduled/actual time and coalesced catch-up.",
+    "Provide independent resource and attention reservation ledgers with expiry and release.",
+    "Trigger only affected temporal outputs and reuse unchanged semantics; trusted controls bypass this queue."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Deadline crossing updates attention without rerunning unchanged semantic support.",
+      "verification": "Advance a fake clock and inspect evaluator invocation counts."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Concurrent workers cannot exceed one shared remaining budget.",
+      "verification": "Race reservations across connections and audit committed totals."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Restart catches up once per current condition without obsolete periodic warning floods.",
+      "verification": "Advance across downtime and inspect firing identities."
+    }
+  ],
+  "artifacts": [
+    "src/matter/scheduler.py",
+    "src/matter/budgets.py",
+    "tests/integration/test_timers_and_budgets.py"
+  ],
+  "tests": [
+    "Cancelled timers remain inert after restart.",
+    "Expired reservation capacity returns once.",
+    "Late firing records delay rather than rewriting schedule.",
+    "Stop applies despite exhausted ordinary budgets."
+  ],
+  "risks": [
+    "Independent per-rule counters can overspend global budgets under concurrency."
+  ],
+  "reuse": [
+    {
+      "source": "matterjevmesh",
+      "application": "Express boundedness and temporal triggers through shared deterministic primitives."
+    }
+  ],
+  "sources": [
+    "docs/contracts/lifecycle.md",
+    "docs/contracts/rules.md",
+    "matterjevmesh"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

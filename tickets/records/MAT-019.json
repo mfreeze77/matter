@@ -1,0 +1,82 @@
+{
+  "id": "MAT-019",
+  "title": "Evaluate attention eligibility against the last delivered baseline",
+  "track": "rules",
+  "phase": 3,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "attention",
+  "depends_on": [
+    "MAT-015",
+    "MAT-016",
+    "MAT-017",
+    "MAT-018"
+  ],
+  "requirements": [
+    "CORE-18"
+  ],
+  "summary": "Build the gate that turns a long history into a useful update. Repeated internal changes should not become repeated interruptions, and quietness must distinguish no material change from inadequate evidence.",
+  "in_scope": [
+    "Attention decisions and neutral treatments",
+    "Audience-purpose material deltas",
+    "Quiet reasons and decision-request criteria"
+  ],
+  "out_of_scope": [
+    "Transport implementations",
+    "Universal importance score"
+  ],
+  "implementation": [
+    "Compare the current assessment with the audience-purpose delivered baseline.",
+    "Apply material change, relevance, ownership, dispositions, and decision-need rules.",
+    "Return quiet, host_hint, digest, update, correction, or decision_request with reasons and dependencies.",
+    "Preserve insufficient evidence and incomplete coverage without automatically escalating to the human."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Equivalent reassessments do not create another update for an informed audience.",
+      "verification": "Deliver a baseline, add paraphrases, and inspect reasons."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "A decisive correction can become eligible without a new positive event.",
+      "verification": "Invalidate a previously delivered conclusion and evaluate its correction delta."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Low confidence alone does not generate a human decision request.",
+      "verification": "Use ambiguous evidence without a decision reserved for that person."
+    }
+  ],
+  "artifacts": [
+    "src/matter/attention.py",
+    "tests/unit/test_attention_deltas.py",
+    "tests/integration/test_audience_attention.py"
+  ],
+  "tests": [
+    "An uninformed audience can still receive the relevant update.",
+    "Owned next steps suppress redundant advice without closing the matter.",
+    "An internal assessment never advances delivered baseline.",
+    "A single critical fact need not wait for an arbitrary count."
+  ],
+  "risks": [
+    "Optimizing message reduction alone can conceal missed important developments."
+  ],
+  "reuse": [
+    {
+      "source": "matterjevmesh",
+      "application": "Use delivered-baseline comparison, explicit quiet reasons, and decision-specific escalation."
+    }
+  ],
+  "sources": [
+    "docs/contracts/lifecycle.md",
+    "matterjevmesh",
+    "matterbrainstormspec"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

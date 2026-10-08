@@ -1,0 +1,81 @@
+{
+  "id": "MAT-007",
+  "title": "Model scoped claims and cited evidence relationships",
+  "track": "core",
+  "phase": 1,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "claims",
+  "depends_on": [
+    "MAT-004",
+    "MAT-005",
+    "MAT-006"
+  ],
+  "requirements": [
+    "CORE-06"
+  ],
+  "summary": "Build the relationship layer that lets a source support one claim while qualifying another. Preserve wording and locators, and prevent ingested assertions from changing established state without an assessment and authorized transition.",
+  "in_scope": [
+    "Versioned propositions and qualifiers",
+    "Cited evidence relation kinds",
+    "Locator validation and missing-source reasons"
+  ],
+  "out_of_scope": [
+    "Domain truth rules",
+    "Automatic transitions or identity assignments"
+  ],
+  "implementation": [
+    "Define claim subjects, predicates, values, attribution, qualifiers, and temporal scope.",
+    "Implement multiple accepted relations targeting whole propositions or named components.",
+    "Accept explicit adapter locator-validation receipts, distinguishing exact passages from whole artifacts.",
+    "Append claim corrections and emit dependency changes without rewriting source wording."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Support and qualification can coexist for one passage without losing scope.",
+      "verification": "Inspect mixed-relation fixtures and proposition components."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Ingesting an assertion does not change matter state or merge identity.",
+      "verification": "Submit asserted approvals and equivalence claims; verify only claims appear."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Unavailable or invalid citations are explicit.",
+      "verification": "Exercise missing bytes, absent quotation, reversed lines, and declared whole-artifact citations."
+    }
+  ],
+  "artifacts": [
+    "src/matter/claims.py",
+    "src/matter/evidence_relations.py",
+    "tests/unit/test_claim_relations.py"
+  ],
+  "tests": [
+    "A forecast does not establish the forecasted outcome.",
+    "Support for component A cannot prove component B.",
+    "Retraction does not prove the opposite proposition.",
+    "Contradictory sources retain both histories."
+  ],
+  "risks": [
+    "Unscoped supporting labels can spread a narrow fact to an entire matter."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/state-civics-ai/blob/a34fcec27f353187e7a23d54788b203d13ac87c1/services/local-accountability/sar_tracker/core_import/claims.py",
+      "application": "Adapt source-statement separation and exact-citation validation concepts without civic schemas."
+    }
+  ],
+  "sources": [
+    "docs/contracts/core.md",
+    "matterjevmesh",
+    "matterbrainstormspec"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

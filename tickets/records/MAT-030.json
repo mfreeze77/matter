@@ -1,0 +1,92 @@
+{
+  "id": "MAT-030",
+  "title": "Persist judgment receipts and exact execution reuse",
+  "track": "jev",
+  "phase": 3,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "semantic/receipts",
+  "depends_on": [
+    "MAT-026",
+    "MAT-029",
+    "MAT-003",
+    "MAT-015",
+    "MAT-016"
+  ],
+  "requirements": [
+    "JEV-06",
+    "JEV-07",
+    "JEV-13",
+    "JEV-15"
+  ],
+  "summary": "Persist sufficient execution evidence to inspect an assessment and replay admission decisions without reissuing a provider call. Reuse must distinguish the original observation from retries and cache hits, while qualification and current-state eligibility remain separately invalidatable.",
+  "in_scope": [
+    "Immutable receipt storage, response artifact references, exact cache keys",
+    "Attempt lineage, usage, timing and unavailable-measurement reasons"
+  ],
+  "out_of_scope": [
+    "Storing credentials or private provider responses in version control",
+    "Treating cache replay as an independent model trial"
+  ],
+  "implementation": [
+    "Bind source packet, rendered question/order, model request/resolution, adapter/precision version and stage parents into the receipt identity.",
+    "Store raw response references and validation faults alongside normalized answers; retain partial diagnostic heads without making a failed set admissible.",
+    "Record dispatch, completion, timeout, retry and cancellation events with logical request and attempt IDs.",
+    "Implement exact reuse over the semantic request and execution assumptions, then rerun current qualification and freshness checks on every reuse.",
+    "Represent missing token usage, unknown wire bytes or unavailable pricing as null with reasons and exclude secrets from persisted fields.",
+    "Store original response bytes separately from normalized decimal-string probability/Score/confidence/residual fields; bind numeric representation and trusted precision to the receipt and reuse key, never reconstructing exact evidence from rounded binary floats."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A cache hit preserves the original receipt and records reuse without new corroboration.",
+      "verification": "Run the same frozen request twice and inspect attempt, cache and occurrence counters."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Model, criteria order, renderer, packet or precision changes prevent incompatible reuse.",
+      "verification": "Mutate each field independently and assert the original cache entry is ineligible."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Failed batches remain inspectable and cannot become admissible through replay.",
+      "verification": "Replay a response with one invalid head and verify retained diagnostics plus rejected admission."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Persisted and replayed receipts retain original numeric wire evidence and stable canonical decimal values.",
+      "verification": "Persist, reload, and replay high-precision Noul and fractional Score/distribution receipts; verify unchanged raw bytes, exact decimal fields, trusted residual, and normalized digest. A rounded binary-float reconstruction must not match as exact reuse."
+    }
+  ],
+  "artifacts": [
+    "src/matter/semantic/receipts.py",
+    "src/matter/semantic/cache.py",
+    "tests/semantic/test_receipts.py"
+  ],
+  "tests": [
+    "Revoking a certificate invalidates a previously cached high-confidence result.",
+    "Absent SDK byte counts remain null.",
+    "Retrying one provider call creates attempts, not source evidence.",
+    "Receipt storage/replay round-trip preserves 0.1234567890123456789 and fractional Score distributions without binary-float loss; changing a precision profile invalidates exact reuse."
+  ],
+  "risks": [
+    "Overbroad cache keys can silently reuse another question.",
+    "Discarding partial faults produces survivorship bias in evaluation."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/validate.py",
+      "application": "Reuse the distinction between diagnostically valid heads and admissible answer sets."
+    }
+  ],
+  "sources": [
+    "matterjevmesh §7",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/validate.py"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

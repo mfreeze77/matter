@@ -1,0 +1,79 @@
+{
+  "id": "MAT-003",
+  "title": "Implement durable transactional storage and revision-checked commands",
+  "track": "core",
+  "phase": 0,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "storage",
+  "depends_on": [
+    "MAT-002"
+  ],
+  "requirements": [
+    "CORE-02"
+  ],
+  "summary": "Provide an embedded reference store behind a persistence port. Establish concurrency and restart guarantees needed by evidence, assessments, and delivery without introducing a service deployment.",
+  "in_scope": [
+    "Storage port and SQLite reference backend",
+    "Command journal and atomic receipts",
+    "Migrations and restart/restore behavior"
+  ],
+  "out_of_scope": [
+    "Hosted database deployment",
+    "Distributed consensus and external delivery guarantees"
+  ],
+  "implementation": [
+    "Define transaction boundaries and unique scoped indexes for records, command keys, and projections.",
+    "Implement command execution with canonical digest, expected read revisions, atomic mutation, and durable receipt.",
+    "Map persistence failure to semantic errors rather than successful empty queries.",
+    "Add versioned migrations and a restart/restore harness preserving identities and command outcomes."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Identical retry returns the original result; changed command content conflicts.",
+      "verification": "Repeat committed and interrupted commands across process restart."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Competing writers cannot both commit incompatible changes from one expected revision.",
+      "verification": "Run concurrent transactions and inspect all child writes and receipts."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Persistence failure leaves neither unreceipted mutation nor fabricated success.",
+      "verification": "Inject failures before receipt, before commit, and during migration."
+    }
+  ],
+  "artifacts": [
+    "src/matter/storage/base.py",
+    "src/matter/storage/sqlite.py",
+    "src/matter/storage/migrations/",
+    "tests/integration/test_storage_transactions.py"
+  ],
+  "tests": [
+    "Crash after commit but before return yields the prior receipt on retry.",
+    "Conflicting transactions leave the winning revision intact.",
+    "Restore retains aliases and command results.",
+    "Unavailable storage produces E_STORAGE_UNAVAILABLE rather than no matter found."
+  ],
+  "risks": [
+    "SQLite transaction configuration can weaken the promised isolation."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_store.py",
+      "application": "Inspect read-version commits and reimplement a neutral storage port without OIL state classes."
+    }
+  ],
+  "sources": [
+    "docs/contracts/core.md",
+    "matterjevmesh"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "id": "MAT-002",
+  "title": "Define interoperable record schemas, canonical encoding, and error results",
+  "track": "core",
+  "phase": 0,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "contracts",
+  "depends_on": [
+    "MAT-001"
+  ],
+  "requirements": [
+    "CORE-01"
+  ],
+  "summary": "Turn the governing prose into executable structural contracts and golden vectors. Keep original source bytes distinct from normalized envelopes, and establish interoperable identifiers, revisions, timestamps, and failures before persistent state is built.",
+  "in_scope": [
+    "Core record and operation schemas",
+    "Canonical encoding and digest vectors",
+    "Schema compatibility and semantic errors"
+  ],
+  "out_of_scope": [
+    "Provider response formats",
+    "Domain payload interpretation"
+  ],
+  "implementation": [
+    "Inventory required fields, conditional references, extension namespaces, and result unions from the contracts.",
+    "Implement strict canonical encoding and decoding, rejecting duplicate keys, invalid Unicode, floating numbers, and unsafe integers.",
+    "Define versioned error results and explicit unknown-time reasons without inventing domain conclusions.",
+    "Publish cross-language golden input/byte/digest vectors and a schema compatibility matrix."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Every declared record kind rejects missing required fields and unsupported versions.",
+      "verification": "Run positive and negative schema vectors for every kind."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Canonical output is invariant to object-key ordering while preserving declared array semantics.",
+      "verification": "Compare Unicode, integer-boundary, escaping, and ordering golden vectors."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Execution failures cannot validate as successful no-match conclusions.",
+      "verification": "Validate storage-unavailable, invalid-scope, and unknown semantic-result fixtures."
+    }
+  ],
+  "artifacts": [
+    "schemas/core-record.schema.json",
+    "schemas/operation-result.schema.json",
+    "src/matter/contracts.py",
+    "src/matter/canonical.py",
+    "tests/contract/test_core_schemas.py",
+    "tests/fixtures/canonical/"
+  ],
+  "tests": [
+    "Reordered maps have identical digests; reordered ordered arrays do not.",
+    "Composed and decomposed Unicode retain distinct source-byte identities.",
+    "Unknown event time remains unknown after normalization.",
+    "Duplicate JSON keys are refused before schema interpretation."
+  ],
+  "risks": [
+    "Convenience serializers can silently alter cross-language digest semantics."
+  ],
+  "reuse": [
+    {
+      "source": "matterbrainstormspec",
+      "application": "Use the common contract and language-independence requirements."
+    },
+    {
+      "source": "docs/contracts/core.md",
+      "application": "Implement specified encoding and errors through portable vectors."
+    }
+  ],
+  "sources": [
+    "docs/contracts/core.md",
+    "matterbrainstormspec"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

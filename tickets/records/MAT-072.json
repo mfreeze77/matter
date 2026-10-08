@@ -1,0 +1,80 @@
+{
+  "id": "MAT-072",
+  "title": "Enforce host scope, access and provider egress contracts",
+  "track": "operations",
+  "phase": 2,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "enforce-host-scope,-access-and-provider-egress-contracts",
+  "depends_on": [
+    "MAT-002",
+    "MAT-003",
+    "MAT-007",
+    "MAT-011",
+    "MAT-028"
+  ],
+  "requirements": [
+    "OPS-01"
+  ],
+  "summary": "Make host-supplied access and sharing restrictions apply consistently to admission, assessment preparation, cache reuse, explanations and outbound provider packets. An assessment for one audience must not reveal evidence that audience or provider is ineligible to receive.",
+  "in_scope": [
+    "Scope and audience checks at all operations and projections.",
+    "Source and derivation sharing restrictions across prepared packets and cached judgments."
+  ],
+  "out_of_scope": [
+    "Deploying or modifying a downstream project as part of this planning ticket without that implementation task.",
+    "Treating synthetic checks as evidence of live provider or user outcomes."
+  ],
+  "implementation": [
+    "Inspect existing ExAIS/Oil access and sharing boundaries; define an adapter contract rather than a second identity service.",
+    "Bind effective access context and evidence eligibility to packet identity and judgment reuse.",
+    "Fail with explicit unavailable or forbidden reasons when access is missing or revoked; retain only permitted audit references."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Cross-scope or ineligible evidence cannot enter an assessment or its rendered explanation.",
+      "verification": "Run a matrix of source, audience and provider permissions and inspect complete serialized packets, responses and logs."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "A cache hit cannot bypass a revoked source grant or a more restrictive audience context.",
+      "verification": "Evaluate once, revoke access, repeat with the same content hash and verify denial or a newly prepared eligible assessment."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Authorized empty results and access failures remain distinguishable without exposing denied content.",
+      "verification": "Exercise permitted-empty, forbidden and source-unavailable paths and compare public error/coverage outputs."
+    }
+  ],
+  "artifacts": [
+    "src/matter/access.py",
+    "tests/security/test_scope_and_egress.py"
+  ],
+  "tests": [
+    "Foreign-scope source referenced by an otherwise valid rule result.",
+    "Derived excerpt inherits the most restrictive source egress policy.",
+    "Revocation between assessment preparation and dispatch."
+  ],
+  "risks": [
+    "Sharing labels copied without validating the host boundary can leak evidence.",
+    "Overbroad cache identity can reuse a conclusion prepared for a different audience."
+  ],
+  "reuse": [
+    {
+      "source": "matterbrainstormspec and matterjevmesh",
+      "application": "Preserve the explicit scope, provenance, qualification, and evidence boundaries in the governing contracts."
+    }
+  ],
+  "sources": [
+    "matterbrainstormspec",
+    "matterjevmesh",
+    "docs/architecture.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

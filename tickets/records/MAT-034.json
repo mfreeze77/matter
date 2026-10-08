@@ -1,0 +1,87 @@
+{
+  "id": "MAT-034",
+  "title": "Add shadow change, recovery and audience-contribution families",
+  "track": "jev",
+  "phase": 3,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "semantic/families/attention",
+  "depends_on": [
+    "MAT-027",
+    "MAT-028",
+    "MAT-029",
+    "MAT-031",
+    "MAT-017",
+    "MAT-018",
+    "MAT-019",
+    "MAT-021"
+  ],
+  "requirements": [
+    "JEV-09",
+    "JEV-11",
+    "JEV-14"
+  ],
+  "summary": "Assess whether new evidence changes an unresolved condition, repair hypothesis, or audience decision. Keep these semantic factors separate from domain transitions and delivery permission so ordinary agent repair can remain quiet while a genuinely decision-changing update becomes eligible for the host.",
+  "in_scope": [
+    "Change causes, matching recovery support and next-step relevance",
+    "Comparison with prior assessment and audience delivery"
+  ],
+  "out_of_scope": [
+    "A universal importance number",
+    "Automatic user questions for every uncertain result"
+  ],
+  "implementation": [
+    "Render distinct comparisons for new evidence, corrected association, changed policy and a deterministic timer event; retain the cause of reassessment.",
+    "Define recovery questions around the original unresolved condition, target, revision and required environment rather than the most recent successful command.",
+    "Ask whether a supported change affects the named objective or next step and whether the recipient already received that information.",
+    "Compose qualified factors in the domain policy while preserving uncertainty and avoiding products of proposition probabilities.",
+    "Provide no direct notification hook; pass proposals through existing audience, control, budget and final freshness boundaries."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "An unrelated success cannot close a failed required integration check.",
+      "verification": "Run a failure/other-success/matching-success episode and inspect recovery proposals and lifecycle decisions."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "An audience preference change changes attention without inventing new external evidence.",
+      "verification": "Hold packet facts constant, change audience policy, and compare cause-tagged assessments."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "New uncertainty can stay recorded without asking the user or delivering duplicate advice.",
+      "verification": "Replay unresolved and already-delivered cases with a spy delivery channel and inspect quietness reasons."
+    }
+  ],
+  "artifacts": [
+    "src/matter/semantic/families/attention.py",
+    "tests/semantic/test_attention_families.py",
+    "tests/fixtures/semantic/recovery_episodes.json"
+  ],
+  "tests": [
+    "A late result after recovery remains historical only.",
+    "A corrected source invalidates an old queued hint.",
+    "Resolved and still important remain separate dimensions."
+  ],
+  "risks": [
+    "Recovery shortcuts can suppress a real unresolved condition.",
+    "A low threshold can turn the anti-interruption layer into another noisy agent."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_store.py",
+      "application": "Apply read-version and dependent-invalidation discipline at the existing core boundary."
+    }
+  ],
+  "sources": [
+    "matterjevmesh §§3D,5–7,9",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_store.py"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

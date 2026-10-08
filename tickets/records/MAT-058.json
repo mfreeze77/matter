@@ -1,0 +1,102 @@
+{
+  "id": "MAT-058",
+  "title": "Evaluate acoustic prosody with room and microphone controls",
+  "track": "diat",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "research",
+  "owner_repo": "mfreeze77/statecivicsai-diat",
+  "component": "experiments.meeting_matter.prosody_channel",
+  "depends_on": [
+    "MAT-001",
+    "MAT-051",
+    "MAT-056",
+    "MAT-063"
+  ],
+  "requirements": [
+    "DIAT-03",
+    "DIAT-04",
+    "DIAT-10",
+    "DIAT-13",
+    "DIAT-14",
+    "DIAT-15"
+  ],
+  "summary": "Investigate audio-derived pitch/energy/duration patterns while separating the person from room, microphone and recording conditions. Feature computation happens in DIAT on copied audio and never masquerades as a feature that the handoff already computed.",
+  "in_scope": [
+    "Bounded acoustic feature extraction research",
+    "Voiced-frame/quality and channel metadata",
+    "Room/microphone/shared-channel regimes",
+    "Original-clock and extractor provenance"
+  ],
+  "out_of_scope": [
+    "Inferring prosody from punctuation alone",
+    "New production embedding space or resolver calibration",
+    "Unbounded GPU/model installation or full-corpus processing without a selected pilot"
+  ],
+  "implementation": [
+    "Audit copied audio availability, sample-rate/channel/crop metadata and the existing audio-preparation interfaces; select a small reproducible extractor with documented units, licensing and model/version provenance.",
+    "Define candidate features only where measurable: voiced pitch contour/range, intensity/energy, durations and local emphasis; store voicing/overlap/noise/clipping coverage and explicit unavailable reasons.",
+    "Bind all measurements to original recording spans and input hashes, retaining resampling/channel transforms; never reset a crop's source clock.",
+    "Build room/mic/channel regime metadata from known source information or an explicitly experimental classifier; missing regimes remain unknown and shared microphones receive separate controls.",
+    "Compare person-heldout, meeting-heldout and channel-regime-shift conditions, including same-person different-mic and different-person same-mic pairs, before admitting features to fusion."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Prosody is computed from actual audio with input/extractor/clock provenance; non-playable or missing audio produces no fabricated feature.",
+      "verification": "Run real small authorized crops and synthetic missing/corrupt controls; inspect feature coverage and failure receipts."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Resampling and crop preparation preserve original recording coordinates.",
+      "verification": "Check a nonzero-offset multi-channel fixture through preparation and feature extraction."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Reported gains survive explicit room/microphone controls or are labeled channel-specific.",
+      "verification": "Compare same-person/different-mic and different-person/same-mic held-out pairs with matched cohort accounting."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "No extracted prosody result changes a production vector, enrollment or identity decision.",
+      "verification": "Instrument the experimental path and compare production-state digests before/after the pilot."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/statecivicsai-diat:src/speaker_identity/experiments/meeting_matter/prosody.py (proposed)",
+    "mfreeze77/statecivicsai-diat:src/speaker_identity/experiments/meeting_matter/channel_context.py (proposed)",
+    "mfreeze77/statecivicsai-diat:docs/research/prosody-channel-qualification.md (proposed)",
+    "mfreeze77/statecivicsai-diat:data/meeting-matter/prosody/<run>/ (private)"
+  ],
+  "tests": [
+    "Shared podium microphone with alternating people",
+    "Same person remote and in-room",
+    "Unvoiced/overlapping/noisy segment",
+    "Stereo channels with one silent channel",
+    "Crop resampled from 44.1 kHz with original offset retained"
+  ],
+  "risks": [
+    "Channel effects can dominate identity-adjacent acoustic measures.",
+    "Extractor defaults and speech quality can create biased missing-feature subsets."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/src/speaker_identity/audio/prepare.py",
+      "application": "Inspect and reuse existing audio preparation and source-span discipline."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/meeting-handoff.md",
+      "application": "Respect feature not_computed/unavailable states in exported packages."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/src/speaker_identity/meeting_package.py",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

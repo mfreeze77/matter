@@ -1,0 +1,103 @@
+{
+  "id": "MAT-059",
+  "title": "Evaluate pause, rhythm and interaction motifs across meetings",
+  "track": "diat",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "research",
+  "owner_repo": "mfreeze77/statecivicsai-diat",
+  "component": "experiments.meeting_matter.rhythm_interaction",
+  "depends_on": [
+    "MAT-001",
+    "MAT-051",
+    "MAT-052",
+    "MAT-054",
+    "MAT-056",
+    "MAT-063"
+  ],
+  "requirements": [
+    "DIAT-04",
+    "DIAT-06",
+    "DIAT-08",
+    "DIAT-11",
+    "DIAT-13",
+    "DIAT-14"
+  ],
+  "summary": "Extend the existing phrase-pause-continuation observations into alignment-aware rhythm and interaction research: response latency, overlap, backchannels and floor transitions. Timing and conversational roles remain descriptive evidence with explicit confounds.",
+  "in_scope": [
+    "Existing pause/motif feature reuse",
+    "Response and handoff timing",
+    "Overlap/backchannel/interrupt patterns",
+    "Mode/source/role-balanced comparisons"
+  ],
+  "out_of_scope": [
+    "Assuming a timestamp gap is acoustic silence",
+    "Inferring untimed intervals or fixed individual rhythm from sparse turns",
+    "Combining correlated timing measures as independent identity votes"
+  ],
+  "implementation": [
+    "Reuse adjacent-word pause/motif and rate definitions, retaining timed/untimed coverage and the rule against skipping over an untimed word.",
+    "Define interaction episodes from procedural floor transitions and original-clock turn spans; distinguish response invitation, response onset, overlap, interruption and backchannel with source uncertainty.",
+    "Compute per-mode and per-context distributions with denominators and recording-group balance; separate chair/microphone delays from candidate person regularity.",
+    "Add alignment-quality and timing-perturbation controls, including partial word timing and chunk-boundary artifacts; no negative gap or overlap is silently converted to silence.",
+    "Evaluate each family and its interactions with procedure/lexical evidence on frozen cohorts and export only qualified descriptive support."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Existing missing/partial timing semantics survive the extension.",
+      "verification": "Run untimed and partially timed lexical fixtures; no synthetic pauses or articulation rates are created."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Response latency is conditioned on an evidenced interaction rather than arbitrary adjacent transcript rows.",
+      "verification": "Test chair invitation, unrelated new agenda item, overlapping speakers and missing turn boundaries."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Timing noise and role/channel confounds are included in the reported effect.",
+      "verification": "Run alignment jitter and chair/shared-mic strata on the same queries and report changes and omissions."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Multiple derived measures from one source occurrence do not become independent corroboration.",
+      "verification": "Inspect provenance-group weights and assessment evidence counts for several motifs from one turn."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/statecivicsai-diat:src/speaker_identity/experiments/meeting_matter/rhythm_interaction.py (proposed)",
+    "mfreeze77/statecivicsai-diat:docs/research/meeting-rhythm.md (proposed)",
+    "mfreeze77/statecivicsai-diat:data/meeting-matter/rhythm/<run>/ (private)"
+  ],
+  "tests": [
+    "Untimed word between two timed words",
+    "Overlapping response with a negative apparent gap",
+    "Chunk boundary splits a phrase",
+    "Same speaker chairing versus giving prepared testimony",
+    "Many motifs from one long turn versus one short turn in another independent meeting"
+  ],
+  "risks": [
+    "ASR alignment artifacts may look stable across reused media.",
+    "Response timing may mostly reflect role/procedure or remote audio transport."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/behavior.md",
+      "application": "Reuse existing phrase–pause–continuation and original-clock limitations."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/src/speaker_identity/behavior/profiles.py",
+      "application": "Reuse independent-group/turn/observation balance."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/src/speaker_identity/behavior/features.py",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}
