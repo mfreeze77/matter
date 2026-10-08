@@ -6,7 +6,7 @@ Matter is a shared foundation for following a continuing subject, preserving its
 
 ## Current status
 
-This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, explicit occurrence grouping, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata. MAT-006 separates reports, happenings, and declared provenance groups with atomic membership corrections and covered counts; its bounded grouping operation brings the command inventory to eighteen variants. Claim/evidence semantics, semantic association, assessment, provider adapters, and native integrations remain planned in the backlog.
+This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, explicit occurrence grouping, scoped claims and citations, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata. MAT-006 separates reports, happenings, and declared provenance groups with atomic membership corrections and covered counts. MAT-007 adds immutable claim corrections, component-scoped evidence relations, exact citation validation, and revisioned acceptance; the command inventory now contains nineteen variants. Semantic identity association, assessment, provider integrations, and native host integrations remain planned in the backlog.
 
 The walkthroughs are deliberately small: their fixtures already contain host-supplied associations and classifications. They demonstrate selected continuity and delivery rules; they do not infer semantic meaning, execute an agent hook, call JEV, train a speaker model, or establish production correctness.
 
@@ -136,6 +136,30 @@ summary lineage, provenance corrections, and backup/restore:
 python examples/occurrence_grouping.py
 ```
 
+## Preserve assertions and exact citations
+
+`matter.claims.ClaimService` stores scoped propositions, qualifiers, attribution,
+named components, and temporal applicability. Corrections append new claim IDs
+with explicit predecessor links. Competing correction branches remain visible;
+source assertions cannot change a matter's state or identity.
+
+`matter.evidence_relations.EvidenceRelationService` retains support,
+qualification, contradiction, and other relations to an exact claim or named
+component. The configured locator adapter binds each new relation to its source
+snapshot, exact locator and quotation, adapter version, and validation receipt.
+The included UTF-8 line adapter distinguishes an exact passage from an explicit
+whole artifact and returns concrete reasons for invalid or unavailable evidence.
+
+Acceptance revisions preserve original citations and every historical decision.
+Claim corrections and relation updates emit durable dependency-change notices;
+the later assessment invalidation engine remains a separate ticket. See the
+[claims and citation API](docs/claims.md) for receipt, authority, retry, correction,
+and adapter contracts. Run its complete installed-package example with:
+
+```bash
+python examples/claim_evidence.py
+```
+
 ## Read the specification
 
 | Document | Responsibility |
@@ -149,6 +173,7 @@ python examples/occurrence_grouping.py
 | [Observation intake](docs/observations.md) | Source identity, immutable payloads, duplicate/conflict receipts, corrections, and knowledge-time views |
 | [Matter identity](docs/matters.md) | Persistent scoped subject keys, conflicts, metadata revisions, and continuity across runs |
 | [Occurrences and provenance](docs/occurrences.md) | Exact happenings, accepted memberships, correction history, dependence declarations, and covered counts |
+| [Claims and citations](docs/claims.md) | Immutable assertion branches, component-scoped evidence, exact locator receipts, and acceptance history |
 | [Rule contract](docs/contracts/rules.md) | Meaning, outcomes, qualification, dependencies, and composition |
 | [Lifecycle contract](docs/contracts/lifecycle.md) | Reassessment, resolution, reopening, attention, and delivery |
 | [JEV design](docs/jev.md) | Replaceable semantic execution and question/version handling |
@@ -164,6 +189,7 @@ python examples/occurrence_grouping.py
 | [Observation validation receipt](docs/validation/MAT-004.md) | What was executed for MAT-004 |
 | [Matter identity validation receipt](docs/validation/MAT-005.md) | What was executed for MAT-005 |
 | [Occurrence validation receipt](docs/validation/MAT-006.md) | What was executed for MAT-006 |
+| [Claim and citation validation receipt](docs/validation/MAT-007.md) | What was executed for MAT-007 |
 
 ## What this repo owns
 

@@ -2065,6 +2065,17 @@
         },
         "proposition_version": {
           "$ref": "#/$defs/text"
+        },
+        "components": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "$ref": "#/$defs/namespaced_name"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/domain_value"
+          },
+          "description": "Declared named components of this exact immutable proposition. Presence does not imply support for other components or for the whole claim."
         }
       }
     },
@@ -2221,6 +2232,14 @@
         },
         "acceptance": {
           "$ref": "#/$defs/acceptance"
+        },
+        "quotation": {
+          "$ref": "#/$defs/text",
+          "description": "Exact source wording offered for citation validation; never normalized or rewritten."
+        },
+        "locator_validation": {
+          "$ref": "#/$defs/receipt_dependency",
+          "description": "The exact immutable adapter-validation receipt for this evidence and locator. Runtime handlers assign and verify this receipt."
         }
       }
     },
@@ -3935,6 +3954,49 @@
         }
       ],
       "description": "A host-declared dependence group or explicit unknown reason for one immutable root observation. The occurrence runtime checks lineage, scope, authority and current assignments; this shape does not prove independence or create a new source."
+    },
+    "dependency_change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cause",
+        "before",
+        "after"
+      ],
+      "properties": {
+        "cause": {
+          "$ref": "#/$defs/change_cause"
+        },
+        "before": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          }
+        },
+        "after": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          }
+        }
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "before": {
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "properties": {
+            "after": {
+              "minItems": 1
+            }
+          }
+        }
+      ],
+      "description": "A local model-record dependency notice. Before references remain historical evidence; notices do not delete records, assert new independent sources, or execute transitive invalidation."
     }
   }
 }

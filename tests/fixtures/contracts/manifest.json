@@ -697,6 +697,90 @@
       "schema": "command",
       "valid": false,
       "description": "Unknown dependence requires a reason and cannot assert a group."
+    },
+    {
+      "path": "records/claim__components_correction.json",
+      "schema": "record",
+      "valid": true,
+      "description": "An immutable corrected proposition names explicit components and preserves its predecessor pin; no truth conclusion is implied."
+    },
+    {
+      "path": "commands/append_claim__correction.json",
+      "schema": "command",
+      "valid": true,
+      "description": "A synthetic correction appends a new claim with named components; predecessor and source wording remain intact."
+    },
+    {
+      "path": "records/evidence_relation__validated_passage.json",
+      "schema": "record",
+      "valid": true,
+      "description": "A component-scoped relation preserves exact quotation and a pinned immutable locator-validation receipt."
+    },
+    {
+      "path": "commands/relate_evidence__validation.json",
+      "schema": "command",
+      "valid": true,
+      "description": "A structural vector freezes a schema-bound adapter declaration outside the transaction and omits the runtime-computed receipt pin."
+    },
+    {
+      "path": "commands/revise_evidence_acceptance.json",
+      "schema": "command",
+      "valid": true,
+      "description": "A revision-checked acceptance edit does not retarget evidence or rewrite its proposition, locator, quotation, or source."
+    },
+    {
+      "path": "results/append_claim__appended_correction.json",
+      "schema": "result",
+      "valid": true,
+      "description": "A correction emits a local dependency notice while keeping the preceding immutable proposition readable."
+    },
+    {
+      "path": "results/relate_evidence__appended_validated.json",
+      "schema": "result",
+      "valid": true,
+      "description": "A relation result distinguishes the current command receipt from its pinned adapter-validation receipt and reports the typed model-record addition."
+    },
+    {
+      "path": "results/revise_evidence_acceptance__updated.json",
+      "schema": "result",
+      "valid": true,
+      "description": "An acceptance edit identifies previous and current relation revisions and a nonempty dependency notice."
+    },
+    {
+      "path": "results/revise_evidence_acceptance__unchanged.json",
+      "schema": "result",
+      "valid": true,
+      "description": "An unchanged acceptance retains the current relation pin and emits no dependency notices."
+    },
+    {
+      "path": "results/revise_evidence_acceptance__failure_revision_conflict.json",
+      "schema": "result",
+      "valid": true,
+      "description": "A stale acceptance edit is a typed failure, not a successful unchanged decision."
+    },
+    {
+      "path": "invalid/dependency_change_without_references.json",
+      "schema": "result",
+      "valid": false,
+      "description": "A dependency-change entry must name at least one before or after snapshot."
+    },
+    {
+      "path": "invalid/claim_with_unscoped_component_name.json",
+      "schema": "command",
+      "valid": false,
+      "description": "Named proposition components require explicit namespaces."
+    },
+    {
+      "path": "invalid/evidence_relation_with_unpinned_validation.json",
+      "schema": "record",
+      "valid": false,
+      "description": "A relation-level validation receipt requires an exact immutable digest pin."
+    },
+    {
+      "path": "invalid/acceptance_update_with_retargeting.json",
+      "schema": "command",
+      "valid": false,
+      "description": "An acceptance revision cannot change the cited proposition target."
     }
   ]
 }

@@ -12,10 +12,10 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-004: Ingest immutable observations with source-aware deduplication](MAT-004.md) | core | 1 | P0 | done | done | MAT-002, MAT-003 |
 | [MAT-005: Implement persistent matter identity and scope continuity](MAT-005.md) | core | 1 | P0 | done | done | MAT-003, MAT-004 |
 | [MAT-006: Track occurrences and evidence dependence separately from observations](MAT-006.md) | core | 1 | P0 | done | done | MAT-004, MAT-005 |
-| [MAT-007: Model scoped claims and cited evidence relationships](MAT-007.md) | core | 1 | P0 | planned | ready | MAT-004, MAT-005, MAT-006 |
-| [MAT-008: Separate association proposals from authorized acceptance](MAT-008.md) | core | 1 | P0 | planned | waiting | MAT-005, MAT-006, MAT-007 |
+| [MAT-007: Model scoped claims and cited evidence relationships](MAT-007.md) | core | 1 | P0 | done | done | MAT-004, MAT-005, MAT-006 |
+| [MAT-008: Separate association proposals from authorized acceptance](MAT-008.md) | core | 1 | P0 | planned | ready | MAT-005, MAT-006, MAT-007 |
 | [MAT-009: Implement matter links, guarded merges, and reversible identity correction](MAT-009.md) | core | 2 | P0 | planned | waiting | MAT-005, MAT-007, MAT-008 |
-| [MAT-010: Represent time, source coverage, and explicit negative evidence scopes](MAT-010.md) | core | 1 | P0 | planned | waiting | MAT-003, MAT-004, MAT-006, MAT-007 |
+| [MAT-010: Represent time, source coverage, and explicit negative evidence scopes](MAT-010.md) | core | 1 | P0 | planned | ready | MAT-003, MAT-004, MAT-006, MAT-007 |
 | [MAT-011: Route trusted controls immediately and preserve authority boundaries](MAT-011.md) | core | 1 | P0 | planned | ready | MAT-002, MAT-003, MAT-005 |
 | [MAT-012: Implement provider-neutral rule and judgment interfaces](MAT-012.md) | rules | 2 | P0 | planned | waiting | MAT-002, MAT-007, MAT-010, MAT-011 |
 | [MAT-013: Version policy profiles and validate semantic compatibility](MAT-013.md) | rules | 2 | P0 | planned | waiting | MAT-012 |

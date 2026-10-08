@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "operation": "revise_evidence_acceptance",
+  "command_id": "command-revise-acceptance",
+  "idempotency_key": "key-revise-acceptance",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [
+    {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "evidence_relation",
+      "id": "evidence_relation-1",
+      "revision": 1
+    }
+  ],
+  "body": {
+    "relation": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "evidence_relation",
+      "id": "evidence_relation-1",
+      "revision": 1
+    },
+    "acceptance": {
+      "status": "rejected",
+      "rationale": "Synthetic review withdraws this relation acceptance without proving the opposite proposition.",
+      "authority": {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "receipt",
+        "id": "authority-1"
+      }
+    }
+  }
+}

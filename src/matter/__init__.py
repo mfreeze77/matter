@@ -6,8 +6,9 @@ immutable source intake and payloads live in ``matter.observations`` and
 ``matter.payloads``. Persistent subject identity and metadata live in
 ``matter.matters`` and ``matter.identity_keys``. Accepted occurrence membership
 and evidence dependence live in ``matter.occurrences`` and
-``matter.provenance_groups``. Semantic association, assessment, and integrations
-remain backlog work.
+``matter.provenance_groups``. Immutable scoped assertions and cited relations
+live in ``matter.claims``, ``matter.evidence_relations`` and ``matter.citations``.
+Semantic identity association, assessment, and integrations remain backlog work.
 """
 
-__version__ = "0.1.0.dev5"
+__version__ = "0.1.0.dev6"

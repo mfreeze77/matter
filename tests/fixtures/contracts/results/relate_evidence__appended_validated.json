@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "operation": "relate_evidence",
+  "operation_id": "operation-relate_evidence",
+  "status": "success",
+  "outcome": "appended",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "relation": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "evidence_relation",
+      "id": "evidence_relation-1",
+      "revision": 1
+    },
+    "locator_validation": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "locator-validation-1",
+      "digest": "2222222222222222222222222222222222222222222222222222222222222222"
+    },
+    "changes": [
+      {
+        "cause": "new_evidence",
+        "before": [],
+        "after": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "evidence_relation",
+            "id": "evidence_relation-1",
+            "revision": 1
+          }
+        ]
+      }
+    ]
+  }
+}

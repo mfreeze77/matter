@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "operation": "revise_evidence_acceptance",
+  "operation_id": "operation-revise-acceptance",
+  "status": "success",
+  "outcome": "updated",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "relation": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "evidence_relation",
+      "id": "evidence_relation-1",
+      "revision": 2
+    },
+    "previous": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "evidence_relation",
+      "id": "evidence_relation-1",
+      "revision": 1
+    },
+    "changes": [
+      {
+        "cause": "disposition_change",
+        "before": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "evidence_relation",
+            "id": "evidence_relation-1",
+            "revision": 1
+          }
+        ],
+        "after": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "evidence_relation",
+            "id": "evidence_relation-1",
+            "revision": 2
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -30,6 +30,7 @@
             "accept_association",
             "append_claim",
             "relate_evidence",
+            "revise_evidence_acceptance",
             "link_matters",
             "merge_matters",
             "correct_merge",
@@ -493,6 +494,13 @@
               "properties": {
                 "claim": {
                   "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/claim_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  },
+                  "minItems": 1
                 }
               }
             }
@@ -515,6 +523,13 @@
               "properties": {
                 "claim": {
                   "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/claim_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  },
+                  "maxItems": 0
                 }
               }
             }
@@ -537,6 +552,16 @@
               "properties": {
                 "relation": {
                   "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/evidence_relation_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  },
+                  "minItems": 1
+                },
+                "locator_validation": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
                 }
               }
             }
@@ -559,6 +584,80 @@
               "properties": {
                 "relation": {
                   "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/evidence_relation_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  },
+                  "maxItems": 0
+                },
+                "locator_validation": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "revise_evidence_acceptance"
+            },
+            "outcome": {
+              "const": "updated"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "relation",
+                "previous",
+                "changes"
+              ],
+              "properties": {
+                "relation": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/evidence_relation_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  },
+                  "minItems": 1
+                },
+                "previous": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/evidence_relation_dependency"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "revise_evidence_acceptance"
+            },
+            "outcome": {
+              "const": "unchanged"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "relation",
+                "changes"
+              ],
+              "properties": {
+                "relation": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/evidence_relation_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  },
+                  "maxItems": 0
                 }
               }
             }
@@ -1095,6 +1194,7 @@
             "accept_association",
             "append_claim",
             "relate_evidence",
+            "revise_evidence_acceptance",
             "link_matters",
             "merge_matters",
             "correct_merge",
