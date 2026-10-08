@@ -3877,6 +3877,64 @@
           "$ref": "#/$defs/domain_value"
         }
       }
+    },
+    "occurrence_grouping_assignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observation",
+        "status"
+      ],
+      "properties": {
+        "observation": {
+          "$ref": "#/$defs/observation_dependency"
+        },
+        "status": {
+          "enum": [
+            "declared",
+            "unknown"
+          ]
+        },
+        "group": {
+          "$ref": "#/$defs/identity_key"
+        },
+        "reason": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "status": {
+              "const": "declared"
+            }
+          },
+          "required": [
+            "group"
+          ],
+          "not": {
+            "required": [
+              "reason"
+            ]
+          }
+        },
+        {
+          "properties": {
+            "status": {
+              "const": "unknown"
+            }
+          },
+          "required": [
+            "reason"
+          ],
+          "not": {
+            "required": [
+              "group"
+            ]
+          }
+        }
+      ],
+      "description": "A host-declared dependence group or explicit unknown reason for one immutable root observation. The occurrence runtime checks lineage, scope, authority and current assignments; this shape does not prove independence or create a new source."
     }
   }
 }

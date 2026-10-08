@@ -649,6 +649,54 @@
       "schema": "result",
       "valid": true,
       "description": "A stale metadata update is an explicit failure, never a successful unchanged result."
+    },
+    {
+      "path": "commands/commit_occurrence_grouping.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic atomic grouping command with creation, replacement, declared root group and explicit unknown provenance."
+    },
+    {
+      "path": "commands/commit_occurrence_grouping__unknown_assignment.json",
+      "schema": "command",
+      "valid": true,
+      "description": "An explicit unknown root assignment can be the only requested change."
+    },
+    {
+      "path": "results/commit_occurrence_grouping__committed.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Grouping result retains current occurrence pins, actual previous revisions and scoped assignment projections."
+    },
+    {
+      "path": "results/commit_occurrence_grouping__unchanged.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Grouping no-op has no previous changed revisions and preserves current dependency pins."
+    },
+    {
+      "path": "results/commit_occurrence_grouping__failure_revision_conflict.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Stale grouping dependencies remain an explicit failure."
+    },
+    {
+      "path": "invalid/grouping_without_changes.json",
+      "schema": "command",
+      "valid": false,
+      "description": "Grouping command requires at least one requested create, replacement or assignment."
+    },
+    {
+      "path": "invalid/grouping_with_forged_computed_groups.json",
+      "schema": "command",
+      "valid": false,
+      "description": "Callers cannot prefill computed provenance groups on created occurrences."
+    },
+    {
+      "path": "invalid/unknown_provenance_with_group.json",
+      "schema": "command",
+      "valid": false,
+      "description": "Unknown dependence requires a reason and cannot assert a group."
     }
   ]
 }

@@ -57,6 +57,18 @@ optional title, description, and namespaced extensions. Omitted fields are
 removed, including when the supplied object is empty. Identity and lifecycle
 fields cannot be written through this operation.
 
+MAT-006 adds `commit_occurrence_grouping` as the eighteenth operation, with
+`committed` and `unchanged` success outcomes and the shared
+`occurrence_grouping_assignment` definition. It retains the twelve stored core
+record kinds, the `1.0` envelope version, and the existing encoding. Its closed
+command batches occurrence creation, membership replacement, and explicit root
+dependence assignments. Created occurrences must supply an empty computed-group
+placeholder; the runtime determines their stored provenance groups. Earlier
+readers must update their bundled command and result schemas before accepting
+this operation. Updated readers continue to admit all earlier v1 fixtures.
+This shape extension does not implement automatic operation negotiation,
+semantic association, independent-source qualification, or an assessment engine.
+
 ## Four independent versions and identities
 
 The schema version identifies the structure and interpretation of an envelope.

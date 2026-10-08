@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/provenance-root-assignment.schema.json",
+  "title": "Matter provenance root assignment v1",
+  "description": "A revisioned declaration for one exact immutable root observation. Eligibility, same-scope references and lineage are checked by the runtime. A declared group describes dependence; it does not establish independent corroboration or a cause.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scope_id", "observation", "assignment"],
+  "properties": {
+    "scope_id": {"$ref": "core-record.schema.json#/$defs/identifier"},
+    "observation": {"$ref": "core-record.schema.json#/$defs/observation_dependency"},
+    "assignment": {"$ref": "#/$defs/assignment"}
+  },
+  "$defs": {
+    "assignment": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "group"],
+          "properties": {
+            "status": {"const": "declared"},
+            "group": {"$ref": "core-record.schema.json#/$defs/identity_key"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "reason"],
+          "properties": {
+            "status": {"const": "unknown"},
+            "reason": {"$ref": "core-record.schema.json#/$defs/text"}
+          }
+        }
+      ]
+    }
+  }
+}

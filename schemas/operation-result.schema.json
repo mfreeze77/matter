@@ -25,6 +25,7 @@
             "ingest_observation",
             "create_matter",
             "update_matter_metadata",
+            "commit_occurrence_grouping",
             "propose_association",
             "accept_association",
             "append_claim",
@@ -194,6 +195,119 @@
               "properties": {
                 "matter": {
                   "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_dependency"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "commit_occurrence_grouping"
+            },
+            "outcome": {
+              "const": "committed"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "occurrences",
+                "previous",
+                "provenance_assignments"
+              ],
+              "properties": {
+                "occurrences": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/occurrence_dependency"
+                  },
+                  "minItems": 0
+                },
+                "previous": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/occurrence_dependency"
+                  },
+                  "minItems": 0
+                },
+                "provenance_assignments": {
+                  "type": "array",
+                  "items": {
+                    "allOf": [
+                      {
+                        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+                      },
+                      {
+                        "properties": {
+                          "record_type": {
+                            "const": "matter:projection"
+                          },
+                          "namespace": {
+                            "const": "matter.provenance_groups"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "minItems": 0
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "commit_occurrence_grouping"
+            },
+            "outcome": {
+              "const": "unchanged"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "occurrences",
+                "previous",
+                "provenance_assignments"
+              ],
+              "properties": {
+                "occurrences": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/occurrence_dependency"
+                  },
+                  "minItems": 0
+                },
+                "previous": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/occurrence_dependency"
+                  },
+                  "minItems": 0,
+                  "maxItems": 0
+                },
+                "provenance_assignments": {
+                  "type": "array",
+                  "items": {
+                    "allOf": [
+                      {
+                        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+                      },
+                      {
+                        "properties": {
+                          "record_type": {
+                            "const": "matter:projection"
+                          },
+                          "namespace": {
+                            "const": "matter.provenance_groups"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "minItems": 0
                 }
               }
             }
@@ -976,6 +1090,7 @@
             "ingest_observation",
             "create_matter",
             "update_matter_metadata",
+            "commit_occurrence_grouping",
             "propose_association",
             "accept_association",
             "append_claim",

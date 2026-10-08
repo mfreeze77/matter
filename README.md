@@ -6,7 +6,7 @@ Matter is a shared foundation for following a continuing subject, preserving its
 
 ## Current status
 
-This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata; its bounded metadata operation brings the command inventory to seventeen variants. Occurrence grouping, association, assessment, provider adapters, and native integrations remain planned in the backlog.
+This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, explicit occurrence grouping, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata. MAT-006 separates reports, happenings, and declared provenance groups with atomic membership corrections and covered counts; its bounded grouping operation brings the command inventory to eighteen variants. Claim/evidence semantics, semantic association, assessment, provider adapters, and native integrations remain planned in the backlog.
 
 The walkthroughs are deliberately small: their fixtures already contain host-supplied associations and classifications. They demonstrate selected continuity and delivery rules; they do not infer semantic meaning, execute an agent hook, call JEV, train a speaker model, or establish production correctness.
 
@@ -113,6 +113,29 @@ replacement semantics, scopes, and the boundaries for future identity changes.
 python examples/matter_identity.py
 ```
 
+## Distinguish reports, happenings, and evidence groups
+
+`matter.occurrences.OccurrenceService` accepts explicit observation membership
+under exact adapter execution/event keys. A log and a report can describe one
+execution, while identical diagnostics from a later execution remain a second
+occurrence. One observation can describe several occurrences or none.
+
+One `commit_occurrence_grouping` command can split a mistaken grouping and
+correct root provenance declarations. Original reports and every occurrence
+revision remain available. Summaries inherit their parents' declared groups,
+and unresolved dependence remains explicit. Counts cover a specified set of
+observations and report source coverage separately from provenance coverage.
+These counts do not establish cause or independent corroboration.
+
+See the [occurrence and provenance API](docs/occurrences.md) for the policy,
+correction, retry, and count contracts. The installed example exercises two
+reports of one execution, a split, identical diagnostics from another execution,
+summary lineage, provenance corrections, and backup/restore:
+
+```bash
+python examples/occurrence_grouping.py
+```
+
 ## Read the specification
 
 | Document | Responsibility |
@@ -125,6 +148,7 @@ python examples/matter_identity.py
 | [Durable storage](docs/storage.md) | Transaction API, exact retries, revision history, migrations, backup, and restore |
 | [Observation intake](docs/observations.md) | Source identity, immutable payloads, duplicate/conflict receipts, corrections, and knowledge-time views |
 | [Matter identity](docs/matters.md) | Persistent scoped subject keys, conflicts, metadata revisions, and continuity across runs |
+| [Occurrences and provenance](docs/occurrences.md) | Exact happenings, accepted memberships, correction history, dependence declarations, and covered counts |
 | [Rule contract](docs/contracts/rules.md) | Meaning, outcomes, qualification, dependencies, and composition |
 | [Lifecycle contract](docs/contracts/lifecycle.md) | Reassessment, resolution, reopening, attention, and delivery |
 | [JEV design](docs/jev.md) | Replaceable semantic execution and question/version handling |
@@ -139,6 +163,7 @@ python examples/matter_identity.py
 | [Storage validation receipt](docs/validation/MAT-003.md) | What was executed for MAT-003 |
 | [Observation validation receipt](docs/validation/MAT-004.md) | What was executed for MAT-004 |
 | [Matter identity validation receipt](docs/validation/MAT-005.md) | What was executed for MAT-005 |
+| [Occurrence validation receipt](docs/validation/MAT-006.md) | What was executed for MAT-006 |
 
 ## What this repo owns
 

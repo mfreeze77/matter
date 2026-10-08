@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "operation": "commit_occurrence_grouping",
+  "operation_id": "operation-commit_occurrence_grouping",
+  "status": "success",
+  "outcome": "committed",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "occurrences": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "occurrence",
+        "id": "occurrence-1",
+        "revision": 2
+      },
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "occurrence",
+        "id": "occurrence-2",
+        "revision": 1
+      }
+    ],
+    "previous": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "occurrence",
+        "id": "occurrence-1",
+        "revision": 1
+      }
+    ],
+    "provenance_assignments": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "matter.provenance_groups",
+        "record_type": "matter:projection",
+        "id": "provenance-assignment-1",
+        "revision": 1
+      },
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "matter.provenance_groups",
+        "record_type": "matter:projection",
+        "id": "provenance-assignment-2",
+        "revision": 1
+      }
+    ]
+  }
+}
