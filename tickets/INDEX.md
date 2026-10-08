@@ -6,8 +6,8 @@ Future work in another repository remains owned by that repository. This scaffol
 
 | Ticket | Track | Phase | Priority | Status | Readiness | Depends on |
 |---|---|---:|---|---|---|---|
-| [MAT-001: Establish the governing scaffold and validated implementation backlog](MAT-001.md) | foundation | 0 | P0 | in_progress | in_progress | — |
-| [MAT-002: Define interoperable record schemas, canonical encoding, and error results](MAT-002.md) | core | 0 | P0 | planned | waiting | MAT-001 |
+| [MAT-001: Establish the governing scaffold and validated implementation backlog](MAT-001.md) | foundation | 0 | P0 | done | done | — |
+| [MAT-002: Define interoperable record schemas, canonical encoding, and error results](MAT-002.md) | core | 0 | P0 | planned | ready | MAT-001 |
 | [MAT-003: Implement durable transactional storage and revision-checked commands](MAT-003.md) | core | 0 | P0 | planned | waiting | MAT-002 |
 | [MAT-004: Ingest immutable observations with source-aware deduplication](MAT-004.md) | core | 1 | P0 | planned | waiting | MAT-002, MAT-003 |
 | [MAT-005: Implement persistent matter identity and scope continuity](MAT-005.md) | core | 1 | P0 | planned | waiting | MAT-003, MAT-004 |
@@ -56,7 +56,7 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-048: Adapt civic source claims and stages into neutral matter history](MAT-048.md) | civic | 3 | P1 | planned | waiting | MAT-001, MAT-004, MAT-005, MAT-006, MAT-007, MAT-008, MAT-009, MAT-010, MAT-046, MAT-047 |
 | [MAT-049: Assess civic developments by purpose and meaningful audience change](MAT-049.md) | civic | 4 | P1 | planned | waiting | MAT-001, MAT-015, MAT-016, MAT-017, MAT-018, MAT-019, MAT-021, MAT-048 |
 | [MAT-050: Qualify civic temporal, authority and receiver boundaries](MAT-050.md) | civic | 5 | P0 | planned | waiting | MAT-001, MAT-024, MAT-025, MAT-037, MAT-042, MAT-048, MAT-049 |
-| [MAT-051: Audit the private DIAT corpus and exported evidence views](MAT-051.md) | diat | 0 | P0 | planned | waiting | MAT-001 |
+| [MAT-051: Audit the private DIAT corpus and exported evidence views](MAT-051.md) | diat | 0 | P0 | planned | ready | MAT-001 |
 | [MAT-052: Define source-linked formal-meeting procedural observations](MAT-052.md) | diat | 2 | P1 | planned | waiting | MAT-001, MAT-002, MAT-004, MAT-007, MAT-046, MAT-051 |
 | [MAT-053: Implement an uncertain procedural state tracker](MAT-053.md) | diat | 3 | P1 | planned | waiting | MAT-001, MAT-012, MAT-014, MAT-015, MAT-016, MAT-017, MAT-052 |
 | [MAT-054: Model anonymous floor, chair and role transitions](MAT-054.md) | diat | 4 | P1 | planned | waiting | MAT-001, MAT-051, MAT-052, MAT-053, MAT-063 |

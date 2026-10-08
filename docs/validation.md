@@ -16,7 +16,7 @@ Local execution used Python **3.12.14**, setuptools **84.0.0**, and jsonschema *
 
 The local verification commands used `PYTHONDONTWRITEBYTECODE=1` to avoid incidental bytecode files. The module commands work after installation without setting `PYTHONPATH`. The local package installer placed the optional `matter` executable outside the shell's PATH; `python -m matter` is the documented and verified entry point.
 
-The [GitHub Actions workflow](../.github/workflows/validate.yml) defines Python 3.11 and 3.12 checks with pinned action revisions. A configured workflow is not evidence of an executed remote run. At the time of this initial receipt, remote CI has not yet been observed; local results above establish only the tested Python 3.12 environment.
+The [GitHub Actions workflow](../.github/workflows/validate.yml) defines Python 3.11 and 3.12 checks with pinned action revisions. Both jobs completed successfully in [run 37750500591](https://github.com/mfreeze77/matter/actions/runs/37750500591) for the first published scaffold commit, `2f541a5caeae9f8a279390007d7704b801b98332`. This is executed remote evidence in addition to the local Python 3.12 checks. Later commits have their own head-specific results in [PR #1](https://github.com/mfreeze77/matter/pull/1).
 
 ## Roadmap integrity
 
@@ -30,6 +30,8 @@ The canonical records contain **80 tickets, 104 requirements, 271 acceptance cri
 | `mfreeze77/oil` | 6 |
 
 Ownership records planned downstream responsibility. They do not imply that any downstream repository was modified. MAT-001's completion evidence is recorded in its [canonical record](../tickets/records/MAT-001.json); the other 79 tickets remain planned and unqualified by this scaffold execution.
+
+The scaffold is published in [PR #1](https://github.com/mfreeze77/matter/pull/1) on `build/matter-foundation-roadmap`. The initial commit added 201 files, and its uploaded tree `8a3c65b255e977f068be6b896c7fe62a33da8cc7` matched the local index exactly. The completion update records this reviewable result and derives the ready-to-start tickets from the completed MAT-001 milestone.
 
 ## Behavior exercised
 

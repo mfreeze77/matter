@@ -4,7 +4,7 @@
   "track": "foundation",
   "phase": 0,
   "priority": "P0",
-  "status": "in_progress",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "repository-scaffold",
@@ -82,7 +82,13 @@
     "User scaffold request and correction on 2026-10-08."
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "2026-10-08: editable installation, render --check, repository validation, all 39 regression tests and all three synthetic walkthroughs passed; see docs/validation.md.",
+      "The 80-ticket, 104-requirement backlog has 271 acceptance criteria, complete coverage, no missing dependencies, no cycles and no phase inversions.",
+      "https://github.com/mfreeze77/matter/pull/1 — reviewable scaffold PR; initial head 2f541a5caeae9f8a279390007d7704b801b98332 verified to contain 201 added files.",
+      "Initial uploaded tree 8a3c65b255e977f068be6b896c7fe62a33da8cc7 matched the local Git index exactly; original notes and LICENSE retain their remote blob hashes.",
+      "https://github.com/mfreeze77/matter/actions/runs/37750500591 — completed successful push workflow for the initial scaffold commit; final-head CI is reported separately."
+    ]
   }
 }

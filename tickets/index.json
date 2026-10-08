@@ -13,7 +13,7 @@
     "rules": 7
   },
   "counts_by_status": {
-    "in_progress": 1,
+    "done": 1,
     "planned": 79
   },
   "tickets": [
@@ -23,13 +23,13 @@
       "track": "foundation",
       "phase": 0,
       "priority": "P0",
-      "status": "in_progress",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [],
       "requirements": [
         "BOOT-01"
       ],
-      "readiness": "in_progress",
+      "readiness": "done",
       "path": "records/MAT-001.json"
     },
     {
@@ -46,7 +46,7 @@
       "requirements": [
         "CORE-01"
       ],
-      "readiness": "waiting",
+      "readiness": "ready",
       "path": "records/MAT-002.json"
     },
     {
@@ -1178,7 +1178,7 @@
         "DIAT-15",
         "DIAT-18"
       ],
-      "readiness": "waiting",
+      "readiness": "ready",
       "path": "records/MAT-051.json"
     },
     {
