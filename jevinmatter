@@ -1,0 +1,112 @@
+That actually makes your experiment much more interesting, because you've narrowed the problem in a way that gives the computer a significant advantage.
+
+You're not trying to build a voice-recognition system that works in restaurants, football stadiums, casual conversations, or random YouTube videos.
+
+You're building something specifically for structured government meetings, hearings, committees, and legislative proceedings, where the participants follow recognizable speaking patterns.
+
+And there's a powerful engineering concept hiding in that distinction:
+
+You don't just have audio evidence. You have procedural evidence.
+
+## Robert's Rules can become another intelligence layer
+
+Think about what happens during a formal committee meeting:
+
+1. The chair opens the meeting and calls items.
+2. The chair recognizes someone to speak.
+3. That person presents, asks questions, or makes a motion.
+4. Someone else responds, seconds the motion, or participates in discussion.
+5. The chair manages the discussion and moves to the next action.
+
+Not every meeting follows that exact sequence, but these are recognizable patterns.
+
+Your system can learn something extremely useful from them: who is likely to speak next, which speaking roles are consistent, and when the floor changes hands.
+
+For example:
+
+EXAMPLE — AN ANONYMOUS COMMITTEE MEETING
+
+Person A
+
+Likely chair
+
+"The chair recognizes the next speaker."
+
+Person B
+
+Recognized speaker
+
+"Thank you, Mr. Chairman. I have a question."
+
+Person C
+
+Respondent
+
+"I'd be happy to answer that."
+
+Your computer doesn't need to know their names to understand that there's a structured interaction happening.
+
+And now imagine combining that procedural evidence with your existing voice embeddings, grammar measurements, speaking mechanics, and interaction profiles.
+
+You can start using the structure of the meeting to help resolve ambiguous speaker boundaries rather than relying entirely on somebody's voice.
+
+That's a substantially better-defined engineering problem than general-purpose speaker recognition.
+
+## What I would add to your experiment
+
+I would build a small parliamentary-procedure state machine.
+
+Robert's Rules provide recurring events such as recognition, motions, seconds, debate, and voting. Those recurring patterns can supply context for determining speaking turns.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://robertsrules.org\&sz=32)
+
+RobertsRules.org
+
++1
+
+
+
+Procedural state model
+
+Chair controls floor
+
+Speaker recognized
+
+Testimony / debate / questions
+
+Response / motion / vote
+
+Return to chair, continue discussion, or change agenda item
+
+The really interesting part is that your system could use three different kinds of evidence:
+
+| Evidence   | What it contributes                                             |
+| ---------- | --------------------------------------------------------------- |
+| Acoustic   | Does this sound like the same speaker?                          |
+| Behavioral | Does this person speak in a similar way?                        |
+| Procedural | Does this speaker transition make sense in the current meeting? |
+
+I'd keep the procedural rules as soft constraints, not absolute truths. People interrupt, chairs change, microphones are shared, and legislative committees may modify Robert's Rules with their own procedures.
+
+That also means you don't necessarily need to train another giant model. A relatively inexpensive event classifier and deterministic state tracker could supply much of this information to your existing fusion system.
+
+## The important change to your success criteria
+
+Since this experiment is targeting formal meetings, I wouldn't evaluate it on whether it identifies random people in arbitrary audio.
+
+I'd evaluate four things:
+
+- Can it maintain anonymous speaker consistency throughout a formal meeting?
+- Does recognizing procedural events reduce speaker-switching mistakes?
+- Does the combination of acoustic, behavioral, and procedural evidence outperform acoustic evidence alone on human-verified examples?
+- Can it correctly say "uncertain" when a procedural clue conflicts with the audio?
+
+And there's another advantage: you already have 446 interaction events in your experiment. Those could become a starting point for extracting procedural transitions, even though their machine-generated boundaries need verification.
+
+The engineering opportunity here is to turn parliamentary procedure into a domain-specific prior for diarization.
+
+In other words, you aren't teaching a machine everything about human conversation. You're teaching it the relatively limited ways people interact inside a structured governmental proceeding.
+
+That's a much more achievable target, and potentially a very valuable specialization for StateCivics.
+
+One design choice I'd strongly favor: make the procedural engine configurable by meeting type and jurisdiction, rather than baking Robert's Rules directly into the acoustic model. That way the same person-print machinery can eventually support legislative hearings, county commissions, city councils, and school boards while retaining their different procedural rules.
