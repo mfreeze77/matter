@@ -1,6 +1,6 @@
 # Core information and operation contract
 
-Status: governing specification. MAT-002 implements the [version 1.0 structural schemas](schema-inventory.md) and [canonical encoding](canonical.md). Structural validation does not implement or qualify the runtime guarantees below. Persistent storage, association, assessment, lifecycle, and delivery remain tracked by MAT-003 through MAT-025. A ticket is complete only with its own recorded acceptance evidence.
+Status: governing specification. MAT-002 implements the [version 1.0 structural schemas](schema-inventory.md) and [canonical encoding](canonical.md). MAT-003 implements the [transactional storage port](../storage.md), qualified by its own [acceptance evidence](../validation/MAT-003.md). Business operations, association, assessment, lifecycle, and delivery remain tracked by MAT-004 through MAT-025. Structural validation and storage commits alone do not qualify those later guarantees. A ticket is complete only with its own recorded acceptance evidence.
 
 ## Purpose and sources
 

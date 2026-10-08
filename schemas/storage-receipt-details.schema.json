@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/storage-receipt-details.schema.json",
+  "title": "Matter storage operation receipt details v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["command_digest", "result_digest", "read_set", "absent_reads", "watch_queries", "writes"],
+  "properties": {
+    "command_digest": {"$ref": "core-record.schema.json#/$defs/sha256"},
+    "result_digest": {"$ref": "core-record.schema.json#/$defs/sha256"},
+    "read_set": {
+      "type": "array",
+      "items": {"$ref": "core-record.schema.json#/$defs/pinned_ref"}
+    },
+    "absent_reads": {
+      "type": "array",
+      "items": {"$ref": "core-record.schema.json#/$defs/entity_ref"}
+    },
+    "watch_queries": {
+      "type": "array",
+      "items": {"$ref": "core-record.schema.json#/$defs/identifier"}
+    },
+    "writes": {
+      "type": "array",
+      "items": {"$ref": "core-record.schema.json#/$defs/pinned_ref"}
+    }
+  }
+}

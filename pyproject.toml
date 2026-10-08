@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "matter-foundation"
-version = "0.1.0.dev1"
-description = "Portable contracts and planning tools for evidence-backed, domain-neutral matter assessments"
+version = "0.1.0.dev2"
+description = "Portable contracts and durable storage for evidence-backed, domain-neutral matter assessments"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
@@ -15,7 +15,7 @@ dependencies = ["jsonschema>=4.23,<5", "referencing>=0.35,<1"]
 matter = "matter.__main__:main"
 
 [tool.setuptools]
-packages = ["matter", "matter._schemas"]
+packages = ["matter", "matter._schemas", "matter.storage", "matter.storage.migrations"]
 
 [tool.setuptools.package-dir]
 "" = "src"
@@ -23,3 +23,4 @@ packages = ["matter", "matter._schemas"]
 
 [tool.setuptools.package-data]
 "matter._schemas" = ["*.schema.json"]
+"matter.storage.migrations" = ["*.sql"]

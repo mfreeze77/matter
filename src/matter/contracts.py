@@ -1,8 +1,8 @@
 """Portable Matter v1 structural validation and transport-neutral failures.
 
 Validation preserves input values and never checks the existence, authority,
-freshness, or truth of a referenced record. Those checks belong to the host and
-the future storage/rule implementations. Schema resources are bundled locally;
+freshness, or truth of a referenced record. Those checks belong to the host,
+storage, and rule implementations. Schema resources are bundled locally;
 validation does not fetch schema URLs or evidence locators over the network.
 """
 
@@ -198,7 +198,7 @@ def record_digest(value: Any) -> str:
 
 
 def command_digest(value: Any) -> str:
-    """Hash a validated command for a future idempotency journal."""
+    """Hash a validated command for the persistence idempotency journal."""
     command = validate_command(value)
     return canonical_digest(command, f"command.{command['operation']}.v1")
 
