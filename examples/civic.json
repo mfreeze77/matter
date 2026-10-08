@@ -1,0 +1,165 @@
+{
+  "schema_version": "1.0",
+  "name": "Civic project lifecycle",
+  "scope_id": "synthetic:civic",
+  "audience": "territory-monitor",
+  "description": "Synthetic reviewed civic evidence: a late-received authoritative disposition changes the current assessment of an earlier event, removes queued opportunity advice, and preserves later reopening. No legal-authority inference is performed.",
+  "events": [
+    {
+      "id": "agenda",
+      "source": "fixture",
+      "scope_id": "synthetic:civic",
+      "at": "2026-10-01T09:00:00Z",
+      "kind": "observation",
+      "matter_key": "project-development",
+      "occurrence_id": "meeting-1",
+      "classification": "routine",
+      "context_revision": "v1",
+      "condition_id": "condition-1",
+      "host_qualified": true,
+      "effective_at": "2026-10-01T09:00:00Z"
+    },
+    {
+      "id": "boundary-1",
+      "source": "fixture",
+      "scope_id": "synthetic:civic",
+      "at": "2026-10-01T09:01:00Z",
+      "kind": "delivery_boundary",
+      "matter_key": "project-development"
+    },
+    {
+      "id": "agenda-reprint",
+      "source": "reprint",
+      "scope_id": "synthetic:civic",
+      "at": "2026-10-01T09:02:00Z",
+      "kind": "observation",
+      "matter_key": "project-development",
+      "occurrence_id": "meeting-1",
+      "classification": "routine",
+      "context_revision": "v1",
+      "condition_id": "condition-1",
+      "host_qualified": true,
+      "effective_at": "2026-10-01T09:00:00Z"
+    },
+    {
+      "id": "budget",
+      "source": "fixture",
+      "scope_id": "synthetic:civic",
+      "at": "2026-10-01T09:03:00Z",
+      "kind": "observation",
+      "matter_key": "project-development",
+      "occurrence_id": "budget-action",
+      "classification": "routine",
+      "context_revision": "v1",
+      "condition_id": "condition-1",
+      "host_qualified": true,
+      "effective_at": "2026-10-01T09:03:00Z"
+    },
+    {
+      "id": "notice",
+      "source": "fixture",
+      "scope_id": "synthetic:civic",
+      "at": "2026-10-01T09:04:00Z",
+      "kind": "observation",
+      "matter_key": "project-development",
+      "occurrence_id": "purchasing-notice",
+      "classification": "material",
+      "context_revision": "v1",
+      "condition_id": "condition-1",
+      "host_qualified": true,
+      "effective_at": "2026-10-01T09:02:00Z"
+    },
+    {
+      "id": "cancellation",
+      "source": "fixture",
+      "scope_id": "synthetic:civic",
+      "at": "2026-10-01T09:07:00Z",
+      "kind": "observation",
+      "matter_key": "project-development",
+      "occurrence_id": "official-disposition",
+      "classification": "resolution",
+      "context_revision": "v1",
+      "condition_id": "condition-1",
+      "host_qualified": true,
+      "effective_at": "2026-10-01T09:03:00Z"
+    },
+    {
+      "id": "boundary-2",
+      "source": "fixture",
+      "scope_id": "synthetic:civic",
+      "at": "2026-10-01T09:08:00Z",
+      "kind": "delivery_boundary",
+      "matter_key": "project-development"
+    },
+    {
+      "id": "reissued",
+      "source": "fixture",
+      "scope_id": "synthetic:civic",
+      "at": "2026-10-01T09:10:00Z",
+      "kind": "observation",
+      "matter_key": "project-development",
+      "occurrence_id": "new-purchasing-notice",
+      "classification": "material",
+      "context_revision": "v1",
+      "condition_id": "condition-1",
+      "host_qualified": true,
+      "effective_at": "2026-10-01T09:09:00Z"
+    },
+    {
+      "id": "boundary-3",
+      "source": "fixture",
+      "scope_id": "synthetic:civic",
+      "at": "2026-10-01T09:11:00Z",
+      "kind": "delivery_boundary",
+      "matter_key": "project-development"
+    },
+    {
+      "id": "late-agenda",
+      "source": "fixture",
+      "scope_id": "synthetic:civic",
+      "at": "2026-10-01T09:12:00Z",
+      "kind": "observation",
+      "matter_key": "project-development",
+      "occurrence_id": "earlier-meeting",
+      "classification": "routine",
+      "context_revision": "v1",
+      "condition_id": "condition-1",
+      "host_qualified": true,
+      "effective_at": "2026-10-01T09:01:00Z"
+    },
+    {
+      "id": "boundary-4",
+      "source": "fixture",
+      "scope_id": "synthetic:civic",
+      "at": "2026-10-01T09:13:00Z",
+      "kind": "delivery_boundary",
+      "matter_key": "project-development"
+    }
+  ],
+  "expected": {
+    "outcomes": [
+      "recorded",
+      "quiet",
+      "correlated_report",
+      "recorded",
+      "eligible",
+      "resolved",
+      "quiet",
+      "eligible",
+      "delivered",
+      "historical_observation",
+      "quiet"
+    ],
+    "delivered_updates": 1,
+    "forwarded_controls": [],
+    "matters": {
+      "project-development": {
+        "status": "open",
+        "observations": 7,
+        "distinct_occurrences": 4,
+        "episodes": 2,
+        "queued_updates": 0
+      }
+    }
+  }
+}

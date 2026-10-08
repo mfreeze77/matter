@@ -1,0 +1,80 @@
+{
+  "id": "MAT-009",
+  "title": "Implement matter links, guarded merges, and reversible identity correction",
+  "track": "core",
+  "phase": 2,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "identity_corrections",
+  "depends_on": [
+    "MAT-005",
+    "MAT-007",
+    "MAT-008"
+  ],
+  "requirements": [
+    "CORE-08"
+  ],
+  "summary": "Provide independent relation and merge operations. Make identity mistakes recoverable, preserve conflicting children, and ensure a protected separation cannot be defeated by a later indirect merge.",
+  "in_scope": [
+    "Typed matter relationships",
+    "Guarded merge receipts and redirects",
+    "Undo/split and invalidation hooks"
+  ],
+  "out_of_scope": [
+    "Semantic proof of equivalence",
+    "Deleting evidence to force a clean merge"
+  ],
+  "implementation": [
+    "Validate relationship type, scope, and cycle rules independently from equivalence.",
+    "Plan merges against the full revision set and record every move, retained conflict, and redirect.",
+    "Enforce protected undo/separation decisions across complete merged groups.",
+    "Restore partitions through explicit correction receipts and emit identity dependency changes."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Related-to chains never become equivalence closures.",
+      "verification": "Create A-related-B-related-C and retain three identities."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "A merge preserves evidence, conflicts, redirects, and movement history.",
+      "verification": "Merge overlapping children and inspect all retained records."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Correction cannot be silently undone by replay or indirect merging.",
+      "verification": "Run merge, undo/split, transitive remerge, and stale retry scenarios."
+    }
+  ],
+  "artifacts": [
+    "src/matter/relations.py",
+    "src/matter/identity_corrections.py",
+    "tests/integration/test_merge_corrections.py"
+  ],
+  "tests": [
+    "Unauthorized cross-scope merge refuses atomically.",
+    "Colliding child evidence remains retained and explained.",
+    "Historical assessment shows its former merged view.",
+    "Concurrent merges cannot create redirect cycles."
+  ],
+  "risks": [
+    "Partial correction could restore IDs while leaving dependent references current."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/state-civics-ai/blob/a34fcec27f353187e7a23d54788b203d13ac87c1/services/local-accountability/sar_tracker/core_import/matters.py",
+      "application": "Inspect merge_blocker and merge receipts, including protected undo, before neutral reimplementation."
+    }
+  ],
+  "sources": [
+    "docs/contracts/core.md",
+    "matterjevmesh"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

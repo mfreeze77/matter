@@ -1,0 +1,81 @@
+{
+  "id": "MAT-077",
+  "title": "Harden package distribution, CI and reuse provenance",
+  "track": "operations",
+  "phase": 5,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "harden-package-distribution,-ci-and-reuse-provenance",
+  "depends_on": [
+    "MAT-025",
+    "MAT-032",
+    "MAT-038",
+    "MAT-074"
+  ],
+  "requirements": [
+    "OPS-06"
+  ],
+  "summary": "Turn the reference package into a reproducible developer dependency with documented support and automated checks. Preserve source and license provenance for harvested components and keep qualification fixtures distinct from private data.",
+  "in_scope": [
+    "Supported Python versions, package assets, CI matrix and reproducible build evidence.",
+    "Third-party source/license inventory and dependency update checks."
+  ],
+  "out_of_scope": [
+    "Deploying or modifying a downstream project as part of this planning ticket without that implementation task.",
+    "Treating synthetic checks as evidence of live provider or user outcomes."
+  ],
+  "implementation": [
+    "Extend the scaffold checks to production schemas, runtime tests, public conformance fixtures and packaging installation from built artifacts.",
+    "Record exact reused components, licenses, local adaptations and upstream versions.",
+    "Verify installation and operation from a clean environment without accidental checkout-only dependencies or private files."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "The built artifact contains all promised public schemas and runs supported operations outside the source checkout.",
+      "verification": "Build and install in a fresh environment and execute documented SDK examples against packaged assets."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "CI catches a broken ticket graph, contract regression and dependency compatibility failure.",
+      "verification": "Introduce controlled mutations in a temporary test branch or local workflow equivalent and record the expected failing checks."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "The distribution excludes private corpus material, credentials and unreviewed copied source.",
+      "verification": "Inspect archive contents and compare the source/license manifest to every vendored or adapted component."
+    }
+  ],
+  "artifacts": [
+    "pyproject.toml",
+    ".github/workflows/validate.yml",
+    "docs/reuse/inventory.json",
+    "tests/packaging/"
+  ],
+  "tests": [
+    "Wheel installed without repository-relative files.",
+    "Unsupported Python version and absent optional provider dependency.",
+    "Dependency upgrade changes response validation behavior."
+  ],
+  "risks": [
+    "A passing checkout test can conceal missing package assets.",
+    "Upstream license or interface changes can invalidate a reuse assumption."
+  ],
+  "reuse": [
+    {
+      "source": "matterbrainstormspec and matterjevmesh",
+      "application": "Preserve the explicit scope, provenance, qualification, and evidence boundaries in the governing contracts."
+    }
+  ],
+  "sources": [
+    "matterbrainstormspec",
+    "matterjevmesh",
+    "docs/architecture.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

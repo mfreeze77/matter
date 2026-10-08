@@ -1,0 +1,100 @@
+{
+  "id": "MAT-046",
+  "title": "Define civic profile and authority-manifest contracts",
+  "track": "civic",
+  "phase": 2,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "profiles.civic.contracts",
+  "depends_on": [
+    "MAT-001",
+    "MAT-002",
+    "MAT-012",
+    "MAT-013"
+  ],
+  "requirements": [
+    "CIV-01",
+    "CIV-02",
+    "CIV-05",
+    "CIV-08"
+  ],
+  "summary": "Specify and implement the neutral validation boundary for versioned civic profiles carrying jurisdiction/body applicability, source stages, scoped capability assertions and reviewed-host authority references. Matter checks integrity and applicability; it does not decide which body has legal power.",
+  "in_scope": [
+    "Manifest identity/hash and compatibility",
+    "Body/category/effective-period capabilities and uncertainty",
+    "Parent profile references and narrow overrides",
+    "Source and host-attestation provenance"
+  ],
+  "out_of_scope": [
+    "Hard-coded Kansas/parliamentary law in the core",
+    "Automatic acceptance of crawler final/recommendation parsing labels",
+    "Changes to a receiving civic authority registry"
+  ],
+  "implementation": [
+    "Define the JSON Schema and domain adapter types over the common profile contract; include producer/code/schema digest, scope, effective/available-at clocks, source stages and declared capability meanings.",
+    "Define authority assertions with source links and distinct unreviewed, supported-source, reviewed-host, disputed, withdrawn and unknown dispositions; review state requires a verifiable host attestation reference.",
+    "Resolve exact pinned parent/override chains with explicit applicability and conflict rules; reject cycles, missing parents and equally applicable conflicting overrides rather than choosing the most permissive value.",
+    "Supply invented profiles for recommendation-only, act-specific final capacity, unknown capacity and a body that changes during a joint recording; document unsupported rules.",
+    "Keep legal categories in domain payloads while the core retains neutral rule/dependency interfaces."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A parser-only final tag never satisfies a reviewed-authority requirement.",
+      "verification": "Run synthetic manifest/assessment fixtures where identical motion text is evaluated with missing, unreviewed and reviewed authority; only the reviewed applicable case can propose the corresponding host action."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Override resolution is deterministic, time/scoped and conflict-preserving.",
+      "verification": "Replay the same profiles with shuffled input order, out-of-period review and conflicting body/category scopes; exact decisions/digests match and conflicts remain named."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "The neutral Matter package imports and runs without crawler, DIAT or civic enumerations.",
+      "verification": "Use the core conformance suite and a dependency-boundary test with the civic adapter excluded."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Every accepted manifest is content-bound and refuses broken parent/review references.",
+      "verification": "Mutate parent digest, source hash and attestation scope independently and verify named refusal before assessment."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/matter:schemas/profiles/civic-profile.v1.schema.json",
+    "mfreeze77/matter:src/matter/profiles/civic.py",
+    "mfreeze77/matter:examples/profiles/civic/",
+    "mfreeze77/matter:docs/profiles/civic.md"
+  ],
+  "tests": [
+    "Recommendation versus final authority for the same act",
+    "Same body with different powers for different categories",
+    "Joint-sitting body change mid-recording",
+    "Missing parent, conflicting override, future review and withdrawn attestation"
+  ],
+  "risks": [
+    "A universal numeric tier would misrepresent act-specific authority.",
+    "Existing sample-derived crawler schemas are looser than the intended Matter contract."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/src/civic_crawler/jurisdictions/ks/ks_county_wyandotte/definition.json",
+      "application": "Reuse body/source/alias concepts, preserving source basis instead of copying jurisdiction policy into Matter."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-087-source-backed-motion-intent-and-vote-mechanics.md",
+      "application": "Retain the explicit boundary between parsing a motion and receiver/operator authority."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/src/civic_crawler/jurisdictions/ks/ks_county_wyandotte/minutes.json",
+    "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-104-related-jurisdiction-and-authority-relationships.md",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

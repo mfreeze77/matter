@@ -1,0 +1,81 @@
+{
+  "id": "MAT-079",
+  "title": "Define scoped rollout, rollback and recovery procedures",
+  "track": "operations",
+  "phase": 5,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "define-scoped-rollout,-rollback-and-recovery-procedures",
+  "depends_on": [
+    "MAT-003",
+    "MAT-021",
+    "MAT-071",
+    "MAT-073",
+    "MAT-076"
+  ],
+  "requirements": [
+    "OPS-08"
+  ],
+  "summary": "Make integration reversible and observable at the host boundary. New profile or evaluator behavior should enter through recorded shadow and narrowly scoped modes, with pending advice and data migrations handled explicitly during rollback.",
+  "in_scope": [
+    "Shadow/advisory enablement modes, per-scope rollout and compatibility checks.",
+    "Recovery from process failure, stale work and version rollback."
+  ],
+  "out_of_scope": [
+    "Deploying or modifying a downstream project as part of this planning ticket without that implementation task.",
+    "Treating synthetic checks as evidence of live provider or user outcomes."
+  ],
+  "implementation": [
+    "Define host-owned flags and supported state transitions between disabled, shadow and advisory operation.",
+    "Tie active workers and queued contributions to effective versions; reject work prepared under an incompatible rolled-back version.",
+    "Write executable recovery and rollback procedures against an isolated host fixture before any real deployment task."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Disabling a scope prevents new advisory delivery while preserving auditable observations and prior receipts under its policy.",
+      "verification": "Disable between assessment and dispatch and verify the pending operation obeys the declared cutoff."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Rollback does not reinterpret historical judgments as if the older policy produced them.",
+      "verification": "Prepare assessments under two versions, roll back and inspect immutable history plus current eligibility."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Interrupted processing resumes without duplicate state transitions or falsely confirmed delivery.",
+      "verification": "Terminate at declared commit/lease/send boundaries and compare recovered state with a serial reference episode."
+    }
+  ],
+  "artifacts": [
+    "docs/operations/rollout.md",
+    "docs/operations/recovery.md",
+    "tests/integration/test_rollout.py"
+  ],
+  "tests": [
+    "Worker lease expires after source correction.",
+    "Ambiguous external send during rollback.",
+    "Database migration fails before activation."
+  ],
+  "risks": [
+    "A rollback can leave stale pending messages outside the new process.",
+    "Recovery commands must reflect the actual host installation rather than an assumed deployment."
+  ],
+  "reuse": [
+    {
+      "source": "matterbrainstormspec and matterjevmesh",
+      "application": "Preserve the explicit scope, provenance, qualification, and evidence boundaries in the governing contracts."
+    }
+  ],
+  "sources": [
+    "matterbrainstormspec",
+    "matterjevmesh",
+    "docs/architecture.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "id": "MAT-049",
+  "title": "Assess civic developments by purpose and meaningful audience change",
+  "track": "civic",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "profiles.civic.assessment_attention",
+  "depends_on": [
+    "MAT-001",
+    "MAT-015",
+    "MAT-016",
+    "MAT-017",
+    "MAT-018",
+    "MAT-019",
+    "MAT-021",
+    "MAT-048"
+  ],
+  "requirements": [
+    "CIV-01",
+    "CIV-05",
+    "CIV-06",
+    "CIV-09"
+  ],
+  "summary": "Compose source-backed civic stage assessments with explicit research, monitored-action or opportunity objectives, then deliver only an actionable or meaningfully changed assessment to the correct audience. Audience preferences never alter underlying facts or authority.",
+  "in_scope": [
+    "Purpose-specific assessment rules",
+    "Funding/purchasing/deadline consequences",
+    "Per-audience previous-assessment comparison",
+    "Quiet, digest, correction and concrete decision-request reasons"
+  ],
+  "out_of_scope": [
+    "A universal civic importance or legal-confidence score",
+    "Sending external notifications during implementation",
+    "Treating every incomplete assessment as a question for the user"
+  ],
+  "implementation": [
+    "Define purpose inputs for monitored subjects, territory/service match, responsible owner, deadlines and known dispositions, with versioned field meanings and source provenance.",
+    "Compose stage/evidence/authority conclusions first; evaluate objective consequences separately and record the inputs responsible for each difference.",
+    "Compare with the last applicable assessment delivered to the same audience, including corrections and changed authority/source coverage; reused assessments retain their original evidence identity.",
+    "Apply named attention treatments and withholding reasons; missing information becomes a bounded evidence request or unresolved status unless a concrete human decision is required.",
+    "Revalidate source/profile/assessment freshness immediately before existing delivery handoff and preserve delivery/consumption/action distinctions."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Two audiences can receive different attention from identical civic evidence without divergent source facts.",
+      "verification": "Run researcher and service-fit audience fixtures and compare their shared factual assessment digest and separate consequence/delivery receipts."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Only a changed actionable predicate, correction or declared boundary creates a repeat update.",
+      "verification": "Replay repeated agenda references, new solicitation deadline and later cancellation; verify the notification sequence and quiet reasons."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Missing authority or source coverage does not become an approval claim or automatic user request.",
+      "verification": "Use unavailable evidence and unreviewed authority controls; inspect unresolved and permitted-next-read output."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "A correction queued against obsolete evidence is withheld or regenerated before emission.",
+      "verification": "Change the relevant source/profile between selection and delivery and check the dependency/freshness receipt."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/matter:src/matter/profiles/civic_assessment.py",
+    "mfreeze77/matter:examples/civic/purpose-comparison/",
+    "mfreeze77/matter:docs/profiles/civic-attention.md",
+    "mfreeze77/matter:tests/integration/test_civic_attention.py"
+  ],
+  "tests": [
+    "Same project inside versus outside audience territory",
+    "Budget discussion without approved allocation",
+    "New purchasing deadline already handled by assigned owner",
+    "Cancellation after an earlier delivered opportunity",
+    "Unchanged event repeated through another source"
+  ],
+  "risks": [
+    "Service-fit preferences can contaminate source interpretation if evaluated in the same unstructured prompt.",
+    "Too-aggressive quietness can hide a corrected prior claim."
+  ],
+  "reuse": [
+    {
+      "source": "matterbrainstormspec",
+      "application": "Retain matter versus purpose/audience assessment as the domain-independent design boundary."
+    },
+    {
+      "source": "jevinmatter",
+      "application": "Use the hypothetical access-control project progression only as an invented conformance scenario."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-090-matter-identity-case-parties-and-lifecycle-exports.md",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

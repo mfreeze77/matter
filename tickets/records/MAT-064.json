@@ -1,0 +1,105 @@
+{
+  "id": "MAT-064",
+  "title": "Create independent meeting labels and useful-attention outcomes",
+  "track": "diat",
+  "phase": 2,
+  "priority": "P0",
+  "status": "planned",
+  "type": "qualification",
+  "owner_repo": "mfreeze77/statecivicsai-diat",
+  "component": "experiments.meeting_matter.annotation_outcomes",
+  "depends_on": [
+    "MAT-001",
+    "MAT-051",
+    "MAT-052"
+  ],
+  "requirements": [
+    "DIAT-02",
+    "DIAT-04",
+    "DIAT-05",
+    "DIAT-06",
+    "DIAT-13",
+    "DIAT-14",
+    "DIAT-16",
+    "DIAT-18"
+  ],
+  "summary": "Define and collect independently reviewed outcomes for anonymous consistency, procedure/floor/agenda transitions, fixed-pool identity decisions and useful attention. Machine hypotheses are not labels; uncertain/unresolvable cases and quiet misses remain visible.",
+  "in_scope": [
+    "Annotation guide and reviewer data boundaries",
+    "Independent double review/adjudication",
+    "Per-task metrics and grouped uncertainty",
+    "Useful/late/repeated/missed hint outcomes"
+  ],
+  "out_of_scope": [
+    "Using upstream accepted/reviewed machine status as gold",
+    "Hiding disputed labels or selecting only easy recurring speakers",
+    "Treating emitted hints as proven consumed/actionable"
+  ],
+  "implementation": [
+    "Write an annotation guide defining tasks, available evidence, temporal mode, uncertain/unresolvable outcomes and source-span labeling; freeze it before held-out inference.",
+    "Prepare separate reviewer packages from private sources with randomized case ordering and no experimental predicted answers; record reviewer identity/process and disagreements.",
+    "Collect independent floor/role/agenda and anonymous track-consistency labels plus verified identity labels only where separately supportable; adjudicate without silently forcing consensus.",
+    "Define useful attention as an evidenced contribution to a next check/decision, distinct from emission/consumption/action; review a sample of quiet cases for missed intervention.",
+    "Compute per-meeting/provenance-group quality, agreement and uncertainty and report sample support for unknown guests, overlaps, chair changes, shared mics and procedural exceptions.",
+    "Prepare independent annotation and report formats using existing DIAT tooling without waiting for the full generic evaluator; integrated comparisons remain gated by MAT-062 and its common split, outcome and leakage prerequisites."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Reviewer labels are physically separate and cannot be read by the experiment builder or runner.",
+      "verification": "Run interface and sentinel checks before inference and verify labels are loaded only by the authorized reporting stage."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Disagreement and unresolvable outcomes survive annotation and reporting.",
+      "verification": "Use conflicting reviewer examples and inspect both raw labels, adjudication reasons and excluded/unknown denominators."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Metrics separate anonymous consistency, identity, procedure and attention.",
+      "verification": "Generate a report where these outcomes disagree and verify no single aggregate hides the distinction."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Usefulness claims include quiet-case misses, timing and observed action scope.",
+      "verification": "Review emitted and withheld sample episodes with source evidence and record consumed/actioned/unknown independently."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/statecivicsai-diat:docs/research/meeting-annotation-guide.md (proposed)",
+    "mfreeze77/statecivicsai-diat:data/meeting-matter/labels/<version>/ (private)",
+    "mfreeze77/statecivicsai-diat:src/speaker_identity/experiments/meeting_matter/report.py (proposed)",
+    "mfreeze77/statecivicsai-diat:examples/meeting-matter/labels.template.json (empty invented template)"
+  ],
+  "tests": [
+    "Two reviewers disagree about a chair handoff",
+    "Track contains multiple voices",
+    "Unknown guest absent from roster",
+    "Hint repeats what an agent/reviewer already knew",
+    "Quiet case contains a real missed contradiction",
+    "Emitted result with unknown consumption"
+  ],
+  "risks": [
+    "Human labels may be uncertain even with source audio.",
+    "Familiar reviewers may recognize recurring people from context, so blind versus identity-enabled tasks need separate labels."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/identity-context-evaluation.md",
+      "application": "Reuse report-only ground truth, explicit execution mode and immutable package/label digests."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/meeting-handoff.md",
+      "application": "Reuse the separate empty labels template and source-view caveats."
+    }
+  ],
+  "sources": [
+    "jevinmatter: anonymous consistency/procedural-switching success criteria.",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

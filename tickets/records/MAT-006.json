@@ -1,0 +1,79 @@
+{
+  "id": "MAT-006",
+  "title": "Track occurrences and evidence dependence separately from observations",
+  "track": "core",
+  "phase": 1,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "occurrences",
+  "depends_on": [
+    "MAT-004",
+    "MAT-005"
+  ],
+  "requirements": [
+    "CORE-05"
+  ],
+  "summary": "Represent the happenings described by evidence without imposing one occurrence per observation. Preserve dependence groups so copied interpretations do not become independent confirmations and repeated real events do not disappear as duplicates.",
+  "in_scope": [
+    "Optional many-to-many occurrence membership",
+    "Revisioned grouping corrections",
+    "Distinct counts and provenance groups"
+  ],
+  "out_of_scope": [
+    "Acoustic matching",
+    "Inferring independence from different wording"
+  ],
+  "implementation": [
+    "Define occurrence references and adapter-owned execution/event keys.",
+    "Implement accepted membership with revision checks and correction history.",
+    "Track derivation parents and evidence-dependence groups separately from occurrence identity.",
+    "Expose named observation, occurrence, and provenance-group counts with coverage."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A log and report of one execution remain two observations and one occurrence.",
+      "verification": "Load shared-execution fixtures and inspect each count."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Identical diagnostics from a new execution increase recurrence without proving cause.",
+      "verification": "Compare occurrence and claim-evidence metrics before and after the run."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Grouping corrections preserve original reports and revise dependent counts.",
+      "verification": "Split a mistaken grouping and inspect change receipts."
+    }
+  ],
+  "artifacts": [
+    "src/matter/occurrences.py",
+    "src/matter/provenance_groups.py",
+    "tests/unit/test_occurrence_counts.py"
+  ],
+  "tests": [
+    "A derived summary adds no independent provenance group.",
+    "A standing requirement can describe zero occurrences.",
+    "One source can describe several happenings.",
+    "Separate reproductions stay distinct despite identical text."
+  ],
+  "risks": [
+    "Overgrouping hides recurrence; undergrouping manufactures corroboration."
+  ],
+  "reuse": [
+    {
+      "source": "matterjevmesh",
+      "application": "Implement the explicit report/occurrence/corroboration distinctions."
+    }
+  ],
+  "sources": [
+    "docs/contracts/core.md",
+    "matterjevmesh"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

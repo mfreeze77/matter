@@ -1,0 +1,130 @@
+{
+  "id": "MAT-068",
+  "title": "Adapt bounded claim-specific evidence and assessments into Matter",
+  "track": "oil",
+  "phase": 5,
+  "priority": "P0",
+  "status": "planned",
+  "type": "integration",
+  "owner_repo": "mfreeze77/oil",
+  "component": "watcher.matter_assessment",
+  "depends_on": [
+    "MAT-001",
+    "MAT-007",
+    "MAT-010",
+    "MAT-012",
+    "MAT-014",
+    "MAT-015",
+    "MAT-027",
+    "MAT-028",
+    "MAT-029",
+    "MAT-032",
+    "MAT-066",
+    "MAT-067"
+  ],
+  "requirements": [
+    "OIL-04",
+    "OIL-06",
+    "OIL-11",
+    "OIL-13",
+    "OIL-14"
+  ],
+  "summary": "Reuse IO2-142 and the existing cognition/evaluator clients to prepare bounded per-proposition Matter assessments. Bind every question and result to the actual admitted evidence, source versions, scope, coverage, sharing policy and evaluator identity; cache unchanged valid work and leave optional research detached.",
+  "in_scope": [
+    "Claim-specific code/docs/skills/tests/config evidence domains",
+    "NarrowState/JudgmentEvidenceSource and final-payload adaptation",
+    "Packet hashes, citation ownership, read dependencies, coverage and availability cuts",
+    "Existing evaluator/provider client reuse and deterministic recorded-result mode",
+    "Targeted semantic cache invalidation and bounded optional investigation handoff"
+  ],
+  "out_of_scope": [
+    "A new repository evidence graph or unrestricted model browsing",
+    "Automatic trust promotion or model-written scope/intent",
+    "Assuming unavailable evidence is a negative finding",
+    "Real provider evaluation or production integration in this scaffold",
+    "Making model availability mandatory for deterministic matter maintenance"
+  ],
+  "implementation": [
+    "Define the Oil assessment adapter over MAT-027/028 question and packet contracts. Each request names one proposition or explicit comparison, claim kind, applicable rule/profile, source and audience/purpose versions, availability cut, completeness/omissions and admitted content digest.",
+    "Translate IO2-142 domain preparation and NarrowState/JudgmentEvidenceSource results without expanding the final admitted scope. Reuse named ticket paths, repository profiles and existing EXAIS/cognition clients; preserve pathless/refused-owner conservative behavior and provider sharing restrictions.",
+    "Map actual final request/citation bytes into evidence receipts, including source snapshot identity, excerpt ranges, per-claim ownership and absence coverage. Register content dependencies and complete-scope absence watches in the operational namespace so later relevant evidence invalidates the result.",
+    "Invoke the existing evaluator clients through the Matter question/provider seam with pinned contract/model settings and bounded batches. Validate that results bind the exact packet, claim and admitted citations; return named unavailable/contract-mismatch/unknown states instead of retrying unboundedly.",
+    "Cache results by semantic packet and evaluator/rule identity. Reuse unchanged valid judgments across renderings and timer ticks; source, coverage, rule or relevant purpose changes invalidate only affected work. Do not mix actor intent, prior generated advice or unrelated working beliefs into a narrow evidence question.",
+    "Provide an optional bounded investigation request through the existing coordinator/session seam when a named missing fact could alter a decision. Bind allowed paths/scope, read/call/byte/deadline budgets and stopping conditions; persistence and deterministic lifecycle must succeed with this facility disabled."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Each assessment is bound to the exact admitted claim-specific payload and cannot cite refused, future or unadmitted evidence.",
+      "verification": "Use citation-present, citation-missing, code-contradiction, pathless-owner, refused-owner and future-available fixtures; independently mutate final payload/citation ownership and verify named refusal or incomplete outcome."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Unchanged semantic packets reuse valid judgments, while changed relevant source or absence coverage invalidates dependent assessments and pending attention.",
+      "verification": "Replay identical packets under timer/render/session changes, then modify a cited file and add previously absent in-scope evidence; assert unchanged cases make zero extra evaluator calls and changed cases invalidate the appropriate dependency chain."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Every evaluator/investigation path stays within declared sharing, byte, call and elapsed-time budgets and fails without blocking ordinary host work.",
+      "verification": "Run deterministic fake-provider oversize/refusal/timeout/cancellation scenarios and local-only evidence cases; inspect request receipts, budget accounting and hook latency without requiring a paid provider."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "The adapter works in a provider-disabled profile and does not convert interpretation into accepted authority.",
+      "verification": "Run deterministic failure/recovery episodes with all provider clients unavailable; assert lifecycle and quiet/eligible decisions still operate, semantic status remains explicit unknown, and ledger authority/projection is unchanged."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/oil:src/intent_oil/watcher/matter_assessment.py (proposed)",
+    "mfreeze77/oil:src/intent_oil/cognition_context.py (planned packet reuse seam)",
+    "mfreeze77/oil:tests/test_matter_claim_evidence_adapter.py (proposed)",
+    "mfreeze77/oil:tests/test_matter_assessment_invalidation.py (proposed)",
+    "mfreeze77/oil:docs/MATTER_INTEGRATION.md (proposed evidence and provider contract)"
+  ],
+  "tests": [
+    "Documentation rule with relevant docs versus unrelated code-only evidence",
+    "Citation present/missing, code contradiction, refused/pathless owner and unavailable graph coverage",
+    "Batch contains multiple claims with independent admitted citation ownership",
+    "Known absent source becomes available after assessment",
+    "Provider tries unapproved evidence or claims a citation outside the final packet",
+    "Timer/render replay reuses unchanged assessment; source/rule change recomputes only affected work",
+    "Provider-disabled deterministic capture/recovery and bounded investigation timeout"
+  ],
+  "risks": [
+    "Reusing a prepared context before its final filtering/byte cut can falsely advertise evidence that the evaluator never saw.",
+    "Missing coverage dependencies allow an apparently negative judgment to remain current after relevant evidence arrives.",
+    "Wrapping providers twice can duplicate cost, receipt ownership and retries unless the existing client remains the invocation owner.",
+    "Model confidence and diagnostic margins are not calibrated authority or a universal matter priority."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/tickets/IO2-142-claim-specific-evidence-domains.md",
+      "application": "Reuse bounded domain preparation, honest absence/coverage, final-payload and native caller controls; retain its open real-provider acceptance cases."
+    },
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_context.py",
+      "application": "Use NarrowState/JudgmentEvidenceSource and bounded context admission rather than constructing a second evidence graph."
+    },
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_engine.py",
+      "application": "Reuse existing evaluator invocation/result contracts and attach explicit operational dependency receipts."
+    },
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_session.py",
+      "application": "Reuse the opt-in bounded local research seam with replay restrictions and no changes to native hook authority."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/tickets/IO2-142-claim-specific-evidence-domains.md",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_context.py",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_engine.py",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_session.py",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_types.py",
+    "User's active Matter build request, 2026-10-08: repurpose durable matters to absorb annoying live agent-session input until a material development warrants attention; complete the scaffold/specification/roadmap, without implementing downstream integrations.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (design notes, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

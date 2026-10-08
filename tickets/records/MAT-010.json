@@ -1,0 +1,84 @@
+{
+  "id": "MAT-010",
+  "title": "Represent time, source coverage, and explicit negative evidence scopes",
+  "track": "core",
+  "phase": 1,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "time_coverage",
+  "depends_on": [
+    "MAT-003",
+    "MAT-004",
+    "MAT-006",
+    "MAT-007"
+  ],
+  "requirements": [
+    "CORE-09"
+  ],
+  "summary": "Build temporal and coverage primitives for historical assessment and missing-event rules. Failed collection and incomplete coverage must remain visible so the system cannot confuse no observation with verified absence.",
+  "in_scope": [
+    "Time intervals and knowledge boundaries",
+    "Coverage snapshots and negative watches",
+    "Replacement versus incremental semantics"
+  ],
+  "out_of_scope": [
+    "Domain calendars and statutory rules",
+    "Global background scanning"
+  ],
+  "implementation": [
+    "Validate explicit time fields without substituting ingestion for unknown event time.",
+    "Represent source/query coverage by source set, interval, snapshot/catalog revision, completeness, and failure reasons.",
+    "Register negative scopes using typed predicates, knowledge boundaries, and expiry.",
+    "Permit retirement only under a declared complete replacement scope; retain prior state on failed or partial empty input."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Late-discovered evidence is excluded from earlier knowledge views while retaining past effective time.",
+      "verification": "Query one corpus at two availability boundaries."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Incomplete empty sources cannot establish absence or retire facts.",
+      "verification": "Compare complete, partial, failed, and not-yet-expected snapshots."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "New eligible evidence matches a negative watch despite having an unknown original ID.",
+      "verification": "Insert matching and unrelated records and inspect change signals."
+    }
+  ],
+  "artifacts": [
+    "src/matter/time.py",
+    "src/matter/coverage.py",
+    "src/matter/negative_dependencies.py",
+    "tests/unit/test_knowledge_time.py",
+    "tests/integration/test_absence_coverage.py"
+  ],
+  "tests": [
+    "Late cancellation revises current understanding without rewriting yesterday.",
+    "Clock progression does not invent an event.",
+    "Unrelated arrivals do not invalidate narrow absence scopes.",
+    "Incremental silence leaves the matter unresolved."
+  ],
+  "risks": [
+    "Treating complete-snapshot omission as universal deletion would corrupt live-stream lifecycle."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/state-civics-ai/blob/a34fcec27f353187e7a23d54788b203d13ac87c1/services/local-accountability/sar_tracker/core_import/matters.py",
+      "application": "Retain retirement only where complete-scope assumptions are explicitly established."
+    }
+  ],
+  "sources": [
+    "docs/contracts/core.md",
+    "docs/contracts/lifecycle.md",
+    "matterjevmesh"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

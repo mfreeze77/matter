@@ -1,0 +1,83 @@
+{
+  "id": "MAT-015",
+  "title": "Commit revision-bound assessments and reusable semantic caches",
+  "track": "rules",
+  "phase": 2,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "assessments",
+  "depends_on": [
+    "MAT-003",
+    "MAT-008",
+    "MAT-010",
+    "MAT-013",
+    "MAT-014"
+  ],
+  "requirements": [
+    "CORE-14"
+  ],
+  "summary": "Make assessment the durable unit of computation. Record component results and context, reusing unchanged evidence judgments across audiences or clock movement only when their declared inputs remain equivalent.",
+  "in_scope": [
+    "Assessment operation and immutable projections",
+    "Semantic cache keys and qualification-aware reuse",
+    "Material-change cause classification"
+  ],
+  "out_of_scope": [
+    "Audience transport",
+    "Learned importance calibration"
+  ],
+  "implementation": [
+    "Construct input from consistent matter, evidence, candidate-set, profile, and context reads.",
+    "Compose conclusions, gaps, dimensions, and permitted proposals with exact receipts.",
+    "Key caches by semantic dependencies and temporal equivalence, excluding irrelevant delivery wrappers.",
+    "Check all revisions, negative scopes, and epoch at commit; retain stale attempts as non-current."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Stale input prevents assessment from becoming current.",
+      "verification": "Pause evaluation, change evidence, then attempt commit."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Audience-independent evidence can be reused while audience-sensitive judgment cannot.",
+      "verification": "Inspect invocation counts and manifests across two audiences."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Policy change and external evidence change have different cause labels.",
+      "verification": "Reassess fixed evidence under new policy, then new evidence under fixed policy."
+    }
+  ],
+  "artifacts": [
+    "src/matter/assessments.py",
+    "src/matter/cache.py",
+    "tests/integration/test_assessment_commit.py"
+  ],
+  "tests": [
+    "Title changes invalidate only consumers of title.",
+    "Deadline crossing reuses unchanged semantic support.",
+    "Expired qualification is not revived by cache.",
+    "Cached unknown remains unknown."
+  ],
+  "risks": [
+    "An incomplete cache key can reuse judgments under changed meanings or coverage."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_store.py",
+      "application": "Adapt version-checked derived state into immutable neutral assessments and caches."
+    }
+  ],
+  "sources": [
+    "docs/contracts/rules.md",
+    "matterjevmesh",
+    "docs/contracts/core.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

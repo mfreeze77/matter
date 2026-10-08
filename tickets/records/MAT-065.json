@@ -1,0 +1,119 @@
+{
+  "id": "MAT-065",
+  "title": "Maintain fingerprint qualification, drift and reference revocation",
+  "track": "diat",
+  "phase": 5,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/statecivicsai-diat",
+  "component": "experiments.meeting_matter.maintenance",
+  "depends_on": [
+    "MAT-001",
+    "MAT-016",
+    "MAT-021",
+    "MAT-025",
+    "MAT-031",
+    "MAT-040",
+    "MAT-045",
+    "MAT-055",
+    "MAT-056",
+    "MAT-061",
+    "MAT-062",
+    "MAT-063",
+    "MAT-064"
+  ],
+  "requirements": [
+    "DIAT-01",
+    "DIAT-04",
+    "DIAT-07",
+    "DIAT-08",
+    "DIAT-13",
+    "DIAT-15",
+    "DIAT-17",
+    "DIAT-18"
+  ],
+  "summary": "Maintain only applicable, source-linked experimental fingerprints and assessments as rosters, rooms, microphones, questions, models and reference permissions change. Revocation invalidates affected future hints while historical receipts remain reproducible; no automatic enrollment or threshold relaxation follows.",
+  "in_scope": [
+    "Corpus/profile/model/question version compatibility",
+    "Roster/chair/channel/coverage drift",
+    "Reference/source revocation and correction dependencies",
+    "Private pilot qualification/rollback receipts"
+  ],
+  "out_of_scope": [
+    "Automatic production retraining, deployment or identity policy changes",
+    "Deleting original evidence because an experimental matter resolved",
+    "Treating expired qualification as valid through cache reuse"
+  ],
+  "implementation": [
+    "Define profile compatibility keys covering corpus/provenance map, source references, roster/role regime, extractor/model/question/threshold versions and supported population/time scope.",
+    "Detect bounded changes in feature availability and distributions by meeting/role/channel; record drift and propose requalification instead of silently widening applicability or relaxing confidence thresholds.",
+    "Apply source corrections and revoked reference samples through dependency invalidation; prevent them entering future profiles/packets and withdraw or regenerate pending private attention.",
+    "Preserve old assessment/package/configuration receipts and reference dispositions so historical results remain inspectable; separately record privacy/retention actions under the domain's approved policy.",
+    "Create a staged pilot qualification and rollback receipt with executed/unrun checks, quality/cost/coverage deltas and explicit operator scope for any future real inference; production remains untouched."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A revoked sample cannot support new or queued assessments while historical receipts retain the original evidence basis.",
+      "verification": "Revoke a shared reference after assessment selection and verify dependency invalidation, no fresh use and preserved historical manifests."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Expired, mismatched or failed qualification cannot be bypassed by a cached model result.",
+      "verification": "Replay cached answers across question/model/profile changes and inspect named unqualified outcomes."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Chair/channel/roster drift creates explicit regime/requalification state rather than automatic identity changes.",
+      "verification": "Run controlled profile shifts and compare production state digests and experimental eligibility."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "The maintenance report separates readiness, inference execution and actual production scope.",
+      "verification": "Inspect a pilot receipt with no deployment and verify every future integration gate remains explicitly pending."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/statecivicsai-diat:src/speaker_identity/experiments/meeting_matter/maintenance.py (proposed)",
+    "mfreeze77/statecivicsai-diat:docs/research/meeting-profile-maintenance.md (proposed)",
+    "mfreeze77/statecivicsai-diat:data/meeting-matter/qualification/<run>/ (private)",
+    "mfreeze77/statecivicsai-diat:tests/test_meeting_profile_revocation.py (proposed)"
+  ],
+  "tests": [
+    "Reference revoked through a transitive provenance group",
+    "Model alias resolves to a changed version",
+    "Chair or roster turnover with the same committee name",
+    "Room/mic change reduces feature coverage",
+    "Changed question keeps output type but changes semantics",
+    "Cached answer against withdrawn profile",
+    "Private retention action preserves required audit disposition"
+  ],
+  "risks": [
+    "Long-lived profiles may outlast their corpus or authority assumptions.",
+    "Drift detection can over-trigger on small samples or miss channel-specific failures."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/README.md",
+      "application": "Reuse immutable decisions/profile version and revocation provenance concepts without modifying enrollment."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/identity-context-evaluation.md",
+      "application": "Retain frozen run/configuration hashes and execution-mode distinctions."
+    },
+    {
+      "source": "MAT-016 and MAT-031",
+      "application": "Use shared dependency invalidation and qualification applicability rather than a second lifecycle authority."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/src/speaker_identity/behavior/profiles.py",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

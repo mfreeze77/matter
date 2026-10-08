@@ -1,0 +1,93 @@
+{
+  "id": "MAT-043",
+  "title": "Qualify availability, latency and concurrent completion behavior",
+  "track": "evaluation",
+  "phase": 4,
+  "priority": "P0",
+  "status": "planned",
+  "type": "qualification",
+  "owner_repo": "mfreeze77/matter",
+  "component": "evaluation/interleavings",
+  "depends_on": [
+    "MAT-039",
+    "MAT-042",
+    "MAT-010",
+    "MAT-011",
+    "MAT-016",
+    "MAT-020",
+    "MAT-021",
+    "MAT-024"
+  ],
+  "requirements": [
+    "EVAL-09",
+    "EVAL-13",
+    "JEV-06",
+    "JEV-14"
+  ],
+  "summary": "Test the timing risks that chronological stepwise replay cannot establish. Interleave source changes, recovery, task switches, controls and provider completion under controlled clocks, while retaining historical evidence and rejecting results no longer eligible to affect the current assessment.",
+  "in_scope": [
+    "Deterministic schedule injection and stale-result qualification",
+    "Availability versus event time and delivery-race evidence"
+  ],
+  "out_of_scope": [
+    "Claims that time-gated inputs prove model ignorance of future facts",
+    "Extrapolating simulated latency as measured live performance"
+  ],
+  "implementation": [
+    "Create an interleaving harness with dispatch, publication, completion, commit and delivery events whose order can be varied reproducibly.",
+    "Inject source revision changes, matched recovery, accepted control updates, task cancellation and new assessment versions while a provider call is outstanding.",
+    "Require admission and final delivery to compare captured read versions, scope and current authority; preserve rejected late results as history.",
+    "Measure queue delay, provider duration, cancellation response and delivery delay independently rather than collapsing them into one latency number.",
+    "Print chronological-pretraining and stepwise-concurrency limitations alongside run results and keep synthetic timing separate from observed provider timing."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A source edit or matching recovery before delivery prevents stale advice from being sent.",
+      "verification": "Explore both completion orders with a spy channel and inspect stale/invalidated receipts."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "A current stop or correction takes effect without waiting for the semantic threshold or worker.",
+      "verification": "Block a provider future, issue the control event and verify immediate host-path handling."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Late-published historical facts are unavailable to earlier replay prefixes.",
+      "verification": "Run the same event-time history with different availability timestamps and compare packet manifests."
+    }
+  ],
+  "artifacts": [
+    "src/matter/evaluation/interleavings.py",
+    "tests/evaluation/test_interleavings.py",
+    "tests/fixtures/evaluation/schedules.json"
+  ],
+  "tests": [
+    "Old model result finishes after new assessment.",
+    "Two conflicting updates attempt to commit the same read version.",
+    "Observer disconnect yields coverage unknown rather than healthy silence."
+  ],
+  "risks": [
+    "A replay that waits for every call hides the races being evaluated.",
+    "Task-scoped cache results can leak into a new task unless scope is rechecked."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_replay.py",
+      "application": "Preserve honest replay limits."
+    },
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_store.py",
+      "application": "Reuse read-version validation and transitive invalidation as testable expectations."
+    }
+  ],
+  "sources": [
+    "matterjevmesh §7",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_replay.py",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_store.py"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

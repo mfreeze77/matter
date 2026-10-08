@@ -1,0 +1,88 @@
+{
+  "id": "MAT-040",
+  "title": "Fit thresholds and issue support-aware qualification records",
+  "track": "evaluation",
+  "phase": 4,
+  "priority": "P0",
+  "status": "planned",
+  "type": "qualification",
+  "owner_repo": "mfreeze77/matter",
+  "component": "evaluation/calibration",
+  "depends_on": [
+    "MAT-031",
+    "MAT-037",
+    "MAT-039"
+  ],
+  "requirements": [
+    "EVAL-06",
+    "EVAL-13",
+    "EVAL-14",
+    "JEV-08"
+  ],
+  "summary": "Measure each semantic family on the frozen corpus and produce qualification records only when predeclared targets and support requirements hold. Treat threshold fitting, held-out checking and runtime applicability as separate steps, avoiding confidence-only admission or copied benchmark numbers.",
+  "in_scope": [
+    "Training-only threshold selection and held-out family reports",
+    "Support counts, clustered uncertainty, abstention and certificate creation"
+  ],
+  "out_of_scope": [
+    "Universal accuracy guarantees",
+    "Promoting failed qualification because a threshold happens to exist"
+  ],
+  "implementation": [
+    "Declare targets, accepted-error costs, eligible classes/domains, minimum independent episode support, confidence measure and interval procedure before selecting thresholds.",
+    "Fit thresholds on the tuning split, including separate affirmative and negative proposition regions where appropriate; retain all tried configurations.",
+    "Evaluate the selected procedure on qualification episodes with accepted accuracy, coverage, per-class mistakes, abstention and provider-error denominators.",
+    "Use episode/provenance-aware uncertainty estimates and mark insufficient support explicitly, including zero-error samples too small to establish the target.",
+    "Issue passing certificates with exact semantic/model/preparation identities and failure reports otherwise; invalidate affected certificates on failed drift checks."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Failed or insufficient-support evaluation never issues a usable passing certificate.",
+      "verification": "Use high-confidence wrong, empty-acceptance and tiny zero-error datasets and inspect gate records."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Threshold selection cannot read final evaluation outcomes.",
+      "verification": "Instrument partition access and assert that fitting sees only the declared tuning cases."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Reports preserve accepted coverage, class errors, failure counts and independent episode support.",
+      "verification": "Recompute metrics from receipts and verify denominators plus the declared resampling unit."
+    }
+  ],
+  "artifacts": [
+    "src/matter/evaluation/calibration.py",
+    "src/matter/evaluation/certificates.py",
+    "tests/evaluation/test_calibration.py"
+  ],
+  "tests": [
+    "Duplicating each message does not double independent support.",
+    "A new renderer cannot reuse an old certificate.",
+    "A confidence measure change requires a new qualification procedure."
+  ],
+  "risks": [
+    "Repeatedly checking the same held-out split turns it into tuning data.",
+    "Aggregate calibration can conceal a weak rare class."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/runtime.py",
+      "application": "Retain its threshold-only admission gap as a regression target."
+    },
+    {
+      "source": "https://github.com/abhixhek/jevcal",
+      "application": "Borrow fit/report/check workflow ideas without importing simulated results."
+    }
+  ],
+  "sources": [
+    "matterjevmesh §8",
+    "https://arxiv.org/abs/2609.37647",
+    "https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/runtime.py"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "id": "MAT-024",
+  "title": "Build chronological replay and language-neutral conformance fixtures",
+  "track": "core",
+  "phase": 4,
+  "priority": "P0",
+  "status": "planned",
+  "type": "qualification",
+  "owner_repo": "mfreeze77/matter",
+  "component": "replay_conformance",
+  "depends_on": [
+    "MAT-002",
+    "MAT-010",
+    "MAT-014",
+    "MAT-015",
+    "MAT-016",
+    "MAT-017",
+    "MAT-019",
+    "MAT-020",
+    "MAT-021",
+    "MAT-023"
+  ],
+  "requirements": [
+    "CORE-23"
+  ],
+  "summary": "Create reproducible episodes and portable golden results. Replay verifies what was knowable and why treatment was eligible without claiming model ignorance of outside information or live race safety from sequential execution.",
+  "in_scope": [
+    "Corpus manifests and availability gating",
+    "Recorded-judgment deterministic replay",
+    "Portable operation and history vectors"
+  ],
+  "out_of_scope": [
+    "Live provider experiments",
+    "Concurrency certification from sequential runs"
+  ],
+  "implementation": [
+    "Define manifests for digests, availability, occurrence mappings, profiles, clocks, controls, and expected invariants.",
+    "Replay through recorded judgments or deterministic bindings under explicit source and time boundaries.",
+    "Compare normalized conclusions, receipts, quiet reasons, and allowed transitions.",
+    "Export another-language-compatible fixtures and separate race/transport fault schedules."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Unavailable future evidence cannot alter earlier assessments.",
+      "verification": "Use late-published cancellation with earlier effective time."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Deterministic replay reproduces results without extra delivery records.",
+      "verification": "Run one manifest on fresh stores and compare canonical outcomes."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Reports separate recorded replay from provider and concurrency experiments.",
+      "verification": "Validate metadata and refuse unsupported qualification claims."
+    }
+  ],
+  "artifacts": [
+    "src/matter/replay.py",
+    "schemas/replay-manifest.schema.json",
+    "tests/fixtures/conformance/",
+    "tests/qualification/test_chronological_replay.py"
+  ],
+  "tests": [
+    "Policy correction changes interpretation without rewriting evidence.",
+    "Out-of-order arrivals preserve prior knowledge snapshots.",
+    "Unqualified recorded judgment remains unqualified.",
+    "Two synthetic domains share operation contracts with different valid lifecycle edges."
+  ],
+  "risks": [
+    "Sequential replay may be mistaken for evidence of live timing or provider accuracy."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_replay.py",
+      "application": "Adapt corpus/availability discipline and retain documented limits; exclude OIL event types."
+    }
+  ],
+  "sources": [
+    "matterjevmesh",
+    "docs/contracts/core.md",
+    "docs/contracts/rules.md",
+    "docs/contracts/lifecycle.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

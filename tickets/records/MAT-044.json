@@ -1,0 +1,84 @@
+{
+  "id": "MAT-044",
+  "title": "Measure overhead and qualify execution budgets",
+  "track": "evaluation",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "qualification",
+  "owner_repo": "mfreeze77/matter",
+  "component": "evaluation/overhead",
+  "depends_on": [
+    "MAT-032",
+    "MAT-039",
+    "MAT-042",
+    "MAT-020"
+  ],
+  "requirements": [
+    "EVAL-10",
+    "EVAL-13",
+    "JEV-13"
+  ],
+  "summary": "Measure whether semantic assessment preserves the intended lightweight experience using explicit workload denominators and budget enforcement. Record total overhead, waiting and repeated work; provider latency alone cannot demonstrate that the substrate is inexpensive or unobtrusive.",
+  "in_scope": [
+    "Attempt/call/token/byte/cost and CPU/wall-time accounting",
+    "Declared profile budgets, percentiles and baseline comparison"
+  ],
+  "out_of_scope": [
+    "Inventing a numerical low-overhead target from an unspecified note",
+    "Reporting unknown usage as zero or free"
+  ],
+  "implementation": [
+    "Define counters for logical requests, actual attempts, cache hits, question/packet bytes, usage and costs with a versioned price basis or unknown reason.",
+    "Instrument CPU, queue waiting, provider time, blocking time and wall time; report p50/p95 only with sample counts and measurement mode.",
+    "Compare A and B under the same frozen workload and state explicit denominators for percentage overhead, including zero-baseline handling.",
+    "Enforce declared per-run, per-matter and per-investigation budgets before dispatch and at retry/follow-up boundaries.",
+    "Exercise bursts, duplicate events, rate-limit retries and unhelpful investigation to expose repeated-cost paths while retaining unresolved outcomes when limits stop work."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Actual retries and speculative questions appear in total cost and workload counts.",
+      "verification": "Use controlled retries and batched fixtures and reconcile counters with receipts."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Exhausted budgets prevent additional dispatch without marking the matter resolved.",
+      "verification": "Run a bounded request burst and assert call limits, explicit incomplete status and preserved evidence."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Unavailable usage or zero baseline time cannot generate a misleading zero-cost or percentage claim.",
+      "verification": "Test missing metadata and zero-duration baseline fixtures and inspect report nulls and reasons."
+    }
+  ],
+  "artifacts": [
+    "src/matter/evaluation/overhead.py",
+    "tests/evaluation/test_overhead.py",
+    "docs/evaluation.md"
+  ],
+  "tests": [
+    "A cache hit avoids a new call but still incurs local processing.",
+    "Repeated failures consume attempts until the declared cap.",
+    "Concurrent queue delay is measured separately from provider latency."
+  ],
+  "risks": [
+    "Averages hide burst-induced user blocking.",
+    "Price tables and SDK usage fields can drift independently of model behavior."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/system_one_http.py",
+      "application": "Adapt observable byte/usage/timing fields while preserving unknown measurements."
+    }
+  ],
+  "sources": [
+    "matterjevmesh §10",
+    "docs/evaluation.md — Timing, concurrency, and overhead",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/system_one_http.py"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

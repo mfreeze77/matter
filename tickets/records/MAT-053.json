@@ -1,0 +1,102 @@
+{
+  "id": "MAT-053",
+  "title": "Implement an uncertain procedural state tracker",
+  "track": "diat",
+  "phase": 3,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/statecivicsai-diat",
+  "component": "experiments.meeting_matter.procedure_state",
+  "depends_on": [
+    "MAT-001",
+    "MAT-012",
+    "MAT-014",
+    "MAT-015",
+    "MAT-016",
+    "MAT-017",
+    "MAT-052"
+  ],
+  "requirements": [
+    "DIAT-01",
+    "DIAT-05",
+    "DIAT-06",
+    "DIAT-13"
+  ],
+  "summary": "Track the current body, agenda item, floor, pending motion/amendment and debate/vote phase as versioned hypotheses. Local procedure is a soft contextual constraint, with branch alternatives and source corrections rather than forced canonical sequences.",
+  "in_scope": [
+    "Deterministic state transitions over procedural observations",
+    "Pending motion/amendment tree and body/agenda scope",
+    "Ambiguous alternatives and invalidation",
+    "Causal versus bounded retrospective mode"
+  ],
+  "out_of_scope": [
+    "Training a new large end-to-end model",
+    "Changing acoustic diarization or production identities",
+    "Closing a civic matter from experimental procedural state"
+  ],
+  "implementation": [
+    "Define immutable state/transition records with source event references, applied rule/profile digest, prior-state version and alternatives; reuse Matter assessment/dependency interfaces.",
+    "Implement ordered transitions for recognition, floor release, motion/second, debate, amendment, vote and body/agenda boundaries while retaining explicit unknown/unsupported transitions.",
+    "Maintain separate nested motion/amendment relations and avoid applying one vote to every pending motion; represent withdrawal, reconsideration and agenda return as new events.",
+    "Mark dependent later states stale when an earlier source event/profile changes and recompute only the affected interval; retain original historical assessments.",
+    "Require explicit mode and lookahead window: causal inference uses only evidence available by the decision cutoff; retrospective smoothing is separately named."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "An ordinary recognition-motion-debate-vote sequence produces traceable state without a person assignment.",
+      "verification": "Run the invented sequence and inspect floor/motion/phase references and authority fields."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Interruptions, omitted seconds and out-of-order source evidence produce alternatives or named unsupported states instead of forced closure.",
+      "verification": "Exercise local-procedure variations and ambiguity controls through the same tracker."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Correction of an earlier motion/body event invalidates dependent states only.",
+      "verification": "Replay a mid-sequence correction and compare unaffected intervals and dependency receipts."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Causal mode cannot use later vote/recognition evidence.",
+      "verification": "Run identical input with different available-at cutoffs and a retrospective variant; verify the declared evidence windows and differing claims."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/statecivicsai-diat:src/speaker_identity/experiments/meeting_matter/procedure_state.py (proposed)",
+    "mfreeze77/statecivicsai-diat:data/meeting-matter/procedure/<run>/ (private)",
+    "mfreeze77/statecivicsai-diat:tests/test_meeting_procedure_state.py (proposed)"
+  ],
+  "tests": [
+    "Amendment voted before original motion",
+    "Motion withdrawn then reintroduced",
+    "Chair changes after recess",
+    "Out-of-order late transcript correction",
+    "Recognition without the named speaker taking the floor"
+  ],
+  "risks": [
+    "Soft procedure can become a hidden hard prior if a decoder prunes unknown branches too aggressively.",
+    "Retrospective evidence can leak into a claimed online result."
+  ],
+  "reuse": [
+    {
+      "source": "MAT-015 and MAT-016 assessment/dependency contracts",
+      "application": "Reuse neutral immutable assessments and invalidation rather than a second authority store."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/meeting-handoff.md",
+      "application": "Preserve multi-meeting and original-clock boundary semantics."
+    }
+  ],
+  "sources": [
+    "jevinmatter: formal-meeting soft-constraint proposal.",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

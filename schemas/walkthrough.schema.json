@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/walkthrough.schema.json",
+  "title": "Synthetic contract walkthrough v1 (not a production observation schema)",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "name", "description", "scope_id", "audience", "events", "expected"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "name": {"type": "string", "minLength": 1},
+    "description": {"type": "string", "minLength": 10},
+    "scope_id": {"type": "string", "minLength": 1},
+    "audience": {"type": "string", "minLength": 1},
+    "events": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/event"}},
+    "expected": {"type": "object", "additionalProperties": false,
+      "required": ["outcomes", "delivered_updates", "forwarded_controls", "matters"],
+      "properties": {
+        "outcomes": {"type": "array", "items": {"type": "string"}},
+        "delivered_updates": {"type": "integer", "minimum": 0},
+        "forwarded_controls": {"type": "array", "items": {"type": "string"}},
+        "matters": {"type": "object", "additionalProperties": {"type": "object", "additionalProperties": false,
+          "required": ["status", "observations", "distinct_occurrences", "episodes", "queued_updates"],
+          "properties": {"status": {"enum": ["open", "resolved"]}, "observations": {"type": "integer", "minimum": 0}, "distinct_occurrences": {"type": "integer", "minimum": 0}, "episodes": {"type": "integer", "minimum": 1}, "queued_updates": {"type": "integer", "minimum": 0}}}}
+      }}
+  },
+  "$defs": {
+    "event": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "source", "scope_id", "at", "kind"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1}, "source": {"type": "string", "minLength": 1},
+        "scope_id": {"type": "string", "minLength": 1}, "at": {"type": "string", "format": "date-time"},
+        "kind": {"enum": ["observation", "context_change", "delivery_boundary", "control"]},
+        "matter_key": {"type": "string", "minLength": 1}, "audience": {"type": "string", "minLength": 1},
+        "context_revision": {"type": "string", "minLength": 1}, "condition_id": {"type": "string", "minLength": 1},
+        "occurrence_id": {"type": "string", "minLength": 1}, "effective_at": {"type": "string", "format": "date-time"},
+        "classification": {"enum": ["routine", "material", "resolution"]},
+        "host_qualified": {"type": "boolean"},
+        "instruction": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {"if": {"properties": {"kind": {"const": "observation"}}}, "then": {"required": ["matter_key", "context_revision", "condition_id", "occurrence_id", "effective_at", "classification", "host_qualified"]}},
+        {"if": {"properties": {"kind": {"const": "context_change"}}}, "then": {"required": ["matter_key", "context_revision"]}},
+        {"if": {"properties": {"kind": {"const": "delivery_boundary"}}}, "then": {"required": ["matter_key"]}},
+        {"if": {"properties": {"kind": {"const": "control"}}}, "then": {"required": ["instruction"]}}
+      ]
+    }
+  }
+}

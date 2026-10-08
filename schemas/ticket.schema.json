@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/ticket.schema.json",
+  "title": "Matter implementation ticket v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "track", "phase", "priority", "status", "type", "owner_repo", "component", "depends_on", "requirements", "summary", "in_scope", "out_of_scope", "implementation", "acceptance", "artifacts", "tests", "risks", "reuse", "sources", "completion"],
+  "$defs": {
+    "text": {"type": "string", "minLength": 1},
+    "texts": {"type": "array", "items": {"$ref": "#/$defs/text"}, "uniqueItems": true},
+    "ticket_id": {"type": "string", "pattern": "^MAT-[0-9]{3}$"},
+    "requirement_id": {"type": "string", "pattern": "^[A-Z]+-[0-9]{2}$"}
+  },
+  "properties": {
+    "id": {"$ref": "#/$defs/ticket_id"},
+    "title": {"type": "string", "minLength": 8},
+    "track": {"enum": ["foundation", "core", "rules", "jev", "evaluation", "civic", "diat", "oil", "operations"]},
+    "phase": {"type": "integer", "minimum": 0, "maximum": 5},
+    "priority": {"enum": ["P0", "P1", "P2"]},
+    "status": {"enum": ["planned", "in_progress", "blocked", "done"]},
+    "type": {"enum": ["implementation", "research", "integration", "qualification"]},
+    "owner_repo": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "component": {"$ref": "#/$defs/text"},
+    "depends_on": {"type": "array", "items": {"$ref": "#/$defs/ticket_id"}, "uniqueItems": true},
+    "requirements": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/requirement_id"}, "uniqueItems": true},
+    "summary": {"type": "string", "minLength": 30},
+    "in_scope": {"$ref": "#/$defs/texts", "minItems": 1},
+    "out_of_scope": {"$ref": "#/$defs/texts", "minItems": 1},
+    "implementation": {"$ref": "#/$defs/texts", "minItems": 2},
+    "acceptance": {
+      "type": "array", "minItems": 3,
+      "items": {"type": "object", "additionalProperties": false, "required": ["id", "criterion", "verification"], "properties": {
+        "id": {"type": "string", "pattern": "^AC-[1-9][0-9]*$"},
+        "criterion": {"type": "string", "minLength": 15},
+        "verification": {"type": "string", "minLength": 15}
+      }}
+    },
+    "artifacts": {"$ref": "#/$defs/texts", "minItems": 1},
+    "tests": {"$ref": "#/$defs/texts", "minItems": 2},
+    "risks": {"$ref": "#/$defs/texts", "minItems": 1},
+    "reuse": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["source", "application"], "properties": {"source": {"$ref": "#/$defs/text"}, "application": {"$ref": "#/$defs/text"}}}},
+    "sources": {"$ref": "#/$defs/texts", "minItems": 1},
+    "completion": {"type": "object", "additionalProperties": false, "required": ["state", "evidence"], "properties": {"state": {"enum": ["not_run", "passed"]}, "evidence": {"$ref": "#/$defs/texts"}}}
+  },
+  "allOf": [{"if": {"properties": {"status": {"const": "done"}}}, "then": {"properties": {"completion": {"properties": {"state": {"const": "passed"}, "evidence": {"minItems": 1}}}}}, "else": {"properties": {"completion": {"properties": {"state": {"const": "not_run"}}}}}}]
+}

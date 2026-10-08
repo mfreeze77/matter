@@ -1,0 +1,81 @@
+{
+  "id": "MAT-075",
+  "title": "Expose neutral inspection and client operations",
+  "track": "operations",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "expose-neutral-inspection-and-client-operations",
+  "depends_on": [
+    "MAT-015",
+    "MAT-018",
+    "MAT-023",
+    "MAT-072",
+    "MAT-074"
+  ],
+  "requirements": [
+    "OPS-04"
+  ],
+  "summary": "Provide a small callable inspection surface for matters, evidence, assessments and attention explanations. Applications should be able to embed the library or adapt a transport without requiring a new service deployment.",
+  "in_scope": [
+    "Read-only queries, pagination, current/as-of views and explanations.",
+    "A documented client contract and CLI suitable for operator investigation."
+  ],
+  "out_of_scope": [
+    "Deploying or modifying a downstream project as part of this planning ticket without that implementation task.",
+    "Treating synthetic checks as evidence of live provider or user outcomes."
+  ],
+  "implementation": [
+    "Specify the core operations and error/coverage responses before selecting optional transport bindings.",
+    "Build bounded read projections for current state, historical knowledge, evidence paths and attention reasons.",
+    "Add CLI output that uses public schemas and can be consumed without exposing internal storage or provider details."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "The same matter can be inspected for different purposes/audiences without rewriting shared identity.",
+      "verification": "Run paired queries with divergent delivery profiles and compare identity, evidence and assessment bindings."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Why-open, why-changed, why-quiet and why-delivered queries identify the governing evidence and rules.",
+      "verification": "Use trace fixtures with correction, delay, exhaustion and recovery and verify each explanation against recorded receipts."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Large histories are bounded and explicitly paginated or summarized with coverage disclosure.",
+      "verification": "Query a long history with small limits and verify deterministic continuation without missing or duplicated records."
+    }
+  ],
+  "artifacts": [
+    "src/matter/api.py",
+    "src/matter/cli.py",
+    "tests/contract/test_inspection_api.py"
+  ],
+  "tests": [
+    "As-of query before a late source became available.",
+    "An unknown consumption outcome remains unknown.",
+    "Forbidden evidence referenced indirectly by an explanation."
+  ],
+  "risks": [
+    "An inspection surface can accidentally leak proprietary or inaccessible evidence.",
+    "Unbounded history retrieval can recreate the overhead the core is meant to reduce."
+  ],
+  "reuse": [
+    {
+      "source": "matterbrainstormspec and matterjevmesh",
+      "application": "Preserve the explicit scope, provenance, qualification, and evidence boundaries in the governing contracts."
+    }
+  ],
+  "sources": [
+    "matterbrainstormspec",
+    "matterjevmesh",
+    "docs/architecture.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

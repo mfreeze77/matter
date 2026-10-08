@@ -1,0 +1,83 @@
+{
+  "id": "MAT-012",
+  "title": "Implement provider-neutral rule and judgment interfaces",
+  "track": "rules",
+  "phase": 2,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "rule_contract",
+  "depends_on": [
+    "MAT-002",
+    "MAT-007",
+    "MAT-010",
+    "MAT-011"
+  ],
+  "requirements": [
+    "CORE-11"
+  ],
+  "summary": "Create one evaluator contract for deterministic functions and future semantic providers. Make unknown, disagreement, and execution failure explicit so downstream policy cannot mistake unavailable judgment for no important concern.",
+  "in_scope": [
+    "Immutable rule definitions and binding registry",
+    "Bounded inputs and typed results",
+    "Deterministic adapter and recorded external results"
+  ],
+  "out_of_scope": [
+    "Jev or other provider client",
+    "Provider accuracy certification"
+  ],
+  "implementation": [
+    "Implement versioned proposition, eligibility, precondition, and output-implication definitions.",
+    "Expose a binding interface that returns receipts and proposals without mutable core access.",
+    "Separate execution_status, evaluation_status, semantic_output, and qualification_status.",
+    "Validate output labels, cited IDs, admissible states, and consequence permissions before downstream use."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A timeout cannot satisfy a negative semantic prerequisite.",
+      "verification": "Feed a fake timeout into a required downstream judgment."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Deterministic and recorded semantic bindings share one neutral input contract.",
+      "verification": "Run packet validation through both bindings without application fields."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Unknown output labels and nonexistent evidence IDs are refused.",
+      "verification": "Exercise structurally plausible but semantically invalid responses."
+    }
+  ],
+  "artifacts": [
+    "src/matter/rules.py",
+    "src/matter/evaluators/base.py",
+    "src/matter/evaluators/deterministic.py",
+    "tests/contract/test_rule_results.py"
+  ],
+  "tests": [
+    "Insufficient evidence may be completed execution with no conclusion.",
+    "A qualified score cannot grant transition authority.",
+    "Not-applicable remains distinct from false.",
+    "Independent partial results survive another component failing."
+  ],
+  "risks": [
+    "A single success boolean would erase distinctions required for honest composition."
+  ],
+  "reuse": [
+    {
+      "source": "matterjevmesh",
+      "application": "Use focused questions and qualification as provider-neutral evaluator concepts."
+    }
+  ],
+  "sources": [
+    "docs/contracts/rules.md",
+    "matterjevmesh",
+    "matterbrainstormspec"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

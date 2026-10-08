@@ -1,0 +1,626 @@
+[
+  {
+    "id": "BOOT-01",
+    "title": "Complete the requested planning scaffold",
+    "description": "Provide governing contracts, every scoped implementation ticket, a ticket schema, validation tools, synthetic examples, and reviewable committed progress.",
+    "source": "User request on 2026-10-08: create the scaffold, every ticket, ticket folder and schema; current correction: you are supposed to build it out."
+  },
+  {
+    "id": "CIV-01",
+    "title": "Neutral civic profile boundary",
+    "description": "Keep civic legal concepts and jurisdiction parsing out of the neutral Matter core; consume versioned domain profiles and host authority attestations.",
+    "source": "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only. Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  },
+  {
+    "id": "CIV-02",
+    "title": "Scoped jurisdiction authority manifests",
+    "description": "Version body/category/time-specific capability assertions, jurisdiction overrides and their evidence; do not treat parser final/recommendation tags as proof of legal power.",
+    "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/src/civic_crawler/jurisdictions/ks/ks_county_wyandotte/minutes.json https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-087-source-backed-motion-intent-and-vote-mechanics.md"
+  },
+  {
+    "id": "CIV-03",
+    "title": "Observed claims remain source claims",
+    "description": "Preserve raw stated claims, exact locators and claim-relative support/contradiction before any accepted action; do not let extraction resolve authority or identity.",
+    "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-090-matter-identity-case-parties-and-lifecycle-exports.md"
+  },
+  {
+    "id": "CIV-04",
+    "title": "Matters differ from occurrences and instruments",
+    "description": "Scope legal identifiers by issuer/jurisdiction/type/year, retain agenda appearances and motions as occurrences, and support distinct instruments and corrections without title-only merges.",
+    "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-090-matter-identity-case-parties-and-lifecycle-exports.md Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  },
+  {
+    "id": "CIV-05",
+    "title": "Temporal coverage and stage integrity",
+    "description": "Separate occurrence, publication, capture, availability, review and effective clocks; preserve unknown thresholds and coverage; model funding/procurement/legal stages as sourced dimensions rather than an ordinal score.",
+    "source": "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence). https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-087-source-backed-motion-intent-and-vote-mechanics.md"
+  },
+  {
+    "id": "CIV-06",
+    "title": "Purpose-specific useful attention",
+    "description": "Evaluate consequences against an explicit objective and audience; changes in preferences do not alter civic evidence or authority.",
+    "source": "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  },
+  {
+    "id": "CIV-07",
+    "title": "Receiver compatibility and refusal",
+    "description": "Pin producer/consumer schema/profile versions; reject unsupported consequential fields and preserve source evidence for later receiving review.",
+    "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-090-matter-identity-case-parties-and-lifecycle-exports.md"
+  },
+  {
+    "id": "CIV-08",
+    "title": "Source-backed body relationships",
+    "description": "Represent related jurisdictions, authorities, joint sittings and body changes from sources, leaving unsupported relationships unknown.",
+    "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-104-related-jurisdiction-and-authority-relationships.md User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only."
+  },
+  {
+    "id": "CIV-09",
+    "title": "Correction and withdrawal dependencies",
+    "description": "Withdrawn sources and revised authority manifests invalidate dependent assessments/queued advice; they do not rewrite historical knowledge or original observations.",
+    "source": "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  },
+  {
+    "id": "CORE-01",
+    "title": "Portable information and operation contract",
+    "description": "Versioned domain-neutral schemas define scoped references, canonical bytes, explicit result states, and stable semantic failures. Structural validation does not claim runtime qualification.",
+    "source": "docs/contracts/core.md"
+  },
+  {
+    "id": "CORE-02",
+    "title": "Durability, atomicity, and concurrency",
+    "description": "Mutations and receipts commit atomically with scoped uniqueness, command idempotency, consistent reads, and revision checks. Restart and storage failure preserve honest durable outcomes.",
+    "source": "docs/contracts/core.md"
+  },
+  {
+    "id": "CORE-03",
+    "title": "Observation identity and redelivery discipline",
+    "description": "Observations preserve original content and provenance; source-event redelivery is idempotent, incompatible identity reuse conflicts, and corrections append explicit revisions.",
+    "source": "docs/contracts/core.md"
+  },
+  {
+    "id": "CORE-04",
+    "title": "Continuing matters independent of runs and assessments",
+    "description": "Matter identity survives processing runs, rewording, policies, and audiences. Scoped domain keys establish identity; titles and run IDs do not.",
+    "source": "docs/contracts/core.md"
+  },
+  {
+    "id": "CORE-05",
+    "title": "Occurrence and provenance-group semantics",
+    "description": "Reports, happenings, and independent corroboration are separately represented. Derived summaries retain parent provenance and genuine recurrence remains countable.",
+    "source": "docs/contracts/core.md"
+  },
+  {
+    "id": "CORE-06",
+    "title": "Claim-specific evidence without automatic truth promotion",
+    "description": "Evidence relations target scoped propositions and qualifiers. Source assertions remain separate from assessed truth, established authority, identity, and actions.",
+    "source": "docs/contracts/core.md"
+  },
+  {
+    "id": "CORE-07",
+    "title": "Association uncertainty and acceptance authority",
+    "description": "Proposals preserve candidates and ambiguity; acceptance checks current revisions and explicit policy authority. No-match, insufficient evidence, conflict, and evaluator failure remain distinct.",
+    "source": "docs/contracts/core.md"
+  },
+  {
+    "id": "CORE-08",
+    "title": "Non-destructive equivalence and relationship correction",
+    "description": "Links retain separate identities; authorized merges preserve redirects, conflicts, and movement receipts. Undo and split restore a valid partition without erasing historical assessments.",
+    "source": "docs/contracts/core.md"
+  },
+  {
+    "id": "CORE-09",
+    "title": "Time and absence are evidenced inputs",
+    "description": "Event, effective, publication, availability, ingestion, and assessment times remain distinct. Absence requires declared coverage and negative dependencies; incremental silence never proves resolution.",
+    "source": "docs/contracts/core.md"
+  },
+  {
+    "id": "CORE-10",
+    "title": "Direct input bypass and explicit authority",
+    "description": "Authenticated host/user controls bypass aggregation and attention budgets. Source text cannot mint authority, and cancellation epochs fence pending commits and dispatch.",
+    "source": "docs/contracts/core.md"
+  },
+  {
+    "id": "CORE-11",
+    "title": "Typed rules and honest evaluation outcomes",
+    "description": "Rules declare meaning, evidence, outcomes, preconditions, limits, dependencies, and consequence permissions. Judgments separate execution, semantic outcome, qualification, and authority.",
+    "source": "docs/contracts/rules.md"
+  },
+  {
+    "id": "CORE-12",
+    "title": "Versioned domain and audience policy profiles",
+    "description": "Immutable profiles bind rules, parameters, authority, budgets, lifecycle edges, and conflict policies. Semantic changes alter bindings and qualification; audience preferences do not rewrite facts.",
+    "source": "docs/contracts/rules.md"
+  },
+  {
+    "id": "CORE-13",
+    "title": "Dependent judgments compose explicitly",
+    "description": "Independent nodes may batch; dependent nodes consume validated admissible outputs in later stages. Explicit conflict policy governs composition, and ranking never overrides required gates.",
+    "source": "docs/contracts/rules.md"
+  },
+  {
+    "id": "CORE-14",
+    "title": "Assessments bind complete context and evidence",
+    "description": "Assessments bind exact matter, policy, purpose, relevant audience, evidence, time, and dependencies. Cached judgments require semantic equivalence and preserve uncertainty and change causes.",
+    "source": "docs/contracts/rules.md"
+  },
+  {
+    "id": "CORE-15",
+    "title": "Freshness follows declared dependency changes",
+    "description": "Positive records, negative queries, candidate sets, policy, time, dispositions, and authority changes invalidate affected results transitively through pending transitions, attention, and delivery.",
+    "source": "docs/contracts/rules.md"
+  },
+  {
+    "id": "CORE-16",
+    "title": "Evidence and authority govern domain lifecycle",
+    "description": "Transitions require declared edges, matching evidence, authority, and temporal applicability. Quietness, acknowledgement, retraction, and unrelated success do not substitute for resolution.",
+    "source": "docs/contracts/lifecycle.md"
+  },
+  {
+    "id": "CORE-17",
+    "title": "Contextual significance and audience separation",
+    "description": "Purpose and audience revisions remain independent of facts and identity. Responsibility, preferences, and dispositions affect only declared consequence and delivery decisions.",
+    "source": "matterbrainstormspec"
+  },
+  {
+    "id": "CORE-18",
+    "title": "Attention is a reasoned per-audience decision",
+    "description": "Attention compares supported current meaning with what an audience actually received, records quiet and delivery reasons, and keeps evidence uncertainty, ownership, urgency, and authority distinct.",
+    "source": "docs/contracts/lifecycle.md"
+  },
+  {
+    "id": "CORE-19",
+    "title": "Time and boundedness are runtime inputs",
+    "description": "Durable timers reevaluate only affected outputs. Separate atomic resource and attention budgets constrain concurrent work without deferring trusted controls or mislabeling exhausted effort as sufficient evidence.",
+    "source": "docs/contracts/lifecycle.md"
+  },
+  {
+    "id": "CORE-20",
+    "title": "Freshness and outcomes extend through delivery",
+    "description": "Outbox intents bind assessment, dependencies, baseline, context, authority, and epoch. Dispatch rechecks freshness and records transport uncertainty separately from consumption, action, and verified outcome.",
+    "source": "docs/contracts/lifecycle.md"
+  },
+  {
+    "id": "CORE-21",
+    "title": "Investigation serves explicit evidence gaps",
+    "description": "Optional investigation names a proposition and missing evidence, respects source permissions and shared budgets, preserves conflict, and distinguishes sufficiency from unavailable sources or exhausted effort.",
+    "source": "docs/contracts/rules.md"
+  },
+  {
+    "id": "CORE-22",
+    "title": "Inspectable current and historical meaning",
+    "description": "Queries explain open, resolved, reopened, delivered, and quiet states from actual rules, evidence, context, and receipts. Missing retained history remains explicit rather than replaced with invented rationale.",
+    "source": "matterbrainstormspec"
+  },
+  {
+    "id": "CORE-23",
+    "title": "Replay preserves knowledge and semantics",
+    "description": "Replay pins availability, profiles, recorded judgments, timers, and receipts; deterministic recorded replay is distinct from provider re-execution and separate concurrency or transport qualification.",
+    "source": "matterjevmesh"
+  },
+  {
+    "id": "CORE-24",
+    "title": "Release evidence covers behavior and quiet outcomes",
+    "description": "Core acceptance requires reproducible continuity, identity correction, authority, freshness, concurrency, boundedness, and attention evidence. Scaffold checks and isolated classifiers do not complete these gates.",
+    "source": "docs/contracts/core.md"
+  },
+  {
+    "id": "DIAT-01",
+    "title": "DIAT-only experimental ownership",
+    "description": "Keep all learning, formal-meeting interpretation and experiments in DIAT on copied/exported data; no production/core writes, enrollment changes or automatic human confirmations.",
+    "source": "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only. https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/identity-context-evaluation.md"
+  },
+  {
+    "id": "DIAT-02",
+    "title": "Verify reported corpus inventory",
+    "description": "Treat approximately 315 hours and 5–10 recurring people as user-reported planning assumptions until package/audio/provenance/label audit verifies actual usable coverage.",
+    "source": "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only."
+  },
+  {
+    "id": "DIAT-03",
+    "title": "Reuse exported meeting evidence",
+    "description": "Reuse meeting-package v0.1 and original-clock turns/source hashes; do not request a fresh transcription or resolver pass to assemble the experiment.",
+    "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/meeting-handoff.md https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/src/civic_crawler/diat_export.py"
+  },
+  {
+    "id": "DIAT-04",
+    "title": "Evidence is not identity probability",
+    "description": "Keep acoustic cosine, behavioral support, semantic relevance and procedural compatibility distinct; experimental decisions never mutate production identity or introduce candidates outside the frozen pool.",
+    "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/identity-context-evaluation.md User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only."
+  },
+  {
+    "id": "DIAT-05",
+    "title": "Formal procedure as soft context",
+    "description": "Represent recognition, motion, second, debate, question/answer, amendment, voting and exceptions through source-linked events and uncertain state; local rules may vary.",
+    "source": "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only. Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  },
+  {
+    "id": "DIAT-06",
+    "title": "Floor and role transitions",
+    "description": "Track anonymous floor/role intervals, chair changes, shared microphones, interruptions and recognized-but-not-speaking cases without equating recognition with verified identity.",
+    "source": "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only. Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  },
+  {
+    "id": "DIAT-07",
+    "title": "Jurisdiction and committee fingerprints",
+    "description": "Learn versioned descriptive meeting-pattern profiles with jurisdiction/body/mode/time scope; distinguish empirical regularities from reviewed procedure and legal authority.",
+    "source": "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only."
+  },
+  {
+    "id": "DIAT-08",
+    "title": "Longitudinal roster and person evidence",
+    "description": "Version recurring roster/role contexts and verified reference cohorts; preserve turnover, guests, unknown speakers, independent source groups and prepared/spontaneous/unknown modes.",
+    "source": "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only. https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/behavior.md"
+  },
+  {
+    "id": "DIAT-09",
+    "title": "Prefixes, suffixes and grammar",
+    "description": "Reuse existing boundary n-grams; research syntax/repair/hedge/formula patterns while controlling scripted language, ASR error, quoted names and identity leaks.",
+    "source": "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only. https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/behavior.md Proposed research extensions are explicitly labeled."
+  },
+  {
+    "id": "DIAT-10",
+    "title": "Acoustic prosody and room/mic context",
+    "description": "Study audio-derived prosody separately from text, with extractor/version/quality provenance and room/channel/microphone controls; do not claim uncomputed pitch or channel correlations as person proof.",
+    "source": "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only. https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/meeting-handoff.md Proposed research, not established implementation."
+  },
+  {
+    "id": "DIAT-11",
+    "title": "Pause, rhythm and interactions",
+    "description": "Extend existing timing motifs with alignment-aware rhythm and floor-response interactions; missing timestamps and overlap remain explicit.",
+    "source": "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only. https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/behavior.md"
+  },
+  {
+    "id": "DIAT-12",
+    "title": "Agenda and procedural alignment",
+    "description": "Link permitted agenda items, topics and phases to original-clock turns with uncertainty and source cutoffs; no future minutes in causal inference.",
+    "source": "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence). Proposed research motivated by the user formal-meeting objective."
+  },
+  {
+    "id": "DIAT-13",
+    "title": "Conflict-aware assessments",
+    "description": "Preserve contradictory acoustic/semantic/procedural evidence, stale profiles, missing features and model failures; uncertainty can yield an unresolved matter without a user interruption.",
+    "source": "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence). https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/identity-context-evaluation.md"
+  },
+  {
+    "id": "DIAT-14",
+    "title": "Comparable frozen cohorts and new arms",
+    "description": "Keep A/B/C/D definitions unchanged; add separately named factor conditions over identical frozen query/candidate/cohort inputs and report feature availability instead of silently dropping cases.",
+    "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/identity-context-evaluation.md User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only."
+  },
+  {
+    "id": "DIAT-15",
+    "title": "No future or identity leakage",
+    "description": "Gate training/history by source groups and availability plus identity-link verification clocks; withhold gold labels and upstream machine names from blind views; separate strict historical and retrospective modes.",
+    "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/identity-context-evaluation.md https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/meeting-handoff.md"
+  },
+  {
+    "id": "DIAT-16",
+    "title": "Independent held-out outcomes",
+    "description": "Use independently annotated and adjudicated meeting outcomes, group-level splits and uncertainty; measure speaker consistency, wrong names, procedure quality and useful attention separately.",
+    "source": "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence). https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/identity-context-evaluation.md"
+  },
+  {
+    "id": "DIAT-17",
+    "title": "Maintenance, drift and revoked samples",
+    "description": "Version corpus/profile/extractor/model/question changes, revoke invalid references, invalidate dependent future hints and requalify without automatically altering enrollment or relaxing identity thresholds.",
+    "source": "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only. https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/README.md Proposed profile maintenance integration."
+  },
+  {
+    "id": "DIAT-18",
+    "title": "Private corpus and neutral export",
+    "description": "Keep real audio, transcript text, rosters, labels, caches and reports out of public fixtures/logs; export only scoped experimental assessment contracts without making Matter depend on voice-specific packages.",
+    "source": "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only. https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/meeting-handoff.md"
+  },
+  {
+    "id": "EVAL-01",
+    "title": "Frozen episodes and label provenance",
+    "description": "Evaluation manifests bind source snapshots, scope, availability, occurrence groups, independent labels, disagreements, and the exact reviewed episode history.",
+    "source": "matterjevmesh §§7–8; docs/evaluation.md — Corpus and availability"
+  },
+  {
+    "id": "EVAL-02",
+    "title": "Grouped partitions and untouched final evaluation",
+    "description": "Split by episode and provenance before tuning; duplicates and derived versions remain grouped, and final evaluation is not reused to choose wording or thresholds.",
+    "source": "matterjevmesh §8; docs/evaluation.md — Comparable arms and splits"
+  },
+  {
+    "id": "EVAL-03",
+    "title": "Comparable deterministic and semantic arms",
+    "description": "Evaluate baseline and candidate on identical frozen events and packets; declare retrieval ablations separately and retain policy/version differences.",
+    "source": "matterjevmesh §10; docs/evaluation.md — Comparable arms and splits"
+  },
+  {
+    "id": "EVAL-04",
+    "title": "Offline evidence has limited meaning",
+    "description": "Deterministic fake responses validate contracts and transitions only; modes and result artifacts must never imply that synthetic output measured a live model.",
+    "source": "matterjevmesh §10; docs/evaluation.md — Modes and what each proves"
+  },
+  {
+    "id": "EVAL-05",
+    "title": "Optional real provider execution",
+    "description": "Provider replay requires explicit configuration, supported adapter, credentials, input scope, model and budget; missing access marks execution unrun rather than silently faking it.",
+    "source": "docs/evaluation.md — Modes and what each proves"
+  },
+  {
+    "id": "EVAL-06",
+    "title": "Support-aware threshold assessment",
+    "description": "Report accepted accuracy and coverage with per-class mistakes, declared support minima and uncertainty appropriate to episode dependence, separately for each semantic family.",
+    "source": "matterjevmesh §8; docs/evaluation.md — Thresholds and qualification"
+  },
+  {
+    "id": "EVAL-07",
+    "title": "Question sensitivity and coherence probes",
+    "description": "Test repeats, option order, label/definition swaps, neutral labels, changed-question meaning, missing fields, and linked propositions without confusing agreement with correctness.",
+    "source": "matterjevmesh §§6,8"
+  },
+  {
+    "id": "EVAL-08",
+    "title": "End-to-end attention and silence audit",
+    "description": "Measure useful, redundant, missed, and late interventions, false recovery, and justified quietness, including missing-coverage silence and severe missed cases.",
+    "source": "matterjevmesh §§5,8,10"
+  },
+  {
+    "id": "EVAL-09",
+    "title": "Temporal and concurrent validity",
+    "description": "Test application availability separately from event time, actual latency, reordered completions, source changes, cancellation, recovery and delivery freshness; state replay limits explicitly.",
+    "source": "matterjevmesh §§7,10"
+  },
+  {
+    "id": "EVAL-10",
+    "title": "Measured overhead and enforceable budgets",
+    "description": "Measure calls, attempts, bytes, tokens, cost basis, CPU, queue delay, blocking time, latency percentiles, and baseline overhead; unknown measurements are not zero.",
+    "source": "matterjevmesh §10"
+  },
+  {
+    "id": "EVAL-11",
+    "title": "Reproducible release evidence",
+    "description": "Gate records distinguish passed, failed and not_run with actual commands and evidence; contracts or synthetic demos cannot satisfy unexecuted provider or live-usefulness gates.",
+    "source": "matterjevmesh §§8,10; docs/evaluation.md — Release packet"
+  },
+  {
+    "id": "EVAL-12",
+    "title": "Private data boundaries",
+    "description": "Repository fixtures are synthetic or appropriately cleared; private session, roster, audio, and provider results remain outside version control with manifests pointing to authorized local artifacts.",
+    "source": "matterjevmesh §9 — How this relates to DIAT; docs/evaluation.md — Corpus and availability"
+  },
+  {
+    "id": "EVAL-13",
+    "title": "Count abstention, disagreement, and failure",
+    "description": "Evaluation preserves denominators for every scheduled decision, including abstention, provider errors, partial invalidity, missing coverage, stale output and disagreement.",
+    "source": "matterbrainstormspec §3; matterjevmesh §§5–8"
+  },
+  {
+    "id": "EVAL-14",
+    "title": "Model drift and certificate revocation",
+    "description": "Changed model resolution, question definitions, criteria order, renderer, preparation or domain requires applicability review and targeted requalification; failed checks revoke eligibility.",
+    "source": "matterjevmesh §§7–8"
+  },
+  {
+    "id": "JEV-01",
+    "title": "Provider-neutral semantic execution",
+    "description": "Core question and judgment contracts remain serializable without a vendor dependency; adapters declare supported primitives and unsupported types fail explicitly.",
+    "source": "matterjevmesh §1; docs/jev.md — Provider-neutral executor"
+  },
+  {
+    "id": "JEV-02",
+    "title": "Preserve Choice, Score, and Noul meaning",
+    "description": "Preserve declared option identity, ordered rubric position and distributions, and proposition probability separately; Noul uncertainty is not severity or a separate vendor confidence.",
+    "source": "matterjevmesh §1; https://docs.typesafe.ai/primitives"
+  },
+  {
+    "id": "JEV-03",
+    "title": "Version complete question rendering",
+    "description": "Complete instructions name the relevant state fields; IDs only correlate responses; revisions bind wording, criteria, order, renderer, and the exact rendered instance.",
+    "source": "matterjevmesh §§6–7"
+  },
+  {
+    "id": "JEV-04",
+    "title": "Bounded evidence preparation",
+    "description": "Build bounded source-linked packets with claim and candidate scope, availability, lineage, omissions, missing requirements, and versioned deterministic preparation.",
+    "source": "matterjevmesh §§3–4,7"
+  },
+  {
+    "id": "JEV-05",
+    "title": "Independent batches and explicit stages",
+    "description": "Batch only questions renderable against the same packet; validate real dependency edges and stop or branch explicitly when a prerequisite is unusable.",
+    "source": "matterjevmesh §6"
+  },
+  {
+    "id": "JEV-06",
+    "title": "Receipts and exact result reuse",
+    "description": "Retain immutable request, response, model, timing, usage, validation, qualification, and parent-stage receipts; cache reuse must preserve exact semantic and execution identity.",
+    "source": "matterjevmesh §7"
+  },
+  {
+    "id": "JEV-07",
+    "title": "Strict primitive validation",
+    "description": "Reject malformed keys, types, nonfinite/range violations, wrong criteria, and inconsistent Score values; apply only trusted precision assumptions and retain failed diagnostic observations.",
+    "source": "docs/jev.md — Preserve primitive meaning; OIL decisions/validate.py at 3d7c629f"
+  },
+  {
+    "id": "JEV-08",
+    "title": "Runtime qualification applicability",
+    "description": "Consequential admission requires an applicable passing certificate for the exact resolved model, question/rubric/options, rendering, evidence-preparation profile, domain, thresholds, and validity period.",
+    "source": "matterjevmesh §8"
+  },
+  {
+    "id": "JEV-09",
+    "title": "Honest abstention and composition",
+    "description": "Separate unqualified, uncertain, conflicting, unavailable, and invalid outcomes; preserve disagreement and never infer a joint probability by multiplying independent answers.",
+    "source": "matterjevmesh §§5–6,8"
+  },
+  {
+    "id": "JEV-10",
+    "title": "Claim-specific association and evidence",
+    "description": "Semantic results relate defined claims and scoped matter candidates; topic overlap, same matter, same occurrence, and independent corroboration remain distinct.",
+    "source": "matterjevmesh §3"
+  },
+  {
+    "id": "JEV-11",
+    "title": "Qualified change, recovery, and attention",
+    "description": "Meaningful change is compared against explicit prior assessments and delivery; qualifying recovery must match the unresolved condition and freshness is checked before use.",
+    "source": "matterjevmesh §§3D,5,9"
+  },
+  {
+    "id": "JEV-12",
+    "title": "Bounded evidence investigation",
+    "description": "Investigations target named gaps over permitted sources, obey host budgets, preserve contradiction, and distinguish sufficient evidence from exhausted budget or absent access.",
+    "source": "matterjevmesh §4"
+  },
+  {
+    "id": "JEV-13",
+    "title": "Explicit provider mode and failure accounting",
+    "description": "Live transport is optional and explicitly selected; model changes, timeouts, retries, usage, unavailable measurements, and provider failures are recorded without synthetic fallback.",
+    "source": "matterjevmesh §§7–8,10; docs/jev.md — Execution and receipts"
+  },
+  {
+    "id": "JEV-14",
+    "title": "Host authority and control independence",
+    "description": "No semantic result grants execution, identity assignment, enrollment, or delivery authority; current user controls bypass accumulation and accepted intent remains protected.",
+    "source": "matterbrainstormspec §3; matterjevmesh §§2,9–10"
+  },
+  {
+    "id": "JEV-15",
+    "title": "No repeated-evidence inflation",
+    "description": "Source observations and occurrence provenance determine recurrence and independence; retries, cache hits, and derived summaries do not become additional corroboration.",
+    "source": "matterbrainstormspec §3; matterjevmesh §3B"
+  },
+  {
+    "id": "OIL-01",
+    "title": "Capture complete operational episodes",
+    "description": "Ingest observations, streamed/returned/deferred check outcomes, trusted success and recovery, source changes, task/lifecycle changes and direct controls. Preserve explicit coverage and unknown states; findings-only capture cannot establish recovery.",
+    "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/hook.py; https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/worker.py"
+  },
+  {
+    "id": "OIL-02",
+    "title": "Assign one durable operational owner",
+    "description": "Oil owns canonical operational matter records through an adapter in existing watcher SQLite storage; Matter owns neutral logic/contracts. Stable matter identity is independent of immutable session/tree cognition runs, with a reviewed schema migration and explicit cross-run dependency handoff.",
+    "source": "User's active Matter build request, 2026-10-08: repurpose durable matters to absorb annoying live agent-session input until a material development warrants attention; complete the scaffold/specification/roadmap, without implementing downstream integrations.; https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/chain_check.py"
+  },
+  {
+    "id": "OIL-03",
+    "title": "Preserve authority and immediate controls",
+    "description": "The ledger remains intent authority. Repeated claims or matter attention cannot accept/supersede intent; direct authenticated controls, permission boundaries and deterministic obligations bypass aggregation without a new approval loop.",
+    "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/kernel/resolver.py; Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (design notes, not implementation evidence)."
+  },
+  {
+    "id": "OIL-04",
+    "title": "Reuse bounded claim-specific evidence",
+    "description": "Adapt IO2-142 admitted domains, NarrowState/JudgmentEvidenceSource, existing clients and final-payload contracts into version-bound Matter judgments. Preserve coverage/omissions and sharing restrictions; no new unbounded evidence graph.",
+    "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/tickets/IO2-142-claim-specific-evidence-domains.md"
+  },
+  {
+    "id": "OIL-05",
+    "title": "Count real occurrences and qualify recovery",
+    "description": "Deduplicate representations of one invocation without dropping genuine repeats; scope operation correspondence by audience/task/workdir/tool/command and qualified overrides. Only matching trusted success resolves a failure; recurrence does not establish cause.",
+    "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/checks.py; https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/hook.py"
+  },
+  {
+    "id": "OIL-06",
+    "title": "Keep lifecycle, validity and disposition separate",
+    "description": "Source change invalidates dependent assessments and pending advice without proving success. Qualified recovery, reopening, acknowledgement, expiry, delivery and compaction have separate state and evidence requirements; generic lifecycle retains IO2-143 protections.",
+    "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/tickets/IO2-143-failure-locality-lifecycle.md; Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (design notes, not implementation evidence)."
+  },
+  {
+    "id": "OIL-07",
+    "title": "Attend to material change for an audience and purpose",
+    "description": "Compare valid matter state to that audience/purpose's last delivered baseline; consider consequences, urgency, owner/next step, dispositions and interruption budget. Use explicit thresholds/hysteresis while retaining an immediate path for decisive developments.",
+    "source": "User's active Matter build request, 2026-10-08: repurpose durable matters to absorb annoying live agent-session input until a material development warrants attention; complete the scaffold/specification/roadmap, without implementing downstream integrations.; https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/tickets/IO2-138-advisories-that-ask-for-nothing.md"
+  },
+  {
+    "id": "OIL-08",
+    "title": "Preserve native task and audience boundaries",
+    "description": "Retain parent-session delivery, child-task provenance, active task changes and distinct human/agent treatment. Session/compaction delivery-memory reset does not erase matter evidence, accepted controls or recovery.",
+    "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/hooks/claude.py; https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/ledger/retrieval.py"
+  },
+  {
+    "id": "OIL-09",
+    "title": "Revalidate at the host dispatch cutoff",
+    "description": "The native host fences delivery against assessment/source revisions, recovery, dispositions, audience/purpose, control epoch and delivered baseline. Its documented observed cutoff governs cancellation/recovery races; late irreversible output cannot be retroactively prevented.",
+    "source": "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (design notes, not implementation evidence).; https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/mailbox.py"
+  },
+  {
+    "id": "OIL-10",
+    "title": "Record actual outcome stages",
+    "description": "Keep eligibility, queue acceptance, local emission/delivery, unknown transport outcome, consumption, action and verified outcome distinct. Delivery advances only the declared transport baseline; it cannot establish reading, agreement, recovery or usefulness.",
+    "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/hook.py; Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (design notes, not implementation evidence)."
+  },
+  {
+    "id": "OIL-11",
+    "title": "Bound cost and require zero ordinary closeout",
+    "description": "Keep model work detached, retain configured delivery caps and native bounded advisory holds, separate resource and attention budgets, and require no new routine acknowledgement/approval/closeout. Absorbing noise must not create unbounded inference or storage.",
+    "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/README.md; https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/config.py; User's active Matter build request, 2026-10-08: repurpose durable matters to absorb annoying live agent-session input until a material development warrants attention; complete the scaffold/specification/roadmap, without implementing downstream integrations."
+  },
+  {
+    "id": "OIL-12",
+    "title": "Measure improvement against corrected current Oil",
+    "description": "Freeze current baseline and candidate, compare retained catches, missed/delayed developments, sampled quiet decisions, noise, timing and overhead with held-out human outcomes. Installed replay, source-reported tests, provider runs and actual live consumption remain separate evidence.",
+    "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/docs/feedback/2026-10-04/MILESTONE_2026-10-07.md; User's active Matter build request, 2026-10-08: repurpose durable matters to absorb annoying live agent-session input until a material development warrants attention; complete the scaffold/specification/roadmap, without implementing downstream integrations."
+  },
+  {
+    "id": "OIL-13",
+    "title": "Bind temporal coverage and honest replay limits",
+    "description": "Keep event/effective/available/observed times and corpus/code/profile/model pins, enforce as-of availability, and retain explicit incomplete/unknown reasons. Structural replay does not establish concurrency or provider ignorance of future facts.",
+    "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_replay.py; Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (design notes, not implementation evidence)."
+  },
+  {
+    "id": "OIL-14",
+    "title": "Make semantic evaluation and investigation optional",
+    "description": "Deterministic capture/lifecycle/attention work without providers. Reuse valid unchanged packets, invoke semantic evaluation only for changed dependencies, and bound optional investigation by host-approved scope, budgets and stopping conditions.",
+    "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_context.py; https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_session.py; Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (design notes, not implementation evidence)."
+  },
+  {
+    "id": "OPS-01",
+    "title": "Scoped access and evidence egress",
+    "description": "Every core operation and projection preserves scope, purpose, source eligibility, and provider sharing restrictions supplied by the host.",
+    "source": "matterbrainstormspec sections 3 and 6; matterjevmesh evidence packet and authority boundaries."
+  },
+  {
+    "id": "OPS-02",
+    "title": "Retention and revocation without false certainty",
+    "description": "Bound stored data and preserve auditable references while handling withdrawn evidence, expired access, and invalidated conclusions explicitly.",
+    "source": "matterjevmesh assessment receipt and dependency invalidation design; current lifecycle discussion."
+  },
+  {
+    "id": "OPS-03",
+    "title": "Schema and semantic compatibility",
+    "description": "Version data, profiles, rule meanings, receipts, and migrations so a language or implementation change does not silently reinterpret stored matters.",
+    "source": "matterbrainstormspec agnostic contracts and shared conformance examples."
+  },
+  {
+    "id": "OPS-04",
+    "title": "Usable inspection and client contracts",
+    "description": "Expose neutral operations and explanations for why a matter remains open, changed, stayed quiet, or became eligible for attention.",
+    "source": "matterbrainstormspec section 8 inspection questions."
+  },
+  {
+    "id": "OPS-05",
+    "title": "Controlled profile and configuration versions",
+    "description": "Distribute validated immutable profile bundles, reject incompatible compositions, and bind effective configuration to assessment receipts.",
+    "source": "matterbrainstormspec section 5; matterjevmesh qualification and rule-version requirements."
+  },
+  {
+    "id": "OPS-06",
+    "title": "Reproducible packaging and checks",
+    "description": "Ship a maintainable package with automated schema, graph, conformance and unit checks, dependency constraints, and source-license provenance.",
+    "source": "User request for a working repository scaffold; current reuse-first implementation discussion."
+  },
+  {
+    "id": "OPS-07",
+    "title": "Useful outcome observability",
+    "description": "Measure association, resolution, attention, evidence quality, cost, latency and ordinary maintenance burden without conflating delivered, consumed, acted, and verified outcomes.",
+    "source": "matterjevmesh Measure the result the user experiences."
+  },
+  {
+    "id": "OPS-08",
+    "title": "Reversible staged integration",
+    "description": "Provide shadow operation, scoped enablement, compatibility checks, rollback and recovery procedures with truthful pending and delivered receipt states.",
+    "source": "matterjevmesh first shadow then narrowly qualified contributions; existing Oil live acceptance limitations."
+  },
+  {
+    "id": "OPS-09",
+    "title": "Integrated release qualification",
+    "description": "Establish complete, reproducible cross-profile acceptance evidence before describing the shared runtime or its integrations as production-qualified.",
+    "source": "matterjevmesh separate synthetic/provider/live evidence and whole-matter evaluation."
+  }
+]

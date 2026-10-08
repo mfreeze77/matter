@@ -1,0 +1,101 @@
+{
+  "id": "MAT-051",
+  "title": "Audit the private DIAT corpus and exported evidence views",
+  "track": "diat",
+  "phase": 0,
+  "priority": "P0",
+  "status": "planned",
+  "type": "integration",
+  "owner_repo": "mfreeze77/statecivicsai-diat",
+  "component": "experiments.meeting_matter.corpus",
+  "depends_on": [
+    "MAT-001"
+  ],
+  "requirements": [
+    "DIAT-01",
+    "DIAT-02",
+    "DIAT-03",
+    "DIAT-15",
+    "DIAT-18"
+  ],
+  "summary": "Establish the private copied/exported corpus and measure the user's reported approximately 315-hour recurring-speaker opportunity. Produce immutable manifests and allowlisted experimental views without retriggering transcription, calling core services, or reading gold labels into model inputs.",
+  "in_scope": [
+    "Existing package validation and source-copy audit",
+    "Actual hours/usable-spans/provenance/roster/feature inventory",
+    "Original-clock neutral views",
+    "Separate private labels and upstream result custody"
+  ],
+  "out_of_scope": [
+    "Running the full corpus or buying inference automatically",
+    "Fetching or modifying core project data",
+    "Promoting upstream identities to labels or enrollments",
+    "Claiming the reported hours/person count is verified before inventory"
+  ],
+  "implementation": [
+    "Select existing copied meeting-package directories and validate them with the existing DIAT handoff interface; hash every source and retain package/producer/schema versions.",
+    "Inventory original recording duration separately from unique provenance-group duration, usable diarized speech, meeting/body count, observed tracks, claimed people, verified references and label availability; report overlap and missing artifacts.",
+    "Construct blind consistency and frozen-candidate views from explicit neutral field allowlists; withhold upstream result names, original label-bearing transcripts and independently held outcomes from model-visible files.",
+    "Keep occurrence, availability, import and identity-verification clocks separate and state when historical replay is impossible; preserve package-local IDs versus DIAT vector IDs.",
+    "Write private immutable corpus/view manifests and a synthetic public example; refuse overwrite and ensure all real artifacts remain under ignored data/meeting-matter/.",
+    "Begin inventory and blind-view preparation with existing DIAT handoff tools after the scaffold; later MAT-062 and MAT-063 enforce common evaluation compatibility, frozen cohorts and leakage qualification before comparative claims."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "The inventory distinguishes user-reported scale from measured unique/usable source coverage.",
+      "verification": "Run on a small copied sample with duplicate recordings and missing audio; check separate reported and verified fields and no fabricated total."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Blind model inputs contain only allowlisted fields and no upstream identity/gold-label payloads.",
+      "verification": "Inject sentinel names into result files, original transcripts and reviewer labels; assert absence from built input bytes while audit artifacts remain retained privately."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Original recording clocks, source hashes and package IDs survive view assembly.",
+      "verification": "Use a cropped recording beginning at a nonzero offset and a multi-meeting file; compare normalized intervals and reject mismatched hashes."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "The assembler performs no provider/core/database/enrollment write operation.",
+      "verification": "Run with those clients disabled and write-path/network instrumentation; only the declared private output is created."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/statecivicsai-diat:src/speaker_identity/experiments/meeting_matter/corpus.py (proposed)",
+    "mfreeze77/statecivicsai-diat:data/meeting-matter/corpora/<digest>/ (private)",
+    "mfreeze77/statecivicsai-diat:docs/meeting-matter-corpus.md (proposed)",
+    "mfreeze77/statecivicsai-diat:tests/test_meeting_matter_corpus.py (proposed)"
+  ],
+  "tests": [
+    "Re-encoded/aliased recordings in one provenance group",
+    "Package with unverified upstream accepted status",
+    "Missing word timing and audio fixture that is non-playable",
+    "Crop with 100-second original offset",
+    "315-hour/5–10-people claim retained as unverified planning metadata"
+  ],
+  "risks": [
+    "Completed exports may contain identity hints inside source transcript text.",
+    "Reported hours may double count aliases or include silence/unusable audio."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/src/speaker_identity/meeting_package.py",
+      "application": "Reuse canonical package validation, IDs, original-clock spans and artifact hashing."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/src/civic_crawler/diat_export.py",
+      "application": "Consume already completed private packages without another transcript/identity pass."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/meeting-handoff.md",
+    "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/identity-context-evaluation.md",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

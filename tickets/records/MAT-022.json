@@ -1,0 +1,84 @@
+{
+  "id": "MAT-022",
+  "title": "Support bounded evidence-gap investigation without forced human escalation",
+  "track": "rules",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "investigation",
+  "depends_on": [
+    "MAT-010",
+    "MAT-011",
+    "MAT-012",
+    "MAT-014",
+    "MAT-016",
+    "MAT-020"
+  ],
+  "requirements": [
+    "CORE-21"
+  ],
+  "summary": "Add a bounded proposal/execution protocol for targeted evidence gathering. Uncertainty should not automatically launch broad research, provider escalation, or a question to the user.",
+  "in_scope": [
+    "Evidence gaps and candidate reads",
+    "Host authorization and result ingestion",
+    "Explicit stopping and repeated-gap suppression"
+  ],
+  "out_of_scope": [
+    "Built-in retrieval connectors",
+    "Unbounded research or external writes"
+  ],
+  "implementation": [
+    "Describe each gap by proposition, eligible evidence, scope, and mandatory counterevidence.",
+    "Nominate reads through a typed interface with host-approved sources and capabilities.",
+    "Reserve shared resources and ingest results as sourced observations with availability.",
+    "Stop precisely and resume only after meaningful new input, eligible source, or declared temporal/retry condition."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Budget exhaustion never becomes evidence_satisfied.",
+      "verification": "Exhaust reads before a mandatory source is obtained."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "A nominated read cannot expand host permissions.",
+      "verification": "Propose an out-of-scope source and verify no execution."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Unchanged gaps do not create infinite retries or automatic human questions.",
+      "verification": "Replay the same unresolved gap across exhausted and renewed budgets."
+    }
+  ],
+  "artifacts": [
+    "src/matter/investigation.py",
+    "tests/unit/test_evidence_gaps.py",
+    "tests/integration/test_investigation_limits.py"
+  ],
+  "tests": [
+    "Agreeing evidence cannot displace required counterevidence.",
+    "New eligible source can resume a blocked gap.",
+    "One satisfied requirement need not resolve downstream conflict.",
+    "Concurrent investigations share the matter budget."
+  ],
+  "risks": [
+    "An apparently helpful investigation loop can become the principal cost and interruption source."
+  ],
+  "reuse": [
+    {
+      "source": "matterjevmesh",
+      "application": "Implement named requirements and honest stopping while keeping investigation optional."
+    }
+  ],
+  "sources": [
+    "docs/contracts/rules.md",
+    "matterjevmesh",
+    "docs/contracts/lifecycle.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

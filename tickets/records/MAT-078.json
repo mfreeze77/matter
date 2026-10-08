@@ -1,0 +1,81 @@
+{
+  "id": "MAT-078",
+  "title": "Instrument lifecycle outcomes and bounded audit reports",
+  "track": "operations",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "instrument-lifecycle-outcomes-and-bounded-audit-reports",
+  "depends_on": [
+    "MAT-021",
+    "MAT-023",
+    "MAT-042",
+    "MAT-044",
+    "MAT-072"
+  ],
+  "requirements": [
+    "OPS-07"
+  ],
+  "summary": "Measure whether Matter improves whole episodes while making overhead and uncertainty visible. Metrics must distinguish eligible, delivered, consumed, acted-upon and verified outcomes and must include important cases that stayed quiet.",
+  "in_scope": [
+    "Stable metric definitions, reason codes and bounded tracing.",
+    "Episode-level reports, quiet-case sampling and actual cost/latency accounting."
+  ],
+  "out_of_scope": [
+    "Deploying or modifying a downstream project as part of this planning ticket without that implementation task.",
+    "Treating synthetic checks as evidence of live provider or user outcomes."
+  ],
+  "implementation": [
+    "Define event counters and denominators with scope, rule-family and model/config versions.",
+    "Aggregate outcomes by independent episode/source groups without treating duplicate reports as independent samples.",
+    "Expose compact audit reports that retain missing evidence and unknown consumption rather than requiring manual acknowledgments."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Delivery and verified benefit cannot be conflated in metrics or reports.",
+      "verification": "Replay an episode with delivered-but-unconsumed and consumed-without-verification updates and inspect separate counters."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Suppression cannot appear successful solely because nothing was emitted.",
+      "verification": "Include labeled important quiet cases and verify missed/late outcomes appear in the report denominator."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Reported overhead includes all evaluation, retrieval, retries and delivery blocking work.",
+      "verification": "Compare instrumented event totals with an independently measured episode trace and account for failed calls."
+    }
+  ],
+  "artifacts": [
+    "src/matter/metrics.py",
+    "schemas/episode-report.schema.json",
+    "tests/qualification/test_metrics.py"
+  ],
+  "tests": [
+    "No events collected versus zero errors among collected events.",
+    "Repeated observations from one source group.",
+    "Budget exhaustion with no human action required."
+  ],
+  "risks": [
+    "Optimizing notification count alone can hide missed developments.",
+    "Verbose tracing can leak evidence or consume more resources than evaluation."
+  ],
+  "reuse": [
+    {
+      "source": "matterbrainstormspec and matterjevmesh",
+      "application": "Preserve the explicit scope, provenance, qualification, and evidence boundaries in the governing contracts."
+    }
+  ],
+  "sources": [
+    "matterbrainstormspec",
+    "matterjevmesh",
+    "docs/architecture.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

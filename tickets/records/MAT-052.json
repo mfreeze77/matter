@@ -1,0 +1,105 @@
+{
+  "id": "MAT-052",
+  "title": "Define source-linked formal-meeting procedural observations",
+  "track": "diat",
+  "phase": 2,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/statecivicsai-diat",
+  "component": "experiments.meeting_matter.procedure_contract",
+  "depends_on": [
+    "MAT-001",
+    "MAT-002",
+    "MAT-004",
+    "MAT-007",
+    "MAT-046",
+    "MAT-051"
+  ],
+  "requirements": [
+    "DIAT-01",
+    "DIAT-03",
+    "DIAT-05",
+    "DIAT-06",
+    "DIAT-13",
+    "DIAT-18"
+  ],
+  "summary": "Represent observed and inferred procedural events with exact original-clock evidence, body/agenda context, alternatives and applicability. This contract supports formal-meeting learning while keeping parliamentary concepts out of Matter's core.",
+  "in_scope": [
+    "Recognition/motion/second/debate/vote event records",
+    "Body/agenda/phase references and evidence spans",
+    "Observed versus inferred status",
+    "Profile version/availability and ambiguity"
+  ],
+  "out_of_scope": [
+    "Assigning legal effect to a spoken motion",
+    "Verified voice identity from a recognized name",
+    "A universal Robert's Rules implementation assumed for every jurisdiction"
+  ],
+  "implementation": [
+    "Define a strict DIAT experimental event schema over neutral observation/evidence references, including event family, span, source/package IDs, raw cue, alternatives, extractor/model version and uncertainty.",
+    "Separate session/body, agenda, floor, motion/amendment, discussion, vote and exception event families; preserve multiple events and quoted/hypothetical speech without automatic occurrence claims.",
+    "Accept profile applicability references from the crawler-owned export and preserve absent/unknown procedures; define optional second/threshold fields without filling defaults from generic parliamentary knowledge.",
+    "Provide an exporter to Matter's neutral evidence/claim contract with experimental authority and no person-resolution write capability.",
+    "Create invented sequences and annotation examples with actual/suspected/missing events and interval overlaps."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Every event retains its source span, extraction version and observed/inferred distinction.",
+      "verification": "Round-trip representative event records and verify linkage to original-clock turns and source hashes."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Quoted or hypothetical motion text and recognition cues do not become votes or verified speakers.",
+      "verification": "Test exact phrase controls in quotation, discussion and actual event contexts; preserve ambiguity when evidence cannot distinguish them."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Unsupported local procedure remains unknown without falling back to a universal rule.",
+      "verification": "Validate a profile with no second requirement and another with missing rules; outputs differ only by supported profile evidence."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "The export validates through neutral Matter schemas without a DIAT dependency in the core.",
+      "verification": "Run contract fixtures through the core and the independent DIAT serializer."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/statecivicsai-diat:src/speaker_identity/experiments/meeting_matter/procedure_contracts.py (proposed)",
+    "mfreeze77/statecivicsai-diat:schemas/meeting-procedure.v1.schema.json (proposed)",
+    "mfreeze77/statecivicsai-diat:examples/meeting-matter/procedure/ (invented)",
+    "mfreeze77/matter:examples/profiles/diat/procedural-events.json (invented)"
+  ],
+  "tests": [
+    "Chair announces a hypothetical amendment",
+    "Motion uttered without a stated second",
+    "Voice vote versus roll-call response",
+    "Joint body reconvening during one recording",
+    "Unintelligible overlapping event with multiple candidates"
+  ],
+  "risks": [
+    "Procedure vocabulary can be mistaken for a legally complete rule set.",
+    "Source text can report prior meetings rather than an event happening now."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/src/speaker_identity/meeting_package.py",
+      "application": "Use existing source-span/turn/recording identities and validation."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/src/civic_crawler/jurisdictions/ks/ks_county_wyandotte/minutes.json",
+      "application": "Treat local parsing conventions as profile evidence and optional event cues."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/meeting-handoff.md",
+    "jevinmatter: formal-meeting/procedural brainstorm, proposed not measured.",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

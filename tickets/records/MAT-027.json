@@ -1,0 +1,82 @@
+{
+  "id": "MAT-027",
+  "title": "Implement versioned question specifications and rendering",
+  "track": "jev",
+  "phase": 2,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "semantic/questions",
+  "depends_on": [
+    "MAT-026",
+    "MAT-007"
+  ],
+  "requirements": [
+    "JEV-02",
+    "JEV-03",
+    "JEV-08"
+  ],
+  "summary": "Build one canonical registry of semantic question definitions and render exact provider-neutral instances. A stable ID must never conceal changed wording, option meaning, rubric order, or field bindings, because those changes invalidate the evidence behind qualification.",
+  "in_scope": [
+    "Versioned specifications, render manifests, ordered criteria digests",
+    "Static outcome sets and explicit field-path bindings"
+  ],
+  "out_of_scope": [
+    "An unrestricted prompt generator",
+    "Automatic qualification of rewritten questions"
+  ],
+  "implementation": [
+    "Store the family, revision, complete instructions, primitive, ordered criteria, required fields, and renderer version as immutable specification data.",
+    "Render instructions with explicit packet paths and persist the exact materialized question plus correlation ID; reject missing required bindings.",
+    "Hash a canonical representation that preserves array and criteria presentation order while distinguishing specification identity from concrete input identity.",
+    "Provide fixed association outcomes and self-contained Score descriptions; reserve dynamic candidate options for an explicitly evaluated extension.",
+    "Produce a semantic-diff report identifying the field that changed and the certificates requiring applicability review."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "An opaque question ID does not change the complete instructions supplied to the evaluator.",
+      "verification": "Render equivalent definitions with two IDs and compare model-visible instructions and semantic digests."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Changing a rubric, option description, order, or renderer changes the appropriate identity.",
+      "verification": "Run mutation cases for every fingerprinted field and inspect invalidation reasons."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Missing state bindings cannot render as empty text or a guessed question.",
+      "verification": "Attempt a absent candidate path and assert a named rendering failure before dispatch."
+    }
+  ],
+  "artifacts": [
+    "src/matter/semantic/questions.py",
+    "src/matter/semantic/rendering.py",
+    "tests/semantic/test_rendering.py"
+  ],
+  "tests": [
+    "Score level referencing only the previous level is rejected by registry lint.",
+    "Topic/matter/occurrence definitions have separate revisions.",
+    "Option-order changes survive canonical serialization."
+  ],
+  "risks": [
+    "Sorting criteria during hashing can hide presentation changes.",
+    "Template reuse without applicability checks can reuse stale qualification."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/libingzheren/Jev-Mem/blob/7ab0c73c6d8f4f611ad252c1e6ba8083f8df0e44/memory/jev_questions.py",
+      "application": "Adapt the explicit field-reference discipline and distinct relationship meanings with original definitions."
+    }
+  ],
+  "sources": [
+    "matterjevmesh §§3,6–8",
+    "https://docs.typesafe.ai/primitives",
+    "https://github.com/libingzheren/Jev-Mem/blob/7ab0c73c6d8f4f611ad252c1e6ba8083f8df0e44/memory/jev_questions.py"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

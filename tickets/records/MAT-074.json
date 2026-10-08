@@ -1,0 +1,81 @@
+{
+  "id": "MAT-074",
+  "title": "Version schemas, migrations and cross-language conformance",
+  "track": "operations",
+  "phase": 4,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "version-schemas,-migrations-and-cross-language-conformance",
+  "depends_on": [
+    "MAT-002",
+    "MAT-003",
+    "MAT-012",
+    "MAT-013",
+    "MAT-024"
+  ],
+  "requirements": [
+    "OPS-03"
+  ],
+  "summary": "Make stored and transmitted contracts portable across supported implementations. A schema revision, rule meaning change or migration must have an explicit compatibility policy and cannot silently reuse incompatible assessment or qualification state.",
+  "in_scope": [
+    "Version negotiation, extensions, canonical numeric/time encoding and migration manifests.",
+    "Shared fixtures consumable by Python and a second language."
+  ],
+  "out_of_scope": [
+    "Deploying or modifying a downstream project as part of this planning ticket without that implementation task.",
+    "Treating synthetic checks as evidence of live provider or user outcomes."
+  ],
+  "implementation": [
+    "Separate structural compatibility from semantic rule compatibility and define rejection behavior for unknown required features.",
+    "Implement forward/backward migration fixtures with preserved IDs, evidence references and historical receipts.",
+    "Use the same canonical cases in a small second-language client to verify encoding and observable operation behavior."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A compatible reader preserves declared extension fields and rejects unknown required semantics.",
+      "verification": "Round-trip versioned envelopes through supported readers and exercise explicit incompatible-feature fixtures."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "A migration preserves stable matter identities and can be rolled back under the documented contract.",
+      "verification": "Migrate a database containing corrections, unresolved associations and delivery-unknown receipts, then verify rollback or the declared one-way boundary."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Equivalent fixtures produce equivalent canonical hashes and outcomes in supported languages.",
+      "verification": "Compare Unicode, decimal, null, timestamp-offset and ordering cases using both client implementations."
+    }
+  ],
+  "artifacts": [
+    "schemas/versioning.md",
+    "src/matter/migrations/",
+    "conformance/clients/"
+  ],
+  "tests": [
+    "Same instant encoded with different offsets.",
+    "Fractional numeric values and negative zero under the declared encoding.",
+    "Rule version changes with unchanged JSON result shape."
+  ],
+  "risks": [
+    "Structural compatibility can conceal changed interpretation.",
+    "Language-specific number handling can alter cache and identity hashes."
+  ],
+  "reuse": [
+    {
+      "source": "matterbrainstormspec and matterjevmesh",
+      "application": "Preserve the explicit scope, provenance, qualification, and evidence boundaries in the governing contracts."
+    }
+  ],
+  "sources": [
+    "matterbrainstormspec",
+    "matterjevmesh",
+    "docs/architecture.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

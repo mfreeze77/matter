@@ -1,0 +1,84 @@
+{
+  "id": "MAT-036",
+  "title": "Freeze episode corpora and independent label provenance",
+  "track": "evaluation",
+  "phase": 2,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "evaluation/corpus",
+  "depends_on": [
+    "MAT-001",
+    "MAT-004",
+    "MAT-006",
+    "MAT-010"
+  ],
+  "requirements": [
+    "EVAL-01",
+    "EVAL-12",
+    "EVAL-13"
+  ],
+  "summary": "Create the evaluation corpus contract before collecting model results. Each episode must preserve the sequence of available observations, source and occurrence relationships, reference outcomes, reviewer disagreements, and the status of its labels so later comparisons have an auditable denominator.",
+  "in_scope": [
+    "Episode manifests, source hashes, availability timestamps and labels",
+    "Synthetic repository fixtures and external private-artifact references"
+  ],
+  "out_of_scope": [
+    "Importing production data into this repository",
+    "Treating teacher-model labels as independent truth"
+  ],
+  "implementation": [
+    "Define episode boundaries, source snapshots, exact observation/occurrence IDs, task scope and evidence availability separately from event time.",
+    "Represent ground-truth association, recovery and attention labels with reviewer identity or role, evidence references, disagreement and unresolved status.",
+    "Add a synthetic starter corpus covering routine work, real failures, retries, misleading successes, late corrections and meaningful quiet periods.",
+    "Create ingestion validation for externally stored reviewed episodes without copying private session text, roster data or audio into tracked fixtures.",
+    "Freeze and hash the manifest before evaluation and preserve explicit counts of eligible, excluded and unlabeled cases."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Every evaluated observation and label resolves to the frozen episode and source revision.",
+      "verification": "Validate manifests and reject unknown IDs, broken source hashes and labels without provenance."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Late publication cannot become visible through an older event timestamp.",
+      "verification": "Use an old event published after the cutoff and inspect the replay prefix."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Teacher-generated, disputed and independent labels remain separately identifiable.",
+      "verification": "Load all three label types and verify that only the declared eligible set enters primary accuracy denominators."
+    }
+  ],
+  "artifacts": [
+    "src/matter/evaluation/corpus.py",
+    "tests/evaluation/test_corpus.py",
+    "tests/fixtures/evaluation/episodes.jsonl"
+  ],
+  "tests": [
+    "A copied log belongs to its original occurrence group.",
+    "An unlabeled quiet episode remains counted as unlabeled.",
+    "A private artifact is referenced by manifest without its content in tracked files."
+  ],
+  "risks": [
+    "Incomplete negative examples can make an interruption system look artificially accurate.",
+    "Unrecorded label revisions can change reported results without a code change."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_replay.py",
+      "application": "Reuse source-availability and pinned-corpus concepts without claiming model ignorance of future events."
+    }
+  ],
+  "sources": [
+    "matterjevmesh §§7–8,10",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_replay.py",
+    "docs/evaluation.md — Corpus and availability"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

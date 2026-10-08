@@ -1,0 +1,84 @@
+{
+  "id": "MAT-028",
+  "title": "Build bounded source-linked assessment packets",
+  "track": "jev",
+  "phase": 2,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "semantic/packets",
+  "depends_on": [
+    "MAT-027",
+    "MAT-004",
+    "MAT-006",
+    "MAT-010"
+  ],
+  "requirements": [
+    "JEV-04",
+    "JEV-10",
+    "JEV-15",
+    "EVAL-01"
+  ],
+  "summary": "Prepare reproducible evidence packets for one claim or candidate relation. The packet must show what the evaluator could see, what was omitted, and which observations concern the same occurrence, so semantic relevance cannot conceal missing evidence or inflate corroboration.",
+  "in_scope": [
+    "Deterministic preparation, availability filtering, byte limits and manifests",
+    "Claim/candidate scope and lineage references"
+  ],
+  "out_of_scope": [
+    "Adaptive retrieval",
+    "New audio, PDF, embedding, or graph-storage infrastructure"
+  ],
+  "implementation": [
+    "Define versioned packet profiles with required source roles, claim/candidate bindings, availability cutoff and maximum size.",
+    "Resolve exact source and occurrence identifiers before rendering text; keep independent source lineage separate from multiple descriptions of one event.",
+    "Select evidence deterministically under the declared profile, recording exclusions, unavailable sources and truncation rather than silently dropping them.",
+    "Compute mechanical dates, counts and identifier matches outside the semantic evaluator and retain the calculation inputs.",
+    "Emit a packet digest, preparation revision, coverage verdict and references that the receipt and qualification gates can match."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "The same source snapshot and profile produce identical packet bytes and manifest.",
+      "verification": "Rebuild packets in separate processes and compare digests and ordered sources."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "An unavailable or oversized required source makes coverage incomplete instead of silently sufficient.",
+      "verification": "Replay a late attachment and a truncation boundary with a mandatory counterexample."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Two summaries of one occurrence remain one provenance group.",
+      "verification": "Supply original, log copy and model summary and assert unchanged independent-source count."
+    }
+  ],
+  "artifacts": [
+    "src/matter/semantic/packets.py",
+    "tests/semantic/test_packets.py",
+    "tests/fixtures/semantic/packet_cases.json"
+  ],
+  "tests": [
+    "A cancellation published after the cutoff is excluded with its reason.",
+    "Similar project text in another scope is not an eligible candidate.",
+    "A missing required counterexample remains visible in coverage."
+  ],
+  "risks": [
+    "Truncation may preferentially remove contradictions.",
+    "A preparation change can invalidate every previously fitted threshold."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_replay.py",
+      "application": "Follow explicit availability gating and record its epistemic limitation."
+    }
+  ],
+  "sources": [
+    "matterjevmesh §§3–4,7",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_replay.py"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

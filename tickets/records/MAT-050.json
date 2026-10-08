@@ -1,0 +1,106 @@
+{
+  "id": "MAT-050",
+  "title": "Qualify civic temporal, authority and receiver boundaries",
+  "track": "civic",
+  "phase": 5,
+  "priority": "P0",
+  "status": "planned",
+  "type": "qualification",
+  "owner_repo": "mfreeze77/matter",
+  "component": "qualification.civic",
+  "depends_on": [
+    "MAT-001",
+    "MAT-024",
+    "MAT-025",
+    "MAT-037",
+    "MAT-042",
+    "MAT-048",
+    "MAT-049"
+  ],
+  "requirements": [
+    "CIV-02",
+    "CIV-03",
+    "CIV-04",
+    "CIV-05",
+    "CIV-07",
+    "CIV-08",
+    "CIV-09"
+  ],
+  "summary": "Build independent, source-linked civic conformance and temporal replay evidence demonstrating correct unresolved states, retained valid actions and compatible receiver proposals. Passing synthetic parsing tests must not be relabeled as legal or live receiving acceptance.",
+  "in_scope": [
+    "Frozen synthetic and authorized sanitized cases",
+    "Profile/authority/identifier/time adversarial controls",
+    "Producer-consumer contract compatibility",
+    "Independent expected outcomes and release limitations"
+  ],
+  "out_of_scope": [
+    "Claiming jurisdiction-wide collection completeness",
+    "Production import, data migrations or publication",
+    "Inventing authoritative outcomes when source rules are unavailable"
+  ],
+  "implementation": [
+    "Construct an adjudicated fixture manifest with source hashes/locators, exact profile and receiving schema pins, explicit expected claim/assessment outcomes and uncertainty labels.",
+    "Cover joint sittings, changed authorities, recommendation/final separation, legal identifiers, failed motions, source corrections and availability cutoffs in chronological episodes.",
+    "Run the actual export adapter, profile composition, assessment and delivery-revalidation path; keep deterministic, provider and receiving results in separate sections.",
+    "Apply mutations to authority-review, scope, temporal and coverage guards, with positive controls retaining an applicable reviewed action and a new useful deadline.",
+    "Publish a bounded qualification receipt and unresolved receiver dependencies; require separate repository acceptance before a real import/deployment can be claimed."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "All listed authority/time/identity negative controls remain unresolved or refused and applicable positives survive.",
+      "verification": "Run the frozen corpus through the production path and compare semantic outputs to independent labels."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Removing key authority/availability/scope guards is detected by real assertion failures.",
+      "verification": "Execute named source-reversion or mutation controls against representative positive/negative cases; retain exact code and corpus hashes."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Replay reports what was available then without overwriting later corrected understanding.",
+      "verification": "Compare as-of and current views for a late published correction and a future authority attestation."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "The report separately names contract validation, source completeness, provider judgment and receiving acceptance.",
+      "verification": "Review a generated release receipt with unrun receiving steps explicitly not_run and no implied live deployment."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/matter:tests/qualification/civic/",
+    "mfreeze77/matter:examples/civic/qualification-manifest.json",
+    "mfreeze77/matter:docs/qualification/civic-template.md",
+    "mfreeze77/matter:reports/civic/<run>/ (future sanitized evidence only)"
+  ],
+  "tests": [
+    "Future authority review cannot affect an earlier assessment",
+    "Available-empty versus unavailable source coverage",
+    "Two institutions with equal names but different scopes",
+    "Revoked authority after advice selection",
+    "Supported positive act amid unrelated contradictory claims"
+  ],
+  "risks": [
+    "Fixtures chosen after seeing outputs can overstate quality.",
+    "A current receiver may not support every proposed extension; unsupported cases must remain explicit."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-090-matter-identity-case-parties-and-lifecycle-exports.md",
+      "application": "Carry forward documented unresolved/replay cases and avoid rebranding sample acceptance as full completion."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-104-related-jurisdiction-and-authority-relationships.md",
+      "application": "Include related-entity leads as unresolved controls rather than assumed relationships."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-087-source-backed-motion-intent-and-vote-mechanics.md",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

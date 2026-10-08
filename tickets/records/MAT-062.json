@@ -1,0 +1,118 @@
+{
+  "id": "MAT-062",
+  "title": "Run versioned meeting-feature ablations on identical frozen cohorts",
+  "track": "diat",
+  "phase": 4,
+  "priority": "P0",
+  "status": "planned",
+  "type": "qualification",
+  "owner_repo": "mfreeze77/statecivicsai-diat",
+  "component": "experiments.meeting_matter.ablation",
+  "depends_on": [
+    "MAT-001",
+    "MAT-036",
+    "MAT-037",
+    "MAT-039",
+    "MAT-040",
+    "MAT-041",
+    "MAT-055",
+    "MAT-057",
+    "MAT-058",
+    "MAT-059",
+    "MAT-060",
+    "MAT-061",
+    "MAT-063",
+    "MAT-064"
+  ],
+  "requirements": [
+    "DIAT-02",
+    "DIAT-04",
+    "DIAT-07",
+    "DIAT-09",
+    "DIAT-10",
+    "DIAT-11",
+    "DIAT-12",
+    "DIAT-14",
+    "DIAT-15",
+    "DIAT-16"
+  ],
+  "summary": "Extend the existing evaluator with a separately versioned, preregistered ablation family while preserving A/B/C/D unchanged. Measure each new feature and selected interactions on the exact same frozen queries/candidates, including difficult/missing-feature cases and negative outcomes.",
+  "in_scope": [
+    "Unchanged A/B/C/D replay baseline",
+    "Separately named procedure/grammar/prosody/agenda factors",
+    "Common-cohort and availability reporting",
+    "Paired per-meeting quality/cost and uncertainty"
+  ],
+  "out_of_scope": [
+    "Silently redefining B or D to include new features",
+    "Selecting thresholds or configurations on held-out labels",
+    "Dropping hard queries separately for each condition",
+    "Launching every possible combination or the full reported corpus by default"
+  ],
+  "implementation": [
+    "Freeze a run manifest containing original A/B/C/D packages, common query/candidate/roster/configuration hashes, independent grouped split and factor definitions selected on development data.",
+    "Add named conditions such as A+procedure, B+procedure and D+procedure; represent lexical/motif removal as explicit ablations of B rather than claiming those existing features are new.",
+    "Select a bounded factorial subset for grammar, prosody, timing/interaction, institution and agenda context, with recorded hypotheses and maximum calls/bytes/cost.",
+    "Retain one query inventory across conditions; record feature-unavailable outcomes and both common evaluable cohort metrics and all-query coverage.",
+    "Report wrong-name/unknown/anonymous-switch/procedure/attention metrics, paired differences and group-level uncertainty alongside extraction/provider cost; include failures and no-improvement results."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Every condition shares the exact common query/candidate input and baseline A/B/C/D semantics remain unchanged.",
+      "verification": "Validate package hashes and compare common fields; mutate a candidate or query span in one condition and require refusal."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Held-out labels cannot influence factor/threshold selection.",
+      "verification": "Verify development-selection manifest timestamps/digests and run label-sentinel tests at build/inference stages."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Missing-feature queries remain in cohort accounting and cannot silently improve accuracy by exclusion.",
+      "verification": "Use an intentionally missing-prosody subset and compare all-query versus evaluable-cohort denominators."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Reports expose incremental gains, harms, uncertainty and total work on grouped independent units.",
+      "verification": "Inspect paired meeting-level outputs and reproducible report replay with zero fresh provider calls."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/statecivicsai-diat:src/speaker_identity/experiments/meeting_matter/ablation.py (proposed)",
+    "mfreeze77/statecivicsai-diat:data/meeting-matter/ablations/<run>/ (private)",
+    "mfreeze77/statecivicsai-diat:docs/research/meeting-ablation-protocol.md (proposed)",
+    "mfreeze77/statecivicsai-diat:tests/test_meeting_ablation_contract.py (proposed)"
+  ],
+  "tests": [
+    "Same query but one arm changes candidate order/pool",
+    "Procedure family adds later context to only one arm",
+    "B baseline with versus without an explicitly named existing motif factor",
+    "Missing audio in one condition",
+    "No eligible person history",
+    "Cached/imported/fresh execution modes kept distinct"
+  ],
+  "risks": [
+    "Many factor combinations create post-hoc selection bias and excessive cost.",
+    "The recurring population may yield high apparent accuracy with poor unknown-speaker behavior."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/src/speaker_identity/identity_context_evaluation.py",
+      "application": "Extend the existing frozen package/report framework using a new schema/arm family rather than modifying A/B/C/D."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/identity-context-evaluation.md",
+      "application": "Reuse common-config pinning, immutable run directories and label-only reporting."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/behavior.md",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

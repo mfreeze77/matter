@@ -1,0 +1,86 @@
+{
+  "id": "MAT-038",
+  "title": "Build the deterministic offline evaluation harness",
+  "track": "evaluation",
+  "phase": 4,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "evaluation/offline",
+  "depends_on": [
+    "MAT-026",
+    "MAT-029",
+    "MAT-030",
+    "MAT-031",
+    "MAT-036",
+    "MAT-037"
+  ],
+  "requirements": [
+    "EVAL-03",
+    "EVAL-04",
+    "EVAL-13",
+    "EVAL-11"
+  ],
+  "summary": "Implement a full offline harness with deterministic fixture responses, controlled clocks and repeatable arm outputs. This exceeds the scaffold walkthrough: it must run complete frozen episodes, report scheduled and unresolved decisions, and exercise faulty provider shapes without claiming semantic accuracy.",
+  "in_scope": [
+    "Fixture executor, clock and fault injection, episode runner",
+    "Structured result manifests and deterministic admission replay"
+  ],
+  "out_of_scope": [
+    "Live provider behavior or measured live usefulness",
+    "Marking the harness complete from a documentation or single-example smoke check"
+  ],
+  "implementation": [
+    "Inject a fake executor keyed by request digest and explicit fixture scenario, rather than generating answers from the same policy being tested.",
+    "Run the two arm manifests over complete episodes and persist scheduled, successful, abstained, failed and stale result counts.",
+    "Provide deterministic timeout, malformed batch, partial answer, conflicting predicate, changed-source and missing-certificate fixtures.",
+    "Validate final lifecycle, assessment and attention expectations derived from independently specified episode outcomes.",
+    "Emit a machine-readable mode marker and command/result manifest that identifies all semantic-provider and live-delivery gates as not_run."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "The same corpus, fixture set and configuration reproduce identical logical outputs.",
+      "verification": "Run twice with controlled timestamps and compare all result digests excluding execution-instance metadata."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Faulted and abstained scheduled decisions remain in denominators and diagnostics.",
+      "verification": "Inject one of each failure class and reconcile scheduled count with all terminal outcomes."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Offline output cannot be presented as a successful real-provider qualification.",
+      "verification": "Inspect the mode/gate schema and reject a report that claims provider accuracy from fixture mode."
+    }
+  ],
+  "artifacts": [
+    "src/matter/evaluation/offline.py",
+    "tests/evaluation/test_offline_harness.py",
+    "tests/fixtures/evaluation/provider_responses.json"
+  ],
+  "tests": [
+    "Missing fixture response is an explicit error, not a guessed success.",
+    "One malformed head rejects admission while retaining valid diagnostics.",
+    "All-silent fake behavior fails an episode that needs a timely contribution."
+  ],
+  "risks": [
+    "Tests mirroring implementation can conceal policy errors.",
+    "A polished synthetic report can accidentally be mistaken for empirical model evidence."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/validate.py",
+      "application": "Adapt strict response and diagnostic/admission separation cases into independent fixture expectations."
+    }
+  ],
+  "sources": [
+    "docs/evaluation.md — Modes and what each proves",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/validate.py"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

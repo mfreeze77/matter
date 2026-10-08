@@ -1,0 +1,103 @@
+{
+  "id": "MAT-057",
+  "title": "Evaluate prefix, suffix and grammar evidence without script leakage",
+  "track": "diat",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "research",
+  "owner_repo": "mfreeze77/statecivicsai-diat",
+  "component": "experiments.meeting_matter.lexical_grammar",
+  "depends_on": [
+    "MAT-001",
+    "MAT-027",
+    "MAT-028",
+    "MAT-051",
+    "MAT-056",
+    "MAT-063"
+  ],
+  "requirements": [
+    "DIAT-04",
+    "DIAT-08",
+    "DIAT-09",
+    "DIAT-13",
+    "DIAT-14",
+    "DIAT-15"
+  ],
+  "summary": "Reuse existing opening/closing lexical features and test whether syntax, repairs, hedges and phrase structure add useful context beyond scripts and topics. All grammar features are proposed research with explicit parser/ASR uncertainty, not existing identity capabilities.",
+  "in_scope": [
+    "Existing lexical boundary-feature adapter",
+    "Experimental grammar/repair/formula feature families",
+    "Script/topic/name-masking controls",
+    "Versioned feature definitions and availability"
+  ],
+  "out_of_scope": [
+    "Rebuilding existing behavior n-grams under a second service",
+    "Using self-introductions or roster names in an acoustics-only result",
+    "Treating lexical similarity as calibrated identity probability"
+  ],
+  "implementation": [
+    "Wrap the existing lexical-timing-v1 output in the experimental feature manifest; retain original definitions and avoid changing B-arm semantics.",
+    "Define a bounded grammar candidate inventory with units and source spans: clause/repair/hedge structures, question formation and formulaic openings/closings; select any parser only after dependency/license/reproducibility review.",
+    "Tag shared institutional scripts and explicit names/quoted speech through separate field views, with source quality and parser version; unavailable/ambiguous grammar stays unknown.",
+    "Compare original lexical support, masked/formula-controlled variants and added grammar over identical queries/reference groups; include topic-swapped and script-shared controls.",
+    "Preserve exact evidence shown to a semantic evaluator and outcome qualification per question family; export descriptive features only to the experimental decision layer."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Existing prefix/suffix features retain their original version/meaning and are not counted as a new implemented grammar capability.",
+      "verification": "Compare wrapper output to existing behavior test fixtures and inspect version fields."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Shared scripts and self-introduction names cannot leak into a claimed acoustic-only or name-masked condition.",
+      "verification": "Run sentinel/script controls and verify packet bytes plus separate labeling of explicit-name evidence conditions."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Missing or low-quality ASR/parser output is reported rather than converted into confident grammar features.",
+      "verification": "Use truncated turns, uncertain tokens and malformed parser responses; inspect availability/failure reasons."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Any claimed grammar gain is measured against lexical-only and script/topic controls on the same cohort.",
+      "verification": "Publish paired per-meeting results and errors with frozen feature/config digests."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/statecivicsai-diat:src/speaker_identity/experiments/meeting_matter/lexical_grammar.py (proposed)",
+    "mfreeze77/statecivicsai-diat:docs/research/grammar-features.md (proposed)",
+    "mfreeze77/statecivicsai-diat:data/meeting-matter/grammar/<run>/ (private)"
+  ],
+  "tests": [
+    "Two people reading the same formal thanks/motion script",
+    "One person speaking on unseen agenda topics",
+    "Quoted self-introduction from another person",
+    "ASR deletes fillers or punctuation",
+    "Very short turn with no reliable clause structure"
+  ],
+  "risks": [
+    "Grammar may mostly measure ASR/editor artifacts rather than a stable speaker characteristic.",
+    "Script and role effects can masquerade as personal patterns."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/src/speaker_identity/behavior/features.py",
+      "application": "Reuse existing opening/closing n-grams, filler counts and input normalization."
+    },
+    {
+      "source": "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/docs/behavior.md",
+      "application": "Retain source-score and timing limitations; grammar is an explicitly new research family."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/statecivicsai-diat/blob/da33bb1171bb537954f59b234c86cfa32cb2641c/src/speaker_identity/behavior/models.py",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

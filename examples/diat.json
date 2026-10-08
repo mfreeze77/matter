@@ -1,0 +1,132 @@
+{
+  "schema_version": "1.0",
+  "name": "DIAT evidence-review lifecycle",
+  "scope_id": "synthetic:diat",
+  "audience": "research-review",
+  "description": "Entirely synthetic anonymous evidence-review matter. Preclassified procedural evidence can support a research hint, while an unqualified hint remains quiet. No person names, acoustic scores, training, enrollments or identity assignments exist in this walkthrough.",
+  "events": [
+    {
+      "id": "segment",
+      "source": "fixture",
+      "scope_id": "synthetic:diat",
+      "at": "2026-10-01T09:00:00Z",
+      "kind": "observation",
+      "matter_key": "ambiguous-floor-transition",
+      "occurrence_id": "turn-boundary",
+      "classification": "routine",
+      "context_revision": "v1",
+      "condition_id": "condition-1",
+      "host_qualified": true,
+      "effective_at": "2026-10-01T09:00:00Z"
+    },
+    {
+      "id": "uncertain-procedure",
+      "source": "fixture",
+      "scope_id": "synthetic:diat",
+      "at": "2026-10-01T09:01:00Z",
+      "kind": "observation",
+      "matter_key": "ambiguous-floor-transition",
+      "occurrence_id": "turn-boundary",
+      "classification": "material",
+      "context_revision": "v1",
+      "condition_id": "condition-1",
+      "host_qualified": false,
+      "effective_at": "2026-10-01T09:00:00Z"
+    },
+    {
+      "id": "qualified-evidence",
+      "source": "fixture",
+      "scope_id": "synthetic:diat",
+      "at": "2026-10-01T09:02:00Z",
+      "kind": "observation",
+      "matter_key": "ambiguous-floor-transition",
+      "occurrence_id": "turn-boundary",
+      "classification": "material",
+      "context_revision": "v1",
+      "condition_id": "condition-1",
+      "host_qualified": true,
+      "effective_at": "2026-10-01T09:00:00Z"
+    },
+    {
+      "id": "boundary-1",
+      "source": "fixture",
+      "scope_id": "synthetic:diat",
+      "at": "2026-10-01T09:03:00Z",
+      "kind": "delivery_boundary",
+      "matter_key": "ambiguous-floor-transition"
+    },
+    {
+      "id": "acoustic-context",
+      "source": "fixture",
+      "scope_id": "synthetic:diat",
+      "at": "2026-10-01T09:04:00Z",
+      "kind": "observation",
+      "matter_key": "ambiguous-floor-transition",
+      "occurrence_id": "adjacent-turn",
+      "classification": "routine",
+      "context_revision": "v1",
+      "condition_id": "condition-1",
+      "host_qualified": true,
+      "effective_at": "2026-10-01T09:04:00Z"
+    },
+    {
+      "id": "anonymous-review",
+      "source": "fixture",
+      "scope_id": "synthetic:diat",
+      "at": "2026-10-01T09:05:00Z",
+      "kind": "observation",
+      "matter_key": "ambiguous-floor-transition",
+      "occurrence_id": "review-disposition",
+      "classification": "resolution",
+      "context_revision": "v1",
+      "condition_id": "condition-1",
+      "host_qualified": true,
+      "effective_at": "2026-10-01T09:05:00Z"
+    },
+    {
+      "id": "boundary-2",
+      "source": "fixture",
+      "scope_id": "synthetic:diat",
+      "at": "2026-10-01T09:06:00Z",
+      "kind": "delivery_boundary",
+      "matter_key": "ambiguous-floor-transition"
+    },
+    {
+      "id": "late-cue",
+      "source": "fixture",
+      "scope_id": "synthetic:diat",
+      "at": "2026-10-01T09:07:00Z",
+      "kind": "observation",
+      "matter_key": "ambiguous-floor-transition",
+      "occurrence_id": "old-turn",
+      "classification": "routine",
+      "context_revision": "v1",
+      "condition_id": "condition-1",
+      "host_qualified": true,
+      "effective_at": "2026-10-01T09:01:00Z"
+    }
+  ],
+  "expected": {
+    "outcomes": [
+      "recorded",
+      "material_unqualified",
+      "eligible",
+      "delivered",
+      "recorded",
+      "resolved",
+      "quiet",
+      "historical_observation"
+    ],
+    "delivered_updates": 1,
+    "forwarded_controls": [],
+    "matters": {
+      "ambiguous-floor-transition": {
+        "status": "resolved",
+        "observations": 6,
+        "distinct_occurrences": 2,
+        "episodes": 1,
+        "queued_updates": 0
+      }
+    }
+  }
+}

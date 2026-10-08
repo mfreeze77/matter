@@ -1,0 +1,118 @@
+{
+  "id": "MAT-067",
+  "title": "Implement Oil-owned durable matter state across cognition runs",
+  "track": "oil",
+  "phase": 5,
+  "priority": "P0",
+  "status": "planned",
+  "type": "integration",
+  "owner_repo": "mfreeze77/oil",
+  "component": "watcher.matter_store",
+  "depends_on": [
+    "MAT-001",
+    "MAT-003",
+    "MAT-005",
+    "MAT-007",
+    "MAT-016",
+    "MAT-017",
+    "MAT-066"
+  ],
+  "requirements": [
+    "OIL-02",
+    "OIL-03",
+    "OIL-06",
+    "OIL-13"
+  ],
+  "summary": "Implement the proposed Oil storage-owner adapter for a stable operational matter namespace in existing watcher SQLite storage. Keep immutable cognition runs as versioned assessment evidence, preserve the mailbox as transport and the ledger as authority, and explicitly reconcile source dependencies across revision/session runs.",
+  "in_scope": [
+    "One Oil-owned operational data namespace and supported schema/version migration",
+    "Stable scoped matter identities independent of core/tree/session cognition run IDs",
+    "Immutable assessment references with operational source/read dependency manifests",
+    "Atomic version checks, idempotency, invalidation and projection rebuild",
+    "Cross-session access/correspondence rules, retention and unavailable-history receipts"
+  ],
+  "out_of_scope": [
+    "An immortal cognition RunManifest used as a matter identity",
+    "Unmanaged table writes bypassing CognitionStore application/version validation",
+    "Another independent matter database, competing lifecycle owner or transport mailbox",
+    "Promotion of operational records into accepted user intent",
+    "Migration of live downstream storage in this scaffold"
+  ],
+  "implementation": [
+    "Write and review an ownership/schema ADR naming Oil as the sole operational data owner, the Matter storage port it implements, the current chain.sqlite3 opener/version constraints and the exact supported migration/downgrade-refusal policy. Design the new namespace and compatibility through that owner rather than appending unmanaged tables.",
+    "Implement stable repository/owner-scoped matter IDs with explicit identity receipts. Keep per-tree/session/lane cognition RunManifest identity unchanged; represent task, audience, revision and session as relationships with access/continuity rules.",
+    "Import immutable cognition results using source store/run/event/payload digests. Materialize the exact source versions, applicable rules, audience/purpose versions, coverage and assessment dependencies into the operational namespace, with an idempotent handoff receipt.",
+    "Use expected-version commits and dependency invalidation in the operational namespace. A source or control change must invalidate dependent current assessments and prepared attention across referenced old runs; do not rely on run-local deps or the existing triggered advice deps=() path.",
+    "Define transactional boundaries for observation ingest, matter projection, invalidation and outbox preparation. Reuse the host worker/queue and mailbox through ports; do not duplicate lifecycle or transport ownership.",
+    "Implement backup/upgrade interruption recovery, schema refusal, projection rebuild and retention of compact audit references. If referenced history has been pruned, return explicit unavailable reconstruction rather than claiming complete replay."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A matter can persist across changed code trees and qualified session transitions while cognition manifests remain immutable and isolated.",
+      "verification": "Create multiple tree/session/core-version runs and link only qualified observations to one operational matter; assert unchanged run manifests, stable matter ID, explicit new assessments and refusal of unauthorized cross-audience linkage."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Changing a registered source invalidates affected operational assessments and pending attention imported from an older run.",
+      "verification": "Construct source→assessment→attention dependencies spanning two cognition runs, update the source and assert stale/withheld projections atomically; include existing empty-dependency triggered advice as a negative control requiring adapter reconstruction."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Existing supported stores migrate through the owner, unsupported stores refuse safely, and interrupted upgrades do not corrupt historical cognition data.",
+      "verification": "Run migration fixtures for empty/current/unsupported databases, crash at each declared transactional boundary, reopen with the supported adapter and compare cognition history hashes and matter projection rebuilds."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Idempotent replay and concurrent conflicting writes create one canonical operational history with no second lifecycle or delivery authority.",
+      "verification": "Apply identical and conflicting handoffs concurrently, then restart/rebuild; assert duplicate-versus-conflict outcomes, one matter identity and mailbox/ledger records unchanged except their explicitly authorized adapter operations."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/oil:docs/adr/matter-operational-storage-owner.md (proposed)",
+    "mfreeze77/oil:src/intent_oil/watcher/matter_store.py (proposed)",
+    "mfreeze77/oil:src/intent_oil/cognition_store.py (planned supported schema integration)",
+    "mfreeze77/oil:tests/test_matter_store_migration.py (proposed)",
+    "mfreeze77/oil:tests/test_matter_cross_run_dependencies.py (proposed)"
+  ],
+  "tests": [
+    "Tree A→tree B with same matter and distinct immutable run manifests",
+    "Qualified versus unqualified cross-session correspondence",
+    "Old-run assessment invalidation after source/purpose/control update",
+    "Schema upgrade interruption, unsupported application ID/version and read-only refusal",
+    "Duplicate/conflicting handoff idempotency and concurrent projection updates",
+    "Pruned assessment payload returns unavailable rather than complete reconstruction"
+  ],
+  "risks": [
+    "The current store's run-local CAS/invalidation does not automatically provide cross-run dependencies; presenting it as already complete would leave stale delivery possible.",
+    "Physical database reuse must respect the existing opener and migration policy rather than weakening schema safety.",
+    "Overbroad durable identity can leak task or audience context across sessions; underbroad identity recreates the same annoyance per tree."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_store.py",
+      "application": "Reuse the validated commit/history/dependency design through a supported Oil-owned schema adapter; extend deliberately for the operational namespace."
+    },
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/chain_check.py",
+      "application": "Preserve existing chain.sqlite3 ownership and immutable per-session/code-tree cognition runs as evidence sources."
+    },
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_engine.py",
+      "application": "Adapt exact assessment/provenance records while supplying missing operational dependencies instead of assuming triggered advice is source-bound."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_store.py",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/chain_check.py",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_engine.py",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_types.py",
+    "Matter proposed design: docs/profiles/oil.md section 4; docs/contracts/lifecycle.md",
+    "User's active Matter build request, 2026-10-08: repurpose durable matters to absorb annoying live agent-session input until a material development warrants attention; complete the scaffold/specification/roadmap, without implementing downstream integrations.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (design notes, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

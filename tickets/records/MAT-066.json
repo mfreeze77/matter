@@ -1,0 +1,116 @@
+{
+  "id": "MAT-066",
+  "title": "Capture complete Oil observations, check results and recovery events",
+  "track": "oil",
+  "phase": 5,
+  "priority": "P0",
+  "status": "planned",
+  "type": "integration",
+  "owner_repo": "mfreeze77/oil",
+  "component": "watcher.matter_capture",
+  "depends_on": [
+    "MAT-001",
+    "MAT-004",
+    "MAT-006",
+    "MAT-010",
+    "MAT-011",
+    "MAT-018",
+    "MAT-025"
+  ],
+  "requirements": [
+    "OIL-01",
+    "OIL-05",
+    "OIL-08",
+    "OIL-13"
+  ],
+  "summary": "Implement an Oil-owned event adapter that supplies Matter with the complete operational episode rather than only emitted findings. Capture trusted success and explicit result semantics alongside original observations, streaming/deferred outcomes and host context changes, retaining provenance and unknown coverage.",
+  "in_scope": [
+    "Neutral typed event envelopes over existing native watcher/check/host paths",
+    "Origin/invocation/phase identity and idempotent streamed/returned/deferred reconciliation",
+    "Durable trusted-success handoff before recovery receipt pruning",
+    "Parent audience, child task, workdir, source-version and temporal provenance",
+    "Explicit complete/partial/unavailable check outcomes without inferring resolution from silence"
+  ],
+  "out_of_scope": [
+    "Changing the intent ledger's authority classes",
+    "Replacing the durable watcher queue or adding a failure daemon",
+    "Treating all exit-zero output as proof that every open matter is resolved",
+    "Provider calls or deployments during this scaffold"
+  ],
+  "implementation": [
+    "Map Observation fields and host-normalized events into the neutral envelope, including occurrence ID, invocation ID, operation key, audience/task identity, producer/check version, original event time, observed/available time, source hashes and omissions. Preserve source event kinds through an adapter rather than silently widening the existing watcher enum.",
+    "Instrument the native observation path and each check completion lane: ctx.post streaming, normal returned CheckResult, deferred work, explicit skips and unavailable results. Define a stable origin key so one finding represented in multiple lanes remains one contribution.",
+    "Consume record_known_success receipts using a durable cursor or atomic owner handoff that prevents the bounded recovery-file prune from deleting an unconsumed success. Store exact status_source and contained normalized workdir; reject inferred success from diagnostic text, unknown workdir or unrelated operation.",
+    "Add source/task/session/control-change envelopes through existing host seams, keeping authenticated controls distinct from observed or model-derived claims. Retain parent-session audience plus child task identity and preserve existing audience/task edit coalescing.",
+    "Define check-specific completion coverage. Only an explicit complete replacement scope or qualified corresponding success may retire an assertion; empty findings, a failed check, search no-match and absent output otherwise retain named unknown/no-finding states.",
+    "Add crash-safe restart/backfill behavior with an observed cutoff and idempotent input receipts. Capture late success and delayed outcomes with their original times instead of re-timing them as new failures."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A failed command followed by a corresponding trusted success reaches Matter even when the success produces no queued watcher observation or finding.",
+      "verification": "Run a native normalized host sequence through observe_tool and the adapter; assert one failure occurrence, one success receipt and a recoverable correspondence, including a worker restart between them."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "The same result emitted through streaming, return and deferred bookkeeping counts once, while two distinct invocation failures count twice.",
+      "verification": "Replay an instrumented check fixture across all lanes and assert immutable origin/occurrence receipts and exact counts before and after duplicate replay."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "No-finding, partial, unavailable, expected search no-match and unknown-status outputs cannot silently establish recovery.",
+      "verification": "Exercise each named result class beside a valid known-success control; assert explicit coverage/reason codes and only the valid success becomes recovery evidence."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Task/audience boundaries and recovery handoff survive concurrent writes, pruning and process interruption without consuming another task's evidence.",
+      "verification": "Use parent with two child tasks, distinct workdirs and concurrent success writers; interrupt around cursor persistence/pruning and verify no lost unconsumed success, no duplicate occurrence and no cross-task resolution."
+    }
+  ],
+  "artifacts": [
+    "mfreeze77/oil:src/intent_oil/watcher/matter_adapter.py (proposed)",
+    "mfreeze77/oil:src/intent_oil/watcher/hook.py (planned capture integration)",
+    "mfreeze77/oil:src/intent_oil/watcher/worker.py (planned check-outcome integration)",
+    "mfreeze77/oil:tests/test_matter_capture_adapter.py (proposed)",
+    "mfreeze77/oil:docs/MATTER_INTEGRATION.md (proposed event mapping)"
+  ],
+  "tests": [
+    "Exit-zero success with no emitted finding; failed/no-finding check does not resolve",
+    "Duplicate invocation arriving from streaming and final CheckResult",
+    "Real repeated invocation with identical text after process restart",
+    "Success pruning race and delayed success observed after a later failure",
+    "Parent and two child tasks running the same command in different workdirs",
+    "Unknown/outside workdir, numeric versus inferred status, and expected rg no-match"
+  ],
+  "risks": [
+    "A _post-only hook misses success and empty-result semantics, leaving stale matters permanently open.",
+    "The current success receipt retention is bounded; an after-the-fact importer can miss recovery without an atomic handoff or cursor guarantee.",
+    "Over-normalizing command text or dropping task/workdir identity can merge unrelated operations."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/hook.py",
+      "application": "Reuse observe_tool, record_known_success, operation_key and normalized native status/workdir provenance rather than infer success from text."
+    },
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/worker.py",
+      "application": "Reuse existing durable check scheduling and all result lanes, adding complete event receipts around them."
+    },
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/model.py",
+      "application": "Translate the established Observation/CheckResult contracts into the neutral Matter envelope without changing authority."
+    }
+  ],
+  "sources": [
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/hook.py",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/worker.py",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/model.py",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/hooks/claude.py",
+    "User's active Matter build request, 2026-10-08: repurpose durable matters to absorb annoying live agent-session input until a material development warrants attention; complete the scaffold/specification/roadmap, without implementing downstream integrations.",
+    "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (design notes, not implementation evidence)."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

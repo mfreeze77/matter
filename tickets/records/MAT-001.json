@@ -1,0 +1,94 @@
+{
+  "id": "MAT-001",
+  "title": "Establish the governing scaffold and validated implementation backlog",
+  "track": "foundation",
+  "phase": 0,
+  "priority": "P0",
+  "status": "done",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "repository-scaffold",
+  "depends_on": [],
+  "requirements": [
+    "BOOT-01"
+  ],
+  "summary": "Build the requested repository scaffold from the starter discussions: governing neutral contracts, complete scoped roadmap, ticket schema and coverage, executable repository checks, synthetic lifecycle examples, and a reviewable GitHub change.",
+  "in_scope": [
+    "Governing contracts, source corrections and explicit domain ownership.",
+    "Canonical ticket records, human-readable projections, dependency graph and requirement inventory.",
+    "Executable validation, regression tests and synthetic Oil/civic/DIAT walkthroughs."
+  ],
+  "out_of_scope": [
+    "Implementing every future runtime or research ticket in this bootstrap.",
+    "Changing another repository, publishing private data, training identity models or deploying a core system."
+  ],
+  "implementation": [
+    "Preserve original notes and add governing documents with a clear precedence and ownership decision.",
+    "Create every scoped ticket with concrete acceptance criteria, tests, dependencies and reuse sources.",
+    "Implement schema/graph/coverage/projection validation and deterministic synthetic walkthroughs with independently declared expected outputs.",
+    "Run negative regression tests, document executed evidence and push a coherent reviewable change."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "All scoped requirements map to detailed valid tickets and the dependency graph is complete and acyclic.",
+      "verification": "Run python -m matter validate and independently inspect the coverage and dependency-readiness reports."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "The repository can be installed and its documented validation and walkthrough commands execute without live credentials or private data.",
+      "verification": "Install the package, run validation, the unit suite, and all three synthetic walkthroughs; record exact results."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "The governing contracts state implemented scaffold limits and keep downstream runtime, semantic qualification and DIAT experiments planned.",
+      "verification": "Review README, source map, contracts and all ticket completion fields against the actual code and executed evidence."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "The completed scaffold is committed and available for review on GitHub with source and validation references.",
+      "verification": "Verify the pushed tree and pull request head contain the checked files and that the PR summary distinguishes completed scaffold work from future tickets."
+    }
+  ],
+  "artifacts": [
+    "README.md",
+    "docs/contracts/",
+    "schemas/",
+    "src/matter/",
+    "tickets/records/",
+    "tests/",
+    "examples/",
+    "docs/validation.md"
+  ],
+  "tests": [
+    "Corrupt ticket fields, dependencies, requirement references and completion evidence must fail validation.",
+    "Duplicate/redelivered events, stale pending updates, wrong recovery and direct controls must have the declared behavior.",
+    "Malformed classifications and path-traversal ticket IDs must be rejected before lifecycle or filesystem mutation."
+  ],
+  "risks": [
+    "A detailed roadmap can be mistaken for completed production behavior unless states and evidence are explicit.",
+    "Cross-repository requirements can be lost or accidentally implemented in the neutral core."
+  ],
+  "reuse": [
+    {
+      "source": "Original starter notes at commit 95b4931b228c4f7591b54042e52a89f47f25de7f",
+      "application": "Preserve their design rationale while formalizing the clarified contracts and source limitations."
+    }
+  ],
+  "sources": [
+    "matterbrainstormspec",
+    "matterjevmesh",
+    "jevinmatter",
+    "User scaffold request and correction on 2026-10-08."
+  ],
+  "completion": {
+    "state": "passed",
+    "evidence": [
+      "2026-10-08: editable installation, render --check, repository validation, all 39 regression tests and all three synthetic walkthroughs passed; see docs/validation.md.",
+      "The 80-ticket, 104-requirement backlog has 271 acceptance criteria, complete coverage, no missing dependencies, no cycles and no phase inversions.",
+      "https://github.com/mfreeze77/matter/pull/1 — reviewable scaffold PR; initial head 2f541a5caeae9f8a279390007d7704b801b98332 verified to contain 201 added files.",
+      "Initial uploaded tree 8a3c65b255e977f068be6b896c7fe62a33da8cc7 matched the local Git index exactly; original notes and LICENSE retain their remote blob hashes.",
+      "https://github.com/mfreeze77/matter/actions/runs/37750500591 — completed successful push workflow for the initial scaffold commit; final-head CI is reported separately."
+    ]
+  }
+}

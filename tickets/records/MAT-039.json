@@ -1,0 +1,87 @@
+{
+  "id": "MAT-039",
+  "title": "Run optional real-provider shadow replay with exact receipts",
+  "track": "evaluation",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "integration",
+  "owner_repo": "mfreeze77/matter",
+  "component": "evaluation/provider",
+  "depends_on": [
+    "MAT-032",
+    "MAT-033",
+    "MAT-034",
+    "MAT-036",
+    "MAT-037",
+    "MAT-038"
+  ],
+  "requirements": [
+    "EVAL-05",
+    "EVAL-12",
+    "EVAL-13",
+    "JEV-13"
+  ],
+  "summary": "Add an explicitly selected provider replay mode over the same frozen packets used offline. The runner observes the real adapter and model while leaving host state and delivery untouched, recording all attempted calls and failures so it can support later threshold and drift analysis.",
+  "in_scope": [
+    "Configured provider-shadow runs, budgets and immutable output references",
+    "Requested/resolved model and full response accounting"
+  ],
+  "out_of_scope": [
+    "Automatic paid runs from default checks",
+    "Production delivery or automatic decisions from unqualified outputs"
+  ],
+  "implementation": [
+    "Require an explicit provider mode, supported adapter, model request, corpus scope, credential source, call/time/cost limits and external result destination.",
+    "Perform configuration validation without dispatching a call; missing credentials or unsupported configuration produce a not_run result with a reason.",
+    "Run frozen packets with bounded concurrency and retries, retaining exact request, response, usage, model-resolution and fault receipts.",
+    "Separate cache replay from fresh provider observations and preserve repeated identical calls as a nondeterminism measurement rather than evidence independence.",
+    "Generate reports that identify unqualified judgments and confirm no host action or audience delivery occurred."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A missing credential or unselected provider cannot trigger a fallback call or synthetic result.",
+      "verification": "Exercise preflight cases with a spy transport and assert zero requests and not_run status."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Every attempted provider request has a receipt or explicit incomplete-attempt record.",
+      "verification": "Interrupt a bounded run and reconcile the manifest against transport attempts and terminal results."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Shadow outputs cannot mutate accepted matter state or deliver advice.",
+      "verification": "Attach action/delivery spies during a provider-shaped integration run and assert no calls."
+    }
+  ],
+  "artifacts": [
+    "src/matter/evaluation/provider.py",
+    "tests/evaluation/test_provider_runner.py",
+    "docs/evaluation.md"
+  ],
+  "tests": [
+    "Resolved model differs from the requested alias.",
+    "One timeout consumes an attempt and remains in reports.",
+    "A resumed run marks cached results separately from fresh trials."
+  ],
+  "risks": [
+    "Selective omission of errors makes accepted coverage look better.",
+    "External data may be sent unintentionally if mode and scope are implicit."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/system_one_http.py",
+      "application": "Reuse observable tracing and arbitrary-set transport behavior through the selected adapter."
+    }
+  ],
+  "sources": [
+    "matterjevmesh §§7–8,10",
+    "docs/jev.md — Execution and receipts",
+    "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/system_one_http.py"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "id": "MAT-008",
+  "title": "Separate association proposals from authorized acceptance",
+  "track": "core",
+  "phase": 1,
+  "priority": "P0",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "associations",
+  "depends_on": [
+    "MAT-005",
+    "MAT-006",
+    "MAT-007"
+  ],
+  "requirements": [
+    "CORE-07"
+  ],
+  "summary": "Make candidate association an explicit decision boundary. An evaluator can propose a connection, while the neutral engine checks revisions, permissions, and protected dispositions before accepting it.",
+  "in_scope": [
+    "Candidate-set and proposal receipts",
+    "Exact-key and evaluator-proposed associations",
+    "Scoped acceptance, rejection, and correction"
+  ],
+  "out_of_scope": [
+    "Provider candidate ranking",
+    "Equivalence merges"
+  ],
+  "implementation": [
+    "Represent candidate IDs/revisions, alternatives, evidence, matching-rule version, and proposal status.",
+    "Build exact-key proposals and accept external semantic proposals without trusting their claimed authority.",
+    "Require a current candidate-set revision and permitted acceptance policy.",
+    "Retain rejection and correction history so replay cannot silently reattach a rejected association."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "No-match, ambiguous, and insufficient-evidence outcomes stay distinct.",
+      "verification": "Test zero candidates, two plausible candidates, and unavailable key evidence."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "A stale candidate proposal cannot be accepted.",
+      "verification": "Race an identity update against proposal acceptance."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Relatedness and confidence do not confer merge or override authority.",
+      "verification": "Submit high-score proposals against protected dispositions."
+    }
+  ],
+  "artifacts": [
+    "src/matter/associations.py",
+    "tests/unit/test_association_outcomes.py",
+    "tests/integration/test_association_acceptance.py"
+  ],
+  "tests": [
+    "A new matching candidate invalidates prior uniqueness.",
+    "Unknown candidate IDs are refused.",
+    "Attachment acceptance can coexist with merge refusal.",
+    "A protected separation survives replayed proposals."
+  ],
+  "risks": [
+    "A score field may be mistaken for permission to mutate identity."
+  ],
+  "reuse": [
+    {
+      "source": "https://github.com/mfreeze77/state-civics-ai/blob/a34fcec27f353187e7a23d54788b203d13ac87c1/services/local-accountability/sar_tracker/core_import/matters.py",
+      "application": "Adapt conflicting-match handling while keeping proposals separate from accepted decisions."
+    }
+  ],
+  "sources": [
+    "docs/contracts/core.md",
+    "matterjevmesh"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}
