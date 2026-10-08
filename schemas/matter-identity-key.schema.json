@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/matter-identity-key.schema.json",
+  "title": "Matter exact identity-key binding v1",
+  "description": "Internal projection value retaining every candidate for one exact scoped subject key. Matter references are bare stable identities, not revision pins. The runtime additionally requires every reference to belong to scope_id; a binding does not itself prove that a candidate matter carries the key or authorize a merge.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scope_id", "key", "matters"],
+  "properties": {
+    "scope_id": {
+      "$ref": "core-record.schema.json#/$defs/identifier"
+    },
+    "key": {
+      "$ref": "core-record.schema.json#/$defs/identity_key"
+    },
+    "matters": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "core-record.schema.json#/$defs/matter_ref"
+      }
+    }
+  }
+}

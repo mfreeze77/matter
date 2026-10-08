@@ -35,12 +35,13 @@ jobs:
         run: node tests/fixtures/canonical/verify.mjs
       - name: Run synthetic lifecycle walkthroughs
         run: python -m matter demo all
-      - name: Verify installed contracts, storage, and observation intake outside the checkout
+      - name: Verify installed contracts, storage, observations, and matter identity outside the checkout
         run: |
           python -m pip wheel . --no-deps --wheel-dir "$RUNNER_TEMP/matter-wheel"
           python -m pip install --force-reinstall --no-deps "$RUNNER_TEMP"/matter-wheel/*.whl
           cp tests/fixtures/contracts/commands/create_matter.json "$RUNNER_TEMP/matter-create.json"
           cp examples/observation_intake.py "$RUNNER_TEMP/matter-observation-intake.py"
+          cp examples/matter_identity.py "$RUNNER_TEMP/matter-identity.py"
           cd "$RUNNER_TEMP"
           python - <<'PY'
           from importlib.resources import files
@@ -57,6 +58,7 @@ jobs:
           assert result["error"]["code"] == "E_STORAGE_UNAVAILABLE"
           assert files("matter.storage.migrations").joinpath("001_initial.sql").is_file()
           assert files("matter._schemas").joinpath("observation-source-index.schema.json").is_file()
+          assert files("matter._schemas").joinpath("matter-identity-key.schema.json").is_file()
           command = decode_command(Path("matter-create.json").read_bytes())
 
           def create(tx):
@@ -84,3 +86,4 @@ jobs:
           print(f"Installed schemas, migrations, transactions, restart and restore passed; SQLite {sqlite3.sqlite_version}.")
           PY
           python matter-observation-intake.py
+          python matter-identity.py

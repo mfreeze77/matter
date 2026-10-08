@@ -24,6 +24,7 @@ FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "contracts"
 SUCCESS_OUTCOMES = {
     "ingest_observation": {"committed", "duplicate"},
     "create_matter": {"created", "existing"},
+    "update_matter_metadata": {"updated", "unchanged"},
     "propose_association": {"proposal", "no_match", "ambiguous", "insufficient_evidence"},
     "accept_association": {"accepted"},
     "append_claim": {"appended", "duplicate"},
@@ -42,6 +43,7 @@ SUCCESS_OUTCOMES = {
 COMMAND_BODY_REQUIRED = {
     "ingest_observation": ("observation",),
     "create_matter": ("matter", "identity_policy"),
+    "update_matter_metadata": ("matter", "metadata"),
     "propose_association": ("subject", "candidates", "matching_rule", "evidence", "assessed_as_of"),
     "accept_association": ("proposal", "candidates", "acceptance_policy"),
     "append_claim": ("claim",),
@@ -197,6 +199,80 @@ class OperationContractTests(unittest.TestCase):
         failure = error_result("ingest_observation", "operation-1", "E_SOURCE_IDENTITY_CONFLICT")
         failure["observation_receipt"] = deepcopy(value["receipt"])
         self.assert_invalid(failure)
+
+    def test_metadata_replacement_accepts_empty_or_optional_display_fields(self):
+        base = command("update_matter_metadata")
+        extensions = deepcopy(base["body"]["metadata"]["extensions"])
+        for metadata in ({}, {"title": "New title"}, {"description": "New description"},
+                         {"extensions": {}}, {"extensions": extensions}, base["body"]["metadata"]):
+            with self.subTest(metadata=metadata):
+                value = deepcopy(base)
+                value["body"]["metadata"] = deepcopy(metadata)
+                self.assertEqual(validate_command(value), value)
+                self.assertEqual(decode_command(json.dumps(value)), value)
+                self.assertEqual(value["body"]["metadata"], metadata)
+
+    def test_metadata_replacement_cannot_change_identity_provenance_or_lifecycle(self):
+        base = command("update_matter_metadata")
+        forbidden = {
+            "scope_id": "other-scope", "namespace": "other", "id": "other-matter",
+            "record_type": "observation", "revision": 3, "domain_kind": "example:problem",
+            "identity_keys": [{"namespace": "example", "value": "another-subject"}],
+            "creation_receipt": deepcopy(base["authority"]), "provenance": {},
+            "lifecycle": {}, "supersedes": [deepcopy(base["body"]["matter"])],
+            "purpose": {}, "audience": {},
+        }
+        for field, content in forbidden.items():
+            for location in ("body", "metadata"):
+                with self.subTest(field=field, location=location):
+                    value = deepcopy(base)
+                    target = value["body"] if location == "body" else value["body"]["metadata"]
+                    target[field] = content
+                    self.assert_invalid(value, kind="command")
+
+    def test_metadata_replacement_fields_are_typed_and_target_requires_a_matter_pin(self):
+        base = command("update_matter_metadata")
+        invalid_metadata = [None, [], "title", 1]
+        invalid_metadata.extend({field: value} for field in ("title", "description")
+                                for value in (None, "", False, {}, []))
+        invalid_metadata.extend(({"extensions": None}, {"extensions": {"unscoped": {}}},
+                                 {"extensions": {"example:display": "untyped"}}))
+        for metadata in invalid_metadata:
+            with self.subTest(metadata=metadata):
+                value = deepcopy(base)
+                value["body"]["metadata"] = metadata
+                self.assert_invalid(value, kind="command")
+        bare = deepcopy(base["body"]["matter"])
+        bare.pop("revision")
+        for reference in (bare, {**bare, "revision": 0},
+                          {**bare, "record_type": "receipt", "digest": "a" * 64},
+                          {**bare, "revision": 1, "digest": "a" * 64}):
+            with self.subTest(reference=reference):
+                value = deepcopy(base)
+                value["body"]["matter"] = reference
+                self.assert_invalid(value, kind="command")
+        value = deepcopy(base)
+        value["body"]["matter"] = {**bare, "digest": "a" * 64}
+        self.assertEqual(validate_command(value), value)
+
+    def test_metadata_results_keep_refusals_separate_from_successful_no_change(self):
+        for outcome in ("updated", "unchanged"):
+            value = success("update_matter_metadata", outcome)
+            self.assertEqual(validate_result(value), value)
+            value["body"]["metadata"] = {}
+            self.assert_invalid(value)
+            value = success("update_matter_metadata", outcome)
+            value["body"]["matter"]["record_type"] = "occurrence"
+            self.assert_invalid(value)
+        for code in sorted(REQUIRED_ERRORS):
+            with self.subTest(code=code):
+                failure = error_result("update_matter_metadata", "update-1", code)
+                self.assertEqual(validate_result(failure), failure)
+                self.assertNotIn("outcome", failure)
+                self.assertNotIn("receipt", failure)
+        failure = fixture("results/update_matter_metadata__failure_revision_conflict.json")
+        self.assertEqual(validate_result(failure), failure)
+        self.assertEqual(failure["error"]["code"], "E_REVISION_CONFLICT")
 
     def test_new_operation_names_and_unscoped_fields_are_not_silently_accepted(self):
         self.assert_invalid(command("create_matter") | {"operation": "execute_anything"}, kind="command")

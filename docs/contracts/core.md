@@ -1,6 +1,6 @@
 # Core information and operation contract
 
-Status: governing specification. MAT-002 implements the [version 1.0 structural schemas](schema-inventory.md) and [canonical encoding](canonical.md). MAT-003 implements the [transactional storage port](../storage.md), qualified by its own [acceptance evidence](../validation/MAT-003.md). MAT-004 implements [immutable observation intake](../observations.md). Continuing matter identity, occurrence grouping, association, assessment, lifecycle, and delivery remain tracked by MAT-005 through MAT-025. Structural validation, storage commits, and observation intake alone do not qualify those later guarantees. A ticket is complete only with its own recorded acceptance evidence.
+Status: governing specification. MAT-002 implements the [version 1.0 structural schemas](schema-inventory.md) and [canonical encoding](canonical.md). MAT-003 implements the [transactional storage port](../storage.md), qualified by its own [acceptance evidence](../validation/MAT-003.md). MAT-004 implements [immutable observation intake](../observations.md). MAT-005 implements [continuing matter identity and revisioned metadata](../matters.md). Occurrence grouping, association, assessment, lifecycle, and delivery remain tracked by MAT-006 through MAT-025. Each implemented component has bounded acceptance evidence; it does not qualify those later guarantees. A ticket is complete only with its own recorded acceptance evidence.
 
 ## Purpose and sources
 
@@ -145,6 +145,7 @@ Every mutation requires a command ID, idempotency key, scope, actor/authority re
 |---|---|---|
 | ingest_observation | Source identity, digest, schema, scope | committed, duplicate, identity_conflict |
 | create_matter | Scope and identity policy; no run-only identity | created, existing, identity_conflict |
+| update_matter_metadata | Current matter dependency, scope, bounded display metadata | updated, unchanged, stale, forbidden |
 | propose_association | Valid candidate references and evidence | proposal, no_match, ambiguous, insufficient_evidence |
 | accept_association | Candidate revisions, declared authority | accepted, stale, forbidden, association_conflict |
 | append_claim / relate_evidence | Claim scope, proposition version, locator | appended, duplicate, invalid_evidence |
@@ -155,6 +156,8 @@ Every mutation requires a command ID, idempotency key, scope, actor/authority re
 | invalidate_dependents | Changed revision or watched negative scope | affected set with reasons, no_op |
 | request_transition | Profile edge, evidence, authority, revisions | applied, held, stale, forbidden |
 | prepare_delivery / dispatch | Audience, latest delivery baseline, epoch, freshness | ready, withheld, stale, transport outcome |
+
+`update_matter_metadata` is the bounded metadata operation added by MAT-005. Its required `metadata` object completely replaces only the optional title, description, and namespaced extensions; omitted fields are removed and an empty object clears all three. It preserves identity keys, scoped matter ID, domain kind, lifecycle, supersession, original provenance, and creation receipt. A changed value appends the next matter revision; an identical replacement returns `unchanged` without a new matter revision. Both results identify the current command receipt, and the command journal records the edit actor. Stale or forbidden requests remain explicit failures. Matter creation never doubles as a metadata update.
 
 Transport-neutral failures carry code, operation ID, retriable boolean, affected references that the caller may read, and safe detail. Required codes: E_SCHEMA_INVALID, E_VERSION_UNSUPPORTED, E_SCOPE_FORBIDDEN, E_NOT_FOUND, E_IDEMPOTENCY_CONFLICT, E_SOURCE_IDENTITY_CONFLICT, E_REVISION_CONFLICT, E_ASSOCIATION_CONFLICT, E_MERGE_CONFLICT, E_EVIDENCE_INVALID, E_EVIDENCE_UNAVAILABLE, E_DEPENDENCY_STALE, E_POLICY_INVALID, E_RULE_CONFLICT, E_AUTHORITY_REQUIRED, E_BUDGET_EXHAUSTED, E_CANCELLED, E_STORAGE_UNAVAILABLE, and E_DELIVERY_UNKNOWN.
 

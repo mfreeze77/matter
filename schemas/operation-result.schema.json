@@ -24,6 +24,7 @@
           "enum": [
             "ingest_observation",
             "create_matter",
+            "update_matter_metadata",
             "propose_association",
             "accept_association",
             "append_claim",
@@ -139,6 +140,50 @@
             },
             "outcome": {
               "const": "existing"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "matter"
+              ],
+              "properties": {
+                "matter": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_dependency"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "update_matter_metadata"
+            },
+            "outcome": {
+              "const": "updated"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "matter"
+              ],
+              "properties": {
+                "matter": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_dependency"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "update_matter_metadata"
+            },
+            "outcome": {
+              "const": "unchanged"
             },
             "body": {
               "type": "object",
@@ -930,6 +975,7 @@
           "enum": [
             "ingest_observation",
             "create_matter",
+            "update_matter_metadata",
             "propose_association",
             "accept_association",
             "append_claim",

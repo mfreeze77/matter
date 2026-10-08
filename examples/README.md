@@ -12,4 +12,19 @@ These are executable examples of a small subset of the future contract. They are
 
 The implementation in `src/matter/demo.py` is an in-memory, single-process walkthrough. Its identities are deterministic within synthetic scope, occurrence counts do not establish independent corroboration, and delivery means a recorded simulated emission only. It has no durable transport, concurrent workers, semantic evaluator, identity resolver, or production authority model. Full implementation and qualification remain in the backlog.
 
-The example `classification` and `condition_id` fields describe already-prepared inputs. The general production observation, evidence, rule, and assessment schemas will be implemented under MAT-002 and dependent tickets; `walkthrough.schema.json` is not their replacement.
+The example `classification` and `condition_id` fields describe already-prepared inputs. MAT-002 supplies the general observation, evidence, rule, and assessment structural schemas; `walkthrough.schema.json` is not their replacement. Runtime operation semantics remain in their individual tickets.
+
+## Installed API examples
+
+These standalone Python examples exercise implemented services with synthetic
+inputs and temporary local storage. They also run from an installed wheel
+outside the checkout, without loading test fixtures:
+
+| Example | Behaviors verified |
+|---|---|
+| [Observation intake](observation_intake.py) | Exact payloads, duplicate delivery, explicit corrections, evidence history, and restart |
+| [Matter identity](matter_identity.py) | Persistent exact subject keys, new-run continuity, revisioned metadata, scope isolation, exact retries, and backup/restore |
+
+Run `python examples/observation_intake.py` and `python examples/matter_identity.py`.
+Both use synthetic host authority references. They do not establish domain
+authority, semantic identity, or a qualified assessment engine.

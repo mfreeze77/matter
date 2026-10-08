@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "description": "Standalone synthetic structural vectors for MAT-002. Expected validity is declared here, independent of backend behavior. Digests consisting of zeroes are fixture placeholders, not assertions about available source bytes.",
+  "description": "Standalone synthetic structural vectors for Matter v1, beginning with MAT-002 and extended with later reviewed operations. Expected validity is declared here, independent of backend behavior. Digests consisting of zeroes are fixture placeholders, not assertions about available source bytes.",
   "fixtures": [
     {
       "path": "records/observation.json",
@@ -625,6 +625,30 @@
       "schema": "command",
       "valid": false,
       "description": "A resource ceiling is a nonnegative exact decimal string."
+    },
+    {
+      "path": "commands/update_matter_metadata.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic pinned metadata replacement command; only display fields and namespaced extensions are replaceable."
+    },
+    {
+      "path": "results/update_matter_metadata__updated.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic metadata update result points to the revised matter and current command receipt."
+    },
+    {
+      "path": "results/update_matter_metadata__unchanged.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic no-op result retains the matter revision and identifies the current command receipt."
+    },
+    {
+      "path": "results/update_matter_metadata__failure_revision_conflict.json",
+      "schema": "result",
+      "valid": true,
+      "description": "A stale metadata update is an explicit failure, never a successful unchanged result."
     }
   ]
 }

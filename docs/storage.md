@@ -6,11 +6,13 @@ short synchronous handler. The store checks the command's dependencies and
 commits record versions, current heads, projection watches, an operation
 receipt, and the exact result together.
 
-The port establishes persistence guarantees for later operation handlers.
-Source-event deduplication, matter identity policy, merge/undo semantics,
-negative-evidence interpretation, authenticated controls, assessment execution,
-and external delivery retain their own tickets. A storage receipt records a
-commit; it does not establish that the host's policy or authority was correct.
+The port establishes persistence guarantees for operation handlers.
+[Observation intake](observations.md) implements source-event deduplication;
+[matter identity](matters.md) implements scoped subject keys and metadata
+revisions. Merge/undo semantics, negative-evidence interpretation, authenticated
+controls, assessment execution, and external delivery retain their own tickets.
+A storage receipt records a commit; it does not establish that the host's policy
+or authority was correct.
 
 ## First transaction
 
@@ -42,9 +44,10 @@ with SQLiteStore("matter.sqlite", scope_id=command["scope_id"]) as store:
 ```
 
 The synthetic handler deliberately performs only structural validation and
-storage. It is not the production `create_matter` implementation planned in
-MAT-005. A host must authenticate the caller, authorize its scope, and apply its
-operation-specific rules before allowing the corresponding writes.
+storage. Use [MAT-005's `MatterService`](matters.md) for exact subject-key
+resolution and guarded metadata updates. A host must authenticate the caller,
+authorize its scope, and apply its operation-specific rules before allowing
+the corresponding writes.
 
 ## Transaction and retry semantics
 
@@ -63,7 +66,7 @@ handler)` uses these boundaries:
    identities in the read set are invalid. A mutable snapshot's digest pin is
    checked against the current head, just like its revision pin.
 5. Run the handler inside a savepoint. Each read of preexisting data through
-   `tx.get` or `tx.watchers` requires its declared current pin. An absent record
+   `tx.get`, `tx.lookup_identity`, or `tx.watchers` requires its declared current pin. An absent record
    can be checked and created under the same writer lock; a record created by
    this command can be read immediately without a nonexistent earlier pin.
 6. For success, append all writes and their receipt. For a terminal semantic
@@ -108,8 +111,9 @@ and digest; a broken snapshot produces an explicit storage error.
 
 | Read API | Meaning |
 |---|---|
-| `store.get(entity_ref)` | Current snapshot of the readable identity |
+| `store.get(entity_ref)` | Current snapshot of the readable identity with the requested kind |
 | `store.get(pinned_ref)` | Exact historical revision or digest snapshot |
+| `store.lookup_identity(entity_ref)` | Current occupant of the scoped ID, across record kinds; bare references only |
 | `store.history(entity_ref)` | All immutable snapshots in storage revision order |
 | `store.receipt_for(reference)` | Operation receipt that committed the current or pinned snapshot |
 | `store.command_receipt(key)` | Original command, canonical command digest, exact result, and full receipt |
@@ -119,6 +123,16 @@ and digest; a broken snapshot produces an explicit storage error.
 pins for immutable records. `snapshot_digest(snapshot)` also supports digest
 pins for mutable snapshots. A historical pin is suitable for reading history;
 it cannot authorize overwriting a newer head.
+
+`lookup_identity` was added with MAT-005 so a proposed matter or key-index ID
+cannot conceal an existing occupant of another record kind. It uses
+`(scope_id, namespace, id)` and returns the actual typed snapshot. Its supplied
+`record_type` is the proposed kind, not a filter; absence is audited using that
+bare reference. `tx.lookup_identity` requires the actual occupant's declared
+current pin, exactly as `tx.get` does. It never discovers and adds an implicit
+pin. An occupant appearing after preparation is a revision conflict. Ordinary
+typed and historical `get` behavior is unchanged; the database format remains
+version 1.
 
 There is no delete or retention API in this ticket. History and result
 pagination, projections for application queries, and explanation construction

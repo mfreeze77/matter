@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "operation": "update_matter_metadata",
+  "operation_id": "operation-update_matter_metadata-stale",
+  "status": "failure",
+  "error": {
+    "code": "E_REVISION_CONFLICT",
+    "operation_id": "operation-update_matter_metadata-stale",
+    "retriable": false,
+    "affected_references": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "matter",
+        "id": "matter-1"
+      }
+    ],
+    "detail": "Synthetic safe failure detail."
+  }
+}
