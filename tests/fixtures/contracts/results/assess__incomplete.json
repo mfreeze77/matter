@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "operation": "assess",
+  "operation_id": "operation-assess",
+  "status": "success",
+  "outcome": "incomplete",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "assessment": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "assessment",
+      "id": "assessment-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "reasons": [
+      "Required source coverage is incomplete."
+    ]
+  }
+}

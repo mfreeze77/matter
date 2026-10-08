@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "operation": "accept_association",
+  "operation_id": "operation-accept_association",
+  "status": "success",
+  "outcome": "accepted",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "association": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "accepted_association",
+      "id": "accepted_association-1",
+      "revision": 1
+    }
+  }
+}

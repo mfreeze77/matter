@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0",
+  "record_type": "association_proposal",
+  "scope_id": "synthetic:mat002",
+  "namespace": "example",
+  "id": "association_proposal-1",
+  "creation_receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "receipt-1"
+  },
+  "provenance": {
+    "origin": "system",
+    "producer": {
+      "namespace": "example",
+      "id": "fixture-producer",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "parents": []
+  },
+  "body": {
+    "subject": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "observation",
+      "id": "observation-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "outcome": "matched",
+    "candidates": [
+      {
+        "candidate": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "matter",
+          "id": "matter-1",
+          "revision": 1
+        },
+        "basis": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "observation",
+            "id": "observation-1",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ]
+      }
+    ],
+    "selected": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "matter",
+        "id": "matter-1",
+        "revision": 1
+      }
+    ],
+    "matching_rule": {
+      "namespace": "example",
+      "id": "exact-key",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "evidence": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "observation",
+        "id": "observation-1",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "evaluator_receipt": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "evaluation-1"
+    },
+    "uncertainty": {
+      "schema": {
+        "namespace": "example",
+        "id": "synthetic-value",
+        "version": "1.0",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "value": {
+        "status": "deterministic"
+      }
+    },
+    "qualification": {
+      "status": "not_required",
+      "reason": "The synthetic exact-key comparison has no learned judgment."
+    }
+  }
+}

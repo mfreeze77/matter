@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "operation": "ingest_observation",
+  "operation_id": "operation-ingest_observation",
+  "status": "success",
+  "outcome": "duplicate",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "observation": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "observation",
+      "id": "observation-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  }
+}

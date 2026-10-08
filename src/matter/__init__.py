@@ -1,6 +1,7 @@
-"""Matter planning tools and deterministic contract walkthrough.
+"""Matter portable contracts, planning tools, and synthetic walkthroughs.
 
-The production matter engine and integrations are tracked in tickets/records.
+Structural contracts live in ``matter.contracts`` and canonical encoding in
+``matter.canonical``. The persistent engine and integrations remain backlog work.
 """
 
-__version__ = "0.1.0.dev0"
+__version__ = "0.1.0.dev1"

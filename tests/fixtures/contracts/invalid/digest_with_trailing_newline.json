@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "record_type": "observation",
+  "scope_id": "synthetic:mat002",
+  "namespace": "example",
+  "id": "observation-1",
+  "creation_receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "receipt-1"
+  },
+  "provenance": {
+    "origin": "system",
+    "producer": {
+      "namespace": "example",
+      "id": "fixture-producer",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "parents": []
+  },
+  "body": {
+    "source_identity": {
+      "namespace": "example:source",
+      "event_id": "source-event-1"
+    },
+    "content": {
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000\n",
+      "locator": {
+        "kind": "whole_artifact",
+        "uri": "urn:example:source:1"
+      },
+      "media_type": "text/plain",
+      "availability": {
+        "status": "available",
+        "checked_at": {
+          "state": "known",
+          "value": "2026-10-08T15:00:00Z",
+          "precision": "second"
+        }
+      },
+      "byte_length": 0
+    },
+    "occurred_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "source_published_at": {
+      "state": "unknown",
+      "reason": "not_reported"
+    },
+    "available_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "ingested_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "extraction": {
+      "namespace": "example",
+      "id": "extractor",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  }
+}

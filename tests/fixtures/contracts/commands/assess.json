@@ -1,0 +1,83 @@
+{
+  "schema_version": "1.0",
+  "operation": "assess",
+  "command_id": "command-assess",
+  "idempotency_key": "idempotency-assess",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [
+    {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    }
+  ],
+  "body": {
+    "matter": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    },
+    "profile": {
+      "namespace": "example",
+      "id": "profile",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "purpose": {
+      "namespace": "example",
+      "id": "purpose",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "evidence": {
+      "references": [
+        {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "observation",
+          "id": "observation-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "coverage": {
+        "status": "complete",
+        "snapshot": {
+          "namespace": "example",
+          "id": "snapshot",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      },
+      "omitted": []
+    },
+    "assessed_as_of": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "budget": {
+      "max_calls": 0,
+      "max_candidates": 10,
+      "max_bytes": 4096,
+      "max_elapsed_ms": 1000,
+      "max_cost": "0.00",
+      "cost_unit": "example:currency"
+    },
+    "control_epoch": 0
+  }
+}

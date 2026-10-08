@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "operation": "prepare_delivery",
+  "operation_id": "operation-prepare_delivery",
+  "status": "success",
+  "outcome": "ready",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "intent": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "outbox-intent-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "delivery_key": "delivery-1"
+  }
+}

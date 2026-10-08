@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "operation": "create_matter",
+  "command_id": "command-create_matter",
+  "idempotency_key": "idempotency-create_matter",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [],
+  "body": {
+    "matter": {
+      "schema_version": "1.0",
+      "record_type": "matter",
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "id": "matter-1",
+      "provenance": {
+        "origin": "system",
+        "producer": {
+          "namespace": "example",
+          "id": "fixture-producer",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "recorded_at": {
+          "state": "known",
+          "value": "2026-10-08T15:00:00Z",
+          "precision": "second"
+        },
+        "parents": []
+      },
+      "body": {
+        "domain_kind": "example:opportunity",
+        "identity_keys": [
+          {
+            "namespace": "example:subject",
+            "value": "subject-1"
+          }
+        ],
+        "title": "Synthetic continuing opportunity"
+      }
+    },
+    "identity_policy": {
+      "namespace": "example",
+      "id": "identity-policy",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  }
+}

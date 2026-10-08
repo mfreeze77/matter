@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "operation": "invalidate_dependents",
+  "operation_id": "operation-invalidate_dependents",
+  "status": "success",
+  "outcome": "no_op",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "affected": []
+  }
+}

@@ -1,4 +1,4 @@
-name: Validate Matter scaffold
+name: Validate Matter contracts and scaffold
 
 on:
   push:
@@ -31,5 +31,22 @@ jobs:
         run: python -m matter validate
       - name: Run behavioral regression tests
         run: python -m unittest discover -s tests -v
+      - name: Verify portable canonical vectors in JavaScript
+        run: node tests/fixtures/canonical/verify.mjs
       - name: Run synthetic lifecycle walkthroughs
         run: python -m matter demo all
+      - name: Verify installed contract resources outside the checkout
+        run: |
+          python -m pip wheel . --no-deps --wheel-dir "$RUNNER_TEMP/matter-wheel"
+          python -m pip install --force-reinstall --no-deps "$RUNNER_TEMP"/matter-wheel/*.whl
+          cd "$RUNNER_TEMP"
+          python - <<'PY'
+          from matter.contracts import error_result, schema_for
+
+          for kind in ("record", "command", "result"):
+              assert schema_for(kind)["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+          result = error_result("ingest_observation", "wheel-check", "E_STORAGE_UNAVAILABLE")
+          assert result["status"] == "failure"
+          assert result["error"]["code"] == "E_STORAGE_UNAVAILABLE"
+          print("Installed schemas and offline validation passed outside the checkout.")
+          PY

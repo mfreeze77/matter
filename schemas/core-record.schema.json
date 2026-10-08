@@ -1,0 +1,3882 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json",
+  "title": "Matter core records v1",
+  "description": "Closed domain-neutral structural contracts. Schemas do not establish authority, reference existence, revision freshness, storage durability, or domain truth.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/observation_record"
+    },
+    {
+      "$ref": "#/$defs/occurrence_record"
+    },
+    {
+      "$ref": "#/$defs/matter_record"
+    },
+    {
+      "$ref": "#/$defs/claim_record"
+    },
+    {
+      "$ref": "#/$defs/evidence_relation_record"
+    },
+    {
+      "$ref": "#/$defs/association_proposal_record"
+    },
+    {
+      "$ref": "#/$defs/accepted_association_record"
+    },
+    {
+      "$ref": "#/$defs/matter_relation_record"
+    },
+    {
+      "$ref": "#/$defs/judgment_record"
+    },
+    {
+      "$ref": "#/$defs/assessment_record"
+    },
+    {
+      "$ref": "#/$defs/control_record"
+    },
+    {
+      "$ref": "#/$defs/receipt_record"
+    }
+  ],
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^\\u0000-\\u0020\\u007f]+(?![\\s\\S])",
+      "not": {
+        "pattern": "[\\u0000-\\u0020\\u007f]"
+      }
+    },
+    "namespace": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z][A-Za-z0-9._:/-]*(?![\\s\\S])",
+      "not": {
+        "pattern": "[\\u0000-\\u0020\\u007f]"
+      }
+    },
+    "namespaced_name": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]*(?:[.:/][A-Za-z0-9][A-Za-z0-9_.:/-]*)+(?![\\s\\S])",
+      "not": {
+        "pattern": "[\\u0000-\\u0020\\u007f]"
+      }
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "counter": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}(?![\\s\\S])",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "decimal_string": {
+      "type": "string",
+      "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?(?![\\s\\S])",
+      "description": "An exact decimal lexeme. It is a string, is never coerced through binary floating point, and is not numerically normalized by matter-json-v1.",
+      "not": {
+        "pattern": "[\\u0000-\\u0020\\u007f]"
+      }
+    },
+    "record_kind": {
+      "enum": [
+        "observation",
+        "occurrence",
+        "matter",
+        "claim",
+        "evidence_relation",
+        "association_proposal",
+        "accepted_association",
+        "matter_relation",
+        "judgment",
+        "assessment",
+        "control",
+        "receipt"
+      ]
+    },
+    "reference_kind": {
+      "anyOf": [
+        {
+          "enum": [
+            "observation",
+            "occurrence",
+            "matter",
+            "claim",
+            "evidence_relation",
+            "association_proposal",
+            "accepted_association",
+            "matter_relation",
+            "judgment",
+            "assessment",
+            "control",
+            "receipt"
+          ]
+        },
+        {
+          "$ref": "#/$defs/namespaced_name"
+        }
+      ]
+    },
+    "entity_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope_id",
+        "namespace",
+        "record_type",
+        "id"
+      ],
+      "properties": {
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "record_type": {
+          "$ref": "#/$defs/reference_kind"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        }
+      }
+    },
+    "pinned_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope_id",
+        "namespace",
+        "record_type",
+        "id"
+      ],
+      "properties": {
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "record_type": {
+          "$ref": "#/$defs/reference_kind"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "revision": {
+          "$ref": "#/$defs/revision"
+        },
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "revision"
+          ],
+          "not": {
+            "required": [
+              "digest"
+            ]
+          }
+        },
+        {
+          "required": [
+            "digest"
+          ],
+          "not": {
+            "required": [
+              "revision"
+            ]
+          }
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "record_type": {
+                "enum": [
+                  "observation",
+                  "claim",
+                  "association_proposal",
+                  "judgment",
+                  "assessment",
+                  "control",
+                  "receipt"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "digest"
+            ]
+          }
+        }
+      ],
+      "description": "Exactly one immutable digest or aggregate revision. Immutable core record kinds require a digest. Mutable aggregate dependencies may pin a revision or the digest of a specific immutable revision snapshot. Namespaced external kinds declare their own pin interpretation."
+    },
+    "observation_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entity_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "observation"
+            }
+          }
+        }
+      ]
+    },
+    "observation_dependency": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "observation"
+            }
+          }
+        }
+      ]
+    },
+    "occurrence_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entity_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "occurrence"
+            }
+          }
+        }
+      ]
+    },
+    "occurrence_dependency": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "occurrence"
+            }
+          }
+        }
+      ]
+    },
+    "matter_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entity_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "matter"
+            }
+          }
+        }
+      ]
+    },
+    "matter_dependency": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "matter"
+            }
+          }
+        }
+      ]
+    },
+    "claim_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entity_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "claim"
+            }
+          }
+        }
+      ]
+    },
+    "claim_dependency": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "claim"
+            }
+          }
+        }
+      ]
+    },
+    "evidence_relation_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entity_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "evidence_relation"
+            }
+          }
+        }
+      ]
+    },
+    "evidence_relation_dependency": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "evidence_relation"
+            }
+          }
+        }
+      ]
+    },
+    "association_proposal_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entity_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "association_proposal"
+            }
+          }
+        }
+      ]
+    },
+    "association_proposal_dependency": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "association_proposal"
+            }
+          }
+        }
+      ]
+    },
+    "accepted_association_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entity_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "accepted_association"
+            }
+          }
+        }
+      ]
+    },
+    "accepted_association_dependency": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "accepted_association"
+            }
+          }
+        }
+      ]
+    },
+    "matter_relation_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entity_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "matter_relation"
+            }
+          }
+        }
+      ]
+    },
+    "matter_relation_dependency": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "matter_relation"
+            }
+          }
+        }
+      ]
+    },
+    "judgment_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entity_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "judgment"
+            }
+          }
+        }
+      ]
+    },
+    "judgment_dependency": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "judgment"
+            }
+          }
+        }
+      ]
+    },
+    "assessment_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entity_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "assessment"
+            }
+          }
+        }
+      ]
+    },
+    "assessment_dependency": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "assessment"
+            }
+          }
+        }
+      ]
+    },
+    "control_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entity_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "control"
+            }
+          }
+        }
+      ]
+    },
+    "control_dependency": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "control"
+            }
+          }
+        }
+      ]
+    },
+    "receipt_ref": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entity_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "receipt"
+            }
+          }
+        }
+      ]
+    },
+    "receipt_dependency": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "const": "receipt"
+            }
+          }
+        }
+      ]
+    },
+    "actor_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope_id",
+        "namespace",
+        "id"
+      ],
+      "properties": {
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        }
+      }
+    },
+    "component_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "namespace",
+        "id",
+        "version",
+        "digest"
+      ],
+      "properties": {
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "version": {
+          "$ref": "#/$defs/text"
+        },
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "domain_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "value"
+      ],
+      "properties": {
+        "schema": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "value": {}
+      },
+      "description": "An explicitly schema-bound domain value. The core preserves the value losslessly but does not interpret it, authorize it, or validate the external domain schema."
+    },
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/namespaced_name"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/domain_value"
+      },
+      "description": "Optional namespaced extension values; each declares an exact external schema. Unknown well-formed optional extensions are preserved, never executed."
+    },
+    "known_time": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "value",
+        "precision"
+      ],
+      "properties": {
+        "state": {
+          "const": "known"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]{3}|\\.[0-9]{6}|\\.[0-9]{9})?Z(?![\\s\\S])",
+          "format": "matter-utc-time"
+        },
+        "precision": {
+          "enum": [
+            "second",
+            "millisecond",
+            "microsecond",
+            "nanosecond"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "precision": {
+                "const": "second"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "pattern": "T[0-9]{2}:[0-9]{2}:[0-9]{2}Z(?![\\s\\S])"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "precision": {
+                "const": "millisecond"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "pattern": "T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z(?![\\s\\S])"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "precision": {
+                "const": "microsecond"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "pattern": "T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{6}Z(?![\\s\\S])"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "precision": {
+                "const": "nanosecond"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "pattern": "T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{9}Z(?![\\s\\S])"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "unknown_time": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "reason"
+      ],
+      "properties": {
+        "state": {
+          "const": "unknown"
+        },
+        "reason": {
+          "enum": [
+            "not_reported",
+            "not_observed",
+            "source_unavailable",
+            "conflicting_evidence",
+            "not_applicable"
+          ]
+        },
+        "detail": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "time_value": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/known_time"
+        },
+        {
+          "$ref": "#/$defs/unknown_time"
+        }
+      ]
+    },
+    "time_interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start",
+        "end",
+        "bounds"
+      ],
+      "properties": {
+        "start": {
+          "$ref": "#/$defs/time_value"
+        },
+        "end": {
+          "$ref": "#/$defs/time_value"
+        },
+        "bounds": {
+          "enum": [
+            "closed",
+            "closed_open",
+            "open_closed",
+            "open"
+          ]
+        }
+      }
+    },
+    "source_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "namespace",
+        "event_id"
+      ],
+      "properties": {
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "event_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "revision_id": {
+          "$ref": "#/$defs/identifier"
+        }
+      }
+    },
+    "identity_key": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "namespace",
+        "value"
+      ],
+      "properties": {
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "value": {
+          "$ref": "#/$defs/identifier"
+        }
+      }
+    },
+    "availability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "checked_at"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "available",
+            "unavailable",
+            "withheld"
+          ]
+        },
+        "reason": {
+          "$ref": "#/$defs/text"
+        },
+        "checked_at": {
+          "$ref": "#/$defs/time_value"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "unavailable",
+                  "withheld"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "reason"
+            ]
+          }
+        }
+      ]
+    },
+    "locator": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "uri"
+          ],
+          "properties": {
+            "kind": {
+              "const": "whole_artifact"
+            },
+            "uri": {
+              "type": "string",
+              "minLength": 1,
+              "format": "uri"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "uri",
+            "selector"
+          ],
+          "properties": {
+            "kind": {
+              "const": "selected_span"
+            },
+            "uri": {
+              "type": "string",
+              "minLength": 1,
+              "format": "uri"
+            },
+            "selector": {
+              "$ref": "#/$defs/domain_value"
+            },
+            "validation_receipt": {
+              "$ref": "#/$defs/receipt_ref"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "properties": {
+            "kind": {
+              "const": "unavailable"
+            },
+            "reason": {
+              "$ref": "#/$defs/text"
+            }
+          }
+        }
+      ]
+    },
+    "source_content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest",
+        "locator",
+        "media_type",
+        "availability"
+      ],
+      "properties": {
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "locator": {
+          "$ref": "#/$defs/locator"
+        },
+        "media_type": {
+          "$ref": "#/$defs/text"
+        },
+        "availability": {
+          "$ref": "#/$defs/availability"
+        },
+        "byte_length": {
+          "$ref": "#/$defs/counter"
+        }
+      },
+      "description": "digest is plain SHA-256 of exact original bytes, without the normalized-contract preimage. Bytes may use any source encoding.",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "availability": {
+                "properties": {
+                  "status": {
+                    "const": "available"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "locator": {
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "whole_artifact",
+                      "selected_span"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "origin",
+        "producer",
+        "recorded_at",
+        "parents"
+      ],
+      "properties": {
+        "origin": {
+          "enum": [
+            "source",
+            "host",
+            "adapter",
+            "evaluator",
+            "derived",
+            "system"
+          ]
+        },
+        "producer": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "recorded_at": {
+          "$ref": "#/$defs/known_time"
+        },
+        "parents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 0
+        },
+        "run_id": {
+          "$ref": "#/$defs/identifier"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "origin": {
+                "const": "derived"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "parents": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "snapshot"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "failed",
+            "not_expected_yet",
+            "expected_not_published",
+            "manual_review"
+          ]
+        },
+        "reason": {
+          "$ref": "#/$defs/text"
+        },
+        "snapshot": {
+          "$ref": "#/$defs/component_ref"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "not": {
+                  "const": "complete"
+                }
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "reason"
+            ]
+          }
+        }
+      ]
+    },
+    "negative_watch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "scope_id",
+        "query",
+        "eligible_sources",
+        "observed_interval",
+        "catalog",
+        "coverage"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "query": {
+          "$ref": "#/$defs/domain_value"
+        },
+        "eligible_sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identity_key"
+          },
+          "minItems": 1
+        },
+        "observed_interval": {
+          "$ref": "#/$defs/time_interval"
+        },
+        "catalog": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "coverage": {
+          "$ref": "#/$defs/coverage"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/known_time"
+        },
+        "next_check_at": {
+          "$ref": "#/$defs/known_time"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "expires_at"
+          ]
+        },
+        {
+          "required": [
+            "next_check_at"
+          ]
+        }
+      ]
+    },
+    "time_condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "condition",
+        "next_check_at",
+        "expires_at"
+      ],
+      "properties": {
+        "condition": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "next_check_at": {
+          "$ref": "#/$defs/known_time"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time_value"
+        }
+      }
+    },
+    "dependency_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "positive",
+        "negative",
+        "time_conditions",
+        "context",
+        "control_epoch"
+      ],
+      "properties": {
+        "positive": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 0
+        },
+        "negative": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/negative_watch"
+          },
+          "minItems": 0
+        },
+        "time_conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/time_condition"
+          },
+          "minItems": 0
+        },
+        "context": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/component_ref"
+          },
+          "minItems": 0
+        },
+        "control_epoch": {
+          "$ref": "#/$defs/counter"
+        }
+      }
+    },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_required",
+            "qualified",
+            "unqualified",
+            "expired",
+            "mismatched",
+            "unknown"
+          ]
+        },
+        "certificate": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "reason": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "qualified"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "certificate"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "not_required"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "reason"
+            ],
+            "not": {
+              "required": [
+                "certificate"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "error_code": {
+      "enum": [
+        "E_SCHEMA_INVALID",
+        "E_VERSION_UNSUPPORTED",
+        "E_SCOPE_FORBIDDEN",
+        "E_NOT_FOUND",
+        "E_IDEMPOTENCY_CONFLICT",
+        "E_SOURCE_IDENTITY_CONFLICT",
+        "E_REVISION_CONFLICT",
+        "E_ASSOCIATION_CONFLICT",
+        "E_MERGE_CONFLICT",
+        "E_EVIDENCE_INVALID",
+        "E_EVIDENCE_UNAVAILABLE",
+        "E_DEPENDENCY_STALE",
+        "E_POLICY_INVALID",
+        "E_RULE_CONFLICT",
+        "E_AUTHORITY_REQUIRED",
+        "E_BUDGET_EXHAUSTED",
+        "E_CANCELLED",
+        "E_STORAGE_UNAVAILABLE",
+        "E_DELIVERY_UNKNOWN"
+      ]
+    },
+    "semantic_error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "operation_id",
+        "retriable",
+        "affected_references",
+        "detail"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/error_code"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "retriable": {
+          "type": "boolean"
+        },
+        "affected_references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/entity_ref"
+          },
+          "minItems": 0
+        },
+        "detail": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "execution_failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reason",
+        "detail",
+        "attempt_receipt"
+      ],
+      "properties": {
+        "reason": {
+          "enum": [
+            "failed",
+            "cancelled",
+            "timed_out",
+            "budget_exhausted"
+          ]
+        },
+        "detail": {
+          "$ref": "#/$defs/text"
+        },
+        "attempt_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "code": {
+          "$ref": "#/$defs/error_code"
+        }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate",
+        "basis"
+      ],
+      "properties": {
+        "candidate": {
+          "$ref": "#/$defs/association_member_dependency"
+        },
+        "basis": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "rationale"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "proposed",
+            "accepted",
+            "rejected",
+            "superseded"
+          ]
+        },
+        "rationale": {
+          "$ref": "#/$defs/text"
+        },
+        "authority": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "evaluator_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "accepted",
+                  "rejected",
+                  "superseded"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "authority"
+            ]
+          }
+        }
+      ]
+    },
+    "target_component": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "whole"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "component"
+          ],
+          "properties": {
+            "kind": {
+              "const": "component"
+            },
+            "component": {
+              "$ref": "#/$defs/text"
+            }
+          }
+        }
+      ]
+    },
+    "resource_limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_calls",
+        "max_candidates",
+        "max_bytes",
+        "max_elapsed_ms",
+        "max_cost",
+        "cost_unit"
+      ],
+      "properties": {
+        "max_calls": {
+          "$ref": "#/$defs/counter"
+        },
+        "max_candidates": {
+          "$ref": "#/$defs/counter"
+        },
+        "max_bytes": {
+          "$ref": "#/$defs/counter"
+        },
+        "max_elapsed_ms": {
+          "$ref": "#/$defs/counter"
+        },
+        "max_cost": {
+          "$ref": "#/$defs/nonnegative_decimal_string"
+        },
+        "cost_unit": {
+          "$ref": "#/$defs/namespaced_name"
+        }
+      }
+    },
+    "quiet_reason": {
+      "enum": [
+        "no_material_change",
+        "already_delivered",
+        "recovery_established",
+        "handled_by_owner",
+        "disposition_applies",
+        "deferred_until_checkpoint",
+        "budget_limited",
+        "insufficient_evidence",
+        "incomplete_coverage",
+        "stale_assessment",
+        "cancelled",
+        "no_active_purpose"
+      ]
+    },
+    "attention_treatment": {
+      "enum": [
+        "quiet",
+        "host_hint",
+        "digest",
+        "update",
+        "correction",
+        "decision_request"
+      ]
+    },
+    "change_cause": {
+      "enum": [
+        "new_evidence",
+        "evidence_correction",
+        "association_correction",
+        "policy_change",
+        "purpose_change",
+        "audience_change",
+        "disposition_change",
+        "temporal_transition"
+      ]
+    },
+    "assessed_proposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim",
+        "status",
+        "evidence_standard"
+      ],
+      "properties": {
+        "claim": {
+          "$ref": "#/$defs/claim_dependency"
+        },
+        "status": {
+          "enum": [
+            "supported",
+            "refuted",
+            "mixed",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "evidence_standard": {
+          "$ref": "#/$defs/component_ref"
+        }
+      }
+    },
+    "observation_body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_identity",
+        "content",
+        "source_published_at",
+        "available_at",
+        "ingested_at",
+        "extraction"
+      ],
+      "properties": {
+        "source_identity": {
+          "$ref": "#/$defs/source_identity"
+        },
+        "content": {
+          "$ref": "#/$defs/source_content"
+        },
+        "occurred_at": {
+          "$ref": "#/$defs/time_value"
+        },
+        "occurred_interval": {
+          "$ref": "#/$defs/time_interval"
+        },
+        "source_published_at": {
+          "$ref": "#/$defs/time_value"
+        },
+        "available_at": {
+          "$ref": "#/$defs/time_value"
+        },
+        "ingested_at": {
+          "$ref": "#/$defs/known_time"
+        },
+        "extraction": {
+          "$ref": "#/$defs/component_ref"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "occurred_at"
+          ],
+          "not": {
+            "required": [
+              "occurred_interval"
+            ]
+          }
+        },
+        {
+          "required": [
+            "occurred_interval"
+          ],
+          "not": {
+            "required": [
+              "occurred_at"
+            ]
+          }
+        }
+      ]
+    },
+    "observation_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "creation_receipt",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "observation"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "creation_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/observation_body"
+        }
+      }
+    },
+    "observation_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "observation"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/observation_body"
+        }
+      },
+      "description": "A proposed creation input. The host assigns the commit receipt and initial aggregate revision. Structural admission grants no authority."
+    },
+    "occurrence_body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "identity_keys",
+        "observations",
+        "provenance_groups"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/namespaced_name"
+        },
+        "identity_keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identity_key"
+          },
+          "minItems": 1
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observation_dependency"
+          },
+          "minItems": 0
+        },
+        "occurred_at": {
+          "$ref": "#/$defs/time_value"
+        },
+        "occurred_interval": {
+          "$ref": "#/$defs/time_interval"
+        },
+        "provenance_groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identity_key"
+          },
+          "minItems": 0
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "occurred_at"
+          ],
+          "not": {
+            "required": [
+              "occurred_interval"
+            ]
+          }
+        },
+        {
+          "required": [
+            "occurred_interval"
+          ],
+          "not": {
+            "required": [
+              "occurred_at"
+            ]
+          }
+        }
+      ]
+    },
+    "occurrence_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "creation_receipt",
+        "provenance",
+        "body",
+        "revision"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "occurrence"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "creation_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/occurrence_body"
+        },
+        "revision": {
+          "$ref": "#/$defs/revision"
+        }
+      }
+    },
+    "occurrence_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "occurrence"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/occurrence_body"
+        }
+      },
+      "description": "A proposed creation input. The host assigns the commit receipt and initial aggregate revision. Structural admission grants no authority."
+    },
+    "matter_body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domain_kind",
+        "identity_keys"
+      ],
+      "properties": {
+        "domain_kind": {
+          "$ref": "#/$defs/namespaced_name"
+        },
+        "identity_keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identity_key"
+          },
+          "minItems": 1
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "description": {
+          "$ref": "#/$defs/text"
+        },
+        "lifecycle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "profile",
+            "state",
+            "transition_receipt"
+          ],
+          "properties": {
+            "profile": {
+              "$ref": "#/$defs/component_ref"
+            },
+            "state": {
+              "$ref": "#/$defs/namespaced_name"
+            },
+            "transition_receipt": {
+              "$ref": "#/$defs/receipt_ref"
+            }
+          }
+        }
+      }
+    },
+    "matter_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "creation_receipt",
+        "provenance",
+        "body",
+        "revision"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "matter"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "creation_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/matter_body"
+        },
+        "revision": {
+          "$ref": "#/$defs/revision"
+        }
+      }
+    },
+    "matter_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "matter"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/matter_body"
+        }
+      },
+      "description": "A proposed creation input. The host assigns the commit receipt and initial aggregate revision. Structural admission grants no authority."
+    },
+    "claim_body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "predicate",
+        "value",
+        "qualifiers",
+        "applicability",
+        "attribution",
+        "proposition_version"
+      ],
+      "properties": {
+        "subject": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/entity_ref"
+            },
+            {
+              "$ref": "#/$defs/domain_value"
+            }
+          ]
+        },
+        "predicate": {
+          "$ref": "#/$defs/namespaced_name"
+        },
+        "value": {
+          "$ref": "#/$defs/domain_value"
+        },
+        "qualifiers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/domain_value"
+          },
+          "minItems": 0
+        },
+        "applicability": {
+          "$ref": "#/$defs/time_interval"
+        },
+        "attribution": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "proposition_version": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "claim_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "creation_receipt",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "claim"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "creation_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/claim_body"
+        }
+      }
+    },
+    "claim_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "claim"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/claim_body"
+        }
+      },
+      "description": "A proposed creation input. The host assigns the commit receipt and initial aggregate revision. Structural admission grants no authority."
+    },
+    "evidence_relation_body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim",
+        "evidence",
+        "relation",
+        "target",
+        "locator",
+        "applicability",
+        "acceptance"
+      ],
+      "properties": {
+        "claim": {
+          "$ref": "#/$defs/claim_dependency"
+        },
+        "evidence": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/pinned_ref"
+            },
+            {
+              "properties": {
+                "record_type": {
+                  "enum": [
+                    "observation",
+                    "judgment",
+                    "assessment",
+                    "claim"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "relation": {
+          "enum": [
+            "supports",
+            "contradicts",
+            "qualifies",
+            "reports_assertion",
+            "context_only",
+            "unresolved"
+          ]
+        },
+        "target": {
+          "$ref": "#/$defs/target_component"
+        },
+        "locator": {
+          "$ref": "#/$defs/locator"
+        },
+        "applicability": {
+          "$ref": "#/$defs/time_interval"
+        },
+        "acceptance": {
+          "$ref": "#/$defs/acceptance"
+        }
+      }
+    },
+    "evidence_relation_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "creation_receipt",
+        "provenance",
+        "body",
+        "revision"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "evidence_relation"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "creation_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/evidence_relation_body"
+        },
+        "revision": {
+          "$ref": "#/$defs/revision"
+        }
+      }
+    },
+    "evidence_relation_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "evidence_relation"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/evidence_relation_body"
+        }
+      },
+      "description": "A proposed creation input. The host assigns the commit receipt and initial aggregate revision. Structural admission grants no authority."
+    },
+    "association_proposal_body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "outcome",
+        "candidates",
+        "selected",
+        "matching_rule",
+        "evidence",
+        "evaluator_receipt",
+        "uncertainty",
+        "qualification"
+      ],
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/association_member_dependency"
+        },
+        "outcome": {
+          "enum": [
+            "matched",
+            "no_match",
+            "ambiguous",
+            "insufficient_evidence"
+          ]
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/candidate"
+          },
+          "minItems": 0
+        },
+        "selected": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/association_member_dependency"
+          },
+          "minItems": 0
+        },
+        "matching_rule": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 0
+        },
+        "evaluator_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "uncertainty": {
+          "$ref": "#/$defs/domain_value"
+        },
+        "qualification": {
+          "$ref": "#/$defs/qualification"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "matched"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "selected": {
+                "minItems": 1
+              },
+              "candidates": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "enum": [
+                  "no_match",
+                  "ambiguous",
+                  "insufficient_evidence"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "selected": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "ambiguous"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "candidates": {
+                "minItems": 2
+              }
+            }
+          }
+        }
+      ]
+    },
+    "association_proposal_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "creation_receipt",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "association_proposal"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "creation_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/association_proposal_body"
+        }
+      }
+    },
+    "association_proposal_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "association_proposal"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/association_proposal_body"
+        }
+      },
+      "description": "A proposed creation input. The host assigns the commit receipt and initial aggregate revision. Structural admission grants no authority."
+    },
+    "accepted_association_body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposal",
+        "members",
+        "relation",
+        "status",
+        "authority"
+      ],
+      "properties": {
+        "proposal": {
+          "$ref": "#/$defs/association_proposal_dependency"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/association_member_dependency"
+          },
+          "minItems": 2
+        },
+        "relation": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "revoked",
+            "superseded"
+          ]
+        },
+        "authority": {
+          "$ref": "#/$defs/receipt_ref"
+        }
+      }
+    },
+    "accepted_association_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "creation_receipt",
+        "provenance",
+        "body",
+        "revision"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "accepted_association"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "creation_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/accepted_association_body"
+        },
+        "revision": {
+          "$ref": "#/$defs/revision"
+        }
+      }
+    },
+    "accepted_association_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "accepted_association"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/accepted_association_body"
+        }
+      },
+      "description": "A proposed creation input. The host assigns the commit receipt and initial aggregate revision. Structural admission grants no authority."
+    },
+    "matter_relation_body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from_matter",
+        "to_matter",
+        "relation_kind",
+        "relationship_schema",
+        "basis",
+        "authority",
+        "status"
+      ],
+      "properties": {
+        "from_matter": {
+          "$ref": "#/$defs/matter_dependency"
+        },
+        "to_matter": {
+          "$ref": "#/$defs/matter_dependency"
+        },
+        "relation_kind": {
+          "$ref": "#/$defs/namespaced_name"
+        },
+        "relationship_schema": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "basis": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 0
+        },
+        "authority": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "revoked",
+            "superseded"
+          ]
+        }
+      }
+    },
+    "matter_relation_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "creation_receipt",
+        "provenance",
+        "body",
+        "revision"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "matter_relation"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "creation_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/matter_relation_body"
+        },
+        "revision": {
+          "$ref": "#/$defs/revision"
+        }
+      }
+    },
+    "matter_relation_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "matter_relation"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/matter_relation_body"
+        }
+      },
+      "description": "A proposed creation input. The host assigns the commit receipt and initial aggregate revision. Structural admission grants no authority."
+    },
+    "judgment_body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule",
+        "input_digest",
+        "evaluator",
+        "execution_status",
+        "qualification",
+        "used_evidence",
+        "limitations",
+        "dependency_manifest",
+        "attempt_receipts",
+        "proposed_consequences",
+        "input_artifact",
+        "raw_result",
+        "execution_interval"
+      ],
+      "properties": {
+        "rule": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "input_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "evaluator": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "execution_status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "timed_out",
+            "budget_exhausted"
+          ]
+        },
+        "evaluation_status": {
+          "enum": [
+            "applicable",
+            "not_applicable",
+            "insufficient_evidence",
+            "ambiguous",
+            "conflicting"
+          ]
+        },
+        "semantic_output": {
+          "$ref": "#/$defs/domain_value"
+        },
+        "qualification": {
+          "$ref": "#/$defs/qualification"
+        },
+        "used_evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_use"
+          },
+          "minItems": 0
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "minItems": 0
+        },
+        "dependency_manifest": {
+          "$ref": "#/$defs/dependency_manifest"
+        },
+        "attempt_receipts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/receipt_ref"
+          },
+          "minItems": 1
+        },
+        "failure": {
+          "$ref": "#/$defs/execution_failure"
+        },
+        "proposed_consequences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/domain_value"
+          },
+          "minItems": 0
+        },
+        "input_artifact": {
+          "$ref": "#/$defs/artifact_reference"
+        },
+        "raw_result": {
+          "$ref": "#/$defs/raw_result_reference"
+        },
+        "execution_interval": {
+          "$ref": "#/$defs/time_interval"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "execution_status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "evaluation_status",
+              "semantic_output"
+            ],
+            "not": {
+              "required": [
+                "failure"
+              ]
+            }
+          },
+          "else": {
+            "required": [
+              "failure"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "evaluation_status"
+                  ]
+                },
+                {
+                  "required": [
+                    "semantic_output"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "qualification": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "unqualified",
+                      "unknown"
+                    ]
+                  }
+                }
+              },
+              "proposed_consequences": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "execution_status": {
+                "const": "failed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "failure": {
+                "properties": {
+                  "reason": {
+                    "const": "failed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "execution_status": {
+                "const": "cancelled"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "failure": {
+                "properties": {
+                  "reason": {
+                    "const": "cancelled"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "execution_status": {
+                "const": "timed_out"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "failure": {
+                "properties": {
+                  "reason": {
+                    "const": "timed_out"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "execution_status": {
+                "const": "budget_exhausted"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "failure": {
+                "properties": {
+                  "reason": {
+                    "const": "budget_exhausted"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "judgment_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "creation_receipt",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "judgment"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "creation_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/judgment_body"
+        }
+      }
+    },
+    "judgment_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "judgment"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/judgment_body"
+        }
+      },
+      "description": "A proposed creation input. The host assigns the commit receipt and initial aggregate revision. Structural admission grants no authority."
+    },
+    "assessment_body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "matter",
+        "profile",
+        "purpose",
+        "assessed_as_of",
+        "dependency_manifest",
+        "judgments",
+        "propositions",
+        "causes",
+        "evaluation_state",
+        "proposals",
+        "limitations",
+        "input_artifact",
+        "evidence_selection",
+        "resource_use",
+        "stop_reason",
+        "consequences",
+        "material_changes",
+        "evidence_gaps"
+      ],
+      "properties": {
+        "matter": {
+          "$ref": "#/$defs/matter_dependency"
+        },
+        "profile": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "purpose": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "audience": {
+          "$ref": "#/$defs/component_ref"
+        },
+        "assessed_as_of": {
+          "$ref": "#/$defs/known_time"
+        },
+        "dependency_manifest": {
+          "$ref": "#/$defs/dependency_manifest"
+        },
+        "judgments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/judgment_dependency"
+          },
+          "minItems": 0
+        },
+        "propositions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/assessed_proposition"
+          },
+          "minItems": 0
+        },
+        "causes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/change_cause"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "evaluation_state": {
+          "enum": [
+            "complete",
+            "incomplete"
+          ]
+        },
+        "proposals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/domain_value"
+          },
+          "minItems": 0
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "minItems": 0
+        },
+        "prior_assessment": {
+          "$ref": "#/$defs/assessment_dependency"
+        },
+        "valid_until": {
+          "$ref": "#/$defs/time_value"
+        },
+        "next_check_at": {
+          "$ref": "#/$defs/time_value"
+        },
+        "input_artifact": {
+          "$ref": "#/$defs/artifact_reference"
+        },
+        "evidence_selection": {
+          "$ref": "#/$defs/evidence_selection"
+        },
+        "resource_use": {
+          "$ref": "#/$defs/domain_value"
+        },
+        "stop_reason": {
+          "$ref": "#/$defs/evaluation_stop_reason"
+        },
+        "consequences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/domain_value"
+          },
+          "minItems": 0
+        },
+        "material_changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/material_change"
+          },
+          "minItems": 0
+        },
+        "evidence_gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/domain_value"
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "assessment_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "creation_receipt",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "assessment"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "creation_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/assessment_body"
+        }
+      }
+    },
+    "assessment_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "assessment"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/assessment_body"
+        }
+      },
+      "description": "A proposed creation input. The host assigns the commit receipt and initial aggregate revision. Structural admission grants no authority."
+    },
+    "control_body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "control_kind",
+        "actor",
+        "authority",
+        "scope",
+        "control_epoch",
+        "effective_from",
+        "effective_until",
+        "effect"
+      ],
+      "properties": {
+        "control_kind": {
+          "enum": [
+            "instruction",
+            "correction",
+            "cancellation",
+            "task_change",
+            "permission",
+            "deferral",
+            "acknowledgement",
+            "rejection",
+            "preference",
+            "decision",
+            "protected_separation"
+          ]
+        },
+        "actor": {
+          "$ref": "#/$defs/actor_ref"
+        },
+        "authority": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scope_id",
+            "targets"
+          ],
+          "properties": {
+            "scope_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "targets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/entity_ref"
+              },
+              "minItems": 0
+            }
+          }
+        },
+        "control_epoch": {
+          "$ref": "#/$defs/counter"
+        },
+        "effective_from": {
+          "$ref": "#/$defs/known_time"
+        },
+        "effective_until": {
+          "$ref": "#/$defs/time_value"
+        },
+        "effect": {
+          "$ref": "#/$defs/domain_value"
+        }
+      }
+    },
+    "control_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "creation_receipt",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "control"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "creation_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "provenance": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/provenance"
+            },
+            {
+              "properties": {
+                "origin": {
+                  "const": "host"
+                }
+              }
+            }
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/control_body"
+        }
+      }
+    },
+    "control_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "control"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "provenance": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/provenance"
+            },
+            {
+              "properties": {
+                "origin": {
+                  "const": "host"
+                }
+              }
+            }
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/control_body"
+        }
+      },
+      "description": "A proposed creation input. The host assigns the commit receipt and initial aggregate revision. Structural admission grants no authority."
+    },
+    "receipt_body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage",
+        "operation_id",
+        "recorded_at",
+        "outcome",
+        "evidence",
+        "details"
+      ],
+      "properties": {
+        "stage": {
+          "enum": [
+            "creation",
+            "operation",
+            "evaluation",
+            "authority",
+            "offered",
+            "queued",
+            "delivered",
+            "consumed",
+            "acted_on",
+            "outcome_verified",
+            "useful",
+            "withheld",
+            "cancelled",
+            "delivery_unknown"
+          ]
+        },
+        "operation_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "recorded_at": {
+          "$ref": "#/$defs/known_time"
+        },
+        "outcome": {
+          "$ref": "#/$defs/namespaced_name"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 0
+        },
+        "details": {
+          "$ref": "#/$defs/domain_value"
+        }
+      }
+    },
+    "receipt_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "creation_receipt",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "receipt"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "creation_receipt": {
+          "$ref": "#/$defs/receipt_ref"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/receipt_body"
+        }
+      }
+    },
+    "receipt_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "scope_id",
+        "namespace",
+        "id",
+        "provenance",
+        "body"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "record_type": {
+          "const": "receipt"
+        },
+        "scope_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 1
+        },
+        "body": {
+          "$ref": "#/$defs/receipt_body"
+        }
+      },
+      "description": "A proposed creation input. The host assigns the commit receipt and initial aggregate revision. Structural admission grants no authority."
+    },
+    "association_member_dependency": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        {
+          "properties": {
+            "record_type": {
+              "enum": [
+                "observation",
+                "occurrence",
+                "matter"
+              ]
+            }
+          }
+        }
+      ],
+      "description": "Association membership concerns observations, occurrences, and continuing matters. Claims, controls, judgments, and receipts remain evidence or decisions, not membership candidates."
+    },
+    "nonnegative_decimal_string": {
+      "type": "string",
+      "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?(?![\\s\\S])",
+      "not": {
+        "pattern": "[\\u0000-\\u0020\\u007f]"
+      },
+      "description": "Exact nonnegative decimal lexeme for resource ceilings. Signed decimal_string remains available for ordinary domain quantities."
+    },
+    "unavailable_artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "reason"
+      ],
+      "properties": {
+        "state": {
+          "const": "unavailable"
+        },
+        "reason": {
+          "enum": [
+            "not_recorded",
+            "not_persisted",
+            "source_unavailable",
+            "withheld",
+            "retention_expired"
+          ]
+        },
+        "detail": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "artifact_reference": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/source_content"
+        },
+        {
+          "$ref": "#/$defs/unavailable_artifact"
+        }
+      ],
+      "description": "Reference to exact original immutable artifact bytes, or an honest unavailable reason when no verified content digest/locator can be supplied. This does not invent a digest or claim replayability."
+    },
+    "raw_result_reference": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/artifact_reference"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "reason"
+          ],
+          "properties": {
+            "state": {
+              "enum": [
+                "not_produced",
+                "not_applicable"
+              ]
+            },
+            "reason": {
+              "$ref": "#/$defs/text"
+            }
+          }
+        }
+      ],
+      "description": "Original result artifact, explicit unavailability, or a declaration that no raw response was produced/applicable. These states are distinct from an empty successful semantic conclusion."
+    },
+    "evidence_use": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference",
+        "locator"
+      ],
+      "properties": {
+        "reference": {
+          "$ref": "#/$defs/pinned_ref"
+        },
+        "locator": {
+          "$ref": "#/$defs/locator"
+        }
+      }
+    },
+    "evidence_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "references",
+        "omitted",
+        "coverage"
+      ],
+      "properties": {
+        "references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 0
+        },
+        "omitted": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 0
+        },
+        "coverage": {
+          "$ref": "#/$defs/coverage"
+        }
+      }
+    },
+    "evaluation_stop_reason": {
+      "enum": [
+        "completed",
+        "incomplete",
+        "execution_failed",
+        "timed_out",
+        "evidence_satisfied",
+        "no_eligible_source",
+        "conflict_persists",
+        "budget_exhausted",
+        "cancelled",
+        "source_unavailable",
+        "decision_required"
+      ]
+    },
+    "material_change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cause",
+        "value"
+      ],
+      "properties": {
+        "cause": {
+          "$ref": "#/$defs/change_cause"
+        },
+        "value": {
+          "$ref": "#/$defs/domain_value"
+        }
+      }
+    }
+  }
+}

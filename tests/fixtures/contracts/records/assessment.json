@@ -1,0 +1,158 @@
+{
+  "schema_version": "1.0",
+  "record_type": "assessment",
+  "scope_id": "synthetic:mat002",
+  "namespace": "example",
+  "id": "assessment-1",
+  "creation_receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "receipt-1"
+  },
+  "provenance": {
+    "origin": "system",
+    "producer": {
+      "namespace": "example",
+      "id": "fixture-producer",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "parents": []
+  },
+  "body": {
+    "matter": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    },
+    "profile": {
+      "namespace": "example",
+      "id": "profile",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "purpose": {
+      "namespace": "example",
+      "id": "purpose",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "assessed_as_of": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "dependency_manifest": {
+      "positive": [
+        {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "observation",
+          "id": "observation-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "negative": [],
+      "time_conditions": [],
+      "context": [],
+      "control_epoch": 0
+    },
+    "judgments": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "judgment",
+        "id": "judgment-1",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "propositions": [
+      {
+        "claim": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "claim",
+          "id": "claim-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "status": "unknown",
+        "evidence_standard": {
+          "namespace": "example",
+          "id": "evidence-standard",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    ],
+    "causes": [
+      "new_evidence"
+    ],
+    "evaluation_state": "complete",
+    "proposals": [],
+    "limitations": [
+      "Synthetic fixtures do not establish domain truth."
+    ],
+    "input_artifact": {
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "locator": {
+        "kind": "whole_artifact",
+        "uri": "urn:example:normalized-input:1"
+      },
+      "media_type": "application/json",
+      "availability": {
+        "status": "available",
+        "checked_at": {
+          "state": "known",
+          "value": "2026-10-08T15:00:00Z",
+          "precision": "second"
+        }
+      }
+    },
+    "evidence_selection": {
+      "references": [
+        {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "observation",
+          "id": "observation-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "omitted": [],
+      "coverage": {
+        "status": "complete",
+        "snapshot": {
+          "namespace": "example",
+          "id": "snapshot",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "resource_use": {
+      "schema": {
+        "namespace": "example",
+        "id": "resource-use",
+        "version": "1.0",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "value": {
+        "calls": 0,
+        "elapsed_ms": 0,
+        "cost": "0.00"
+      }
+    },
+    "stop_reason": "completed",
+    "consequences": [],
+    "material_changes": [],
+    "evidence_gaps": []
+  }
+}

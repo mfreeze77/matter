@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "operation": "prepare_delivery",
+  "command_id": "command-prepare_delivery",
+  "idempotency_key": "idempotency-prepare_delivery",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [
+    {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    }
+  ],
+  "body": {
+    "assessment": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "assessment",
+      "id": "assessment-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "audience": {
+      "namespace": "example",
+      "id": "audience",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "purpose": {
+      "namespace": "example",
+      "id": "purpose",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "baseline": null,
+    "control_epoch": 0,
+    "treatment": "update",
+    "content_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "dependency_manifest_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "delivery_key": "delivery-1"
+  }
+}

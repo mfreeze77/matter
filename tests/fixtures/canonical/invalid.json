@@ -1,0 +1,216 @@
+{
+  "vectors": [
+    {
+      "name": "duplicate_key",
+      "input_json": "{\"key\":1,\"key\":2}"
+    },
+    {
+      "name": "duplicate_nested_key",
+      "input_json": "{\"outer\":{\"key\":1,\"key\":2}}"
+    },
+    {
+      "name": "duplicate_escaped_key",
+      "input_json": "{\"key\":1,\"\\u006bey\":2}"
+    },
+    {
+      "name": "duplicate_surrogate_pair_key",
+      "input_json": "{\"\\ud83d\\ude00\":1,\"\ud83d\ude00\":2}"
+    },
+    {
+      "name": "unsafe_positive_integer",
+      "input_json": "9007199254740992"
+    },
+    {
+      "name": "unsafe_negative_integer",
+      "input_json": "-9007199254740992"
+    },
+    {
+      "name": "integral_float",
+      "input_json": "1.0"
+    },
+    {
+      "name": "float_negative_zero",
+      "input_json": "-0.0"
+    },
+    {
+      "name": "exponent_integer",
+      "input_json": "1e0"
+    },
+    {
+      "name": "exponent_uppercase",
+      "input_json": "1E+0"
+    },
+    {
+      "name": "exponent_overflow",
+      "input_json": "1e400"
+    },
+    {
+      "name": "exponent_underflow",
+      "input_json": "-1e-400"
+    },
+    {
+      "name": "not_a_number",
+      "input_json": "NaN"
+    },
+    {
+      "name": "positive_infinity",
+      "input_json": "Infinity"
+    },
+    {
+      "name": "negative_infinity",
+      "input_json": "-Infinity"
+    },
+    {
+      "name": "high_surrogate",
+      "input_json": "\"\\ud800\""
+    },
+    {
+      "name": "low_surrogate",
+      "input_json": "\"\\udfff\""
+    },
+    {
+      "name": "two_high_surrogates",
+      "input_json": "\"\\ud800\\ud800\""
+    },
+    {
+      "name": "reversed_surrogate_pair",
+      "input_json": "\"\\udc00\\ud800\""
+    },
+    {
+      "name": "surrogate_key",
+      "input_json": "{\"\\ud800\":0}"
+    },
+    {
+      "name": "raw_surrogate_scalar",
+      "input_json": "\"\ud800\""
+    },
+    {
+      "name": "bom_text",
+      "input_json": "\ufeff{}"
+    },
+    {
+      "name": "bom_after_whitespace",
+      "input_json": " \ufeff{}"
+    },
+    {
+      "name": "empty_document",
+      "input_json": ""
+    },
+    {
+      "name": "whitespace_document",
+      "input_json": " \t\r\n"
+    },
+    {
+      "name": "trailing_object",
+      "input_json": "{} {}"
+    },
+    {
+      "name": "trailing_scalar",
+      "input_json": "true false"
+    },
+    {
+      "name": "uppercase_true",
+      "input_json": "True"
+    },
+    {
+      "name": "uppercase_null",
+      "input_json": "NULL"
+    },
+    {
+      "name": "positive_sign",
+      "input_json": "+1"
+    },
+    {
+      "name": "leading_zero",
+      "input_json": "01"
+    },
+    {
+      "name": "double_minus",
+      "input_json": "--1"
+    },
+    {
+      "name": "trailing_decimal_point",
+      "input_json": "1."
+    },
+    {
+      "name": "missing_integer_part",
+      "input_json": ".1"
+    },
+    {
+      "name": "comment",
+      "input_json": "{/*comment*/}"
+    },
+    {
+      "name": "invalid_escape",
+      "input_json": "\"\\x00\""
+    },
+    {
+      "name": "missing_value",
+      "input_json": "{\"key\":}"
+    },
+    {
+      "name": "non_string_key",
+      "input_json": "{1:\"value\"}"
+    },
+    {
+      "name": "utf8_bom",
+      "input_hex": "efbbbf7b7d"
+    },
+    {
+      "name": "utf16le_bom",
+      "input_hex": "fffe7b007d00"
+    },
+    {
+      "name": "utf16be_bom",
+      "input_hex": "feff007b007d"
+    },
+    {
+      "name": "utf16le_no_bom",
+      "input_hex": "7b007d00"
+    },
+    {
+      "name": "utf16be_no_bom",
+      "input_hex": "007b007d"
+    },
+    {
+      "name": "utf32le_bom",
+      "input_hex": "fffe00007b0000007d000000"
+    },
+    {
+      "name": "utf32be_bom",
+      "input_hex": "0000feff0000007b0000007d"
+    },
+    {
+      "name": "utf32le_no_bom",
+      "input_hex": "7b0000007d000000"
+    },
+    {
+      "name": "utf32be_no_bom",
+      "input_hex": "0000007b0000007d"
+    },
+    {
+      "name": "invalid_utf8_continuation",
+      "input_hex": "228022"
+    },
+    {
+      "name": "overlong_utf8",
+      "input_hex": "22c0af22"
+    },
+    {
+      "name": "utf8_encoded_surrogate",
+      "input_hex": "22eda08022"
+    },
+    {
+      "name": "out_of_unicode_range",
+      "input_hex": "22f490808022"
+    },
+    {
+      "name": "truncated_utf8",
+      "input_hex": "22f09f22"
+    },
+    {
+      "name": "literal_control_character",
+      "input_hex": "220a22"
+    }
+  ]
+}

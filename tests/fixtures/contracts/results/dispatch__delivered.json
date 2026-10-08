@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "operation": "dispatch",
+  "operation_id": "operation-dispatch",
+  "status": "success",
+  "outcome": "delivered",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "delivery_receipt": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "delivery-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "milestone": "example:transport_accepted"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "operation": "dispatch",
+  "operation_id": "operation-dispatch",
+  "status": "success",
+  "outcome": "withheld",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "reasons": [
+      "no_material_change"
+    ],
+    "reconsider_at": {
+      "state": "unknown",
+      "reason": "not_reported"
+    }
+  }
+}

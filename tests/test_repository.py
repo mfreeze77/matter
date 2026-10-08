@@ -18,6 +18,9 @@ class RepositoryIntegrityTests(unittest.TestCase):
     def setUp(self):
         self.ticket = read(ROOT / 'tickets/records/MAT-002.json')
         self.ticket['depends_on'] = []
+        # Graph tests use a planned fixture independently of roadmap progress.
+        self.ticket['status'] = 'planned'
+        self.ticket['completion'] = {'state': 'not_run', 'evidence': []}
         self.requirements = [r for r in read(ROOT / 'docs/requirements.json') if r['id'] in self.ticket['requirements']]
 
     def test_complete_repository_is_valid(self):

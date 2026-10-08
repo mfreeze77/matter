@@ -1,6 +1,6 @@
 # Core information and operation contract
 
-Status: normative target specification. The repository scaffold and any deterministic walkthrough are demonstrations; they do not implement or qualify this contract. Runtime delivery is tracked by MAT-002 through MAT-025. A ticket is complete only with its own recorded acceptance evidence.
+Status: governing specification. MAT-002 implements the [version 1.0 structural schemas](schema-inventory.md) and [canonical encoding](canonical.md). Structural validation does not implement or qualify the runtime guarantees below. Persistent storage, association, assessment, lifecycle, and delivery remain tracked by MAT-003 through MAT-025. A ticket is complete only with its own recorded acceptance evidence.
 
 ## Purpose and sources
 
@@ -26,7 +26,7 @@ Every stored record has a schema version, record type, opaque ID, scope ID, crea
 
 IDs are unique within an explicit scope and namespace. A source ID or subject string MUST NOT be assumed globally unique. An entity reference includes scope, record type, and ID; a revision-specific dependency also includes the exact revision or immutable digest. References across scopes require an explicit host-authorized relationship and read grant. Discovering a similar identifier in another scope does not grant access or establish identity.
 
-Canonical normalized contract JSON uses the versioned encoding matter-json-v1:
+Canonical normalized contract JSON uses the versioned encoding matter-json-v1, detailed in the [executable encoding specification](canonical.md):
 
 - UTF-8 without BOM; keys sorted by Unicode scalar-value order; no Unicode normalization.
 - No duplicate object keys, non-finite values, floating-point JSON numbers, or unpaired surrogates.
@@ -35,7 +35,7 @@ Canonical normalized contract JSON uses the versioned encoding matter-json-v1:
 - Compact separators and JSON escaping for quotes, backslashes, and control characters; other Unicode scalars are emitted directly.
 - Digests use SHA-256 over these bytes and include the encoding version and contract kind in the digest preimage.
 
-Original payload bytes MAY use other encodings. Their content digest is over the exact bytes, not the normalized contract. An adapter must not silently rewrite source content to make a digest match. This is a repository-owned encoding contract, not a claim of compliance with another JSON canonicalization standard. MAT-002 must supply cross-language golden vectors before runtime use.
+Original payload bytes MAY use other encodings. Their content digest is over the exact bytes, not the normalized contract. An adapter must not silently rewrite source content to make a digest match. This is a repository-owned encoding contract, not a claim of compliance with another JSON canonicalization standard. MAT-002 supplies [cross-language golden vectors](../../tests/fixtures/canonical/golden.json) for this boundary; runtime conformance remains separate.
 
 Timestamps use RFC 3339 UTC strings with a declared precision. Unknown timestamps remain absent with a reason; ingestion time must not be substituted for an unknown event time. Ordering concurrent events requires explicit source ordering or storage sequence, not a guessed chronological tie-break.
 
@@ -164,4 +164,4 @@ The persistence port MUST support atomic mutation plus receipt, unique scoped id
 
 A conforming implementation must prove redelivery idempotency, concurrent mutation conflicts, restart continuity, non-destructive merge correction, cross-scope isolation, historical knowledge gating, explicit incomplete coverage, direct-control bypass, and stale-delivery refusal. Validation of JSON shape alone does not establish these properties.
 
-The planned schemas, operations, and tests listed in tickets are delivery targets. Existing documentation, a passing roadmap validator, or a walkthrough output must not be presented as evidence that these runtime guarantees have been implemented.
+The schemas and encoding delivered by MAT-002 establish structural and byte-level checks. The operations and runtime tests listed in later tickets remain delivery targets. Existing documentation, a passing roadmap validator, or a walkthrough output must not be presented as evidence that these runtime guarantees have been implemented.

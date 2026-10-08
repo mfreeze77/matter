@@ -1,0 +1,630 @@
+{
+  "schema_version": "1.0",
+  "description": "Standalone synthetic structural vectors for MAT-002. Expected validity is declared here, independent of backend behavior. Digests consisting of zeroes are fixture placeholders, not assertions about available source bytes.",
+  "fixtures": [
+    {
+      "path": "records/observation.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Synthetic valid observation shape; no runtime acceptance is claimed."
+    },
+    {
+      "path": "records/occurrence.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Synthetic valid occurrence shape; no runtime acceptance is claimed."
+    },
+    {
+      "path": "records/matter.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Synthetic valid matter shape; no runtime acceptance is claimed."
+    },
+    {
+      "path": "records/claim.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Synthetic valid claim shape; no runtime acceptance is claimed."
+    },
+    {
+      "path": "records/evidence_relation.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Synthetic valid evidence_relation shape; no runtime acceptance is claimed."
+    },
+    {
+      "path": "records/association_proposal.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Synthetic valid association_proposal shape; no runtime acceptance is claimed."
+    },
+    {
+      "path": "records/accepted_association.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Synthetic valid accepted_association shape; no runtime acceptance is claimed."
+    },
+    {
+      "path": "records/matter_relation.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Synthetic valid matter_relation shape; no runtime acceptance is claimed."
+    },
+    {
+      "path": "records/judgment.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Synthetic valid judgment shape; no runtime acceptance is claimed."
+    },
+    {
+      "path": "records/assessment.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Synthetic valid assessment shape; no runtime acceptance is claimed."
+    },
+    {
+      "path": "records/control.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Synthetic valid control shape; no runtime acceptance is claimed."
+    },
+    {
+      "path": "records/receipt.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Synthetic valid receipt shape; no runtime acceptance is claimed."
+    },
+    {
+      "path": "records/observation_unknown_time.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Unknown occurrence time retains its reason independently of known ingestion time."
+    },
+    {
+      "path": "records/judgment_unknown.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Unknown meaning is a completed semantic result, not an execution failure."
+    },
+    {
+      "path": "records/judgment_failed.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Failed execution carries no completed semantic output or proposal."
+    },
+    {
+      "path": "records/judgment_qualified.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Structural certificate reference only; validity and applicability are later checks."
+    },
+    {
+      "path": "commands/ingest_observation.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed ingest_observation command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/create_matter.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed create_matter command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/propose_association.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed propose_association command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/accept_association.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed accept_association command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/append_claim.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed append_claim command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/relate_evidence.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed relate_evidence command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/link_matters.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed link_matters command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/merge_matters.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed merge_matters command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/correct_merge.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed correct_merge command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/record_control.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed record_control command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/commit_assessment.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed commit_assessment command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/invalidate_dependents.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed invalidate_dependents command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/request_transition.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed request_transition command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/prepare_delivery.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed prepare_delivery command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/dispatch.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed dispatch command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "commands/assess.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic proposed assess command; existence, authority, and revision checks are not implemented here."
+    },
+    {
+      "path": "results/ingest_observation__committed.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared ingest_observation/committed success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/ingest_observation__duplicate.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared ingest_observation/duplicate success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/create_matter__created.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared create_matter/created success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/create_matter__existing.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared create_matter/existing success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/propose_association__proposal.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared propose_association/proposal success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/propose_association__no_match.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared propose_association/no_match success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/propose_association__ambiguous.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared propose_association/ambiguous success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/propose_association__insufficient_evidence.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared propose_association/insufficient_evidence success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/accept_association__accepted.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared accept_association/accepted success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/append_claim__appended.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared append_claim/appended success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/append_claim__duplicate.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared append_claim/duplicate success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/relate_evidence__appended.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared relate_evidence/appended success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/relate_evidence__duplicate.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared relate_evidence/duplicate success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/link_matters__linked.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared link_matters/linked success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/merge_matters__committed.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared merge_matters/committed success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/correct_merge__committed.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared correct_merge/committed success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/record_control__applied.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared record_control/applied success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/record_control__duplicate.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared record_control/duplicate success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/commit_assessment__committed.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared commit_assessment/committed success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/invalidate_dependents__affected.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared invalidate_dependents/affected success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/invalidate_dependents__no_op.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared invalidate_dependents/no_op success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/request_transition__applied.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared request_transition/applied success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/request_transition__already_applied.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared request_transition/already_applied success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/request_transition__held_for_evidence.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared request_transition/held_for_evidence success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/request_transition__held_for_conflict.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared request_transition/held_for_conflict success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/prepare_delivery__ready.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared prepare_delivery/ready success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/prepare_delivery__withheld.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared prepare_delivery/withheld success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/dispatch__delivered.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared dispatch/delivered success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/dispatch__withheld.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared dispatch/withheld success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/assess__assessed.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared assess/assessed success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/assess__incomplete.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic declared assess/incomplete success shape, not a runtime receipt."
+    },
+    {
+      "path": "results/failure__E_SCHEMA_INVALID.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_VERSION_UNSUPPORTED.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_SCOPE_FORBIDDEN.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_NOT_FOUND.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_IDEMPOTENCY_CONFLICT.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_SOURCE_IDENTITY_CONFLICT.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_REVISION_CONFLICT.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_ASSOCIATION_CONFLICT.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_MERGE_CONFLICT.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_EVIDENCE_INVALID.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_EVIDENCE_UNAVAILABLE.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_DEPENDENCY_STALE.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_POLICY_INVALID.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_RULE_CONFLICT.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_AUTHORITY_REQUIRED.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_BUDGET_EXHAUSTED.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_CANCELLED.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_STORAGE_UNAVAILABLE.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "results/failure__E_DELIVERY_UNKNOWN.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Explicit semantic error; no successful conclusion is present."
+    },
+    {
+      "path": "invalid/storage_unavailable_as_no_match.json",
+      "schema": "result",
+      "valid": false,
+      "description": "A storage failure cannot be added to a successful no-match result."
+    },
+    {
+      "path": "invalid/failed_execution_as_no_match.json",
+      "schema": "result",
+      "valid": false,
+      "description": "A closed semantic-success body cannot conceal a failed execution."
+    },
+    {
+      "path": "invalid/invalid_scope.json",
+      "schema": "record",
+      "valid": false,
+      "description": "Empty scope identifiers are structurally invalid."
+    },
+    {
+      "path": "invalid/unknown_time_with_value.json",
+      "schema": "record",
+      "valid": false,
+      "description": "Unknown time cannot also assert a timestamp."
+    },
+    {
+      "path": "invalid/failed_judgment_with_conclusion.json",
+      "schema": "record",
+      "valid": false,
+      "description": "Failed judgment cannot claim any completed semantic conclusion."
+    },
+    {
+      "path": "invalid/qualified_without_certificate.json",
+      "schema": "record",
+      "valid": false,
+      "description": "Qualified judgment requires an exact certificate reference."
+    },
+    {
+      "path": "invalid/unsafe_revision.json",
+      "schema": "record",
+      "valid": false,
+      "description": "Aggregate revisions remain in the interoperable integer range."
+    },
+    {
+      "path": "invalid/unpinned_matter_dependency.json",
+      "schema": "record",
+      "valid": false,
+      "description": "Revision-specific assessment dependencies require an exact revision or digest."
+    },
+    {
+      "path": "invalid/malformed_source_digest.json",
+      "schema": "record",
+      "valid": false,
+      "description": "Source payload digests require lowercase SHA-256 hex."
+    },
+    {
+      "path": "invalid/unscoped_command_field.json",
+      "schema": "command",
+      "valid": false,
+      "description": "Operation bodies are closed to unscoped fields."
+    },
+    {
+      "path": "invalid/available_content_unavailable_locator.json",
+      "schema": "record",
+      "valid": false,
+      "description": "An available original artifact must have a concrete whole-artifact or span locator."
+    },
+    {
+      "path": "invalid/control_as_association_candidate.json",
+      "schema": "record",
+      "valid": false,
+      "description": "A control is not an observation, occurrence, or matter eligible for association membership."
+    },
+    {
+      "path": "invalid/digest_with_trailing_newline.json",
+      "schema": "record",
+      "valid": false,
+      "description": "SHA256 is exactly 64 lowercase hex characters even when the regex engine gives dollar an end-of-line match."
+    },
+    {
+      "path": "invalid/scope_with_trailing_newline.json",
+      "schema": "record",
+      "valid": false,
+      "description": "Scope identifiers forbid control or whitespace anywhere, including a final newline."
+    },
+    {
+      "path": "records/judgment_unavailable_artifacts.json",
+      "schema": "record",
+      "valid": true,
+      "description": "Unavailable artifacts retain explicit reasons and do not invent payload digests or full replayability."
+    },
+    {
+      "path": "records/judgment_raw_result_artifact.json",
+      "schema": "record",
+      "valid": true,
+      "description": "A stored original result artifact retains exact-byte identity separately from normalized semantic output."
+    },
+    {
+      "path": "records/assessment_unavailable_input.json",
+      "schema": "record",
+      "valid": true,
+      "description": "A partial assessment records unavailable input, incomplete coverage, and a source-specific stop reason."
+    },
+    {
+      "path": "invalid/judgment_missing_input_artifact.json",
+      "schema": "record",
+      "valid": false,
+      "description": "Judgments must declare exact input availability, not only an unreconstructable digest."
+    },
+    {
+      "path": "invalid/not_produced_result_with_digest.json",
+      "schema": "record",
+      "valid": false,
+      "description": "A not-produced result cannot claim a fabricated original-byte digest."
+    },
+    {
+      "path": "invalid/judgment_evidence_without_locator.json",
+      "schema": "record",
+      "valid": false,
+      "description": "Used judgment evidence must identify its scope of citation, including whole-artifact or explicit unavailable state."
+    },
+    {
+      "path": "invalid/assessment_missing_evidence_selection.json",
+      "schema": "record",
+      "valid": false,
+      "description": "Assessment input must preserve selected and omitted evidence plus coverage."
+    },
+    {
+      "path": "invalid/negative_cost_ceiling.json",
+      "schema": "command",
+      "valid": false,
+      "description": "A resource ceiling is a nonnegative exact decimal string."
+    }
+  ]
+}

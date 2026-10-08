@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.0",
+  "record_type": "judgment",
+  "scope_id": "synthetic:mat002",
+  "namespace": "example",
+  "id": "judgment-1",
+  "creation_receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "receipt-1"
+  },
+  "provenance": {
+    "origin": "system",
+    "producer": {
+      "namespace": "example",
+      "id": "fixture-producer",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "parents": []
+  },
+  "body": {
+    "rule": {
+      "namespace": "example",
+      "id": "evidence-rule",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "evaluator": {
+      "namespace": "example",
+      "id": "deterministic-fixture",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "execution_status": "failed",
+    "qualification": {
+      "status": "unqualified"
+    },
+    "used_evidence": [
+      {
+        "reference": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "observation",
+          "id": "observation-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "locator": {
+          "kind": "whole_artifact",
+          "uri": "urn:example:source:1"
+        }
+      }
+    ],
+    "limitations": [],
+    "dependency_manifest": {
+      "positive": [
+        {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "observation",
+          "id": "observation-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "negative": [],
+      "time_conditions": [],
+      "context": [],
+      "control_epoch": 0
+    },
+    "attempt_receipts": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "receipt",
+        "id": "evaluation-1"
+      }
+    ],
+    "proposed_consequences": [],
+    "failure": {
+      "reason": "failed",
+      "detail": "Synthetic evaluator was unavailable.",
+      "attempt_receipt": {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "receipt",
+        "id": "failed-attempt-1"
+      },
+      "code": "E_EVIDENCE_UNAVAILABLE"
+    },
+    "input_artifact": {
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "locator": {
+        "kind": "whole_artifact",
+        "uri": "urn:example:normalized-input:1"
+      },
+      "media_type": "application/json",
+      "availability": {
+        "status": "available",
+        "checked_at": {
+          "state": "known",
+          "value": "2026-10-08T15:00:00Z",
+          "precision": "second"
+        }
+      }
+    },
+    "raw_result": {
+      "state": "not_produced",
+      "reason": "The synthetic executor failed before producing a raw response."
+    },
+    "execution_interval": {
+      "start": {
+        "state": "known",
+        "value": "2026-10-08T15:00:00Z",
+        "precision": "second"
+      },
+      "end": {
+        "state": "known",
+        "value": "2026-10-08T15:00:00Z",
+        "precision": "second"
+      },
+      "bounds": "closed"
+    }
+  }
+}
