@@ -69,6 +69,34 @@ this operation. Updated readers continue to admit all earlier v1 fixtures.
 This shape extension does not implement automatic operation negotiation,
 semantic association, independent-source qualification, or an assessment engine.
 
+MAT-007 adds `revise_evidence_acceptance` as the nineteenth operation, with
+`updated` and `unchanged` outcomes, while retaining twelve core record kinds
+and both existing wire and encoding versions. It also adds optional named
+claim components, exact relation quotation and pinned locator-validation
+receipt fields, a schema-bound `relate_evidence.body.validation` declaration,
+and dependency notices in claim/relation results. Updated readers continue to
+accept earlier records, commands, and result fixtures without the optional
+fields. Earlier closed-schema readers must update before receiving them or
+the new operation; no automatic negotiation or silent operation fallback is
+introduced.
+
+The MAT-007 runtime computes the relation's immutable validation receipt from
+the frozen adapter declaration and commits it with the relation. Invalid or
+unavailable validation produces an explicit failure. Its declaration remains
+in the failed command journal; transaction rollback means no newly inserted
+validation receipt or relation was committed. Structural admission of a receipt
+pin, quotation, or validation payload establishes neither citation validity,
+source truth, applicable authority, nor current source availability.
+
+Acceptance revisions change only the relation's acceptance descriptor and
+preserve its cited proposition, source, and original wording. Claim corrections
+append new immutable IDs through explicit predecessor pins, retaining branches
+and their source history. Exact scoped ID and canonical input determine a
+duplicate; common wording does not. Dependency notices describe changed model
+records, not newly established external observations or independent support,
+and do not execute MAT-016 assessment invalidation. See the
+[field inventory](schema-inventory.md) for result-array and receipt distinctions.
+
 ## Four independent versions and identities
 
 The schema version identifies the structure and interpretation of an envelope.

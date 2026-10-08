@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "operation": "revise_evidence_acceptance",
+  "operation_id": "operation-revise-stale",
+  "status": "failure",
+  "error": {
+    "code": "E_REVISION_CONFLICT",
+    "operation_id": "operation-revise-stale",
+    "retriable": false,
+    "affected_references": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "matter",
+        "id": "matter-1"
+      }
+    ],
+    "detail": "Synthetic safe failure detail."
+  }
+}

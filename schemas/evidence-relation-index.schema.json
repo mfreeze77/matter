@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/evidence-relation-index.schema.json",
+  "title": "Matter evidence-relation-index v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scope_id",
+    "relation",
+    "claim",
+    "evidence",
+    "locator_validation",
+    "original"
+  ],
+  "properties": {
+    "scope_id": {
+      "$ref": "core-record.schema.json#/$defs/identifier"
+    },
+    "relation": {
+      "$ref": "core-record.schema.json#/$defs/evidence_relation_dependency"
+    },
+    "claim": {
+      "$ref": "core-record.schema.json#/$defs/claim_dependency"
+    },
+    "evidence": {
+      "$ref": "core-record.schema.json#/$defs/pinned_ref"
+    },
+    "locator_validation": {
+      "$ref": "core-record.schema.json#/$defs/receipt_dependency"
+    },
+    "original": {
+      "$ref": "core-record.schema.json#/$defs/evidence_relation_input"
+    }
+  }
+}

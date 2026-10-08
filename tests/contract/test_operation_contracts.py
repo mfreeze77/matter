@@ -16,6 +16,7 @@ from matter.contracts import (
     decode_result,
     error_result,
     validate_command,
+    validate_record,
     validate_result,
 )
 
@@ -30,6 +31,7 @@ SUCCESS_OUTCOMES = {
     "accept_association": {"accepted"},
     "append_claim": {"appended", "duplicate"},
     "relate_evidence": {"appended", "duplicate"},
+    "revise_evidence_acceptance": {"updated", "unchanged"},
     "link_matters": {"linked"},
     "merge_matters": {"committed"},
     "correct_merge": {"committed"},
@@ -52,6 +54,7 @@ COMMAND_BODY_REQUIRED = {
     "accept_association": ("proposal", "candidates", "acceptance_policy"),
     "append_claim": ("claim",),
     "relate_evidence": ("relation",),
+    "revise_evidence_acceptance": ("relation", "acceptance"),
     "link_matters": ("from_matter", "to_matter", "relation_kind", "relationship_schema", "basis"),
     "merge_matters": ("survivor", "merged", "equivalence_basis", "merge_policy"),
     "correct_merge": ("merge_receipt", "correction_kind", "partitions", "basis"),
@@ -92,7 +95,7 @@ def success(operation, outcome):
 
 class OperationContractTests(unittest.TestCase):
     def assert_invalid(self, value, *, kind="result", code="E_SCHEMA_INVALID"):
-        validator = validate_command if kind == "command" else validate_result
+        validator = {"command": validate_command, "record": validate_record, "result": validate_result}[kind]
         before = deepcopy(value)
         with self.assertRaises(ContractError) as error:
             validator(value)
@@ -203,6 +206,146 @@ class OperationContractTests(unittest.TestCase):
         failure = error_result("ingest_observation", "operation-1", "E_SOURCE_IDENTITY_CONFLICT")
         failure["observation_receipt"] = deepcopy(value["receipt"])
         self.assert_invalid(failure)
+
+    def test_claim_components_are_optional_namespaced_typed_proposition_values(self):
+        for path in ("records/claim.json", "records/claim__components_correction.json"):
+            value = fixture(path)
+            self.assertEqual(validate_record(value), value)
+        base = fixture("commands/append_claim__correction.json")
+        self.assertEqual(validate_command(base), base)
+        typed_value = base["body"]["claim"]["body"]["value"]
+        for components in ({}, None, [], {"unscoped": typed_value},
+                           {"example:allocation": "untyped"},
+                           {"example:allocation\n": typed_value}):
+            with self.subTest(components=components):
+                value = deepcopy(base)
+                value["body"]["claim"]["body"]["components"] = components
+                self.assert_invalid(value, kind="command")
+        # Schema admission preserves source strings exactly, including newlines.
+        value = deepcopy(base)
+        value["body"]["claim"]["body"]["components"]["example:allocation"]["value"] = "Exact\nsource wording"
+        self.assertEqual(decode_command(json.dumps(value)), value)
+
+    def test_relation_quotation_and_validation_receipt_are_optional_but_typed(self):
+        base = fixture("records/evidence_relation__validated_passage.json")
+        self.assertEqual(validate_record(base), base)
+        earlier = fixture("records/evidence_relation.json")
+        self.assertNotIn("quotation", earlier["body"])
+        self.assertNotIn("locator_validation", earlier["body"])
+        self.assertEqual(validate_record(earlier), earlier)
+        for quotation in (None, "", {}, [], True):
+            value = deepcopy(base)
+            value["body"]["quotation"] = quotation
+            self.assert_invalid(value, kind="record")
+        receipt = base["body"]["locator_validation"]
+        bare = {key: value for key, value in receipt.items() if key != "digest"}
+        for reference in (bare, {**bare, "revision": 1},
+                          {**receipt, "record_type": "claim"}, {**receipt, "digest": "invalid"}):
+            value = deepcopy(base)
+            value["body"]["locator_validation"] = reference
+            self.assert_invalid(value, kind="record")
+        for locator in ({"kind": "whole_artifact", "uri": "urn:example:whole"},
+                        {"kind": "unavailable", "reason": "Synthetic inaccessible source."}):
+            value = deepcopy(base)
+            value["body"]["locator"] = locator
+            self.assertEqual(validate_record(value), value)
+        # Runtime receipt assignment is deliberately not a new restriction on
+        # the generic input schema; the MAT-007 service refuses supplied pins.
+        value = command("relate_evidence")
+        value["body"]["relation"]["body"]["locator_validation"] = receipt
+        self.assertEqual(validate_command(value), value)
+
+    def test_relation_adapter_declaration_is_optional_and_schema_bound(self):
+        base = fixture("commands/relate_evidence__validation.json")
+        self.assertEqual(decode_command(json.dumps(base)), base)
+        self.assertEqual(validate_command(command("relate_evidence")), command("relate_evidence"))
+        for declaration in (None, {}, "validated", {"value": {}}, {"schema": {}},
+                            {**base["body"]["validation"], "extra": True}):
+            value = deepcopy(base)
+            value["body"]["validation"] = declaration
+            self.assert_invalid(value, kind="command")
+        value = command("append_claim")
+        value["body"]["validation"] = base["body"]["validation"]
+        self.assert_invalid(value, kind="command")
+
+    def test_acceptance_revision_requires_a_relation_pin_and_only_replaces_acceptance(self):
+        base = command("revise_evidence_acceptance")
+        self.assertEqual(validate_command(base), base)
+        for status in ("proposed", "accepted", "rejected", "superseded"):
+            value = deepcopy(base)
+            value["body"]["acceptance"]["status"] = status
+            self.assertEqual(validate_command(value), value)
+            if status != "proposed":
+                del value["body"]["acceptance"]["authority"]
+                self.assert_invalid(value, kind="command")
+        for field, content in {
+            "claim": fixture("records/evidence_relation.json")["body"]["claim"],
+            "target": {"kind": "whole"}, "quotation": "Changed source wording",
+            "locator": {"kind": "whole_artifact", "uri": "urn:example:other"},
+            "provenance": {}, "extensions": {}, "validation": {},
+        }.items():
+            value = deepcopy(base)
+            value["body"][field] = content
+            self.assert_invalid(value, kind="command")
+        bare = {key: value for key, value in base["body"]["relation"].items() if key != "revision"}
+        for reference in (bare, {**bare, "record_type": "matter", "revision": 1},
+                          {**bare, "revision": 0}, {**bare, "revision": 1, "digest": "a" * 64}):
+            value = deepcopy(base)
+            value["body"]["relation"] = reference
+            self.assert_invalid(value, kind="command")
+
+    def test_dependency_notices_require_typed_affected_snapshots_and_known_causes(self):
+        base = success("revise_evidence_acceptance", "updated")
+        notice = base["body"]["changes"][0]
+        for field in ("cause", "before", "after"):
+            value = deepcopy(base)
+            del value["body"]["changes"][0][field]
+            self.assert_invalid(value)
+        for invalid in (
+            {**notice, "before": [], "after": []},
+            {**notice, "cause": "established_truth"}, {**notice, "invalidates_all": True},
+            {**notice, "before": [base["receipt"]]}, {**notice, "after": "all"},
+        ):
+            value = deepcopy(base)
+            value["body"]["changes"] = [invalid]
+            self.assert_invalid(value)
+        for before, after in ((notice["before"], []), ([], notice["after"])):
+            value = deepcopy(base)
+            value["body"]["changes"][0].update(before=before, after=after)
+            self.assertEqual(validate_result(value), value)
+
+    def test_claim_relation_results_keep_prior_shapes_and_discriminate_change_notices(self):
+        notice = success("revise_evidence_acceptance", "updated")["body"]["changes"][0]
+        receipt = fixture("records/evidence_relation__validated_passage.json")["body"]["locator_validation"]
+        for operation in ("append_claim", "relate_evidence"):
+            for outcome in ("appended", "duplicate"):
+                value = success(operation, outcome)
+                self.assertEqual(validate_result(value), value)
+                value["body"]["changes"] = [notice] if outcome == "appended" else []
+                if operation == "relate_evidence":
+                    value["body"]["locator_validation"] = receipt
+                self.assertEqual(validate_result(value), value)
+                value["body"]["changes"] = [] if outcome == "appended" else [notice]
+                self.assert_invalid(value)
+        for outcome in ("updated", "unchanged"):
+            value = success("revise_evidence_acceptance", outcome)
+            self.assertEqual(validate_result(value), value)
+            value["body"]["changes"] = [] if outcome == "updated" else [notice]
+            self.assert_invalid(value)
+            value = success("revise_evidence_acceptance", outcome)
+            if outcome == "updated":
+                del value["body"]["previous"]
+            else:
+                value["body"]["previous"] = deepcopy(value["body"]["relation"])
+            self.assert_invalid(value)
+        value = success("append_claim", "appended")
+        value["body"]["locator_validation"] = receipt
+        self.assert_invalid(value)
+        for code in sorted(REQUIRED_ERRORS):
+            failure = error_result("revise_evidence_acceptance", "revision-1", code)
+            self.assertEqual(validate_result(failure), failure)
+        failure = fixture("results/revise_evidence_acceptance__failure_revision_conflict.json")
+        self.assertEqual(validate_result(failure), failure)
 
     def test_metadata_replacement_accepts_empty_or_optional_display_fields(self):
         base = command("update_matter_metadata")

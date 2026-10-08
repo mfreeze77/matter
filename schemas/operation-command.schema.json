@@ -29,6 +29,7 @@
         "accept_association",
         "append_claim",
         "relate_evidence",
+        "revise_evidence_acceptance",
         "link_matters",
         "merge_matters",
         "correct_merge",
@@ -404,6 +405,39 @@
             "properties": {
               "relation": {
                 "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/evidence_relation_input"
+              },
+              "validation": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value",
+                "description": "Frozen schema-bound adapter declaration prepared outside the storage transaction. Failed commands retain it in their durable journal; only successful relations commit a validation receipt."
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "revise_evidence_acceptance"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "body": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "relation",
+              "acceptance"
+            ],
+            "properties": {
+              "relation": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/evidence_relation_dependency"
+              },
+              "acceptance": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/acceptance"
               }
             }
           }

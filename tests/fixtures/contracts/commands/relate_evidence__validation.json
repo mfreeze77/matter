@@ -1,0 +1,187 @@
+{
+  "schema_version": "1.0",
+  "operation": "relate_evidence",
+  "command_id": "command-relate-validated",
+  "idempotency_key": "key-relate-validated",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [
+    {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    }
+  ],
+  "body": {
+    "relation": {
+      "schema_version": "1.0",
+      "record_type": "evidence_relation",
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "id": "evidence_relation-1",
+      "provenance": {
+        "origin": "system",
+        "producer": {
+          "namespace": "example",
+          "id": "fixture-producer",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "recorded_at": {
+          "state": "known",
+          "value": "2026-10-08T15:00:00Z",
+          "precision": "second"
+        },
+        "parents": []
+      },
+      "body": {
+        "claim": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "claim",
+          "id": "claim-2",
+          "digest": "1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "evidence": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "observation",
+          "id": "observation-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "relation": "reports_assertion",
+        "target": {
+          "kind": "component",
+          "component": "example:allocation"
+        },
+        "locator": {
+          "kind": "selected_span",
+          "uri": "urn:example:source:1",
+          "selector": {
+            "schema": {
+              "namespace": "example",
+              "id": "synthetic-line-selector",
+              "version": "1.0",
+              "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "value": {
+              "first_line": 2,
+              "last_line": 2
+            }
+          }
+        },
+        "applicability": {
+          "start": {
+            "state": "unknown",
+            "reason": "not_reported"
+          },
+          "end": {
+            "state": "unknown",
+            "reason": "not_reported"
+          },
+          "bounds": "closed_open"
+        },
+        "acceptance": {
+          "status": "accepted",
+          "rationale": "Synthetic host-reviewed relation.",
+          "authority": {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "receipt",
+            "id": "authority-1"
+          }
+        },
+        "quotation": "Synthetic allocation remains pending."
+      }
+    },
+    "validation": {
+      "schema": {
+        "namespace": "example",
+        "id": "synthetic-locator-validation",
+        "version": "1.0",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "value": {
+        "scope_id": "synthetic:mat002",
+        "evidence": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "observation",
+          "id": "observation-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "locator": {
+          "kind": "selected_span",
+          "uri": "urn:example:source:1",
+          "selector": {
+            "schema": {
+              "namespace": "example",
+              "id": "synthetic-line-selector",
+              "version": "1.0",
+              "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "value": {
+              "first_line": 2,
+              "last_line": 2
+            }
+          }
+        },
+        "quotation": "Synthetic allocation remains pending.",
+        "adapter": {
+          "namespace": "example",
+          "id": "synthetic-validator",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "checked_at": {
+          "state": "known",
+          "value": "2026-10-08T15:00:00Z",
+          "precision": "second"
+        },
+        "dependencies": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "observation",
+            "id": "observation-1",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "result": {
+          "status": "valid",
+          "kind": "exact_passage",
+          "selection_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "content": {
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+          "locator": {
+            "kind": "whole_artifact",
+            "uri": "urn:example:source:1"
+          },
+          "media_type": "text/plain",
+          "availability": {
+            "status": "available",
+            "checked_at": {
+              "state": "known",
+              "value": "2026-10-08T15:00:00Z",
+              "precision": "second"
+            }
+          },
+          "byte_length": 0
+        }
+      }
+    }
+  }
+}

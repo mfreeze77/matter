@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "operation": "append_claim",
+  "operation_id": "operation-append-correction",
+  "status": "success",
+  "outcome": "appended",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "claim": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "claim",
+      "id": "claim-2",
+      "digest": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "changes": [
+      {
+        "cause": "evidence_correction",
+        "before": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "claim",
+            "id": "claim-1",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "after": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "claim",
+            "id": "claim-2",
+            "digest": "1111111111111111111111111111111111111111111111111111111111111111"
+          }
+        ]
+      }
+    ]
+  }
+}

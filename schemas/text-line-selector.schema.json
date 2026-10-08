@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/text-line-selector.schema.json",
+  "title": "Matter text-line-selector v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "start_line",
+    "end_line"
+  ],
+  "properties": {
+    "start_line": {
+      "$ref": "core-record.schema.json#/$defs/revision"
+    },
+    "end_line": {
+      "$ref": "core-record.schema.json#/$defs/revision"
+    }
+  },
+  "description": "Inclusive one-based LF-delimited lines in exact UTF-8 source bytes. No normalization; reversed and unavailable ranges are adapter-invalid."
+}

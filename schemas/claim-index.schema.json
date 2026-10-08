@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/claim-index.schema.json",
+  "title": "Matter immutable claim lookup and correction projection v1",
+  "description": "One exact immutable assertion, its declared subject and predicate, and explicit correction predecessors. Runtime verifies the complete value and watch keys against the claim. Branches are retained; this index does not choose established truth or a latest winner.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scope_id", "claim", "subject", "predicate", "predecessors"],
+  "properties": {
+    "scope_id": {"$ref": "core-record.schema.json#/$defs/identifier"},
+    "claim": {"$ref": "core-record.schema.json#/$defs/claim_dependency"},
+    "subject": {
+      "oneOf": [
+        {"$ref": "core-record.schema.json#/$defs/entity_ref"},
+        {"$ref": "core-record.schema.json#/$defs/domain_value"}
+      ]
+    },
+    "predicate": {"$ref": "core-record.schema.json#/$defs/namespaced_name"},
+    "predecessors": {
+      "type": "array", "uniqueItems": true,
+      "items": {"$ref": "core-record.schema.json#/$defs/claim_dependency"}
+    }
+  }
+}

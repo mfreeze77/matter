@@ -30,6 +30,7 @@
     "accept_association",
     "append_claim",
     "relate_evidence",
+    "revise_evidence_acceptance",
     "link_matters",
     "merge_matters",
     "correct_merge",
@@ -74,6 +75,10 @@
     "relate_evidence": [
       "appended",
       "duplicate"
+    ],
+    "revise_evidence_acceptance": [
+      "updated",
+      "unchanged"
     ],
     "link_matters": [
       "linked"
