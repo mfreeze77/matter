@@ -1,0 +1,261 @@
+I read the whole note. **I would carry this direction forward, with one central refinement: make the meaning of a rule independent of the model or code that evaluates it.** That is what turns the idea into a reusable engineering pillar.
+
+The note adds a practical way to evaluate meaning: a matter retains continuity, focused evaluators contribute judgments, and an assessment combines those judgments under explicit rules. Its distinctions between an observation, an occurrence, a matter, and an assessment are particularly useful. Pasted text(20261008-063426)
+
+JEV can make that system more capable. The enduring design should be understandable and usable with ordinary code, JEV, another model, or an authorized human judgment.
+
+## 1. The principle I would put at the center
+
+I would express the pillar this way:
+
+> **Preserve continuity, evaluate changing evidence under explicit rules, and use attention only for a current, useful reason.**
+
+That gives the system three responsibilities.
+
+**Continuity:** it can recognize that different inputs concern the same continuing subject. It remembers what has already happened, what remains unresolved, and what has already been communicated.
+
+**Interpretation:** it can explain what the available evidence means under a particular set of rules. That interpretation can change when evidence, objectives, or rules change.
+
+**Attention:** it can determine who needs an update, what they need from it, and when receiving it would be useful.
+
+This applies to a failing test, a purchasing opportunity, a research question, a public project, or a standing requirement. The subject matter changes; those responsibilities remain.
+
+The uniform part is the discipline:
+
+- Preserve the origin and scope of evidence.
+- Distinguish reports from the events they describe.
+- Keep uncertainty and disagreement explicit.
+- Record which inputs and rules support a conclusion.
+- Reconsider conclusions when relevant inputs change.
+- Justify delivery for the particular recipient.
+
+The profiles define the meaning: what establishes identity, what counts as sufficient evidence, what constitutes a significant change, and what warrants attention.
+
+That is how I would answer your earlier question about uniform rules: **make the guarantees uniform, give the rules a common structure, and let their substantive definitions vary.**
+
+## 2. The most useful abstraction is a rule contract
+
+The next piece I would formalize is a common contract for every rule.
+
+A rule needs more than a name such as `important`, `recovered`, or `same_matter`. Those names hide most of the difficult decisions.
+
+Here is what the contract should declare:
+
+| Part of the contract | What it establishes |
+|---|---|
+| **Meaning** | The precise proposition or relationship being evaluated |
+| **Outcomes** | What each possible answer means, including insufficient or conflicting evidence |
+| **Eligible evidence** | Which sources, scopes, time periods, and evidence types may support the answer |
+| **Preconditions** | What must already be known before this rule can run |
+| **Dependencies** | Which evidence revisions, prior judgments, objectives, and time conditions can change the result |
+| **Execution requirements** | Whether the rule needs exact computation, semantic interpretation, or an explicitly authorized decision |
+| **Qualification** | Which implementations have demonstrated acceptable behavior for this particular use |
+| **Permitted use** | How the result may contribute to an assessment or a subsequent action |
+
+Consider a rule called **“Does the new evidence establish that the original condition has been satisfied?”**
+
+In Oil, the original condition might be a required integration test passing under specified conditions. In a civic application, it might be an official disposition establishing that a particular requirement has been fulfilled.
+
+Both can use the same general contract. Their evidence requirements belong to their respective profiles.
+
+Even the outcome definitions matter. These are different answers:
+
+- The evidence establishes satisfaction.
+- The evidence establishes that the condition remains unsatisfied.
+- The available evidence is insufficient.
+- Eligible sources conflict.
+
+An absent test result should not quietly become “failed.” A successful but unrelated test should not become “recovered.” A later document should not automatically supersede an earlier authoritative decision.
+
+The contract makes those distinctions reviewable.
+
+**This is also where the engineering ethic becomes enforceable.** A contributor adding a new rule has to explain its meaning, evidence requirements, uncertainty, and consequences. Those requirements can become ordinary review criteria.
+
+## 3. Portability has two layers: meaning and execution
+
+The note is right to position JEV as a replaceable evaluator. TypeSafe’s documented interface supports focused typed questions, and questions in the same request are evaluated independently against the supplied state. That fits a design in which application code composes smaller judgments. [TypeSafe AI](https://docs.typesafe.ai/introduction?utm_source=chatgpt.com)
+
+But returning the same output shape does not establish that two implementations behave equivalently.
+
+Suppose two models both return:
+
+```text
+same_matter
+related_matter
+different_matter
+insufficient_evidence
+```
+
+They can still interpret “same matter” differently. One might group by topic, another by unresolved objective, and another by named entity.
+
+So I would make the **portable definition** include examples and counterexamples:
+
+- Two descriptions of one failed test execution.
+- Two separate executions failing for the same reason.
+- Two different problems affecting the same file.
+- Two problems sharing a diagnostic phrase.
+- One problem that persists while the relevant files change.
+
+Those cases establish what the rule means. Each implementation then has to demonstrate that it respects that meaning.
+
+A model change can preserve the contract while requiring new qualification. Its confidence values and thresholds should be evaluated for that implementation and question version. Research cited in the note reports both sensitivity to option labels and inconsistencies across related probability questions; that supports keeping qualification specific to the judgment being used. [arxiv.org](https://arxiv.org/abs/2609.26758?utm_source=chatgpt.com)
+
+There is a similar distinction for language and media. The core can accept evidence from many programming languages, human languages, and source formats through adapters. The currently documented Jev model is text-only, so its adapter would require suitable textual evidence. Cross-language behavior would also need qualification for the intended use. [TypeSafe AI](https://docs.typesafe.ai/models?utm_source=chatgpt.com)
+
+The general system can therefore remain agnostic while being precise about each evaluator’s actual capabilities.
+
+## 4. The engineering benefit comes from selective reassessment
+
+The biggest benefit I see is **recomputing only the understanding that a change can affect**.
+
+That can reduce both interruption and processing cost.
+
+For example:
+
+| What changes | What should be reconsidered |
+|---|---|
+| The same event is delivered again | Usually nothing beyond recording or rejecting redelivery |
+| A source is corrected | Conclusions that depended on that source |
+| The recipient’s objective changes | Relevance and attention, while reusable evidence judgments remain available |
+| A deadline approaches | The applicable timing and attention rules |
+| A matching recovery arrives | The unresolved condition and any pending advice based on it |
+| An update is delivered | That recipient’s baseline for deciding whether a later update adds anything |
+
+This is more precise than repeatedly asking a model to summarize everything and decide whether something is important.
+
+There is one subtle requirement I would add to the note: **dependencies must include the conditions behind an absence claim.**
+
+Suppose an assessment says, “No purchasing notice has been found.” That conclusion depends on which sources were checked, what period they cover, and how current the check is. It cannot depend only on the documents that happened to be returned.
+
+A newly published notice should trigger reconsideration even though none of the previously stored documents changed.
+
+The same applies in Oil. “No matching recovery has been observed” depends on the relevant event stream and its coverage. A missing or delayed stream does not establish that a failure continues, and silence does not establish recovery.
+
+That means a matter needs both:
+
+- Dependencies on specific evidence and judgments.
+- Relevant triggers for new evidence, coverage changes, and time conditions.
+
+This is how a quiet matter remains responsive without constantly running an evaluator.
+
+### Attention needs its own comparison baseline
+
+The baseline should be what the particular recipient was actually sent, together with the current assessment.
+
+An agent may already have received a diagnostic that you have never seen. You might need a decision request later, while the agent needs no repeated explanation.
+
+Delivery, consumption, action, and verified outcome should remain separate observations. A successful delivery does not establish that anyone read or used the information. Missing acknowledgment can remain unknown; it need not create another question.
+
+## 5. One claim about existing Oil needs narrowing
+
+I checked the implementation behind the note’s statement that Oil already invalidates dependent attention and advice.
+
+**The underlying capability exists, but the proposed matter lifecycle still requires integration work.**
+
+At the Oil commit inspected:
+
+- `RunStore.commit` checks supplied versions and marks registered dependent records stale. Its dependency queries are scoped to a particular run. [RunStore implementation](https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_store.py)
+- The live watcher creates runs using the core fingerprint, audience/session, and code-tree identity. That provides a useful evaluation snapshot, while a matter needs continuity across those changing snapshots. [Watcher run creation](https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/watcher/chain_check.py)
+- `Coordinator.triggered_advise` reads triggered results but records the advice with an empty dependency list and a read-version check on the advice record itself. The generic store’s invalidation mechanism therefore does not, by itself, establish a complete dependency path from those source results through the live advice. [Triggered advice implementation](https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_engine.py)
+
+These findings describe the current implementation’s scope; they are not sufficient evidence of a defect in its existing snapshot-oriented behavior.
+
+For the proposed design, they identify two concrete additions:
+
+**First, a stable matter identity above individual evaluation runs.** One concern can continue through several code trees, agent sessions, evidence revisions, and assessments. The assessments can reference those evaluation runs.
+
+**Second, explicit freshness dependencies through delivery.** A queued contribution must still be justified when it is about to be emitted. Recovery, corrected evidence, changed objectives, or a newer delivered update can make it obsolete.
+
+Oil has useful storage and execution primitives to reuse. The long-lived owner of matter state and its relationship to run-local assessments still need to be designed.
+
+That is a much more concrete implementation target than “add a matter record.”
+
+## 6. Define the neutral contract now, with Oil as its first host
+
+I would slightly adjust the note’s recommendation to “build inside Oil, then generalize.”
+
+**Define the neutral meaning now; implement and prove it through Oil first.**
+
+That avoids letting the first application’s vocabulary become the permanent core.
+
+For example:
+
+- A code-tree revision belongs in an Oil evidence adapter.
+- A test target belongs in an Oil condition or occurrence profile.
+- An official meeting identifier belongs in a civic identity profile.
+- A procurement-stage definition belongs in a civic evidence policy.
+- Evidence dependencies, assessment revisions, and recipient delivery history belong in the common mechanism.
+
+You can check that boundary using two worked examples before integrating a second application. If the same contract can describe an ongoing validation problem and an evolving purchasing development without redefining its fields, the boundary is promising.
+
+I would also keep the note’s record types as **conceptual responsibilities**. A simple input should create only the records its processing requires.
+
+A standing objective may have no occurrence. One observation may support several matters. A duplicate observation may require no new semantic judgment. An unchanged matter may need no new assessment.
+
+That keeps the abstraction lightweight.
+
+### Association also needs several distinct operations
+
+This is especially important if JEV helps determine what belongs together:
+
+- Attaching an observation to a matter.
+- Grouping reports into one occurrence.
+- Linking related matters.
+- Merging matter identities and histories.
+
+Those operations have different consequences and should have different acceptance rules.
+
+A qualified semantic judgment might be sufficient for a provisional attachment or a reversible relationship. Merging two histories needs its own policy. Similarity can help propose candidates; the host determines the accepted identity change.
+
+That preserves automation without giving every “these look related” answer the power to reshape the system’s memory.
+
+## 7. Give matters bounded initiative without making them burdensome
+
+The note’s bounded investigation idea is useful: a matter can remember the particular evidence needed to resolve an uncertainty.
+
+For example:
+
+> “A matching execution result would establish whether this condition still holds.”
+
+Or:
+
+> “An official disposition is needed to distinguish a proposed action from an adopted one.”
+
+That is a much better starting point for investigation than a broad instruction to “look into this.”
+
+I would make investigation optional and impose separate budgets on three things:
+
+1. **Evaluation:** how much computation a matter may consume.
+2. **Investigation:** how much additional evidence it may seek.
+3. **Attention:** how often, and under what conditions, it may contact a recipient.
+
+These budgets solve different problems. A matter can deserve more evidence without deserving an interruption. It can deserve an update while requiring no model call. It can remain unresolved after its investigation budget is exhausted.
+
+An unresolved result should retain a useful state: what is unknown, what would resolve it, and what should trigger reconsideration.
+
+Human input should arise from a concrete need for human judgment, authority, or information. Low model confidence alone is an incomplete reason to interrupt you.
+
+That is directly connected to your original frustration. The system should absorb uncertainty as well as repetition.
+
+## 8. Judge success at the level of the whole matter
+
+The research in the note supports exploring focused semantic evaluation. It does not establish that the resulting matter system will improve your live sessions. Even the broad Jev benchmark evaluates classification tasks, with task-specific threshold considerations, rather than this complete association, recovery, and attention workflow. [arxiv.org](https://arxiv.org/abs/2609.37647?utm_source=chatgpt.com)
+
+For this design, the decisive evidence would come from complete episodes:
+
+- Did observations attach to the right matter?
+- Did repeated reports inflate the apparent evidence?
+- Did the system recognize a useful change?
+- Did it keep an important development quiet for too long?
+- Did matching recovery clear obsolete advice?
+- Did the contribution improve the recipient’s next step?
+- How much total computation and blocking time did the episode consume?
+- How much ordinary maintenance did the system ask of the user?
+
+Quiet cases need review too. Emitting fewer messages is valuable only while preserving the interventions that matter.
+
+My first concrete target would still be one continuing Oil concern that survives several ordinary events, receives better evidence, produces a useful contribution when justified, and clears its pending advice when qualifying recovery arrives.
+
+**The next design object I would settle is the rule contract, illustrated with one Oil example and one civic example.** That gives us a way to decide which semantics belong in profiles, which mechanisms are common, and what JEV actually has to evaluate.
+
+The architecture then has a clear division of responsibility: the matter preserves continuity; profiles define meaning; evaluators contribute judgments; assessments record the current understanding; attention policies determine what each recipient needs. That is a coding pillar you can carry between applications without tying it to one model, language, or kind of matter.
