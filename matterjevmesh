@@ -1,172 +1,580 @@
-# 🎙️ You built a voice detective. Here's what the report actually says.
+**Yes. JEV could make this substrate substantially more capable by giving it a practical way to evaluate the meaning of new evidence continuously.** Your matter model supplies continuity; JEV can help determine what belongs to that matter, what changed, what the evidence supports, what remains unanswered, and whether the change deserves anyone’s attention.
 
-Imagine you record a classroom with 20 kids talking. Nobody is wearing a name tag, and you can't see their faces.
+The ambitious version is a system that can follow a concern for months, absorb hundreds of observations, investigate specific gaps, and present a small, timely, well-supported update when it can improve a decision.
 
-Your computer has one job:
+**I would make JEV a replaceable semantic evaluator inside the substrate.** The durable infrastructure would own matter identity, evidence, history, policy, and authority. JEV would perform narrow judgments within that structure.
 
-Figure out when the same kid is talking again, even if they sound a little different.
+That division also fits your immediate motivation: Oil should absorb the ordinary friction of agent work, maintain the relevant context automatically, and contribute when it has something useful to add.
 
-That's basically what your Anonymous Person-Print system is trying to do.
+Below is the architecture I would pursue. The proposed extensions are design recommendations; we still need comparative evaluation before calling their performance state of the art.
 
-But here's what makes your system interesting: instead of just listening to what someone's voice sounds like, you're teaching the computer to recognize how that person talks, behaves, and communicates.
+## 1. JEV makes the rule families in your design executable
 
-## 1. You're building a fingerprint for someone's speaking behavior
+Your notes describe reusable rule families: association, evidence, change, recurrence, consequence, time, resolution, and attention.
 
-[Sound waves.](https://images.openai.com/static-rsc-4/T1e3KKfIvXKgGoxb_luWqvXNdIdrkbqljEk59sik7tsbz-ibxEAeD4ltiGIVe4L75c55XmfRNHrkWzJI6Mign6ifMO965WX7x5wHJHLWWsVMbu3VuIc9-zih1Lzi49_OtUTzQjE5Rp5OdRF2N183S238YUEoIo1f7kEIev1Veju4Jmgv2axDtXXgvfamShT2?purpose=inline)
+Some parts are exact computations. Others depend on meaning.
 
-Voice fingerprint
+For example, code can establish that two observations have different event IDs. Understanding whether their different wording describes the same underlying validation problem may require semantic judgment. Code can establish that a deadline is three days away. Understanding whether the deadline concerns the project you are pursuing may require another judgment.
 
-Does this person have the same unique sound as before? Like recognizing your friend over the phone.
+JEV fits that second category. Its official interface accepts a state and typed questions, returning **Choice**, **Score**, or **Noul** answers. TypeSafe explicitly recommends small, focused questions whose results are composed in application code. [TypeSafe AI](https://docs.typesafe.ai/introduction?utm_source=chatgpt.com)
 
-[About Audio & Speech Research Group](https://images.openai.com/static-rsc-4/X4o7x8wS9CRr8gTzyZePWVWVUcpyD6XCDAKLUYxrUhNtPOlLT72XgrbvYUfVgQFBGufpluPrwY2FIpxwjjpyP6s3scMi491yY1ezJ8Xb2ao6_qC1fofMvFZKkdeQQhmtBLZIax6tw3dSCMWDwqGerV8v9azM4wfo_rFOX5E9xnY?purpose=inline)
+Here is how I would apply those primitives:
 
-Pitch
+| Primitive | Useful question in the matter substrate | What the surrounding code determines |
+|---|---|---|
+| **Choice** | Which supplied relationship best describes this observation’s connection to the matter? | Valid candidate IDs, permitted relationships, acceptance conditions |
+| **Noul** | Does this passage explicitly contradict the named claim? | Whether the answer qualifies for use and what that implies under policy |
+| **Score** | Which defined level describes the effect on this particular objective? | The meaning of each level, its local use, and any ordering of work |
 
-Does their voice tend to be high, low, or change in a recognizable way?
+The important design decision is to **decompose broad judgments into specific factors**.
 
-[11 Language Notes ideas to save today | school notes, pretty notes, notes inspiration and more](https://images.openai.com/static-rsc-4/3rPYeC7hNjWJekTevWNqU1F15Kj82pdz5DuKJ4MmxqGhAhdSsD1Swv38SPWXn0F9ndMrPJCQL7-D05-5NkmEu-YfTqRhXiBRoD5NAvsM2V777XzD-4gHlPop56azI92nVlhLDsqvF28TEdr8KEYKZ0nRcZdLZjAA7WhBdOgygjI?purpose=inline)
+For an agent-work matter, those factors might be:
 
-Language habits
+- Does the new diagnostic address the unresolved failure?
+- Does it invalidate the current repair hypothesis?
+- Does it identify a relevant requirement the agent has not considered?
+- Does it change the next permitted step?
+- Has the agent already received this information?
 
-Do they use certain words, sentence patterns, or grammatical habits?
+A policy can then determine whether to remain quiet, update the working agent, or prepare a question for you.
 
-[How to Cut Audio Online with Precise Edits](https://images.openai.com/static-rsc-4/nRnCEAr4xWiok0bpEMKslxh16fThtN3MxJtnV_XzaGnkhuJHtT5Y6GW-AZ6iMDM1pypLDnpPNrm-W9tggtuSV4q2KqqHK924JxnxHhGdnk4gRWgt1z4JOS3N20pn_-_88JHLbZorjX2sYvtu9i-s_qM4OdSYpjKciSul0cJyJoU?purpose=inline)
+There are practical boundaries. The currently documented Jev model is text-only; audio, images, and other material need appropriate extraction first. TypeSafe also documents weaknesses in arithmetic, date comparisons, indirection, and distracting context. Those support keeping calculations and source preparation in ordinary code while reserving JEV for meaning. [TypeSafe AI](https://docs.typesafe.ai/models?utm_source=chatgpt.com)
 
-Speaking mechanics
+## 2. Make the assessment the central unit of computation
 
-How do they pause, interrupt, take turns, and organize their speech?
+Your distinction between a matter and its assessment is the foundation I would preserve.
 
-Put these measurements together and you get something like a behavioral fingerprint.
+A matter answers:
 
-Not a fingerprint that tells you someone's name. A fingerprint that might help answer:
+> What continuing subject are we following?
 
-Have I heard this same person before?
+An assessment answers:
 
-## 2. Did your new system get better?
+> Given this evidence, these rules, this purpose, and this time, what can we conclude?
 
-Here's where things get interesting.
+I would make that operation explicit enough to run, cache, compare, invalidate, and replay.
 
-You tested 32 comparisons to see whether the computer could match a piece of speech to the correct anonymous speaking track.
+Conceptually:
 
-Successful own-track matches out of 32 tests
+> **Assess matter revision M using evidence snapshot E, policy P, purpose G, and audience context A, as of time T.**
 
-Original
+The result would preserve:
 
-New wired
+- The conclusions the evidence supports.
+- The unresolved or conflicting questions.
+- The exact evidence and prior assessments used.
+- The relevant JEV results and their qualification status.
+- What changed from the previous applicable assessment.
+- Any proposed investigation or attention treatment.
 
-07142128EmbeddingPitchVoiceLanguageMechanicsAll combined
+The core records would have distinct jobs:
 
-Higher is better. These are anonymous track-matching tests, not proven speaker identities.
+| Record | Responsibility |
+|---|---|
+| **Observation** | Preserve what a source reported, its origin, and when it became available |
+| **Occurrence** | Identify the particular event being reported, such as one failed test run or one public meeting |
+| **Matter** | Preserve the continuing subject across observations, occurrences, and changing descriptions |
+| **Judgment** | Record an evaluator’s answer to one specified question |
+| **Assessment** | Combine evidence and judgments under a particular policy and purpose |
+| **Attention and delivery record** | Explain what an audience was eligible to receive, what was delivered, and why |
 
-The surprising part?
+These are conceptual boundaries. An initial implementation can represent them inside the existing application and store.
 
-Simply connecting all the new intelligence together actually made the original ranking system worse.
+The execution flow would look approximately like this:
 
-The combined result dropped from 25 correct matches to 18.
+```mermaid
+flowchart TD
+    A["New evidence or relevant change"] --> B["Validate scope, identity, and availability"]
+    B --> C["Record observation and occurrence"]
+    C --> D["Assemble bounded assessment input"]
+    P["Versioned rules and purpose"] --> D
+    D --> E["JEV semantic questions"]
+    E --> F["Validate and qualify results"]
+    F --> G["Compose assessment in code"]
+    F --> H["Record unresolved judgment"]
+    G --> I["Evaluate attention and investigation"]
+    H --> I
+    I --> J["Quiet record or permitted delivery"]
+    I --> K["Bounded evidence request"]
+    K --> C
+```
 
-Think about five detectives trying to solve a mystery.
+Any proposed consequential action would still pass through the host application’s authority rules.
 
-Two detectives are really good at recognizing voices. Three others are less reliable. If everybody gets an equal vote, the weaker detectives can outvote the stronger ones.
+This architecture gives JEV a well-defined place to contribute while making the resulting behavior inspectable.
 
-That's a possible explanation for what you're seeing.
+## 3. Give matters stronger continuity and a more precise understanding of evidence
 
-It doesn't mean the other measurements are useless. It means giving every measurement an equal say isn't necessarily a good idea.
+### A. Associate observations with the right continuing matter
 
-## 3. But then you tried something smarter
+This is one of the highest-value applications.
 
-Instead of making every detective's vote equally important, you tested a trained system that learns how to combine the evidence.
+Imagine these three observations:
 
-You also added something called cohort normalization.
+- “The integration test is still failing.”
+- “The fixture expects the old response format.”
+- “Validation fails because the returned payload includes the new field.”
 
-Imagine you're trying to identify which kid is talking.
+They may describe one continuing problem. They could also refer to different tests, branches, or environments.
 
-Instead of asking just:
+I would use a staged association process:
 
-"Does this sound like Charlie?"
+1. Resolve exact source, task, operation, project, or domain identifiers.
+2. Find a bounded set of plausible existing matters.
+3. Give JEV the relevant evidence for each candidate.
+4. Ask about the precise relationship.
+5. Preserve ambiguous associations explicitly.
 
-You ask:
+Useful outcomes include **same continuing matter**, **related matter**, **different matter**, and **insufficient evidence**. Whether something is a new occurrence would be evaluated separately where necessary.
 
-"Does this sound more like Charlie than it sounds like the other kids in this classroom?"
+A matter’s ID should survive changes in its title or summary. Correcting an association should append a correction to its history and reopen affected assessments.
 
-That's the basic intuition.
+This also means avoiding premature automatic merges. If two civic projects share a location and similar descriptions, that can justify investigation. Their distinct identifiers, decision histories, and funding records still matter.
 
-And look what happened in your separate eight-query test:
+### B. Make occurrence identity explicit
 
-| Voice model       | Voice alone | With 3 signals + cohort |
-| ----------------- | ----------- | ----------------------- |
-| WeSpeaker         | 7/8         | 7/8                     |
-| SpeechBrain ECAPA | 7/8         | 8/8                     |
-| Resemblyzer       | 7/8         | 8/8                     |
-| NVIDIA TitaNet    | 7/8         | 8/8                     |
+Your notes already distinguish repetition from recurrence. I would give that distinction a concrete representation.
 
-Three of the four models matched all eight test queries to the existing machine references.
+Consider four situations:
 
-These results come from a different test than the 32 comparisons above. They cannot be compared directly, and 8/8 does not establish real-world identity accuracy.
+| Situation | Interpretation |
+|---|---|
+| The same tool event is delivered twice | One observation received again |
+| A log and a report describe the same execution | Two observations of one occurrence |
+| A new execution fails in the same way | A new occurrence of the continuing condition |
+| A separate reproduction provides additional evidence | Potential corroboration, subject to provenance checks |
 
-The additional Brier scores also generally improved with cohort normalization. That measures how well the scores agreed with the machine references, including how confidently they did so. Lower is better.
+The text may be identical in all four cases.
 
-That is your most promising finding. The extra evidence may be useful when you combine it intelligently, rather than just throwing everything into one pile.
+JEV can help interpret ambiguous descriptions, but event IDs, execution IDs, timestamps, source relationships, and accepted occurrence associations should drive the counts.
 
-## 4. How much of the actual system is working?
+This has a direct payoff: the system can recognize persistence without repeatedly notifying you about one event, and recognize recurrence without erasing it as a semantic duplicate.
 
-Most of the experimental machinery ran successfully.
+A derived summary should retain its source relationships. It should never become an additional independent observation merely because a model restated the evidence.
 
-Working
+### C. Interpret evidence relative to a specific claim
 
-Voice fingerprints, alternative voice models, grammar measurements, speaking behavior, conversation events, clustering comparisons, score calibration, and trained fusion.
+An observation should not receive a global label such as “supporting evidence.”
 
-Not fully available
+The relevant relationship is:
 
-Fine-grained phrase and pause patterns couldn't be learned because word-level timestamps were missing. Two optional model packages were unavailable.
+> This evidence supports, contradicts, qualifies, or leaves unanswered this claim under these rules.
 
-Safely separated
+A statement that an official “expects funding next year” could support the claim that funding is being discussed. It does not by itself establish an approved allocation.
 
-The experiment didn't automatically assign names, change the production identity resolver, or approve anybody's identity.
+Likewise, a passing unit test may support a narrow behavior claim without establishing that the required integration test passed.
 
-You also processed hundreds of little audio clips, collected 446 conversation events, and kept records of what worked and what failed.
+JEV can help distinguish:
 
-That's important because experiments are much more useful when you can repeat them and understand where the results came from.
+- Direct evidence for the proposition.
+- A statement that someone asserted the proposition.
+- A qualification that narrows the proposition.
+- Relevant counterevidence.
+- Background or topic overlap.
+- Insufficient evidence.
 
-## 5. What doesn't this prove yet?
+Some of those relationships can coexist. A passage can support part of a claim while qualifying its scope. We should preserve that structure rather than force everything into one mutually exclusive answer.
 
-Imagine your system watches one classroom video and gets really good at telling the students apart.
+Jev-Mem already supplies useful question templates for relevance, new information, contradiction, and explicit updates. Its definitions distinguish needed facts from shared topics and distinguish an explicit replacement from mere recency. Those are useful starting points for our rule families. [Source: Jev-Mem’s question definitions](https://github.com/libingzheren/Jev-Mem/blob/7ab0c73c6d8f4f611ad252c1e6ba8083f8df0e44/memory/jev_questions.py)
 
-That's great.
+### D. Detect meaningful change and valid recovery
 
-But what happens when those same kids show up next week?
+I would first compute what changed mechanically: evidence IDs, source revisions, observed fields, policy versions, coverage, and temporal conditions.
 
-What if Charlie has a cold? What if he starts whispering? What if the microphone changes? What if somebody else talks exactly like him?
+JEV would then assess the semantic significance of that difference.
 
-Your experiment hasn't answered those questions.
+The assessment should distinguish changes caused by:
 
-It used one recording from October 1, and its answers were compared with existing machine-generated speaker links, not verified real-person identities.
+- New external evidence.
+- A correction or retraction.
+- A corrected association.
+- A changed policy.
+- A changed objective or audience preference.
+- A deadline or other time condition becoming relevant.
 
-So we cannot yet say it recognizes people accurately, works across different meetings, or is ready for production.
+That distinction prevents a new interpretation from masquerading as a new external event.
 
-## 6. What I would do next
+Recovery deserves particularly precise rules. A newer successful operation must address the original unresolved condition under the required circumstances. An unrelated successful command does not establish recovery. A relevant source change may invalidate old advice while leaving recovery unproven.
 
-I'd run three experiments:
+The shared pattern can be general. Each domain supplies the required correspondence and evidence standard.
 
-1. Different recording: Can a fingerprint built on Monday recognize the same anonymous speaker on Thursday?
-2. Voice changes: Can it still recognize someone who whispers, shouts, laughs, or speaks emotionally?
-3. Harder comparisons: Can it separate two people who sound very similar without falsely combining them?
+## 4. Turn the matter into an active, bounded investigator
 
-And I'd add human-verified examples so we can measure true accuracy rather than agreement with another computer.
+This is where the design can advance beyond passive tracking.
 
-## The big picture
+A matter should be able to retain **what evidence would settle its open questions**.
 
-You're moving from a computer that asks:
+For example:
 
-"Do these two audio clips sound alike?"
+> “We have evidence that this project is planned. We still lack an authoritative purchasing milestone.”
 
-Toward a computer that asks:
+Or:
 
-"Do these two clips contain the same person's distinctive combination of voice, language habits, rhythm, and conversational behavior?"
+> “We have a failing test and two plausible explanations. The expected response contract would distinguish them.”
 
-That's a much more ambitious problem.
+That missing information becomes a concrete investigation target.
 
-Your results show that the individual components are largely functioning, and the smarter combination method looks promising. They also demonstrate that adding more evidence can make results worse when the evidence isn't weighted properly.
+### Define evidence requirements for each assessment
 
-The next big breakthrough wouldn't be getting 8 out of 8 on this recording. It would be recognizing the same anonymous person across completely different recordings, without ever needing to know their name.
+A rule should declare the information it needs:
 
-That would turn your experimental person-print into something potentially much more useful for diarization and speaker continuity.
+- The proposition being assessed.
+- Eligible source types and scope.
+- Mandatory evidence or coverage.
+- Relevant counterevidence or superseding records.
+- The applicable time boundary.
+- What can remain unknown.
+
+The engine can nominate permitted next reads. JEV can evaluate which candidate read is likely to resolve a named uncertainty.
+
+For a development matter, those candidates might be a fixture, a documented contract, a relevant test, or the output from a targeted command. For civic monitoring, they might be a referenced attachment, a purchasing notice, or a later authoritative disposition.
+
+**The next step should address a specific gap.**
+
+### Use bounded retrieval with explicit stopping reasons
+
+Jev-Mem’s questions about relevance, missing evidence, contradiction, and whether another retrieval round would help are useful here. We would adapt them to the matter’s evidence requirements. [Source: traversal and stopping questions](https://github.com/libingzheren/Jev-Mem/blob/7ab0c73c6d8f4f611ad252c1e6ba8083f8df0e44/memory/jev_questions.py)
+
+The host would enforce limits on calls, time, bytes, candidate expansion, and permitted sources.
+
+Stopping needs a precise meaning:
+
+| Stop reason | Result |
+|---|---|
+| Required evidence obtained | Assessment may proceed if its other gates pass |
+| No eligible source can answer the gap | Preserve the unresolved question |
+| Evidence remains contradictory | Preserve the conflict |
+| Investigation budget exhausted | Record incomplete evaluation |
+| An authorized person must decide | Prepare a concrete decision request |
+
+A retrieval budget ending must not become an assertion that enough evidence exists.
+
+We also need to protect against a model repeatedly selecting evidence that agrees with its initial interpretation. Required source checks and relevant counterevidence should remain part of the policy, and evaluation should measure what useful evidence was missed.
+
+For the first implementation, I would use fixed, bounded evidence packets. Adaptive investigation can follow once the basic assessments are reliable.
+
+## 5. Make attention depend on what changes a decision
+
+This is the part that can most directly improve Oil’s experience.
+
+I would separate three questions:
+
+1. **What does the evidence support?**
+2. **How does that affect an active objective?**
+3. **What does this audience need now?**
+
+A development problem may require action from the working agent while requiring no action from you. An early civic development may belong in a digest. A correction to something already delivered may deserve a prompt update.
+
+### Evaluate importance through explicit dimensions
+
+For a particular objective, I would assess dimensions such as:
+
+- Whether a commitment is affected.
+- Whether a dependency changed.
+- Whether a new opportunity became actionable.
+- Whether delay changes the available options.
+- Whether the next step is already being handled.
+- Whether an unresolved decision belongs to the audience.
+
+JEV can judge the semantic parts of those questions. Code can calculate deadlines, check assignments, apply dispositions, and enforce delivery preferences.
+
+A local ranking score may be useful for ordering a queue, but its meaning should remain attached to the named policy. “Importance” should not become a universal number shared across unrelated domains.
+
+### Compare with what this audience already received
+
+The right comparison is often:
+
+> What changed since the last assessment delivered to this audience?
+
+A matter may have changed internally without requiring another interruption. Conversely, one decisive correction may require attention immediately.
+
+A delivery decision should retain:
+
+- The assessment being considered.
+- The audience and active purpose.
+- The previously delivered assessment.
+- The meaningful difference.
+- The action or decision this update could improve.
+- The reason for delivering or withholding it.
+- The freshness and recovery checks performed before delivery.
+
+Possible treatments could be **quiet record**, **agent hint**, **digest item**, **correction**, and **decision request**. Those would be proposed application outcomes, with definitions supplied by policy.
+
+### Keep “uncertain” from automatically becoming “ask Michael”
+
+Low confidence should first mean that the current judgment is unqualified.
+
+Depending on the matter, the next permitted response could be to gather a missing source, ask a stronger model a focused question, wait for an expected event, or preserve an unresolved assessment.
+
+A question to you should identify the decision that actually needs your authority or preference, along with the evidence and available options.
+
+That prevents the system from converting every unresolved interpretation into more work for you.
+
+### Make quietness explainable
+
+The system should be able to say why it stayed quiet:
+
+- The audience already has the relevant information.
+- No material change occurred.
+- The working agent is handling the next step.
+- The matter was deferred under an applicable disposition.
+- The new information belongs in a later digest.
+- The required evidence is unavailable.
+
+The last case is operationally different from finding nothing important. Keeping those reasons distinct is essential when evaluating missed developments.
+
+## 6. Compose JEV judgments through explicit dependencies
+
+This is a crucial technical requirement.
+
+TypeSafe documents that questions in a request are evaluated independently against the same state. They do not consume each other’s answers. [TypeSafe AI](https://docs.typesafe.ai/primitives?utm_source=chatgpt.com)
+
+That lets us batch questions when all their necessary inputs are already present.
+
+For example, a fixed passage and claim can support parallel questions about direct support, qualification, and contradiction.
+
+But a question about whether a newly selected candidate resolves the matter may depend on a candidate selection that has not happened yet. That needs a later stage using the validated selection.
+
+I would use a small dependency graph:
+
+1. Establish permitted evidence and known identity.
+2. Evaluate unresolved semantic relationships.
+3. Validate and qualify those results.
+4. Prepare any dependent questions.
+5. Apply the profile’s assessment rules.
+6. Evaluate consequences and attention.
+
+Every question should explicitly identify the relevant state and condition. A descriptive question ID alone is insufficient; Jev-Mem’s source specifically notes that question IDs are not model input. [Source: question construction](https://github.com/libingzheren/Jev-Mem/blob/7ab0c73c6d8f4f611ad252c1e6ba8083f8df0e44/memory/jev_questions.py)
+
+### Separate logical composition from probabilities
+
+Separate JEV answers should not be treated as a joint probability model.
+
+A recent coherence study tested logically related questions and found that Jev’s answers could disagree across complementary and equivalent forms. Bundling questions did not establish logical coherence. Its experiments were limited to specific datasets and a model snapshot, but the architectural implication is directly relevant: we must enforce our own composition rules. [arxiv.org](https://arxiv.org/html/2609.33209v1?utm_source=chatgpt.com)
+
+For example, multiplying “belongs to this matter,” “supports recovery,” and “relevant to the objective” probabilities would not establish the probability that closing the matter is correct.
+
+Instead:
+
+- Qualify the individual judgments.
+- Check their required relationships.
+- Preserve conflicts.
+- Apply explicit transition rules.
+- Evaluate the resulting behavior end to end.
+
+Where one question has mutually exclusive outcomes, a complete Choice can represent them. Where dimensions can coexist—such as resolved and still important—they should remain separate.
+
+## 7. Make every assessment explainable, current, and replayable
+
+This is where the surrounding infrastructure becomes especially valuable.
+
+### Retain a complete decision receipt
+
+Each assessment should bind the exact material that produced it:
+
+| Category | What to retain |
+|---|---|
+| **Subject** | Matter ID, revision, candidate IDs, association state |
+| **Evidence** | Source IDs, revisions, locators, hashes, provenance, coverage and omissions |
+| **Question semantics** | Exact wording, definitions, ordered options, rendering version |
+| **Execution** | Provider, requested and resolved model, input digest, raw result, attempts, cost and timing |
+| **Qualification** | Applicable certificate, thresholds, support requirements, acceptance result |
+| **Policy** | Rule profile, purpose, audience context, temporal boundary |
+| **Outcome** | Conclusions, unresolved reasons, differences, proposed attention or investigation |
+
+JEV itself does not generate an explanatory essay. We can construct explanations from the rule path and linked evidence.
+
+For example:
+
+> “This remained open because the newer success concerns a different test target.”
+
+Or:
+
+> “This became eligible for an update because an authoritative deadline now affects your active objective.”
+
+Those are inspectable explanations of system behavior.
+
+### Reassess only affected dependencies
+
+A changed delivery preference should cause a new attention decision. It should not require reclassifying unchanged evidence.
+
+A corrected source should invalidate conclusions that depended on it. A changed evidence rule should reopen the affected assessment family. A timer crossing may require only deterministic reevaluation.
+
+OIL already has a strong mechanism to build on: its store checks read versions and transitively invalidates dependent records when their inputs change, including attention and advice. [Source: `RunStore.commit`](https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_store.py)
+
+The matter extension should use that dependency machinery.
+
+### Preserve both historical knowledge and later corrections
+
+We need to distinguish:
+
+- What evidence the system had at a particular time.
+- What current evidence says happened at that time.
+
+A cancellation published late may revise the current understanding of a project’s history. It should not rewrite what the system actually knew before publication.
+
+OIL’s replay machinery already gates evidence by availability and pins the replay corpus. Its own documentation correctly limits the claim: chronological source gating does not prove model ignorance of future outcomes, and stepwise replay does not reproduce concurrent delivery timing. [Source: chronological replay](https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_replay.py)
+
+We should preserve those distinctions in our evaluation reports.
+
+## 8. Use the research to qualify each rule family
+
+The research gives us implementation patterns and concrete failure tests.
+
+### Jevcal: borrow the measurement workflow
+
+Jevcal provides threshold fitting, held-out accuracy and coverage reporting, and drift-checking patterns. That makes it useful for asking how much of a particular decision family JEV can handle at an acceptable measured error level. [GitHub](https://github.com/abhixhek/jevcal?utm_source=chatgpt.com)
+
+We should enforce qualification in our own runtime. The source we inspected accepts an answer when its confidence clears a stored threshold without checking the stored held-out status at that decision point. [Source: Jevcal’s runtime gate](https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/runtime.py)
+
+For our substrate, an expired, failed, inapplicable, or mismatched qualification record must prevent that judgment from being treated as qualified.
+
+### Changed-question research: version the meaning of the rule
+
+The 5G study’s dramatic changed-question failure concerned its fine-tuned Laya encoder. It does not establish the same failure rate for hosted Jev or our workloads. It does demonstrate why a stable output type is insufficient evidence that a changed question still behaves correctly. [arxiv.org](https://arxiv.org/abs/2609.33689?utm_source=chatgpt.com)
+
+For us, these are materially different questions:
+
+- Does this concern the same topic?
+- Does this concern the same matter?
+- Does this report the same occurrence?
+
+A qualification suite should include cases where changing between those questions must change the correct answer.
+
+### Label research: test whether the definitions govern the answer
+
+The open-model paper you brought in remains useful for label-definition testing. A separate study also reports hosted Jev sensitivity when meaningful option names were reassigned across fixed definitions. Its findings concern that experimental setup, and do not establish the hosted model’s internal mechanism. [arxiv.org](https://arxiv.org/html/2609.26758v2?utm_source=chatgpt.com)
+
+We should test descriptive labels against neutral labels, vary option order, and compare results after mapping back to the same semantic outcomes.
+
+Agreement alone does not prove correctness. We still need independent outcome labels and a baseline for ordinary repeated-call variation.
+
+### Broader evaluation: qualify thresholds separately
+
+A 37-dataset Jev evaluation provides encouraging evidence for bounded classification use, while also showing that binary probabilities and task-specific thresholds require care. It is evidence for pursuing this design, not a measurement of our matter or attention policies. [arxiv.org](https://arxiv.org/abs/2609.37647?utm_source=chatgpt.com)
+
+TypeSafe’s own `confidence` is a statistic derived from the returned distribution. It is not an independent certificate of correctness. [TypeSafe AI](https://docs.typesafe.ai/confidence?utm_source=chatgpt.com)
+
+Accordingly, I would qualify **association**, **evidence support**, **material change**, **recovery**, and **attention contribution** separately.
+
+### Evaluate the entire matter behavior
+
+Good individual classifiers do not guarantee a useful system. A correct evidence assessment can still be delivered too late, repeated unnecessarily, or attached to the wrong matter.
+
+Evaluation should include chronological episodes with independent outcome labels. Repeated observations from one session or hearing should remain grouped when splitting datasets and estimating uncertainty.
+
+We also need to review samples that stayed quiet. Otherwise, the system could appear successful by emitting very little while missing the developments it should have caught.
+
+## 9. What this would look like in practice
+
+### Example: an agent validation problem
+
+Consider a hypothetical agent session.
+
+| Development | Matter behavior | Attention behavior |
+|---|---|---|
+| A required integration test fails | Record the operation, revision, diagnostic, and unmet validation condition | Usually stay quiet while the agent begins the obvious repair |
+| The same event is delivered again | Recognize redelivery | No additional update |
+| A new run fails with new evidence | Record another occurrence and reassess the repair hypothesis | Contribute only if the evidence changes the next useful step |
+| The relevant contract distinguishes two explanations | Record which hypothesis the evidence supports | Send one focused, cited hint at a useful boundary |
+| A fixture or source revision changes | Invalidate dependent old advice; preserve the unresolved validation requirement | Withhold stale queued advice |
+| The matching test passes under the required conditions | Record qualifying recovery | Clear pending failure advice |
+| A later run genuinely fails again | Record a new occurrence within the matter’s history | Reassess the recurrence in its current context |
+
+The useful intervention might be:
+
+> “The supplied contract requires the v3 response shape, while this fixture still expects v2. Check the fixture expectation before changing the serializer.”
+
+The statement would need the actual evidence. JEV could help evaluate that relationship; the host would verify the source references and policy conditions.
+
+You would receive a question only if a concrete decision required your input. Routine repair and recovery would maintain the matter through ordinary evidence, without a closeout ceremony.
+
+### Example: the county access-control project
+
+The same framework could follow the project in your notes:
+
+- An agenda reference establishes that it is being discussed.
+- A budget document supports a particular funding-stage assessment.
+- A purchasing notice adds an actionable milestone.
+- A later cancellation changes the supported status and invalidates pending opportunity advice.
+
+A researcher, a salesperson, and a person responsible for procurement could receive different assessments and delivery treatments from the same source history.
+
+JEV would interpret the relation between documents, claims, and objectives. The civic profile would determine what sources establish particular stages and which authorities can make the relevant dispositions.
+
+This also matches a useful boundary in the StateCivics importer: deriving a matter action depends on the stated motion, its target, the acting body’s reviewed authority, and source evidence. [Source: matter-action import logic](https://github.com/mfreeze77/state-civics-ai/blob/a34fcec27f353187e7a23d54788b203d13ac87c1/services/local-accountability/sar_tracker/core_import/matters.py)
+
+### How this relates to DIAT
+
+DIAT could eventually use the same assessment contracts for source-linked evidence judgments and qualification receipts.
+
+Its own identity rules would remain specific to that application. The acoustic candidate pool and evidence boundaries we discussed would still govern the experiment. A semantic judgment that a passage supports a candidate-related claim would not become an acoustic identity probability.
+
+That illustrates the value of the agnostic core: shared assessment mechanics, precise domain meaning.
+
+## 10. Build the first version inside OIL, then generalize what proves useful
+
+I checked current OIL because the implementation path matters here. It already contains several relevant foundations:
+
+| Existing owner | Relevant implemented behavior | Remaining evidence needed |
+|---|---|---|
+| [IO2-138](https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/tickets/IO2-138-advisories-that-ask-for-nothing.md) | Actionability, bookkeeping guards, and delivery controls | Comparable live usefulness and retained catches |
+| [IO2-142](https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/tickets/IO2-142-claim-specific-evidence-domains.md) | Claim-specific evidence preparation and honest coverage | Real provider semantic replay of the declared cases |
+| [IO2-143](https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/tickets/IO2-143-failure-locality-lifecycle.md) | Occurrence-based expiry, matching recovery, and source invalidation | Live incident reconstruction and comparative outcomes |
+
+Those October 7 milestones are valuable groundwork. The broader stable Matter/Assessment relationship would be the proposed extension.
+
+I would implement it in this sequence.
+
+### First: introduce a minimal matter assessment over one existing stream
+
+Use the current failure and recovery stream.
+
+Add durable matter association and an assessment history that can answer:
+
+- What remains unresolved?
+- Which observations belong to it?
+- What changed?
+- What has already been delivered?
+- What evidence would establish recovery?
+
+Reuse the current evidence, invalidation, worker, and delivery components.
+
+### Second: evaluate a small JEV question set in shadow
+
+Start with ambiguous evidence relationships and meaningful changes. Compare against the existing deterministic behavior on the same frozen inputs.
+
+Keep initial evidence packets bounded and reproducible. Include genuine problems, routine successful work, expected nonzero commands, duplicate events, incomplete evidence, and valid recovery.
+
+### Third: allow narrowly qualified contributions
+
+Enable only the judgment families that meet their declared acceptance criteria. Keep unqualified results explicit, retain receipts, and recheck freshness immediately before delivery.
+
+OIL’s existing authority boundary should continue to govern consequences. Its resolver explicitly prevents model inferences from superseding accepted intent. [Source: trust resolver](https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/kernel/resolver.py)
+
+### Fourth: add bounded investigation and additional profiles
+
+Once continuity and attention improve measured outcomes, add targeted evidence requests through the existing permitted retrieval boundaries.
+
+Then test a second domain and extract the mechanics that actually remain the same. StateCivics can become an additive consumer of a demonstrated contract.
+
+### Measure the result the user experiences
+
+I would use these measures:
+
+| Goal | Measure |
+|---|---|
+| Preserve continuity | Correct associations; false merges and splits |
+| Recognize recovery | False closures; stale advice after matching recovery |
+| Improve attention | Useful interventions; missed or late important developments |
+| Reduce repetition | Repeated advice and repeated investigation per matter |
+| Preserve evidence discipline | Unsupported conclusions and omitted counterevidence |
+| Verify contribution | Delivery, consumption, action, and verified outcome as separate stages |
+| Stay lightweight | Calls, tokens, cost, blocking time, and total overhead |
+| Avoid maintenance burden | Zero required closeout actions for ordinary work |
+
+We should retain your earlier low-overhead target as a measured engineering requirement. Provider latency alone will not establish it.
+
+**The first result I would aim for is very concrete: one unresolved concern can persist across many tool events, receive better evidence over time, produce one useful contribution when something changes, and disappear from attention when qualifying recovery arrives.**
+
+From there, the same mechanics can support civic developments, opportunities, research questions, and other continuing matters. JEV supplies frequent, focused semantic judgments; the substrate turns those judgments into continuity, disciplined investigation, and attention that earns its place.
