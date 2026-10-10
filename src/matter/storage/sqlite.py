@@ -682,7 +682,13 @@ class SQLiteStore:
                         if replay_guard is not None:
                             replay_view = _Snapshot(self, db)
                             try:
-                                replay_guard(replay_view)
+                                decision = replay_guard(replay_view)
+                                if decision is not None:
+                                    # An async guard or a false return value
+                                    # cannot silently authorize disclosure.
+                                    if hasattr(decision, "close"):
+                                        decision.close()
+                                    raise StorageError("E_POLICY_INVALID", "A replay guard must synchronously return None or raise a refusal.")
                             except ContractError as error:
                                 return self._failure(command, error)
                             finally:

@@ -32,3 +32,8 @@ outside the checkout, without loading test fixtures:
 Run any example with `python examples/<filename>.py`.
 All use synthetic inputs and host authority declarations. They do not establish domain
 authority, semantic identity, or a qualified assessment engine.
+
+`trusted_controls.py` is the portable MAT-011 runtime example. It uses explicit
+synthetic host admission, real matter metadata commands, scoped stop/release,
+durable hook receipts, stale-token refusal, protected replay and restart.
+It imports no test fixtures and requires no credentials or provider.

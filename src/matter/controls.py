@@ -10,9 +10,10 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import datetime, timezone
+from inspect import isawaitable
 
 from .authority import AuthorityPolicy, CAPABILITIES
-from .canonical import canonical_bytes, canonical_digest
+from .canonical import CanonicalError, canonical_bytes, canonical_digest
 from .citations import _contract, _domain
 from .contracts import command_digest, validate_command, validate_record
 from .storage import PROJECTION_TYPE, StorageError, entity_ref, pin
@@ -68,8 +69,12 @@ def _targets(scope, values):
 
 def _checked(name, value):
     descriptor, validator = _contract(name)
-    canonical_bytes(value)
-    if not validator.is_valid(value):
+    try:
+        canonical_bytes(value)
+        valid = validator.is_valid(value)
+    except (CanonicalError, RecursionError):
+        valid = False
+    if not valid:
         raise StorageError("E_SCHEMA_INVALID", "The trusted-control value does not match its declared schema.")
     return deepcopy(value)
 
@@ -152,10 +157,15 @@ def _effect(record):
 
 def _active(record, now):
     body = record["body"]
+    if compare_times(body["effective_from"], now) > 0:
+        # Future controls cannot be committed through this service. Seeing
+        # one during current authority checks means the host clock regressed;
+        # it must not make an accepted restriction disappear temporarily.
+        raise StorageError("E_POLICY_INVALID", "The current authority clock precedes an already committed control.")
     # For this registered effect schema only, unknown/not_applicable means
     # explicitly no automatic expiry. Other unknown endpoints are refused.
     end = body["effective_until"]
-    return compare_times(body["effective_from"], now) <= 0 and (end["state"] == "unknown" or compare_times(now, end) < 0)
+    return end["state"] == "unknown" or compare_times(now, end) < 0
 
 
 def _governing(body):
@@ -515,16 +525,6 @@ class ControlService:
             claimed = []
             # Reserve by using a unique receipt insertion. A competing caller
             # that replays this command must not run the callback.
-            identity = self._hook_identity(control, name, attempt_id, "started")
-            try:
-                before = self._storage.command_receipt(identity)
-            except StorageError as error:
-                if error.code != "E_NOT_FOUND":
-                    reports.append({"hook_id": name, "attempt_id": attempt_id, "status": "unavailable"})
-                    continue
-            else:
-                reports.append(self.hook_status(control, name, attempt_id=attempt_id))
-                continue
             # _hook_receipt reports its reservation ownership through the
             # storage handler, so simultaneous exact retries cannot both run.
             result = self._hook_receipt(record, name, attempt_id, "started", "started", claimed=claimed)
@@ -533,7 +533,11 @@ class ControlService:
                 continue
             status, error_type = "succeeded", None
             try:
-                hook(deepcopy(record))
+                outcome = hook(deepcopy(record))
+                if isawaitable(outcome):
+                    if hasattr(outcome, "close"):
+                        outcome.close()
+                    raise TypeError("Control hooks must be synchronous; async orchestration belongs to the host.")
             except Exception as error:
                 status, error_type = "failed", type(error).__name__
             finished = self._hook_receipt(record, name, attempt_id, "finished", status, error_type)
@@ -618,7 +622,9 @@ class GuardedStorage:
                 present[_key(reference)] = reference
         return validate_command(command)
 
-    def execute(self, command, handler):
+    def execute(self, command, handler, *, replay_guard=None):
+        if not callable(handler) or (replay_guard is not None and not callable(replay_guard)):
+            raise TypeError("Synchronous command and replay handlers are required.")
         command = validate_command(command)
         capability, targets = self._context(command)
         wrapped = command.get("extensions", {}).get(TOKEN_EXTENSION)
@@ -630,5 +636,8 @@ class GuardedStorage:
         def guarded(tx):
             self.controls.require_current(tx, token, capability=capability, targets=targets)
             return handler(tx)
-        return self._storage.execute(command, guarded,
-            replay_guard=lambda view: self.controls._audit(view, command, targets))
+        def audit(view):
+            self.controls._audit(view, command, targets)
+            if replay_guard is not None:
+                replay_guard(view)
+        return self._storage.execute(command, guarded, replay_guard=audit)

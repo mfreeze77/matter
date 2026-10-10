@@ -16,7 +16,9 @@ derivatives use the atomic ``matter.identity_dependencies`` validity hook.
 Explicit temporal views, source catalogs, coverage and absence registrations
 live in ``matter.time``, ``matter.source_catalogs``, ``matter.coverage`` and
 ``matter.negative_dependencies``.
+Trusted host authority, scoped control fences and guarded execution live in
+``matter.authority`` and ``matter.controls``.
 Semantic ranking, assessment execution and integrations remain backlog work.
 """
 
-__version__ = "0.1.0.dev9"
+__version__ = "0.1.0.dev10"

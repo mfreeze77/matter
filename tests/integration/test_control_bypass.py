@@ -11,6 +11,7 @@ from matter.storage import SQLiteStore, StorageError, entity_ref, pin
 
 from association_helpers import ACTOR, SCOPE, acceptance_command
 from control_helpers import ControlTestCase, authority_policy, control_command, instant
+from integration.helpers import create_command, record_input
 from observation_helpers import observation_command
 
 
@@ -210,6 +211,15 @@ class ControlBypassTests(ControlTestCase):
                          capability="read", targets=[entity_ref(target)], as_of=instant("2026-10-09T12:00:00Z"))
         self.assert_code("E_CANCELLED", self.controls.read, token, entity_ref(target))
 
+    def test_clock_regression_cannot_make_committed_stop_or_denial_inactive(self):
+        for action, capability in (("cancel", "write"), ("deny", "read")):
+            self.clock.value = instant()
+            target = self.matter("clock-" + action)
+            self.apply_control("clock-control-" + action, targets=[target], action=action,
+                               capabilities=[capability] if action == "deny" else [])
+            self.clock.value = instant("2026-10-10T11:59:59Z")
+            self.assert_code("E_POLICY_INVALID", self.token, [target], capability=capability)
+
     def test_idempotency_duplicate_identity_conflict_and_restart(self):
         target = self.matter("restart")
         command, first = self.apply_control("durable-stop", targets=[target])
@@ -247,6 +257,117 @@ class ControlBypassTests(ControlTestCase):
         controls.run_hooks(result["body"]["control"], attempt_id="explicit-retry")
         self.assertEqual(len(calls), 2)
         self.assertEqual(controls.apply(command), result)
+
+    def test_temporary_release_is_refused_and_finite_restriction_expiry_invalidates_token(self):
+        target = self.matter("expiry")
+        _, denied = self.apply_control("temporary-denial", targets=[target], action="deny", capabilities=["read"],
+                                       until=instant("2026-10-10T12:02:00Z"))
+        work = self.token([target], capability="write")
+        self.assert_code("E_POLICY_INVALID", self.controls.prepare, control_command("temporary-release", self.authority,
+            targets=[target], action="allow", capabilities=["read"], supersedes=[denied["body"]["control"]],
+            until=instant("2026-10-10T12:01:00Z")))
+        self.clock.value = instant("2026-10-10T12:03:00Z")
+        self.assert_code("E_DEPENDENCY_STALE", self.controls.check, work)
+        self.token([target], capability="read")
+
+    def test_evaluation_receipt_cannot_be_admitted_as_host_authority(self):
+        command = create_command("fake-receipt", "fake-receipt-matter", scope_id=SCOPE)
+        fake = deepcopy(self.authority)
+        fake.pop("creation_receipt")
+        fake["id"] = "evaluation-only"
+        fake["body"]["stage"] = "evaluation"
+        def handler(tx):
+            tx.insert(fake)
+            matter = tx.insert(tx.command["body"]["matter"])
+            return tx.success("created", {"matter": pin(matter)})
+        self.assertEqual(self.storage.execute(command, handler)["status"], "success")
+        record = self.storage.get(entity_ref(fake))
+        policy = AuthorityPolicy(SCOPE, actors=[ACTOR], authorities=[pin(record)], capabilities=["read"], control_kinds=["cancellation"])
+        controls = ControlService(self.storage, policy=policy, clock=self.clock)
+        self.assert_code("E_AUTHORITY_REQUIRED", controls.prepare, control_command("fake-control", record))
+
+    def test_invalid_control_scope_effect_and_future_time_fail_before_mutation(self):
+        variants = []
+        bad = control_command("mismatch", self.authority)
+        bad["body"]["control"]["body"]["actor"]["id"] = "another-actor"
+        variants.append((bad, "E_SCOPE_FORBIDDEN"))
+        bad = control_command("future", self.authority, now=instant("2026-10-11T12:00:00Z"))
+        variants.append((bad, "E_POLICY_INVALID"))
+        bad = control_command("unknown-effect", self.authority)
+        bad["body"]["control"]["body"]["effect"]["schema"]["digest"] = "0" * 64
+        variants.append((bad, "E_POLICY_INVALID"))
+        for value, code in variants:
+            self.assert_code(code, self.controls.prepare, value)
+        self.assertIsNone(self.controls.current())
+
+    def test_control_atomicity_and_lost_commit_acknowledgement(self):
+        for stage in ("before_commit", "after_commit"):
+            target = self.matter(stage)
+            command = self.controls.prepare(control_command("crash-" + stage, self.authority, targets=[target]))
+            def fault(point):
+                if point == stage:
+                    raise OSError("Synthetic storage fault.")
+            with SQLiteStore(self.database, scope_id=SCOPE, fault_hook=fault) as faulty:
+                service = ControlService(faulty, policy=self.host_policy, clock=self.clock)
+                self.assert_failure(service.apply(command), "E_STORAGE_UNAVAILABLE")
+            if stage == "before_commit":
+                self.assertIsNone(self.controls.current(entity_ref(target)))
+            else:
+                self.assertIsNotNone(self.controls.current(entity_ref(target)))
+            recovered = self.controls.apply(command)
+            self.assertEqual(recovered["outcome"], "applied")
+            self.assertEqual(self.controls.apply(command), recovered)
+
+    def test_concurrent_hook_attempt_is_claimed_once_and_started_is_not_blindly_retried(self):
+        entered, release = threading.Event(), threading.Event()
+        calls, reports = [], []
+        def hook(control):
+            calls.append(control["id"])
+            entered.set()
+            release.wait(5)
+        controls = ControlService(self.storage, policy=self.host_policy, clock=self.clock, hooks={"worker": hook})
+        result = controls.apply(controls.prepare(control_command("hook-concurrent", self.authority)))
+        reference = result["body"]["control"]
+        thread = threading.Thread(target=lambda: reports.extend(controls.run_hooks(reference, attempt_id="one")))
+        thread.start()
+        try:
+            self.assertTrue(entered.wait(3))
+            second = controls.run_hooks(reference, attempt_id="one")
+            self.assertEqual(second[0]["status"], "started")
+            self.assertEqual(len(calls), 1)
+        finally:
+            release.set()
+            thread.join(5)
+        self.assertEqual(reports[0]["status"], "succeeded")
+        self.assertEqual(len(calls), 1)
+
+    def test_dispatch_authorization_is_fenced_and_completed_transport_stays_factual(self):
+        target = self.matter("dispatch-target")
+        token = self.token([target], capability="delivery")
+        command = create_command("authorize-dispatch", "authorization-record", scope_id=SCOPE)
+        command.update(actor=deepcopy(ACTOR), authority=entity_ref(self.authority))
+        command["expected_revisions"] = [token["authority"]]
+        delivery_ref = {"scope_id": SCOPE, "namespace": "example:delivery", "record_type": "receipt", "id": "actual-delivery"}
+        def authorize(tx):
+            self.controls.authorize_dispatch(tx, token, targets=[entity_ref(target)])
+            receipt = record_input("receipt", delivery_ref["id"], scope_id=SCOPE)
+            receipt["namespace"] = delivery_ref["namespace"]
+            # Synthetic host transport evidence represents a completed send;
+            # production adapters own their authorization-to-I/O boundary.
+            receipt["body"].update(stage="delivered", outcome="example:transport_success")
+            tx.insert(receipt)
+            matter = tx.insert(tx.command["body"]["matter"])
+            return tx.success("created", {"matter": pin(matter)})
+        result = self.storage.execute(command, authorize)
+        self.assertEqual(result["status"], "success")
+        delivered = self.storage.get(delivery_ref)
+        self.apply_control("stop-after-delivery", targets=[target])
+        self.assertEqual(self.storage.get(delivery_ref), delivered)
+        late = create_command("late-dispatch", "late-record", scope_id=SCOPE)
+        late.update(actor=deepcopy(ACTOR), authority=entity_ref(self.authority), expected_revisions=[token["authority"]])
+        failed = self.storage.execute(late, authorize)
+        self.assertEqual(failed["status"], "failure")
+        self.assertIn(failed["error"]["code"], {"E_CANCELLED", "E_REVISION_CONFLICT"})
 
 
 if __name__ == "__main__":
