@@ -254,7 +254,7 @@ class ObservationIngestor:
         observation = command["body"]["observation"]
         source = observation["body"]["source_identity"]
         content = observation["body"]["content"]
-        if observation["namespace"] in {INDEX_NAMESPACE, "matter.source_catalogs", "matter.coverage", "matter.negative_dependencies"}:
+        if observation["namespace"] in {INDEX_NAMESPACE, "matter.source_catalogs", "matter.coverage", "matter.negative_dependencies"} or observation["namespace"].startswith("matter.controls"):
             raise StorageError("E_SCOPE_FORBIDDEN", "The observation service namespaces are reserved.")
         if "occurred_interval" in observation["body"]:
             validate_interval(observation["body"]["occurred_interval"])

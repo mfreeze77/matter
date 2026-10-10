@@ -225,7 +225,15 @@ class Storage(Protocol):
     @property
     def scope_id(self) -> str: ...
 
-    def execute(self, command: dict[str, Any], handler: CommandHandler) -> dict[str, Any]: ...
+    def execute(self, command: dict[str, Any], handler: CommandHandler, *,
+                replay_guard: Callable[[Snapshot], None] | None = None) -> dict[str, Any]:
+        """Execute, or authorize disclosure of a prior result inside its transaction.
+
+        replay_guard is trusted local synchronous code, called only for an
+        exact prior command. It receives a read-only current snapshot. A
+        refusal does not modify the earlier command, result or receipt.
+        """
+        ...
 
     def snapshot(self) -> AbstractContextManager[Snapshot]: ...
 

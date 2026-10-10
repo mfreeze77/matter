@@ -385,6 +385,10 @@ class _Transaction(_Snapshot):
         if record.get("record_type") in MUTABLE_RECORD_TYPES:
             record["revision"] = 1
         record = validate_record(record)
+        if (record["namespace"] == "matter.controls"
+                or (record["namespace"].startswith("matter.controls.")
+                    and not (record["namespace"] == "matter.controls.hooks" and record["record_type"] == "receipt"))):
+            raise StorageError("E_SCOPE_FORBIDDEN", "Control state namespaces are reserved for internal projections and hook receipts.")
         reference = entity_ref(record)
         self._writable_ref(reference)
         if self._db.execute("SELECT 1 FROM heads WHERE scope_id=? AND namespace=? AND id=?", _identity(record)).fetchone():
@@ -639,7 +643,7 @@ class SQLiteStore:
             affected_references=references, detail=exc.detail,
         )
 
-    def execute(self, command: dict[str, Any], handler: CommandHandler) -> dict[str, Any]:
+    def execute(self, command: dict[str, Any], handler: CommandHandler, *, replay_guard=None) -> dict[str, Any]:
         """Atomically execute or replay a command; never retry the handler here.
 
         A handled semantic refusal is durable with no child writes. Unexpected
@@ -651,6 +655,8 @@ class SQLiteStore:
         digest = command_digest(command)
         if not callable(handler):
             raise TypeError("A synchronous command handler is required.")
+        if replay_guard is not None and not callable(replay_guard):
+            raise TypeError("A synchronous replay guard is required.")
         if (
             command["scope_id"] != self.scope_id
             or command["actor"]["scope_id"] != self.scope_id
@@ -673,6 +679,14 @@ class SQLiteStore:
                         journal = transaction._journal(prior[0])
                         if journal["command_digest"] != digest or canonical_bytes(journal["command"]) != canonical_bytes(command):
                             return self._failure(command, StorageError("E_IDEMPOTENCY_CONFLICT"))
+                        if replay_guard is not None:
+                            replay_view = _Snapshot(self, db)
+                            try:
+                                replay_guard(replay_view)
+                            except ContractError as error:
+                                return self._failure(command, error)
+                            finally:
+                                replay_view._active = False
                         return journal["result"]
 
                     db.execute("SAVEPOINT command_mutation")
