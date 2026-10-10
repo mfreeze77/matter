@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/rule-evaluation-receipt.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "input_digest": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+    },
+    "rule": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    },
+    "binding": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    },
+    "execution_status": {
+      "enum": [
+        "completed",
+        "failed",
+        "cancelled",
+        "timed_out",
+        "budget_exhausted"
+      ]
+    },
+    "qualification": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/qualification"
+    },
+    "elapsed_ms": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+    },
+    "called": {
+      "type": "boolean"
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "control_token_digest": {
+      "oneOf": [
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "raw_result": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/raw_result_reference"
+    }
+  },
+  "required": [
+    "input_digest",
+    "rule",
+    "binding",
+    "execution_status",
+    "qualification",
+    "elapsed_ms",
+    "called",
+    "reason",
+    "control_token_digest",
+    "raw_result"
+  ]
+}
+
