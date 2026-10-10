@@ -5,8 +5,10 @@ encoding version `matter-json-v1`. MAT-003 adds the separate
 [durable storage and migration boundary](../storage.md) without changing those
 wire versions. MAT-004 adds the [observation intake handler](../observations.md)
 and the result field described below. Schema negotiation, later business
-operations, and semantic evaluator qualification retain their own tickets, including
-[MAT-012](../../tickets/MAT-012.md) and [MAT-074](../../tickets/MAT-074.md).
+operations, and semantic evaluator qualification retain their own milestones.
+MAT-012 adds the bounded [rule/evaluator interface](../rules.md) without adding a
+core wire variant; [MAT-074](../../tickets/MAT-074.md) owns broader compatibility
+qualification.
 
 The authoritative field inventory is [schema-inventory.md](schema-inventory.md).
 The exact byte encoding and digest preimage are in [canonical.md](canonical.md).
@@ -295,3 +297,58 @@ and encoding boundary. They do not establish durable idempotency, correct
 association, authorization, fresh assessment commits, provider accuracy, or
 safe external delivery. Each of those claims needs its own implementation and
 acceptance evidence.
+
+## MAT-011 control and replay compatibility
+
+MAT-011 implements the already-declared `record_control` operation. It adds five
+packaged private control schemas and an explicitly interpreted
+`matter:control-token` command extension. Core record kinds, command/result
+inventory, wire version, canonical encoding, and SQLite migration are unchanged.
+Legacy control payloads remain readable but are not executable unless their
+effect matches the runtime's registered schema and current host authority.
+
+`Storage.execute` gains an optional keyword-only `replay_guard(snapshot)` callback.
+Its default preserves existing behavior. SQLite invokes it under the command
+transaction only before returning an exact saved result. Refusal preserves the
+old journal and result; it does not rerun the mutation or overwrite history.
+The callback must synchronously return `None` or raise a refusal; Boolean-like
+results and asynchronous callbacks do not authorize disclosure.
+Custom storage backends must implement this optional callback before being used
+with `GuardedStorage`; ignoring it would disclose historical results despite a
+current read denial. Ordinary unguarded callers need no change.
+
+The new internal control projection namespace is reserved against core-record
+creation. The hook subnamespace permits receipt records for the trusted host's
+hook implementation; raw storage remains a privileged interface. Existing
+wrong-kind occupants fail closed and require explicit host repair rather than
+automatic deletion. No existing data or historical control is rewritten.
+
+Hosts opt existing services into guarded execution by supplying the decorated
+storage port. Raw storage and service preparation reads remain trusted host
+interfaces; permission-checked data delivery uses `ControlService.read`. Work
+tokens must be captured before evaluation and carried unchanged into the
+transaction. A token is never inferred from observation content, and no
+implicit compatibility fallback refreshes stale work. Full lifecycle, outbox
+and native transport semantics remain separate milestones.
+
+## MAT-012 rule interface compatibility
+
+MAT-012 adds four separately digest-bound runtime schemas for immutable rule
+definitions, ordered evaluation inputs, evaluator responses, and evaluation
+receipt details. It reuses the existing judgment and receipt creation inputs.
+The twelve core kinds, twenty-four command variants, forty-five successful
+operation/outcome pairs, `1.0` envelopes, canonical encoding, and SQLite migration
+remain unchanged. No evaluator persistence or assessment operation is added.
+
+The installed package now includes `matter.evaluators`. Domain schema values
+must resolve an exact local descriptor; they are validated using only that
+definition's self-contained schema resource. Opaque domain payloads accepted by
+generic core validation do not automatically satisfy a rule's declared schema,
+label meaning, exact citation set, permitted proposals, or qualification scope.
+
+Prepared inputs bind the full rule definition, ordered evidence and direct
+prerequisite input material. Consumers must supply the exact expected original
+input and fresh host guards where needed; resolving an arbitrary result for the
+same rule is insufficient. Results remain uncommitted attempts. Any later
+storage/publication adapter must preserve original input/control artifacts and
+perform its atomic currentness and authority checks before publication.

@@ -48,6 +48,41 @@
     },
     "raw_result": {
       "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/raw_result_reference"
+    },
+    "events": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stage",
+          "status"
+        ],
+        "properties": {
+          "stage": {
+            "enum": [
+              "pre_gate",
+              "binding",
+              "validation",
+              "post_gate",
+              "elapsed_limit"
+            ]
+          },
+          "status": {
+            "enum": [
+              "completed",
+              "failed",
+              "cancelled",
+              "timed_out",
+              "budget_exhausted"
+            ]
+          },
+          "code": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/error_code"
+          }
+        }
+      }
     }
   },
   "required": [
@@ -60,7 +95,7 @@
     "called",
     "reason",
     "control_token_digest",
-    "raw_result"
+    "raw_result",
+    "events"
   ]
 }
-

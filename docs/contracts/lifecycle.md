@@ -1,6 +1,6 @@
 # Matter lifecycle, attention, and delivery contract
 
-Status: normative target specification. This document specifies behavior to be implemented and qualified through MAT-009, MAT-010, MAT-011, and MAT-017 through MAT-025. The scaffold does not implement these runtime guarantees.
+Status: normative target specification. Bounded portions are implemented by MAT-009 [identity correction](../identity-corrections.md), MAT-010 [time and coverage](../time-coverage.md), and MAT-011 [trusted controls](../controls.md). Domain lifecycle, audience attention, scheduling and full delivery remain to be implemented and qualified through MAT-017 through MAT-025. The existing components do not establish those later runtime guarantees.
 
 Sources: [matterbrainstormspec](../../matterbrainstormspec), sections 2–5 and 8–9, and [matterjevmesh](../../matterjevmesh), sections 3–7, 9, and 10. Companion contracts: [core](core.md) and [rules](rules.md).
 

@@ -4,7 +4,7 @@
   "track": "core",
   "phase": 1,
   "priority": "P0",
-  "status": "planned",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "control_authority",
@@ -52,7 +52,30 @@
   "artifacts": [
     "src/matter/controls.py",
     "src/matter/authority.py",
-    "tests/integration/test_control_bypass.py"
+    "src/matter/storage/base.py",
+    "src/matter/storage/sqlite.py",
+    "src/matter/observations.py",
+    "src/matter/__init__.py",
+    "schemas/control-effect.schema.json",
+    "schemas/control-sequence.schema.json",
+    "schemas/control-fence.schema.json",
+    "schemas/control-token.schema.json",
+    "schemas/control-hook.schema.json",
+    "tests/control_helpers.py",
+    "tests/contract/test_control_contracts.py",
+    "tests/integration/test_control_bypass.py",
+    "tests/integration/test_control_storage.py",
+    "examples/trusted_controls.py",
+    "examples/README.md",
+    "docs/controls.md",
+    "docs/validation/MAT-011.md",
+    "docs/contracts/core.md",
+    "docs/contracts/lifecycle.md",
+    "docs/contracts/schema-inventory.md",
+    "docs/contracts/compatibility.md",
+    "README.md",
+    "pyproject.toml",
+    ".github/workflows/validate.yml"
   ],
   "tests": [
     "A scope correction invalidates only affected work.",
@@ -76,7 +99,19 @@
     "matterjevmesh"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "2026-10-10: implemented against merged MAT-010 main ee294d2f4c1c709cceba2857730c75e9f54a71f0. Inspected the governing core/lifecycle contracts and pinned Oil resolver 3d7c629fd45067de405c1bbae0a2aa0e4036399a to preserve accepted-intent precedence without copying application-specific policy. Reused immutable control records, record_control, scoped storage transactions, receipts and existing association services; no external host or deployment changed.",
+      "2026-10-10: final combined python -m unittest discover -s tests -v passed all 704 tests in 701.495 seconds on Python 3.12.14 and SQLite 3.53.1, including all 674 baseline cases and 30 control additions. All 362 frozen runtime/schema/test/example/workflow/packaging input hashes remained unchanged. Local qualification finished at 2026-10-10T01:16:50Z. Submitted-head Python 3.11/3.12 CI is a separate merge gate; its exact result is recorded in the PR.",
+      "AC-1: a real control commit advances the applicable fence while a synchronized fake evaluator remains blocked and simulated evaluation/attention budgets are exhausted. apply returns the durable effect before explicit optional hooks; callback or hook storage failure cannot mask or undo that returned effect. The control lane does not consult salience or evaluation.",
+      "AC-2: role-spoofing and quoted stop instructions remain ordinary observation data. Runtime checks exact admitted host authority receipt pins, actor, scope, capability ceiling, control kind and packaged effect identity. Evaluation receipts cannot become host authority. Supported source/core intake cannot poison internal sequence or fence namespaces; wrong-kind occupants fail closed.",
+      "AC-3: an actual AssociationService acceptance prepared through GuardedStorage races with cancellation on a separate SQLite handle. The original token is bound into the command and checked in the committing transaction; stale work writes no accepted child. Late preparation cannot renew a token. Full command/read targets cannot be narrowed by a caller, and A-only changes preserve unrelated B work.",
+      "Cancellation and capability restrictions remain conjunctive across original exact target scopes. Narrow release cannot remove a broader overlapping restriction; shorter expiry cannot weaken an indefinite restriction. Release requires exact current supersession and cannot be temporary. Finite half-open expiry allows fresh work without reviving old tokens; historical time and backward host clocks cannot make accepted stop or denial disappear.",
+      "Present read authority gates exact success and failure replay inside the idempotency transaction without rewriting historical results. Cancellation alone preserves historical replay. Dispatch authorization checks the original delivery token transactionally, while a synthetic completed transport receipt remains factual after later cancellation; a native transport/outbox is not implemented.",
+      "Real SQLite regression cases cover conflicting identity, duplicate control redelivery, stale preparation, restart, injected pre-commit failure, lost post-commit acknowledgement and concurrent hook attempts. Durable started reservations prevent blind duplicate invocation; successful/failed outcomes are immutable, and interrupted hooks remain outcome unknown until an explicit new attempt. Independent review reproduced and verified scope-iterator, overlap-release, expiry and namespace fixes.",
+      "2026-10-10: isolated installed 0.1.0.dev10 wheel passed outside the checkout. All 37 packaged Python files, 36 schemas and 1 migration SQL asset matched source bytes. All 203 copied contract fixtures and eight copied standalone examples passed, including trusted controls. Wheel SHA-256: 7cc0741af655aa1616013733e1ca06c9132979844a5c37a9e9e3fd22f1f13afc.",
+      "2026-10-10: generated-file checks, repository validation, all three synthetic lifecycle walkthroughs, JavaScript 26 canonical plus 8 exact-source vectors, and whitespace checks passed. Inventory remains 12 record kinds, 24 commands, 45 success pairs and 19 errors; validation reports 80 tickets, 104 requirements, 36 schemas and zero errors. The final acceptance receipt is docs/validation/MAT-011.md.",
+      "Qualification is bounded and synthetic. The host authenticates transport, installs static policies, protects raw storage, declares all domain reads and derives actual dispatch targets. SQLite may wait for another writer, running Python is cooperatively cancellable, hooks do not guarantee exactly-once external effects, and no identity provider, provider execution, native delivery, outbox, scheduler, live Oil usefulness or multi-backend parity is claimed. Core wire version, canonical encoding, migration and dependencies remain unchanged."
+    ]
   }
 }

@@ -17,7 +17,7 @@ The example `classification` and `condition_id` fields describe already-prepared
 ## Installed API examples
 
 These standalone Python examples exercise implemented services with synthetic
-inputs and temporary local storage. They also run from an installed wheel
+inputs and temporary local storage where persistence is required. They also run from an installed wheel
 outside the checkout, without loading test fixtures:
 
 | Example | Behaviors verified |
@@ -28,7 +28,15 @@ outside the checkout, without loading test fixtures:
 | [Claim evidence](claim_evidence.py) | Attributed claims, verified source citations, supporting and conflicting evidence, retained history, and restore |
 | [Association acceptance](association_acceptance.py) | Explicit candidate catalogs, proposals, guarded host acceptance, rejection, authorized release, and replay |
 | [Identity corrections](identity_corrections.py) | Typed links, guarded merges, preserved evidence and conflicts, historical assessment, atomic validity, protected undo, explicit separation release, re-protection, and restore |
+| [Time and coverage](time_coverage.py) | Explicit historical knowledge cuts, source catalogs, published coverage, negative watches, and due boundaries |
+| [Trusted controls](trusted_controls.py) | Host-admitted scoped controls, durable fences, fixed work tokens, protected replay, and restart |
+| [Rule evaluation](rule_evaluation.py) | Exact immutable rule and binding, neutral integer comparison, distinct outcome dimensions, uncommitted attempt receipt, and no action authority |
 
 Run any example with `python examples/<filename>.py`.
 All use synthetic inputs and host authority declarations. They do not establish domain
 authority, semantic identity, or a qualified assessment engine.
+
+`trusted_controls.py` is the portable MAT-011 runtime example. It uses explicit
+synthetic host admission, real matter metadata commands, scoped stop/release,
+durable hook receipts, stale-token refusal, protected replay and restart.
+It imports no test fixtures and requires no credentials or provider.

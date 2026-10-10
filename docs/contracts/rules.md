@@ -1,6 +1,6 @@
 # Rule, profile, and assessment contract
 
-Status: normative target specification. MAT-012 through MAT-016 and related core tickets implement these mechanisms later. A scaffold, a deterministic walkthrough, or a model returning a well-formed object does not qualify the assessment engine.
+MAT-012 implements the bounded rule/evaluator interface described in [the runtime API](../rules.md): immutable definitions, detached inputs, deterministic and recorded bindings, direct prerequisite admission, and uncommitted attempt receipts. Policy composition, assessment publication, transitive invalidation, live providers, and qualification issuance remain later milestones. The governing sections below include those planned contracts; structural or deterministic interface conformance does not qualify the assessment engine.
 
 Sources: [matterbrainstormspec](../../matterbrainstormspec), sections 2–7, and [matterjevmesh](../../matterjevmesh), sections 1–8. Read [core](core.md) for identities and time, and [lifecycle](lifecycle.md) for consequences and delivery. The core is provider-neutral. No Jev-specific client behavior is specified here.
 

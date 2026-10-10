@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/control-fence.schema.json",
+  "title": "Matter control fence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scope_id",
+    "target",
+    "epoch",
+    "last_control",
+    "cancellations",
+    "denials",
+    "dispositions"
+  ],
+  "properties": {
+    "scope_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "target": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/entity_ref"
+        }
+      ]
+    },
+    "epoch": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+    },
+    "last_control": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
+    },
+    "denials": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "capability",
+          "control"
+        ],
+        "properties": {
+          "capability": {
+            "enum": [
+              "association",
+              "merge",
+              "correction",
+              "transition",
+              "read",
+              "delivery",
+              "assessment",
+              "write"
+            ]
+          },
+          "control": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
+          }
+        }
+      }
+    },
+    "dispositions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "control"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "instruction",
+              "correction",
+              "cancellation",
+              "task_change",
+              "permission",
+              "deferral",
+              "acknowledgement",
+              "rejection",
+              "preference",
+              "decision",
+              "protected_separation"
+            ]
+          },
+          "control": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
+          }
+        }
+      }
+    },
+    "cancellations": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
+      }
+    }
+  }
+}

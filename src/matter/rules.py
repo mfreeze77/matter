@@ -29,6 +29,26 @@ class SchemaDefinition(FrozenValue):
             Draft202012Validator.check_schema(schema)
         except Exception:
             raise ContractError("E_POLICY_INVALID", "The local domain schema is invalid.") from None
+        def closed(value, *, root=False):
+            if isinstance(value, dict):
+                if not root and "$id" in value:
+                    raise ContractError("E_POLICY_INVALID", "Nested domain schema resource IDs are unsupported.")
+                if any(keyword in value for keyword in ("$dynamicRef", "$recursiveRef", "$dynamicAnchor")):
+                    raise ContractError("E_POLICY_INVALID", "Dynamic domain schema references are unsupported.")
+                for keyword in ("$ref",):
+                    if keyword in value and (not isinstance(value[keyword], str) or not value[keyword].startswith("#")):
+                        raise ContractError("E_POLICY_INVALID", "Domain schemas permit only self-contained fragment references.")
+                for keyword in ("properties", "patternProperties", "$defs", "definitions", "dependentSchemas"):
+                    for child in value.get(keyword, {}).values():
+                        closed(child)
+                for keyword in ("additionalProperties", "unevaluatedProperties", "propertyNames", "items",
+                                "contains", "unevaluatedItems", "not", "if", "then", "else", "contentSchema"):
+                    if keyword in value:
+                        closed(value[keyword])
+                for keyword in ("allOf", "anyOf", "oneOf", "prefixItems"):
+                    for child in value.get(keyword, []):
+                        closed(child)
+        closed(schema, root=True)
         self._freeze(schema)
         ref = fragment({"namespace": namespace, "id": identity, "version": version,
                         "digest": source_digest(self._encoded)}, "component_ref")
@@ -42,15 +62,14 @@ class SchemaDefinition(FrozenValue):
 
 class SchemaRegistry:
     """Frozen exact schema bindings; unknown references never fetch the network."""
-    __slots__ = ("_entries", "_registry")
+    __slots__ = ("_entries",)
 
     def __init__(self, definitions=()):
         values = tuple(definitions)
         if len(values) > 128 or any(not isinstance(item, SchemaDefinition) for item in values):
             raise ContractError("E_POLICY_INVALID")
-        identities, references, resources = set(), set(), []
+        identities, references = set(), set()
         core = schema_for("record")
-        resources.append((core["$id"], Resource.from_contents(core)))
         schema_ids = {core["$id"]}
         for item in values:
             ref = item.reference
@@ -65,9 +84,7 @@ class SchemaRegistry:
             if not isinstance(schema_id, str) or not schema_id or schema_id in schema_ids:
                 raise ContractError("E_POLICY_INVALID", "Installed schema resource IDs must be explicit and unique.")
             schema_ids.add(schema_id)
-            resources.append((schema_id, Resource.from_contents(schema)))
         object.__setattr__(self, "_entries", tuple((canonical_bytes(item.reference), item) for item in values))
-        object.__setattr__(self, "_registry", Registry().with_resources(resources))
 
     def __setattr__(self, name, value):
         raise AttributeError("SchemaRegistry is immutable.")
@@ -84,7 +101,13 @@ class SchemaRegistry:
         candidate = fragment(value, "domain_value")
         definition = self.resolve(candidate["schema"])
         try:
-            valid = Draft202012Validator(definition.value, registry=self._registry,
+            # Isolation also closes local JSON Pointers into annotation data:
+            # a fragment can point at any JSON object, including one that was
+            # not a schema-bearing keyword during construction. That object
+            # must not gain access to another installed domain/core resource.
+            schema = definition.value
+            isolated = Registry().with_resources([(schema["$id"], Resource.from_contents(schema))])
+            valid = Draft202012Validator(schema, registry=isolated,
                                         format_checker=_FORMAT_CHECKER).is_valid(candidate["value"])
         except Exception:
             raise ContractError("E_POLICY_INVALID", "A domain schema reference cannot be resolved locally.") from None

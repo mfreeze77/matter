@@ -79,7 +79,7 @@ class RuleContractTests(RuleTestCase):
         result, rule, binding, packet = self.evaluate(self.binding(timeout))
         self.assertEqual(result.judgment["body"]["execution_status"], "timed_out")
         self.assertNotIn("semantic_output", result.judgment["body"])
-        admission = admit_result(result.judgment, rule, binding=binding, schemas=self.schemas,
+        admission = admit_result(result.judgment, rule, binding=binding, schemas=self.schemas, expected_input=packet,
             as_of=NOW, accepted_labels=["example:negative"])
         self.assertEqual(admission, {"status": "blocked", "reason": "execution_timed_out"})
         self.assertNotIn("private provider", str(result.value))
@@ -95,11 +95,12 @@ class RuleContractTests(RuleTestCase):
         self.assertEqual(incomplete.receipt["body"]["details"]["value"]["called"], False)
         rule = self.rule(binding, change=lambda d: d["preconditions"].append(
             {"pointer": "/enabled", "equals": False, "otherwise_label": "example:inapplicable"}))
-        result = self.runner([rule], [binding]).evaluate(self.packet(rule),
+        packet = self.packet(rule)
+        result = self.runner([rule], [binding]).evaluate(packet,
             judgment_id="na-judgment", attempt_id="na-attempt")
         self.assertEqual(result.judgment["body"]["evaluation_status"], "not_applicable")
         self.assertEqual(result.judgment["body"]["semantic_output"]["value"]["label"], "example:inapplicable")
-        self.assertEqual(admit_result(result.judgment, rule, binding=binding, schemas=self.schemas,
+        self.assertEqual(admit_result(result.judgment, rule, binding=binding, schemas=self.schemas, expected_input=packet,
             as_of=NOW, accepted_labels=["example:negative"])["status"], "blocked")
 
     def test_ambiguous_and_conflicting_remain_inspectable(self):
@@ -139,7 +140,7 @@ class RuleContractTests(RuleTestCase):
         result, rule, binding, packet = self.recorded_result(
             certificate={"reference": component("unknown-certificate")})
         self.assertEqual(result.judgment["body"]["qualification"]["status"], "unknown")
-        self.assertEqual(admit_result(result.judgment, rule, binding=binding, schemas=self.schemas,
+        self.assertEqual(admit_result(result.judgment, rule, binding=binding, schemas=self.schemas, expected_input=packet,
             as_of=NOW, accepted_labels=["example:positive"])["reason"], "qualification_unknown")
 
     def test_admitted_certificate_exact_match_expiry_and_scope(self):
@@ -149,7 +150,7 @@ class RuleContractTests(RuleTestCase):
         registry = QualificationRegistry([certificate])
         result, rule, binding, packet = self.recorded_result(certificate=certificate, qualifications=registry)
         self.assertEqual(result.judgment["body"]["qualification"]["status"], "qualified")
-        self.assertEqual(admit_result(result.judgment, rule, binding=binding, schemas=self.schemas,
+        self.assertEqual(admit_result(result.judgment, rule, binding=binding, schemas=self.schemas, expected_input=packet,
             qualifications=registry, as_of=LATE, accepted_labels=["example:positive"])["reason"], "qualification_expired")
         wrong = self.certificate(rule, binding, change=lambda c: c.update(task_scope=component("other-task")))
         result, _, _, _ = self.recorded_result(certificate=wrong, qualifications=QualificationRegistry([wrong]))

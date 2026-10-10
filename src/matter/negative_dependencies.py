@@ -187,6 +187,15 @@ def inspect_registration(view, scope, body, policy, authority):
             raise _invalid("The assessment must retain the exact coverage snapshot in its positive dependencies.")
         if not any(canonical_bytes(watch) == canonical_bytes(item) for item in manifest["negative"]):
             raise _invalid("The assessment must retain this exact time-bounded negative scope.")
+    for source in spec["eligible_sources"]:
+        registrations = _source_registrations(view, scope, source)
+        # Preparation retains every bucket member's current pin. Transactional
+        # discovery refuses a newly added unpinned watch, so competing writers
+        # cannot both consume the final slot. Refreshing an existing ID consumes
+        # no additional slot; a newly joined source bucket must have capacity.
+        occupies_slot = any(entity_ref(item) == address for item in registrations)
+        if not occupies_slot and len(registrations) >= MAX_NEGATIVE_REGISTRATIONS:
+            raise StorageError("E_BUDGET_EXHAUSTED", "The source bucket has reached its negative-registration bound.")
     catalogs, records = _catalog_view(view, scope, spec)
     original = {canonical_bytes(item) for item in snapshot["observations"]}
     if not original.issubset({canonical_bytes(pin(item)) for item in records.values()}):
@@ -221,6 +230,20 @@ def commit_registration(tx, plan):
     return tx.success("registered", {"registration": pin(stored), "changes": changes})
 
 
+def _source_registrations(view, scope, source):
+    """Read the same checked, bounded source bucket for admission and arrival."""
+    records = _bounded(view.watchers(source_watch_key(scope, source)), MAX_NEGATIVE_REGISTRATIONS)
+    seen, verified = set(), []
+    for stored in records:
+        record = read_negative_dependency(view, scope, pin(stored))
+        if (source not in record["value"]["value"]["watch"]["eligible_sources"]
+                or canonical_bytes(record) != canonical_bytes(stored) or _identity(record) in seen):
+            raise _invalid("The source bucket contains an inconsistent negative registration.")
+        seen.add(_identity(record))
+        verified.append(record)
+    return _sorted(verified)
+
+
 def collect_arrival_watches(view, scope_id, observation):
     """Collect every registration in this exact source bucket, including firsts.
 
@@ -232,16 +255,7 @@ def collect_arrival_watches(view, scope_id, observation):
     if observation["scope_id"] != scope:
         raise StorageError("E_SCOPE_FORBIDDEN")
     source = source_key(observation["body"]["source_identity"]["namespace"])
-    records = _bounded(view.watchers(source_watch_key(scope, source)), MAX_NEGATIVE_REGISTRATIONS)
-    seen, verified = set(), []
-    for stored in records:
-        record = read_negative_dependency(view, scope, pin(stored))
-        if (source not in record["value"]["value"]["watch"]["eligible_sources"]
-                or canonical_bytes(record) != canonical_bytes(stored) or _identity(record) in seen):
-            raise _invalid("The source bucket contains an inconsistent negative registration.")
-        seen.add(_identity(record))
-        verified.append(record)
-    return _sorted(verified)
+    return _source_registrations(view, scope, source)
 
 
 def record_arrival(tx, observation):

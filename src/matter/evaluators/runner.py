@@ -9,7 +9,7 @@ from ..canonical import canonical_bytes, canonical_digest
 from ..contracts import ContractError, validate_record
 from ..rules import RuleRegistry, SchemaRegistry
 from ..storage import entity_ref
-from ..time import validate_interval
+from ..time import knowledge_eligible, validate_interval
 from .._rule_values import checked, descriptor, domain, fragment, same
 from .base import BindingRegistry, EvaluationBundle, EvaluationInput, QualificationRegistry
 
@@ -44,17 +44,53 @@ def _label(body, rule, schemas):
     return outcome
 
 
-def admit_result(judgment, rule, *, binding, schemas, qualifications=None, as_of,
-                 accepted_labels, accepted_statuses=("applicable",), require_qualified=True):
-    """Admit a prerequisite, not an action. Failure never means semantic false.
+def _validate_response(response, rule, packet, schemas):
+    """The same semantic boundary applies to fresh and previously stored results."""
+    value = domain("rule-evaluator-response", response)["value"]
+    allowed = [{"reference": item["reference"], "locator": item["locator"]} for item in packet["evidence"]]
+    seen = set()
+    for use in value["used_evidence"]:
+        encoded = canonical_bytes(use)
+        if use not in allowed or encoded in seen:
+            raise ContractError("E_EVIDENCE_INVALID", "Citations must be unique exact admitted evidence and locators.")
+        seen.add(encoded)
+    if value["execution_status"] == "completed":
+        outcome = _label(value, rule, schemas)
+        for proposal in value["proposed_consequences"]:
+            schemas.validate(proposal)
+            if proposal["schema"] not in outcome["implications"]:
+                raise ContractError("E_AUTHORITY_REQUIRED", "The rule does not permit this typed proposal.")
+    return value
 
-    Recheck certificate applicability at this consumption time. A stored
-    qualification declaration alone cannot authenticate a certificate or
-    revive an expired result. No result from this function grants authority.
-    """
+
+def _expected_input(expected_input, rule, binding):
+    material = expected_input.value if isinstance(expected_input, EvaluationInput) else checked(
+        expected_input, required=("rule_definition", "packet"))
+    if len(canonical_bytes(material)) > rule.value["resource_limits"]["max_input_bytes"]:
+        raise ContractError("E_BUDGET_EXHAUSTED")
+    packet = domain("rule-evaluation-input", material["packet"])["value"]
+    if (not same(material["rule_definition"], rule.value) or packet["rule"] != rule.reference
+            or packet["binding"] != binding.reference):
+        raise ContractError("E_EVIDENCE_INVALID", "The expected input must bind the exact installed meaning.")
+    return material
+
+
+def _admit_result(judgment, rule, *, binding, schemas, qualifications, as_of,
+                  expected_input, accepted_labels, accepted_statuses, require_qualified):
     body = _body(judgment)
-    if not same(body["rule"], rule.reference) or not same(body["evaluator"], binding.reference):
-        return {"status": "blocked", "reason": "meaning_or_binding_mismatch"}
+    material = _expected_input(expected_input, rule, binding)
+    packet = material["packet"]
+    if (not same(body["rule"], rule.reference) or not same(body["evaluator"], binding.reference)
+            or judgment["scope_id"] != packet["scope_id"]
+            or body["input_digest"] != canonical_digest(material, "matter.evaluation-input.v1")
+            or not same(body["dependency_manifest"], packet["dependencies"])):
+        return {"status": "blocked", "reason": "expected_input_mismatch"}
+    if (knowledge_eligible(body["execution_interval"]["end"], as_of) is not True
+            or knowledge_eligible(judgment["provenance"]["recorded_at"], as_of) is not True):
+        return {"status": "blocked", "reason": "not_available_at_admission"}
+    fields = ("execution_status", "evaluation_status", "semantic_output", "qualification",
+              "used_evidence", "proposed_consequences", "limitations")
+    _validate_response({key: deepcopy(body[key]) for key in fields if key in body}, rule, packet, schemas)
     if body["execution_status"] != "completed":
         return {"status": "blocked", "reason": "execution_" + body["execution_status"]}
     outcome = _label(body, rule, schemas)
@@ -66,10 +102,33 @@ def admit_result(judgment, rule, *, binding, schemas, qualifications=None, as_of
         return {"status": "blocked", "reason": "output_not_admitted"}
     registry = qualifications if qualifications is not None else QualificationRegistry()
     qualification = registry.classify(body["qualification"], rule=rule, binding=binding,
-        context=body["dependency_manifest"]["context"], as_of=as_of)
+        context=packet["context"], as_of=as_of)
     if require_qualified and qualification["status"] not in {"qualified", "not_required"}:
         return {"status": "blocked", "reason": "qualification_" + qualification["status"]}
     return {"status": "usable", "reason": "declared_prerequisite_satisfied"}
+
+
+def admit_result(judgment, rule, *, binding, schemas, expected_input, qualifications=None, as_of,
+                 accepted_labels, accepted_statuses=("applicable",), require_qualified=True,
+                 check_current=None):
+    """Admit the host-selected exact input/result pair, never grant action authority.
+
+    Mapping a dependent question to its prerequisite belongs to the host or
+    later composition policy. An arbitrary result for the same rule is not
+    sufficient. Mutable, temporal, absence and original control contexts need
+    a fresh host gate; MAT-015 owns their atomic commit and durable restoration.
+    """
+    from .packets import requires_currentness_guard
+    material = _expected_input(expected_input, rule, binding)
+    now = fragment(as_of, "known_time")
+    if requires_currentness_guard(material) or material["packet"]["control_token_digest"] is not None:
+        if not callable(check_current):
+            raise ContractError("E_POLICY_INVALID", "Prerequisite admission requires its original currentness context.")
+        check_current(deepcopy(material), as_of=deepcopy(now))
+    return _admit_result(judgment, rule, binding=binding, schemas=schemas,
+        qualifications=qualifications, as_of=now, expected_input=material,
+        accepted_labels=accepted_labels, accepted_statuses=accepted_statuses,
+        require_qualified=require_qualified)
 
 
 class RuleEvaluator:
@@ -127,7 +186,7 @@ class RuleEvaluator:
                 return self._fallback(rule, condition["otherwise_label"], "A declared deterministic prerequisite was not satisfied.")
         supplied = {}
         for predecessor in packet["upstream"]:
-            key = canonical_bytes(predecessor["body"]["rule"])
+            key = canonical_bytes(predecessor["judgment"]["body"]["rule"])
             if key in supplied:
                 raise ContractError("E_RULE_CONFLICT", "Multiple upstream results need an explicit composition policy.")
             supplied[key] = predecessor
@@ -140,7 +199,8 @@ class RuleEvaluator:
                 return self._fallback(rule, requirements["incomplete_label"], "A required predecessor is missing.")
             previous_rule = self.rules.resolve(requirement["rule"])
             previous_binding = self.bindings.resolve(previous_rule.value["evaluator_binding"])
-            admission = admit_result(predecessor, previous_rule, binding=previous_binding,
+            admission = _admit_result(predecessor["judgment"], previous_rule, binding=previous_binding,
+                expected_input=predecessor["expected_input"],
                 schemas=self.schemas, qualifications=self.qualifications, as_of=started,
                 accepted_labels=requirement["accepted_labels"], accepted_statuses=requirement["accepted_statuses"],
                 require_qualified=requirement["require_qualified"])
@@ -148,25 +208,7 @@ class RuleEvaluator:
                 return self._fallback(rule, requirements["incomplete_label"], "Required predecessor blocked: " + admission["reason"] + ".")
         return None
 
-    def _validate_response(self, response, rule, packet):
-        value = domain("rule-evaluator-response", response)["value"]
-        allowed = [{"reference": item["reference"], "locator": item["locator"]} for item in packet["evidence"]]
-        seen = set()
-        for use in value["used_evidence"]:
-            encoded = canonical_bytes(use)
-            if use not in allowed or encoded in seen:
-                raise ContractError("E_EVIDENCE_INVALID", "Citations must be unique exact admitted evidence and locators.")
-            seen.add(encoded)
-        if value["execution_status"] != "completed":
-            return value
-        outcome = _label(value, rule, self.schemas)
-        for proposal in value["proposed_consequences"]:
-            self.schemas.validate(proposal)
-            if proposal["schema"] not in outcome["implications"]:
-                raise ContractError("E_AUTHORITY_REQUIRED", "The rule does not permit this typed proposal.")
-        return value
-
-    def evaluate(self, prepared, *, judgment_id, attempt_id, check_control=None):
+    def evaluate(self, prepared, *, judgment_id, attempt_id, check_control=None, check_current=None):
         if not isinstance(prepared, EvaluationInput):
             raise ContractError("E_SCHEMA_INVALID", "Evaluation requires a prepared detached input.")
         request = prepared.value
@@ -184,6 +226,9 @@ class RuleEvaluator:
         token = prepared.control_token
         if token is not None and not callable(check_control):
             raise ContractError("E_POLICY_INVALID", "A captured host control token requires its currentness guard.")
+        from .packets import requires_currentness_guard
+        if requires_currentness_guard(prepared) and not callable(check_current):
+            raise ContractError("E_POLICY_INVALID", "This input requires a fresh host dependency gate.")
         # Revalidate exact packet bytes before calling any installed function.
         domain("rule-evaluation-input", packet)
         if len(prepared.canonical_bytes) > rule.value["resource_limits"]["max_input_bytes"]:
@@ -192,34 +237,77 @@ class RuleEvaluator:
         tick = self._monotonic()
         response, called, reason, failure_code = None, False, "completed", None
         raw = {"state": "not_produced", "reason": "No evaluator response was returned."}
-        try:
+        events = []
+
+        def failed(error, stage):
+            nonlocal reason, failure_code
+            code = error.code if isinstance(error, ContractError) else None
+            status = ("timed_out" if isinstance(error, TimeoutError) else
+                      "cancelled" if code == "E_CANCELLED" else
+                      "budget_exhausted" if code == "E_BUDGET_EXHAUSTED" else "failed")
+            reason, failure_code = status, code
+            events.append({"stage": stage, "status": status, **({"code": code} if code else {})})
+
+        def gates(now):
             if token is not None:
                 check_control(deepcopy(token))
+            if check_current is not None:
+                check_current(prepared, as_of=deepcopy(now))
+
+        stage = "pre_gate"
+        pre_admitted = False
+        try:
+            if knowledge_eligible(packet["as_of"], started) is not True:
+                raise ContractError("E_EVIDENCE_INVALID", "The knowledge cut cannot follow the actual attempt time.")
+            gates(started)
+            pre_admitted = True
+            events.append({"stage": stage, "status": "completed"})
+            stage = "validation"
             response = self._preconditions(rule, packet, started)
             if response is None:
                 called = True
+                stage = "binding"
                 returned = binding.evaluate({"input_digest": prepared.digest, "input": deepcopy(request)})
+                events.append({"stage": stage, "status": "completed"})
+                # Returned content exists even if its shape/size is invalid.
+                # Retain a valid bounded artifact declaration before checking
+                # the semantic payload; never fabricate its missing bytes.
+                raw = {"state": "unavailable", "reason": "not_persisted",
+                       "detail": "The returned result was invalid or exceeded its byte bound."}
+                if type(returned) is dict and "raw_result" in returned:
+                    try:
+                        candidate = fragment(returned["raw_result"], "raw_result_reference")
+                        if len(canonical_bytes(candidate)) <= rule.value["resource_limits"]["max_output_bytes"]:
+                            raw = candidate
+                    except ContractError:
+                        pass
+                stage = "validation"
                 returned = checked(returned, required=("response", "raw_result"))
                 if len(canonical_bytes(returned)) > rule.value["resource_limits"]["max_output_bytes"]:
                     raise ContractError("E_BUDGET_EXHAUSTED")
-                raw = fragment(returned["raw_result"], "raw_result_reference")
-                response = self._validate_response(returned["response"], rule, packet)
+                fragment(returned["raw_result"], "raw_result_reference")
+                response = _validate_response(returned["response"], rule, packet, self.schemas)
             else:
-                response = self._validate_response(response, rule, packet)
-            if token is not None:
-                check_control(deepcopy(token))
-        except TimeoutError:
-            reason = "timed_out"
-        except ContractError as error:
-            reason = "cancelled" if error.code == "E_CANCELLED" else "budget_exhausted" if error.code == "E_BUDGET_EXHAUSTED" else "failed"
-            failure_code = error.code
-        except Exception:
-            reason = "failed"
+                response = _validate_response(response, rule, packet, self.schemas)
+            events.append({"stage": stage, "status": "completed"})
+        except Exception as error:
+            failed(error, stage)
+        # A failed/timed-out callback can still race with cancellation or a
+        # changed prerequisite. Preserve its event, then fail closed at the
+        # post gate using the originally captured context (no token recapture).
+        if pre_admitted:
+            try:
+                gates(fragment(self._clock(), "known_time"))
+                events.append({"stage": "post_gate", "status": "completed"})
+            except Exception as error:
+                failed(error, "post_gate")
         elapsed = max(0, int(math.ceil((self._monotonic() - tick) * 1000)))
         ended = fragment(self._clock(), "known_time")
         interval = validate_interval({"start": started, "end": ended, "bounds": "closed"})
-        if reason == "completed" and elapsed > rule.value["resource_limits"]["max_elapsed_ms"]:
-            reason = "timed_out"
+        if elapsed > rule.value["resource_limits"]["max_elapsed_ms"]:
+            events.append({"stage": "elapsed_limit", "status": "timed_out"})
+            if reason == "completed":
+                reason = "timed_out"
         if reason != "completed":
             response = {"execution_status": reason, "qualification": {"status": "unknown"},
                         "used_evidence": [], "proposed_consequences": [], "limitations": ["The attempt did not establish a domain conclusion."]}
@@ -231,7 +319,7 @@ class RuleEvaluator:
         receipt_body = {"input_digest": prepared.digest, "rule": rule.reference, "binding": binding.reference,
                         "execution_status": status, "qualification": qualification, "elapsed_ms": elapsed,
                         "called": called, "reason": "The declared result was validated." if status == "completed" else "The evaluator did not complete a usable attempt.",
-                        "control_token_digest": packet["control_token_digest"], "raw_result": raw}
+                        "control_token_digest": packet["control_token_digest"], "raw_result": raw, "events": events}
         parents = deepcopy(packet["dependencies"]["positive"])
         receipt = {"schema_version": "1.0", **receipt_ref,
                    "provenance": {"origin": "system", "producer": deepcopy(_ENGINE), "recorded_at": ended, "parents": parents},
