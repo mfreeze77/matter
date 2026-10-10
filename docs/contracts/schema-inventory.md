@@ -48,10 +48,23 @@ MAT-010 adds the [typed observation predicate](../../schemas/observation-predica
 [source catalog and admission revisions](../../schemas/source-catalog.schema.json),
 [frozen coverage snapshot](../../schemas/coverage-snapshot.schema.json), and
 [negative-dependency registration](../../schemas/negative-dependency.schema.json).
-The package now contains **31 JSON Schema resources**: three portable families,
+At MAT-010 the package reached **31 JSON Schema resources**: three portable families,
 twenty-five runtime-specific resources and three repository-tooling schemas.
 These four resources bind exact source/query/time scopes and historical
 catalog populations; structural validation alone cannot establish completeness.
+
+MAT-012 adds [immutable rule definitions](../../schemas/rule-definition.schema.json),
+[bounded evaluation input](../../schemas/rule-evaluation-input.schema.json),
+[typed evaluator responses](../../schemas/rule-evaluator-response.schema.json), and
+[evaluation receipt details](../../schemas/rule-evaluation-receipt.schema.json).
+They reuse the existing judgment and receipt creation inputs; no core record
+kind, command, or result variant is added. Domain schemas use separate exact,
+self-contained resource resolution as described in the [rule API](../rules.md).
+Together with MAT-011's five [control resources](#trusted-control-runtime-schemas),
+the current package contains **40 JSON Schema resources**: three portable
+families, thirty-four runtime-specific resources, and three repository-tooling
+schemas. The portable inventory remains twelve record kinds, twenty-four
+command variants, and forty-five successful operation/outcome pairs.
 
 ## Common record envelope
 

@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/rule-evaluator-response.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "execution_status": {
+      "enum": [
+        "completed",
+        "failed",
+        "cancelled",
+        "timed_out",
+        "budget_exhausted"
+      ]
+    },
+    "evaluation_status": {
+      "enum": [
+        "applicable",
+        "not_applicable",
+        "insufficient_evidence",
+        "ambiguous",
+        "conflicting"
+      ]
+    },
+    "semantic_output": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
+    },
+    "qualification": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/qualification"
+    },
+    "used_evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/evidence_use"
+      },
+      "minItems": 0,
+      "maxItems": 128
+    },
+    "proposed_consequences": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
+      },
+      "minItems": 0,
+      "maxItems": 16
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 16384
+      },
+      "minItems": 0,
+      "maxItems": 64
+    }
+  },
+  "required": [
+    "execution_status",
+    "qualification",
+    "used_evidence",
+    "proposed_consequences",
+    "limitations"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "execution_status": {
+            "const": "completed"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "evaluation_status",
+          "semantic_output"
+        ]
+      },
+      "else": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "evaluation_status"
+              ]
+            },
+            {
+              "required": [
+                "semantic_output"
+              ]
+            }
+          ]
+        },
+        "properties": {
+          "proposed_consequences": {
+            "maxItems": 0
+          },
+          "qualification": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "unqualified",
+                  "unknown"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
+

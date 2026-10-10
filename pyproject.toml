@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "matter-foundation"
-version = "0.1.0.dev10"
-description = "Portable contracts, durable evidence, continuing identity, temporal coverage, and trusted control fences for Matter"
+version = "0.1.0.dev11"
+description = "Portable evidence, trusted controls, and provider-neutral rules for Matter"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
@@ -15,7 +15,7 @@ dependencies = ["jsonschema>=4.23,<5", "referencing>=0.35,<1"]
 matter = "matter.__main__:main"
 
 [tool.setuptools]
-packages = ["matter", "matter._schemas", "matter.storage", "matter.storage.migrations"]
+packages = ["matter", "matter._schemas", "matter.storage", "matter.storage.migrations", "matter.evaluators"]
 
 [tool.setuptools.package-dir]
 "" = "src"

@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/rule-evaluation-input.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "scope_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "rule": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    },
+    "binding": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    },
+    "proposition": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "record": {
+            "oneOf": [
+              {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/observation_record"
+              },
+              {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/claim_record"
+              },
+              {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/judgment_record"
+              },
+              {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/assessment_record"
+              }
+            ]
+          },
+          "reference": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+          },
+          "locator": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/locator"
+          },
+          "quotation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespaced_name"
+            },
+            "minItems": 0,
+            "maxItems": 32
+          },
+          "available_at": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+          },
+          "validation": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
+          }
+        },
+        "required": [
+          "record",
+          "reference",
+          "locator",
+          "quotation",
+          "roles",
+          "available_at",
+          "validation"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 128
+    },
+    "omitted": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reference": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 16384
+          },
+          "mandatory": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "reference",
+          "reason",
+          "mandatory"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 128
+    },
+    "coverage": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/coverage"
+    },
+    "as_of": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+    },
+    "context": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+      },
+      "minItems": 0,
+      "maxItems": 32
+    },
+    "upstream": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "judgment",
+          "expected_input_digest",
+          "subject",
+          "context",
+          "available_at",
+          "expected_input"
+        ],
+        "properties": {
+          "judgment": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/judgment_record"
+          },
+          "expected_input_digest": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+          },
+          "subject": {
+            "oneOf": [
+              {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_dependency"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "context": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+            }
+          },
+          "available_at": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+          },
+          "expected_input": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "rule_definition",
+              "packet"
+            ],
+            "properties": {
+              "rule_definition": {
+                "type": "object"
+              },
+              "packet": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "minItems": 0,
+      "maxItems": 32
+    },
+    "dependencies": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_manifest"
+    },
+    "control_token_digest": {
+      "oneOf": [
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "subject": {
+      "oneOf": [
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_dependency"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "negative_registrations": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "scope_id",
+    "rule",
+    "binding",
+    "proposition",
+    "evidence",
+    "omitted",
+    "coverage",
+    "as_of",
+    "context",
+    "upstream",
+    "dependencies",
+    "control_token_digest",
+    "subject",
+    "negative_registrations"
+  ]
+}

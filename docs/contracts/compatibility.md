@@ -5,8 +5,10 @@ encoding version `matter-json-v1`. MAT-003 adds the separate
 [durable storage and migration boundary](../storage.md) without changing those
 wire versions. MAT-004 adds the [observation intake handler](../observations.md)
 and the result field described below. Schema negotiation, later business
-operations, and semantic evaluator qualification retain their own tickets, including
-[MAT-012](../../tickets/MAT-012.md) and [MAT-074](../../tickets/MAT-074.md).
+operations, and semantic evaluator qualification retain their own milestones.
+MAT-012 adds the bounded [rule/evaluator interface](../rules.md) without adding a
+core wire variant; [MAT-074](../../tickets/MAT-074.md) owns broader compatibility
+qualification.
 
 The authoritative field inventory is [schema-inventory.md](schema-inventory.md).
 The exact byte encoding and digest preimage are in [canonical.md](canonical.md).
@@ -328,3 +330,25 @@ tokens must be captured before evaluation and carried unchanged into the
 transaction. A token is never inferred from observation content, and no
 implicit compatibility fallback refreshes stale work. Full lifecycle, outbox
 and native transport semantics remain separate milestones.
+
+## MAT-012 rule interface compatibility
+
+MAT-012 adds four separately digest-bound runtime schemas for immutable rule
+definitions, ordered evaluation inputs, evaluator responses, and evaluation
+receipt details. It reuses the existing judgment and receipt creation inputs.
+The twelve core kinds, twenty-four command variants, forty-five successful
+operation/outcome pairs, `1.0` envelopes, canonical encoding, and SQLite migration
+remain unchanged. No evaluator persistence or assessment operation is added.
+
+The installed package now includes `matter.evaluators`. Domain schema values
+must resolve an exact local descriptor; they are validated using only that
+definition's self-contained schema resource. Opaque domain payloads accepted by
+generic core validation do not automatically satisfy a rule's declared schema,
+label meaning, exact citation set, permitted proposals, or qualification scope.
+
+Prepared inputs bind the full rule definition, ordered evidence and direct
+prerequisite input material. Consumers must supply the exact expected original
+input and fresh host guards where needed; resolving an arbitrary result for the
+same rule is insufficient. Results remain uncommitted attempts. Any later
+storage/publication adapter must preserve original input/control artifacts and
+perform its atomic currentness and authority checks before publication.

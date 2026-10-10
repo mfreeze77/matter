@@ -18,7 +18,9 @@ live in ``matter.time``, ``matter.source_catalogs``, ``matter.coverage`` and
 ``matter.negative_dependencies``.
 Trusted host authority, scoped control fences and guarded execution live in
 ``matter.authority`` and ``matter.controls``.
-Semantic ranking, assessment execution and integrations remain backlog work.
+Provider-neutral immutable rules and bounded deterministic/recorded attempts
+live in ``matter.rules`` and ``matter.evaluators``. Semantic ranking, policy
+composition, assessment execution and integrations remain backlog work.
 """
 
-__version__ = "0.1.0.dev10"
+__version__ = "0.1.0.dev11"
