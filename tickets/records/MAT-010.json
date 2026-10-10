@@ -4,7 +4,7 @@
   "track": "core",
   "phase": 1,
   "priority": "P0",
-  "status": "planned",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "time_coverage",
@@ -52,10 +52,24 @@
   ],
   "artifacts": [
     "src/matter/time.py",
+    "src/matter/source_catalogs.py",
     "src/matter/coverage.py",
     "src/matter/negative_dependencies.py",
+    "schemas/observation-predicate.schema.json",
+    "schemas/source-catalog.schema.json",
+    "schemas/coverage-snapshot.schema.json",
+    "schemas/negative-dependency.schema.json",
     "tests/unit/test_knowledge_time.py",
-    "tests/integration/test_absence_coverage.py"
+    "tests/unit/test_source_catalogs.py",
+    "tests/unit/test_temporal_admission.py",
+    "tests/unit/test_coverage_integrity.py",
+    "tests/contract/test_coverage_contracts.py",
+    "tests/integration/test_absence_coverage.py",
+    "tests/integration/test_coverage_atomicity.py",
+    "tests/integration/test_negative_registration_capacity.py",
+    "docs/time-coverage.md",
+    "docs/validation/MAT-010.md",
+    "examples/time_coverage.py"
   ],
   "tests": [
     "Late cancellation revises current understanding without rewriting yesterday.",
@@ -78,7 +92,21 @@
     "matterjevmesh"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "2026-10-08: implemented from merged MAT-009 main commit c223ecf8753e384c79f1f3cf2b9e206320fc702b. Inspected governing contracts, existing observation/claim/occurrence/storage services, and the pinned StateCivics replace_scope ownership rules plus caller empty-derivation guard. Reused scoped replacement and retained human decisions without copying civic SQL or runtime; no upstream tests or downstream deployment ran.",
+      "2026-10-08, recorded 22:14 UTC: python -m unittest discover -s tests -v passed all 670 tests in 649.026 seconds on Python 3.12.14 and SQLite 3.53.1. The final combined run covers all 586 prior cases and 84 additions, including the final operation-receipt and catalog-digest proof fixes. All 349 frozen runtime/contract/test/example/workflow input hashes remained unchanged. Actual submitted-commit CI results are recorded in the PR.",
+      "AC-1: independent explicit knowledge and effective cuts preserve late cancellation history. The same corpus queried at two availability boundaries excludes later evidence from earlier knowledge while retaining its past applicability. Exact nanoseconds, inclusive cuts, open/closed intervals, unknown endpoints and atomic refusal of reversed observation/occurrence/claim intervals are tested without ingestion-time substitution.",
+      "AC-2: complete, partial, failed, not-yet-expected, expected-not-published, manual-review and incremental snapshots remain distinct. Complete absence additionally requires an initialized source history and fully known, nonempty elapsed interval with no matching or indeterminate records. Only admitted complete replacement retires omitted machine-owned membership; disabled retirement, incomplete collection and incremental silence retain prior state. Operator decisions, reviewed evidence, rejected tombstones and neighboring scopes stay protected.",
+      "AC-3: source-namespace watch keys and typed predicates admit future observation IDs. New matching intake invalidates all affected current registrations in the same transaction and returns exact negative_scope_arrival before/after pins. Unrelated source, predicate and interval arrivals do not advance narrow registrations. Unknown relevant time or metadata requires explicit reconsideration without claiming a positive match; duplicate delivery and exact replay emit no new arrival.",
+      "Source catalogs retain all immutable admitted observations with exact admission revisions. A one-time authorized baseline merges explicit legacy pins with current intake without silently certifying old history. Current guarded reads reconstruct the exact frozen population, baseline state and full historical catalog bytes/digests. Later initialization and new arrivals cannot rewrite an old coverage proof.",
+      "Negative registration binds current coverage, target, original knowledge cut, expiry or next-check time, admitted host authority and the exact prior registration. Assessment manifests must retain the same positive coverage pin and canonical negative scope. Registration detects arrivals between publication and first subscription; current-use helpers take an explicit clock, never invent events, and reject expired, invalidated or changed dependencies. A watch ID cannot be reassigned to another derivative.",
+      "Independent integrity review verifies exact frozen populations, no unattested-completeness substitution, canonical Boolean/integer predicate identity, actual coverage writes and selected catalog reads under the committing operation receipt, reserved storage provenance, copied-receipt refusal and valid digest-form historical reads after later arrivals. Malformed catalogs/watches refuse instead of becoming empty sets; real backend and revision failures retain their codes.",
+      "Concurrency evidence covers both first-arrival races, newly occupied catalog phantoms and two independent replacement writers with one revision winner. Four actual spawned-process exits interrupt replacement and observation intake before and after commit; two watches are affected by intake. Membership, observations, source indexes, catalogs, registrations and receipts recover atomically. Lost-acknowledgement replay, restart and new-file backup/restore retain exact historical results and invalidation.",
+      "2026-10-08: final isolated 0.1.0.dev9 wheel verification passed outside the checkout. All 34 Python sources, 31 schema assets and migration SQL matched tested bytes. All 203 copied fixtures retained declared validity (145 valid/58 invalid), and all seven copied standalone examples passed, including time/coverage, safe replacement, unknown-ID arrival, expiry, replay and restore. Wheel SHA-256: 27328c348b7ac5119feacc731fca03ea9223311b9e06df582bff81df30294944.",
+      "2026-10-08: render --check, repository validation, all three lifecycle walkthroughs, git diff --check, and JavaScript 26 canonical plus 8 exact-source vectors passed. Portable inventory is 12 record kinds, 24 operations, 45 success pairs and unchanged 19 errors. Validation reports 80 tickets, 104 requirements, 31 schemas and zero errors. Detailed acceptance and qualification limits are in docs/validation/MAT-010.md.",
+      "Qualification remains synthetic and bounded: 64 sources and predicate clauses; 4096 observations per catalog/coverage population, members per replacement family, watches per source bucket and temporal packets. Source completeness and legacy inventory are host attestations; arbitrary trusted storage handlers maintain their own indexing. This is scoped member retirement and direct negative-dependency invalidation, not domain truth or lifecycle resolution. Global scanning, calendars, transitive invalidation, assessment execution, host control epochs, provider qualification and native delivery remain later work. Core kinds, wire version, canonical encoding and SQLite migration are stable; closed-schema readers must update for additions.",
+      "2026-10-10 pre-merge correction: independent review reproduced destination watch-bucket overflow before intake. Registration now checks the same bounded, verified source bucket in preparation and transactional admission; existing-ID refresh uses no new slot, competing last-slot commands conflict, and a full destination preserves the original subscription. Four new regression cases reproduced three failures in 5.703 seconds before the fix and all passed in 6.784 seconds afterward. The affected coverage/catalog/observation/concurrency/recovery suite passed 81 tests in 89.691 seconds. Original-head CI passed 670 tests on Python 3.11 and 3.12; final corrected-head CI for the 674-case suite is recorded in PR #10. No new schema, migration, dependency or eviction policy was added. See the dated addendum in docs/validation/MAT-010.md."
+    ]
   }
 }

@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/coverage-snapshot.schema.json",
+  "title": "Matter coverage snapshot v1",
+  "description": "A scope-bound source/query coverage snapshot. Replacement can retire only explicitly owned derived members under policy; observations, controls and source authority are preserved.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scope_id",
+    "specification",
+    "catalog",
+    "coverage",
+    "as_of",
+    "mode",
+    "adapter",
+    "policy",
+    "authority",
+    "publication_receipt",
+    "catalogs",
+    "observations",
+    "matches",
+    "indeterminate",
+    "excluded",
+    "result",
+    "members",
+    "history_complete"
+  ],
+  "properties": {
+    "scope_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "specification": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/coverage_specification"
+    },
+    "catalog": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    },
+    "coverage": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/coverage"
+    },
+    "as_of": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+    },
+    "mode": {
+      "enum": [
+        "incremental",
+        "replacement"
+      ]
+    },
+    "adapter": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    },
+    "policy": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    },
+    "authority": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+    },
+    "publication_receipt": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_ref"
+    },
+    "catalogs": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+      },
+      "maxItems": 64
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/observation_dependency"
+      },
+      "maxItems": 4096
+    },
+    "matches": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/observation_dependency"
+      },
+      "maxItems": 4096
+    },
+    "indeterminate": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/observation_dependency"
+      },
+      "maxItems": 4096
+    },
+    "excluded": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/observation_dependency"
+      },
+      "maxItems": 4096
+    },
+    "result": {
+      "enum": [
+        "adequate_empty",
+        "evidence_present",
+        "indeterminate",
+        "unusable_coverage"
+      ]
+    },
+    "members": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reference",
+          "ownership",
+          "status",
+          "review_required"
+        ],
+        "properties": {
+          "reference": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+          },
+          "ownership": {
+            "enum": [
+              "machine",
+              "operator",
+              "reviewed",
+              "rejected"
+            ]
+          },
+          "status": {
+            "enum": [
+              "active",
+              "retired",
+              "rejected"
+            ]
+          },
+          "review_required": {
+            "type": "boolean"
+          }
+        }
+      },
+      "maxItems": 4096
+    },
+    "history_complete": {
+      "type": "boolean"
+    }
+  }
+}

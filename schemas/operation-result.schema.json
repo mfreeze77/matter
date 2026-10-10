@@ -43,7 +43,9 @@
             "request_transition",
             "prepare_delivery",
             "dispatch",
-            "assess"
+            "assess",
+            "publish_coverage",
+            "register_negative_watch"
           ]
         },
         "operation_id": {
@@ -85,6 +87,12 @@
                 "observation_receipt": {
                   "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_ref",
                   "description": "The referenced observation's original creation receipt. The top-level receipt identifies the current command's operation receipt."
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  }
                 }
               }
             }
@@ -1465,6 +1473,66 @@
               }
             }
           }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "publish_coverage"
+            },
+            "outcome": {
+              "const": "published"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "coverage",
+                "changes"
+              ],
+              "properties": {
+                "coverage": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  },
+                  "minItems": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "register_negative_watch"
+            },
+            "outcome": {
+              "const": "registered"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "registration",
+                "changes"
+              ],
+              "properties": {
+                "registration": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "changes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/dependency_change"
+                  },
+                  "minItems": 1
+                }
+              }
+            }
+          }
         }
       ]
     },
@@ -1505,7 +1573,9 @@
             "request_transition",
             "prepare_delivery",
             "dispatch",
-            "assess"
+            "assess",
+            "publish_coverage",
+            "register_negative_watch"
           ]
         },
         "operation_id": {

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "operation": "publish_coverage",
+  "operation_id": "command-publish_coverage",
+  "status": "failure",
+  "error": {
+    "code": "E_STORAGE_UNAVAILABLE",
+    "operation_id": "command-publish_coverage",
+    "retriable": true,
+    "affected_references": [],
+    "detail": "Synthetic safe failure detail."
+  }
+}

@@ -1,0 +1,347 @@
+{
+  "schema_version": "1.0",
+  "record_type": "receipt",
+  "scope_id": "synthetic:mat002",
+  "namespace": "example",
+  "id": "coverage-domains",
+  "creation_receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "receipt-1"
+  },
+  "provenance": {
+    "origin": "system",
+    "producer": {
+      "namespace": "example",
+      "id": "fixture-producer",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "parents": []
+  },
+  "body": {
+    "stage": "creation",
+    "operation_id": "operation-1",
+    "recorded_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "outcome": "matter:committed",
+    "evidence": [],
+    "details": {
+      "schema": {
+        "namespace": "example",
+        "id": "receipt-details",
+        "version": "1.0",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "value": {
+        "synthetic": true
+      }
+    }
+  },
+  "extensions": {
+    "example:observation-predicate": {
+      "schema": {
+        "namespace": "matter",
+        "id": "observation-predicate",
+        "version": "1.0",
+        "digest": "d4c26e822417c3c576f0b525c00eb31a13159409a035b70301f66f90fee8140a"
+      },
+      "value": {
+        "record_type": "observation",
+        "clauses": [
+          {
+            "field": "origin",
+            "equals": "source"
+          }
+        ]
+      }
+    },
+    "example:source-catalog": {
+      "schema": {
+        "namespace": "matter",
+        "id": "source-catalog",
+        "version": "1.0",
+        "digest": "fe62474d24fee70d86be9d73c688c71583b79b0cac03ac5fd59980442cc50cff"
+      },
+      "value": {
+        "scope_id": "synthetic:mat002",
+        "source": {
+          "namespace": "example:source",
+          "value": "synthetic-feed"
+        },
+        "observations": [],
+        "baseline": {
+          "declared_at": {
+            "state": "known",
+            "value": "2026-10-08T15:00:00Z",
+            "precision": "second"
+          },
+          "adapter": {
+            "namespace": "example",
+            "id": "coverage-adapter",
+            "version": "1.0",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "authority": {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "receipt",
+            "id": "authority-1",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "catalog_revision": 1
+        },
+        "admissions": []
+      }
+    },
+    "example:coverage-snapshot": {
+      "schema": {
+        "namespace": "matter",
+        "id": "coverage-snapshot",
+        "version": "1.0",
+        "digest": "de981a7d72282ba6a20ab7d71555f47f6b7ba5b9586363fbb59e07d9ea1370e8"
+      },
+      "value": {
+        "scope_id": "synthetic:mat002",
+        "specification": {
+          "query": {
+            "schema": {
+              "namespace": "matter",
+              "id": "observation-predicate",
+              "version": "1.0",
+              "digest": "d4c26e822417c3c576f0b525c00eb31a13159409a035b70301f66f90fee8140a"
+            },
+            "value": {
+              "record_type": "observation",
+              "clauses": [
+                {
+                  "field": "origin",
+                  "equals": "source"
+                }
+              ]
+            }
+          },
+          "eligible_sources": [
+            {
+              "namespace": "example:source",
+              "value": "synthetic-feed"
+            }
+          ],
+          "observed_interval": {
+            "start": {
+              "state": "known",
+              "value": "2026-10-01T00:00:00Z",
+              "precision": "second"
+            },
+            "end": {
+              "state": "known",
+              "value": "2026-10-08T15:00:00Z",
+              "precision": "second"
+            },
+            "bounds": "closed_open"
+          }
+        },
+        "catalog": {
+          "namespace": "example",
+          "id": "snapshot",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "coverage": {
+          "status": "complete",
+          "snapshot": {
+            "namespace": "example",
+            "id": "snapshot",
+            "version": "1.0",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        },
+        "as_of": {
+          "state": "known",
+          "value": "2026-10-08T15:00:00Z",
+          "precision": "second"
+        },
+        "mode": "replacement",
+        "adapter": {
+          "namespace": "example",
+          "id": "coverage-adapter",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "policy": {
+          "namespace": "example",
+          "id": "coverage-policy",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "authority": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "receipt",
+          "id": "authority-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "publication_receipt": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "receipt",
+          "id": "publication-receipt"
+        },
+        "catalogs": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "matter.source_catalogs",
+            "record_type": "matter:projection",
+            "id": "catalog-1",
+            "revision": 1
+          }
+        ],
+        "observations": [],
+        "matches": [],
+        "indeterminate": [],
+        "excluded": [],
+        "result": "adequate_empty",
+        "members": [
+          {
+            "reference": {
+              "scope_id": "synthetic:mat002",
+              "namespace": "example:derived",
+              "record_type": "matter:projection",
+              "id": "output-1",
+              "revision": 1
+            },
+            "ownership": "machine",
+            "status": "active",
+            "review_required": false
+          }
+        ],
+        "history_complete": true
+      }
+    },
+    "example:negative-dependency": {
+      "schema": {
+        "namespace": "matter",
+        "id": "negative-dependency",
+        "version": "1.0",
+        "digest": "260953532272c8b7a9e5d443488c3951fca28cd0c8c9ea59b72cda762f081195"
+      },
+      "value": {
+        "scope_id": "synthetic:mat002",
+        "watch": {
+          "id": "watch-1",
+          "scope_id": "synthetic:mat002",
+          "query": {
+            "schema": {
+              "namespace": "matter",
+              "id": "observation-predicate",
+              "version": "1.0",
+              "digest": "d4c26e822417c3c576f0b525c00eb31a13159409a035b70301f66f90fee8140a"
+            },
+            "value": {
+              "record_type": "observation",
+              "clauses": [
+                {
+                  "field": "origin",
+                  "equals": "source"
+                }
+              ]
+            }
+          },
+          "eligible_sources": [
+            {
+              "namespace": "example:source",
+              "value": "synthetic-feed"
+            }
+          ],
+          "observed_interval": {
+            "start": {
+              "state": "known",
+              "value": "2026-10-01T00:00:00Z",
+              "precision": "second"
+            },
+            "end": {
+              "state": "known",
+              "value": "2026-10-08T15:00:00Z",
+              "precision": "second"
+            },
+            "bounds": "closed_open"
+          },
+          "catalog": {
+            "namespace": "example",
+            "id": "snapshot",
+            "version": "1.0",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "coverage": {
+            "status": "complete",
+            "snapshot": {
+              "namespace": "example",
+              "id": "snapshot",
+              "version": "1.0",
+              "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          "assessed_as_of": {
+            "state": "known",
+            "value": "2026-10-08T15:00:00Z",
+            "precision": "second"
+          },
+          "expires_at": {
+            "state": "known",
+            "value": "2026-10-09T00:00:00Z",
+            "precision": "second"
+          }
+        },
+        "reference": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example:derived",
+          "record_type": "matter:projection",
+          "id": "output-1",
+          "revision": 1
+        },
+        "coverage_snapshot": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "matter.coverage",
+          "record_type": "matter:projection",
+          "id": "coverage-1",
+          "revision": 1
+        },
+        "catalogs": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "matter.source_catalogs",
+            "record_type": "matter:projection",
+            "id": "catalog-1",
+            "revision": 1
+          }
+        ],
+        "status": "current",
+        "matches": [],
+        "indeterminate": [],
+        "invalidation": null,
+        "policy": {
+          "namespace": "example",
+          "id": "coverage-policy",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "authority": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "receipt",
+          "id": "authority-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    }
+  }
+}

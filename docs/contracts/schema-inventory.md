@@ -41,10 +41,17 @@ MAT-009 adds the [typed-link index](../../schemas/matter-link-index.schema.json)
 [protected separation history](../../schemas/identity-separation.schema.json),
 [explicit separation release](../../schemas/identity-release.schema.json), and
 [registered identity validity](../../schemas/identity-dependency.schema.json).
-The package now contains **27 JSON Schema resources**: three portable families,
-twenty-one runtime-specific resources and three repository-tooling schemas.
 These new resources preserve original evidence and exact historical partitions;
 they do not supply semantic equivalence proof or a transitive assessment engine.
+
+MAT-010 adds the [typed observation predicate](../../schemas/observation-predicate.schema.json),
+[source catalog and admission revisions](../../schemas/source-catalog.schema.json),
+[frozen coverage snapshot](../../schemas/coverage-snapshot.schema.json), and
+[negative-dependency registration](../../schemas/negative-dependency.schema.json).
+The package now contains **31 JSON Schema resources**: three portable families,
+twenty-five runtime-specific resources and three repository-tooling schemas.
+These four resources bind exact source/query/time scopes and historical
+catalog populations; structural validation alone cannot establish completeness.
 
 ## Common record envelope
 
@@ -116,7 +123,18 @@ Unknown time uses a different closed branch:
 
 Allowed reasons are `not_reported`, `not_observed`, `source_unavailable`, `conflicting_evidence`, and `not_applicable`; optional `detail` supplies context. Unknown time forbids `value` and `precision`. A timestamp must not be filled from ingestion time. A complete occurrence instant and occurrence interval are alternative fields on observations and occurrences; neither silently supplies the other.
 
-Intervals contain `start`, `end`, and explicit boundary semantics. This ticket validates their shape and individual timestamps. Event-order interpretation, interval comparison, knowledge gating, completeness, and negative-watch invalidation are implemented by MAT-010 and later tickets.
+Intervals contain `start`, `end`, and explicit boundary semantics. The structural contracts validate their shape and individual timestamps. MAT-010 supplies exact interval comparison, separate knowledge/effective selection, explicit source coverage and direct negative-watch invalidation. Domain calendars, event authority and transitive assessment invalidation remain separate work; see [time and coverage](../time-coverage.md).
+
+MAT-010 adds optional `negative_watch.assessed_as_of` to retain a known original
+knowledge boundary. The runtime requires it on registrations, while earlier
+structural manifests without it remain valid. `coverage_specification` binds
+a domain query, nonempty eligible source set and observed interval. The
+`coverage_member_input` and `coverage_source_baseline` fragments require exact
+host projection/observation pins and explicit ownership/history declarations.
+New `coverage_change` and `negative_scope_arrival` causes distinguish these
+local dependency notices. Committed observation results may include `changes`;
+duplicate deliveries do not. Both new operations require nonempty result
+`changes` and the exact published coverage or registration pin.
 
 ## Domain values and optional extensions
 
@@ -186,6 +204,8 @@ Creation operations embed typed `*_input` records. These preserve the source/pro
 | `update_matter_metadata` | Pinned matter and complete replacement of optional title, description, and namespaced extensions. | `updated`, `unchanged` |
 | `commit_occurrence_grouping` | Batch occurrence creations, pinned membership replacements, explicit root provenance assignments, grouping policy, and schema-bound basis. | `committed`, `unchanged` |
 | `publish_association_candidates` | Query, complete declared catalog entries, coverage, evidence, as-of time, and previous set pin or explicit null. | `published`, `unchanged` |
+| `publish_coverage` | Exact source/query/interval specification, catalog and collection coverage, known cut, mode, protected derivative members, optional one-time source baselines, prior pin, adapter and policy. | `published` |
+| `register_negative_watch` | Stable watch ID, exact host derivative and coverage pins, original knowledge cut, expiry or next-check, previous registration pin and policy. | `registered` |
 | `propose_association` | Subject, considered candidates, matching rule, evidence and knowledge boundary; optional candidate-set pin and external evaluation declaration. | `proposal`, `no_match`, `ambiguous`, `insufficient_evidence`, `evaluation_failed` |
 | `accept_association` | Pinned proposal/candidates and acceptance policy; optional candidate set, relationship and capability. | `accepted` |
 | `decide_association` | Pinned pair, relationship/capability, reject/protect/release decision, previous disposition or null, reason, as-of time and policy. | `applied`, `unchanged` |
@@ -204,7 +224,7 @@ Creation operations embed typed `*_input` records. These preserve the source/pro
 | `dispatch` | Intent, lease token, epoch, delivery key, audience, and baseline. | `delivered`, `withheld` |
 | `assess` | Matter, profile/purpose, explicit evidence selection or query, knowledge boundary, resource budget, and control epoch. | `assessed`, `incomplete` |
 
-These are 22 command variants and 43 successful operation/outcome pairs. MAT-009 adds the explicit separation-release operation. MAT-005 adds the bounded `update_matter_metadata` operation, MAT-006 adds `commit_occurrence_grouping`, MAT-007 adds `revise_evidence_acceptance`, and MAT-008 adds `publish_association_candidates` and `decide_association` to the initial 16-operation inventory. MAT-008 also adds the explicit `evaluation_failed` proposal outcome. The `assess` operation comes from the rule contract in addition to the core operation table. `no_match` preserves the considered candidate set, requires an empty `selected` array, and declares adequate coverage. A nonempty considered set can yield no match when every candidate is rejected; the fixture preserves that history. `ambiguous` returns multiple candidates. Insufficient evidence remains explicit. Association subjects, candidates, selected references, and accepted membership all use the same typed observation/occurrence/matter dependency union. A claim, control, judgment, or receipt cannot become an association member. MAT-008 verifies candidate existence and currentness within the declared catalog and preserves its coverage. External discovery, actual source completeness, independent-source qualification and allowed domain transitions remain separate responsibilities.
+These are 24 command variants and 45 successful operation/outcome pairs. MAT-010 adds coverage publication and negative-watch registration; MAT-009 adds the explicit separation-release operation. MAT-005 adds the bounded `update_matter_metadata` operation, MAT-006 adds `commit_occurrence_grouping`, MAT-007 adds `revise_evidence_acceptance`, and MAT-008 adds `publish_association_candidates` and `decide_association` to the initial 16-operation inventory. MAT-008 also adds the explicit `evaluation_failed` proposal outcome. The `assess` operation comes from the rule contract in addition to the core operation table. `no_match` preserves the considered candidate set, requires an empty `selected` array, and declares adequate coverage. A nonempty considered set can yield no match when every candidate is rejected; the fixture preserves that history. `ambiguous` returns multiple candidates. Insufficient evidence remains explicit. Association subjects, candidates, selected references, and accepted membership all use the same typed observation/occurrence/matter dependency union. A claim, control, judgment, or receipt cannot become an association member. MAT-008 verifies candidate existence and currentness within the declared catalog and preserves its coverage. External discovery, actual source completeness, independent-source qualification and allowed domain transitions remain separate responsibilities.
 
 For `ingest_observation`, both successful bodies require a pinned `observation` and permit an optional `observation_receipt`, a typed bare receipt reference to that observation's original creation receipt. The MAT-004 handler supplies both fields. The top-level `receipt` always identifies the current command's operation receipt: it matches the observation receipt for a new commit and differs for a duplicate submitted under a new command. Structural validation checks the reference type, not that either receipt exists or that their relationship is correct. Existing v1 results without the optional field remain valid; [compatibility.md](compatibility.md) describes the reader-update requirement.
 
@@ -342,7 +362,7 @@ A delivered result names the observed transport milestone; it does not assert co
 
 ## Fixtures, verification, and remaining boundaries
 
-The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares the validity of standalone record, command, result, and intentionally invalid examples. The [inventory](../../tests/fixtures/contracts/inventory.json) lists the supported kinds, operations, outcome pairs, and error codes. The current manifest contains **180 fixtures: 134 valid and 46 intentionally invalid**. All examples are synthetic. Their zero-valued digest placeholders establish shape only and are not evidence that source bytes or referenced schemas exist.
+The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares the validity of standalone record, command, result, and intentionally invalid examples. The [inventory](../../tests/fixtures/contracts/inventory.json) lists the supported kinds, operations, outcome pairs, and error codes. The current manifest contains **203 fixtures: 145 valid and 58 intentionally invalid**. All examples are synthetic. Their zero-valued digest placeholders establish shape only and are not evidence that source bytes or referenced schemas exist.
 
 The examples cover every record kind, every command, every permitted success pair, every semantic error code, and additional unknown-time, failed/unknown/qualified judgment cases. Invalid examples include storage failure disguised as `no_match`, embedded execution failure in a semantic success, empty scope, unknown time with an invented value, failed judgment with a conclusion, absent qualification certificate, unsafe revision, missing dependency pin, malformed source digest, undeclared command fields, incompatible availability/locator declarations, ineligible association members, newline-suffixed digests or scope identifiers, missing reproducibility fields, fabricated digests for unproduced outputs, missing evidence locators, and negative resource ceilings.
 

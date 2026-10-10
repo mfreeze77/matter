@@ -145,7 +145,7 @@ class ObservationRevisionTests(ObservationTestCase):
         self.assertEqual(self.ingestor.read_payload(pin(stored)).data, summary_bytes)
         self.assertEqual(self.ingestor.read_payload(pin(parent)).data, PAYLOAD)
         self.assertEqual(self.ingestor.revisions(parent["body"]["source_identity"]), [parent])
-        self.assertEqual(self.record_counts(), {"observation": 2, "matter:projection": 2, "receipt": 2})
+        self.assertEqual(self.record_counts(), {"observation": 2, "matter:projection": 4, "receipt": 2})
 
     def test_missing_and_wrong_digest_parent_pins_are_durable_revision_refusals(self):
         _, first = self.submit(observation_command("parent", "parent"))
@@ -237,7 +237,7 @@ class ObservationRevisionTests(ObservationTestCase):
         _, success = self.submit(fresh, payload=None)
         self.assertEqual(success["outcome"], "committed")
         self.assertEqual(self.ingestor.read_payload(success["body"]["observation"]).data, PAYLOAD)
-        self.assertEqual(self.record_counts(), {"observation": 1, "matter:projection": 1, "receipt": 2})
+        self.assertEqual(self.record_counts(), {"observation": 1, "matter:projection": 2, "receipt": 2})
 
     def test_explicit_unavailable_and_withheld_metadata_need_no_payload_bytes(self):
         for status in ("unavailable", "withheld"):
@@ -276,7 +276,7 @@ class ObservationRevisionTests(ObservationTestCase):
         _, failure = self.submit(duplicate, b"Wrong replacement bytes.\n")
         self.assert_failure(failure, "E_EVIDENCE_INVALID")
         self.assertEqual(self.ingestor.read_payload(first["body"]["observation"]).data, PAYLOAD)
-        self.assertEqual(self.record_counts(), {"observation": 1, "matter:projection": 1, "receipt": 2})
+        self.assertEqual(self.record_counts(), {"observation": 1, "matter:projection": 2, "receipt": 2})
 
     def test_unknown_availability_does_not_acquire_the_ingestion_timestamp(self):
         unknown = {"state": "unknown", "reason": "not_reported"}

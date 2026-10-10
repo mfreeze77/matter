@@ -152,6 +152,37 @@ history. Registered derivative validity changes atomically with identity
 changes; general transitive invalidation remains a separate engine. See the
 [identity correction API](../identity-corrections.md) for its exact bounds.
 
+MAT-010 adds `publish_coverage` and `register_negative_watch`, bringing the
+inventory to twenty-four operations and forty-five successful operation/outcome
+pairs. Four private schemas bind exact typed predicates, source catalog
+admission revisions, coverage snapshots and direct absence registrations.
+The twelve core record kinds, wire/encoding versions and SQLite migration
+remain unchanged.
+
+A committed ingest result may include nonempty negative-scope change notices;
+duplicate ingestion does not. Core negative scopes gain optional
+`assessed_as_of`; MAT-010 registrations require that original knowledge cut.
+Updated readers preserve earlier fixtures and journals without these fields.
+Older closed-schema readers must update before admitting the new commands,
+fields and change causes; no operation negotiation or automatic fallback occurs.
+
+Supported observation intake now maintains a source-namespace catalog as well
+as its original source-family index. Existing databases require a one-time,
+explicitly authorized history baseline before an empty source catalog can
+support absence. Admission revisions preserve the original population and
+initialization status of every earlier coverage snapshot. A later baseline
+cannot retroactively certify a prior cut. This is a host inventory declaration,
+not an automatic scan of arbitrary custom-handler writes.
+
+Time and coverage services refuse reversed known intervals without changing
+unknown timestamps. Complete replacement may retire only explicitly owned
+machine membership within its exact source/query/interval family; incomplete
+collection and incremental silence cannot. New eligible observations update
+all affected direct watch registrations in the ingestion transaction. Historical
+proofs remain readable, and expiry or next-check evaluation creates no events.
+See the [time and coverage API](../time-coverage.md) for exact source selectors,
+predicate semantics, protected membership and current-use gates.
+
 ## Four independent versions and identities
 
 The schema version identifies the structure and interpretation of an envelope.

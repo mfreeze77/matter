@@ -24,6 +24,8 @@ from matter.contracts import (
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "contracts"
 SUCCESS_OUTCOMES = {
     "ingest_observation": {"committed", "duplicate"},
+    "publish_coverage": {"published"},
+    "register_negative_watch": {"registered"},
     "create_matter": {"created", "existing"},
     "update_matter_metadata": {"updated", "unchanged"},
     "commit_occurrence_grouping": {"committed", "unchanged"},
@@ -48,6 +50,11 @@ SUCCESS_OUTCOMES = {
 }
 COMMAND_BODY_REQUIRED = {
     "ingest_observation": ("observation",),
+    "publish_coverage": (
+        "specification", "catalog", "coverage", "as_of", "mode", "members", "source_baselines",
+        "previous", "adapter", "coverage_policy",
+    ),
+    "register_negative_watch": ("id", "reference", "coverage", "as_of", "previous", "coverage_policy"),
     "create_matter": ("matter", "identity_policy"),
     "update_matter_metadata": ("matter", "metadata"),
     "commit_occurrence_grouping": (

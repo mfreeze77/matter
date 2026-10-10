@@ -58,7 +58,7 @@ class ObservationAtomicityTests(ObservationTestCase):
         # payload checks, must not run again after a lost acknowledgement.
         self.assertEqual(self.ingestor.ingest(prepared, payload=b"not a new submission"), original)
         self.assertEqual(self.ingestor.read_payload(original["body"]["observation"]).data, PAYLOAD)
-        self.assertEqual(self.record_counts(), {"observation": 1, "matter:projection": 1, "receipt": 1})
+        self.assertEqual(self.record_counts(), {"observation": 1, "matter:projection": 2, "receipt": 1})
 
     def test_payload_storage_failure_does_not_publish_sql_references_or_receipts(self):
         command = observation_command("unavailable", "unavailable")
@@ -87,7 +87,7 @@ class ObservationAtomicityTests(ObservationTestCase):
         journal = self.storage.command_receipt(command["idempotency_key"])
         self.assertEqual(journal["result"]["outcome"], "committed")
         self.assertEqual(self.ingestor.ingest(prepared), journal["result"])
-        self.assertEqual(self.record_counts(), {"observation": 1, "matter:projection": 1, "receipt": 1})
+        self.assertEqual(self.record_counts(), {"observation": 1, "matter:projection": 2, "receipt": 1})
 
     def test_restored_metadata_keeps_history_when_payloads_are_temporarily_missing(self):
         command = observation_command("original", "original")

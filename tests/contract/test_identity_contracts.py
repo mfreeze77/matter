@@ -335,7 +335,7 @@ class IdentityContractTests(unittest.TestCase):
                 operations.add(value["operation"])
             elif value["status"] == "success":
                 outcomes.add((value["operation"], value["outcome"]))
-        self.assertEqual((12, 22, 43, 19), (len(records), len(operations), len(outcomes), len(ERROR_CODES)))
+        self.assertEqual((12, 24, 45, 19), (len(records), len(operations), len(outcomes), len(ERROR_CODES)))
         self.assertEqual(set(SUCCESS_OUTCOMES), operations)
         inventory = fixture("inventory.json")
         self.assertEqual(records, set(inventory["record_kinds"]))

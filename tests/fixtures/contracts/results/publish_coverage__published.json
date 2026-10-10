@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "operation": "publish_coverage",
+  "operation_id": "command-publish_coverage",
+  "status": "success",
+  "outcome": "published",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "coverage": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.coverage",
+      "record_type": "matter:projection",
+      "id": "coverage-1",
+      "revision": 1
+    },
+    "changes": [
+      {
+        "cause": "coverage_change",
+        "before": [],
+        "after": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "matter.coverage",
+            "record_type": "matter:projection",
+            "id": "coverage-1",
+            "revision": 1
+          }
+        ]
+      }
+    ]
+  }
+}

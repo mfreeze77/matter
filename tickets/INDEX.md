@@ -15,7 +15,7 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-007: Model scoped claims and cited evidence relationships](MAT-007.md) | core | 1 | P0 | done | done | MAT-004, MAT-005, MAT-006 |
 | [MAT-008: Separate association proposals from authorized acceptance](MAT-008.md) | core | 1 | P0 | done | done | MAT-005, MAT-006, MAT-007 |
 | [MAT-009: Implement matter links, guarded merges, and reversible identity correction](MAT-009.md) | core | 2 | P0 | done | done | MAT-005, MAT-007, MAT-008 |
-| [MAT-010: Represent time, source coverage, and explicit negative evidence scopes](MAT-010.md) | core | 1 | P0 | planned | ready | MAT-003, MAT-004, MAT-006, MAT-007 |
+| [MAT-010: Represent time, source coverage, and explicit negative evidence scopes](MAT-010.md) | core | 1 | P0 | done | done | MAT-003, MAT-004, MAT-006, MAT-007 |
 | [MAT-011: Route trusted controls immediately and preserve authority boundaries](MAT-011.md) | core | 1 | P0 | planned | ready | MAT-002, MAT-003, MAT-005 |
 | [MAT-012: Implement provider-neutral rule and judgment interfaces](MAT-012.md) | rules | 2 | P0 | planned | waiting | MAT-002, MAT-007, MAT-010, MAT-011 |
 | [MAT-013: Version policy profiles and validate semantic compatibility](MAT-013.md) | rules | 2 | P0 | planned | waiting | MAT-012 |
@@ -41,7 +41,7 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-033: Add shadow association and claim-evidence question families](MAT-033.md) | jev | 3 | P1 | planned | waiting | MAT-027, MAT-028, MAT-029, MAT-031, MAT-007, MAT-008 |
 | [MAT-034: Add shadow change, recovery and audience-contribution families](MAT-034.md) | jev | 3 | P1 | planned | waiting | MAT-027, MAT-028, MAT-029, MAT-031, MAT-017, MAT-018, MAT-019, MAT-021 |
 | [MAT-035: Add bounded investigation judgments and stopping outcomes](MAT-035.md) | jev | 4 | P1 | planned | waiting | MAT-028, MAT-029, MAT-031, MAT-033, MAT-034, MAT-022, MAT-040 |
-| [MAT-036: Freeze episode corpora and independent label provenance](MAT-036.md) | evaluation | 2 | P0 | planned | waiting | MAT-001, MAT-004, MAT-006, MAT-010 |
+| [MAT-036: Freeze episode corpora and independent label provenance](MAT-036.md) | evaluation | 2 | P0 | planned | ready | MAT-001, MAT-004, MAT-006, MAT-010 |
 | [MAT-037: Create grouped splits and comparable baseline manifests](MAT-037.md) | evaluation | 4 | P0 | planned | waiting | MAT-036, MAT-024 |
 | [MAT-038: Build the deterministic offline evaluation harness](MAT-038.md) | evaluation | 4 | P0 | planned | waiting | MAT-026, MAT-029, MAT-030, MAT-031, MAT-036, MAT-037 |
 | [MAT-039: Run optional real-provider shadow replay with exact receipts](MAT-039.md) | evaluation | 4 | P1 | planned | waiting | MAT-032, MAT-033, MAT-034, MAT-036, MAT-037, MAT-038 |

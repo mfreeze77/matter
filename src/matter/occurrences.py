@@ -33,6 +33,7 @@ from .provenance_groups import (
 )
 from .storage import PROJECTION_TYPE, Snapshot, Storage, StorageError, Transaction, entity_ref, pin, snapshot_digest
 from .storage.base import STORAGE_NAMESPACE, _validate_fragment, _validate_projection
+from .time import validate_interval
 
 
 INDEX_NAMESPACE = "matter.occurrences"
@@ -279,6 +280,8 @@ def _stored_occurrence(value: dict[str, Any], reference: dict[str, Any]) -> dict
         if record["record_type"] != "occurrence" or entity_ref(record) != entity_ref(reference):
             raise _integrity_error()
         body = record["body"]
+        if "occurred_interval" in body:
+            validate_interval(body["occurred_interval"])
         members = _members(record["scope_id"], body["observations"])
         keys = _sorted(body["identity_keys"])
         groups = _sorted(body["provenance_groups"])
@@ -503,6 +506,8 @@ class OccurrenceService:
 
         for proposed in body["creates"]:
             proposed = deepcopy(proposed)
+            if "occurred_interval" in proposed["body"]:
+                validate_interval(proposed["body"]["occurred_interval"])
             if proposed["namespace"] in _RESERVED_NAMESPACES:
                 raise StorageError("E_SCOPE_FORBIDDEN", "The persistence namespace is reserved.")
             if "supersedes" in proposed:

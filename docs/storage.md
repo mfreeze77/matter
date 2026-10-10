@@ -164,8 +164,11 @@ registration during that command.
 
 The storage port does not interpret identity or negative-evidence predicates.
 [MAT-009](identity-corrections.md) builds verified identity groups and atomic
-registered-validity hooks on this port. MAT-010 and MAT-016 retain their temporal
-and transitive invalidation responsibilities. Storage restore tests prove that
+registered-validity hooks on this port. [MAT-010](time-coverage.md) adds source
+catalogs, explicit coverage and direct negative-scope invalidation using the
+same checked reads, watches and atomic journal. Catalog admission revisions
+verify frozen populations without a historical-read bypass inside transactions.
+MAT-016 retains transitive invalidation responsibilities. Storage restore tests prove that
 values and registrations survive; each domain service has separate behavioral
 acceptance evidence.
 

@@ -13,7 +13,10 @@ Host-published candidate sets and authorized association decisions live in
 Typed links and guarded equivalence/correction live in ``matter.relations``,
 ``matter.identity_groups`` and ``matter.identity_corrections``. Explicit host
 derivatives use the atomic ``matter.identity_dependencies`` validity hook.
+Explicit temporal views, source catalogs, coverage and absence registrations
+live in ``matter.time``, ``matter.source_catalogs``, ``matter.coverage`` and
+``matter.negative_dependencies``.
 Semantic ranking, assessment execution and integrations remain backlog work.
 """
 
-__version__ = "0.1.0.dev8"
+__version__ = "0.1.0.dev9"
