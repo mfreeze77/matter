@@ -16,8 +16,8 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-008: Separate association proposals from authorized acceptance](MAT-008.md) | core | 1 | P0 | done | done | MAT-005, MAT-006, MAT-007 |
 | [MAT-009: Implement matter links, guarded merges, and reversible identity correction](MAT-009.md) | core | 2 | P0 | done | done | MAT-005, MAT-007, MAT-008 |
 | [MAT-010: Represent time, source coverage, and explicit negative evidence scopes](MAT-010.md) | core | 1 | P0 | done | done | MAT-003, MAT-004, MAT-006, MAT-007 |
-| [MAT-011: Route trusted controls immediately and preserve authority boundaries](MAT-011.md) | core | 1 | P0 | planned | ready | MAT-002, MAT-003, MAT-005 |
-| [MAT-012: Implement provider-neutral rule and judgment interfaces](MAT-012.md) | rules | 2 | P0 | planned | waiting | MAT-002, MAT-007, MAT-010, MAT-011 |
+| [MAT-011: Route trusted controls immediately and preserve authority boundaries](MAT-011.md) | core | 1 | P0 | done | done | MAT-002, MAT-003, MAT-005 |
+| [MAT-012: Implement provider-neutral rule and judgment interfaces](MAT-012.md) | rules | 2 | P0 | planned | ready | MAT-002, MAT-007, MAT-010, MAT-011 |
 | [MAT-013: Version policy profiles and validate semantic compatibility](MAT-013.md) | rules | 2 | P0 | planned | waiting | MAT-012 |
 | [MAT-014: Execute staged rule graphs with explicit conflict composition](MAT-014.md) | rules | 2 | P0 | planned | waiting | MAT-012, MAT-013 |
 | [MAT-015: Commit revision-bound assessments and reusable semantic caches](MAT-015.md) | rules | 2 | P0 | planned | waiting | MAT-003, MAT-008, MAT-010, MAT-013, MAT-014 |

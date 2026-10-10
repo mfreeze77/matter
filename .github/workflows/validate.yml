@@ -47,6 +47,7 @@ jobs:
           cp examples/association_acceptance.py "$RUNNER_TEMP/matter-associations.py"
           cp examples/identity_corrections.py "$RUNNER_TEMP/matter-identity-corrections.py"
           cp examples/time_coverage.py "$RUNNER_TEMP/matter-time-coverage.py"
+          cp examples/trusted_controls.py "$RUNNER_TEMP/matter-trusted-controls.py"
           cd "$RUNNER_TEMP"
           python - <<'PY'
           from importlib.resources import files
@@ -75,6 +76,8 @@ jobs:
                        "identity-dependency", "identity-release", "matter-link-index"):
               assert files("matter._schemas").joinpath(name + ".schema.json").is_file()
           for name in ("observation-predicate", "source-catalog", "coverage-snapshot", "negative-dependency"):
+              assert files("matter._schemas").joinpath(name + ".schema.json").is_file()
+          for name in ("control-effect", "control-sequence", "control-fence", "control-token", "control-hook"):
               assert files("matter._schemas").joinpath(name + ".schema.json").is_file()
           command = decode_command(Path("matter-create.json").read_bytes())
 
@@ -109,3 +112,4 @@ jobs:
           python matter-associations.py
           python matter-identity-corrections.py
           python matter-time-coverage.py
+          python matter-trusted-controls.py

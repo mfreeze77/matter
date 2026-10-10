@@ -6,7 +6,7 @@ Matter is a shared foundation for following a continuing subject, preserving its
 
 ## Current status
 
-This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, explicit occurrence grouping, scoped claims and citations, authorized association decisions, typed relationships, reversible identity correction, temporal coverage and negative evidence scopes, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata. MAT-006 separates reports, happenings, and declared provenance groups with atomic membership corrections and covered counts. MAT-007 adds immutable claim corrections, component-scoped evidence relations, exact citation validation, and revisioned acceptance. MAT-008 adds explicit candidate catalogs, exact-key and external proposals, currentness checks, and authorized attachment and rejection decisions. MAT-009 adds typed relationship constraints, complete guarded identity groups, retained evidence/conflicts, protected undo/split, explicit separation release, and atomic registered-dependency invalidation. MAT-010 adds nanosecond-preserving time views, explicit source catalogs and historical initialization, protected complete-scope replacement, and atomic negative watches for previously unknown observation IDs; the command inventory now contains twenty-four variants. Semantic ranking, provider qualification, general host control epochs, transitive assessment invalidation, and native integrations remain planned in the backlog.
+This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, explicit occurrence grouping, scoped claims and citations, authorized association decisions, typed relationships, reversible identity correction, temporal coverage and negative evidence scopes, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata. MAT-006 separates reports, happenings, and declared provenance groups with atomic membership corrections and covered counts. MAT-007 adds immutable claim corrections, component-scoped evidence relations, exact citation validation, and revisioned acceptance. MAT-008 adds explicit candidate catalogs, exact-key and external proposals, currentness checks, and authorized attachment and rejection decisions. MAT-009 adds typed relationship constraints, complete guarded identity groups, retained evidence/conflicts, protected undo/split, explicit separation release, and atomic registered-dependency invalidation. MAT-010 adds nanosecond-preserving time views, explicit source catalogs and historical initialization, protected complete-scope replacement, and atomic negative watches for previously unknown observation IDs; the command inventory now contains twenty-four variants. MAT-011 adds a trusted control lane with scoped durable fences, static host authority ceilings, transaction-time guards, and explicit post-commit hooks. Semantic ranking, provider qualification, transitive assessment invalidation, and native integrations remain planned in the backlog.
 
 The walkthroughs are deliberately small: their fixtures already contain host-supplied associations and classifications. They demonstrate selected continuity and delivery rules; they do not infer semantic meaning, execute an agent hook, call JEV, train a speaker model, or establish production correctness.
 
@@ -303,3 +303,24 @@ The starter files [matterbrainstormspec](matterbrainstormspec), [matterjevmesh](
 ## License
 
 The repository retains its original [Apache License 2.0](LICENSE). Referenced third-party projects retain their own licenses; references and reuse plans do not grant permission to copy their code.
+
+## Apply trusted controls without waiting for evaluation
+
+`ControlService` accepts host-authenticated stop, scope, permission and disposition
+commands independently of model calls and budgets. Immutable control records and
+root/target fence changes commit with the operation receipt. A captured work
+token must still be current inside the later authoritative transaction; an old
+token does not revive after resume. Exact replay is historical and checks present
+read permission before disclosing a prior protected result.
+
+`AuthorityPolicy` supplies static actor, receipt, target and capability ceilings.
+`GuardedStorage` decorates existing domain services, preserving their distinct
+association and merge policies. Explicit cooperative hooks run after commit; the
+control response never waits for a blocked callback. This milestone does not
+authenticate users, preempt SQLite writers, or implement an external transport.
+See the [trusted controls API](docs/controls.md) and run the standalone synthetic
+example:
+
+```bash
+python examples/trusted_controls.py
+```

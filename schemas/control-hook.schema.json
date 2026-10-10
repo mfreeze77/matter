@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/control-hook.schema.json",
+  "title": "Matter control hook v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "control",
+    "hook_id",
+    "attempt_id",
+    "status",
+    "error_type"
+  ],
+  "properties": {
+    "control": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
+    },
+    "hook_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "attempt_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "status": {
+      "enum": [
+        "started",
+        "succeeded",
+        "failed"
+      ]
+    },
+    "error_type": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+        }
+      ]
+    }
+  }
+}

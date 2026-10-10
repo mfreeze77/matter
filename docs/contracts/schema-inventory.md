@@ -78,7 +78,7 @@ A creation receipt is a typed receipt reference. A receipt may refer to itself a
 | `control` | Immutable accepted host effect | Kind of instruction or disposition, actor and authority, explicit target scope, control epoch, effective time and expiry/unknown reason, and schema-bound effect. |
 | `receipt` | Append-only observed outcome | Explicit stage, operation identity, known recording time, namespaced outcome, evidence dependencies, and schema-bound details. |
 
-The `control` record covers cancellation, instructions, corrections, permissions, scope/task changes, deferral, acknowledgement, rejection, preference, decisions, and protected separation. A source record mentioning one of these words remains ordinary evidence. Control records and inputs require `provenance.origin: "host"`; source and evaluator origins cannot validate as controls. Only the future host control interface can accept an effective control; the schema does not authenticate a serialized claim of host origin.
+The `control` record covers cancellation, instructions, corrections, permissions, scope/task changes, deferral, acknowledgement, rejection, preference, decisions, and protected separation. A source record mentioning one of these words remains ordinary evidence. Control records and inputs require `provenance.origin: "host"`; source and evaluator origins cannot validate as controls. The MAT-011 host control interface accepts effective controls under its explicit policy; the schema does not authenticate a serialized claim of host origin.
 
 Assessment `evaluation_state` describes whether the recorded evaluation was complete. It is separate from the future current/superseded/invalidated projection. Changing projection validity must not mutate the immutable judgment or assessment result.
 
@@ -367,3 +367,24 @@ The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares th
 The examples cover every record kind, every command, every permitted success pair, every semantic error code, and additional unknown-time, failed/unknown/qualified judgment cases. Invalid examples include storage failure disguised as `no_match`, embedded execution failure in a semantic success, empty scope, unknown time with an invented value, failed judgment with a conclusion, absent qualification certificate, unsafe revision, missing dependency pin, malformed source digest, undeclared command fields, incompatible availability/locator declarations, ineligible association members, newline-suffixed digests or scope identifiers, missing reproducibility fields, fabricated digests for unproduced outputs, missing evidence locators, and negative resource ceilings.
 
 Structural validation does not implement persistence, idempotent execution, reference existence or access, same-scope authorization, duplicate-event counting, source locator verification, merges, trusted control routing, dependency freshness, rule evaluation, profile compatibility, transition authority, timers, or external delivery. Those behaviors remain owned by their dependent tickets. Canonical wire validation also remains necessary before schema validation: JSON Schema alone cannot detect duplicate keys already lost by a decoder or distinguish the numeric token `1.0` from the integer `1`.
+
+## Trusted control runtime schemas
+
+MAT-011 reuses the existing `record_control` command/result pairs and immutable
+`control` kind. It adds five packaged private schemas, without changing the
+twenty-four command variants, forty-five success pairs, core wire version,
+canonical encoding or SQLite migration:
+
+- [control-effect](../../schemas/control-effect.schema.json): registered action, reason, capabilities and optional inert typed payload.
+- [control-sequence](../../schemas/control-sequence.schema.json): scope and audit ordering counter.
+- [control-fence](../../schemas/control-fence.schema.json): exact target, epoch and retained governing restrictions/dispositions, including overlapping original scopes.
+- [control-token](../../schemas/control-token.schema.json): static policy/authority binding, actual work context, root/target pins with explicit absence, governing and active controls, and capture time.
+- [control-hook](../../schemas/control-hook.schema.json): accepted control, hook/attempt identity, started/succeeded/failed state and safe exception type.
+
+The `matter:control-token` command extension uses the exact packaged token schema
+descriptor. Generic structural readers preserve it as data. The guarded runtime
+requires and checks it, includes existing pins in the read set, and never treats
+a supplied token as authentication. Old v1 control fixtures remain structurally
+valid; their arbitrary effect descriptor does not make them executable controls.
+See [trusted controls](../controls.md) for scope conjunction, explicit releases,
+current-time enforcement, exact replay and the future dispatch binding seam.
