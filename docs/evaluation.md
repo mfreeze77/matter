@@ -95,3 +95,26 @@ MAT-045 collects the run manifest, source and question digests, model resolution
 A release candidate can enable only the rule families that passed their applicable gates. Unqualified families remain shadow-only; live permission and application integration remain owned by the host. Replacing a model, renderer, criteria order, or evidence preparation requires the appropriate requalification. A delivery preference change may require only audience-policy evaluation when the raw judgment remains applicable.
 
 Sources: [matterbrainstormspec](../matterbrainstormspec), [matterjevmesh](../matterjevmesh), [OIL validation](https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/validate.py), [Jevcal runtime](https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/runtime.py).
+
+## October 16 research-derived cases
+
+The [dated source review](research/jev-watch-2026-10-16.md) motivates the following
+additional cases within MAT-037/040/041/044 and the domain-owned media work.
+These are proposed cases, not executed tests or new qualification results.
+
+| Case | Required observation or outcome |
+|---|---|
+| Answer present in a source but omitted from its description | Preserve the source and description versions; measure preparation-induced false none separately from absent evidence. |
+| Correct source omitted from a shortlist | Report candidate recall and bounded selection separately; none cannot establish corpus-wide absence. |
+| Partial coverage, denied source, timeout, or malformed response | Retain distinct insufficiency/failure reasons and all scheduled-decision denominators; do not coerce them to no match. |
+| A useful source returned with an irrelevant source | Report contamination as well as the narrower neither-returned-source-answers handoff failure. |
+| Support plus a required exception or contradiction | Preserve jointly relevant evidence and claim components; measure lost counterevidence independently of top-one selection. |
+| Candidate count, order, or label definitions change | Preserve semantic mappings, compare repeat-call variation, and recheck family/certificate applicability. |
+| Direct, gateway, or rival-provider execution | Bind exact resolved model, adapter, endpoint, context mode, raw numeric evidence, precision profile, usage, and faults; compare frozen inputs. |
+| Shared-state multi-question request | Measure the selected provider's actual billing and every attempted question; missing usage is unknown, not zero. |
+| Absent, repeated, brief, or ambiguous video event | In a domain-owned experiment, label event presence and original-clock boundaries independently; a forced nonempty proposal cannot establish occurrence. |
+| Cached media features or recorded judgments | Report the exact reused computation and source/model identities; distinguish full-pipeline timing, fresh provider trials, and replay. |
+
+Provider quality, interface conformance, and application usefulness remain
+separate outcomes. Existing host authority, control/currentness, provenance,
+and release gates apply to every new comparison.

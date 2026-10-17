@@ -2,6 +2,15 @@
 
 Reviewed 2026-10-08. This is an implementation planning record, not a claim that upstream code was incorporated or its tests were rerun. Only the listed files and source pages were inspected. No third-party code has been copied for this record.
 
+## October 16 follow-up
+
+The [JEV research update](../research/jev-watch-2026-10-16.md) adds VideoJev,
+Sayora's candidate-selection experiment, Liquid d1-ultra, and OpenRouter's Jev
+transport. It maps the findings to the existing semantic and evaluation tickets
+and records proposed EXAIS/CSCAi relationships alongside the OIL, civic, and DIAT
+profiles. The October 8 review below remains unchanged historical evidence.
+See also the [new evaluation cases](../evaluation.md#october-16-research-derived-cases).
+
 ## Existing OIL seams
 
 All OIL links below are pinned to `3d7c629fd45067de405c1bbae0a2aa0e4036399a`.
