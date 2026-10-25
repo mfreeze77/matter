@@ -107,3 +107,19 @@ No stop caused by cost, error, or missing access becomes an assertion that the m
 Semantic evaluation proposes facts about relevance and change. The domain profile decides whether those facts establish a valid assessment. The audience policy decides whether an update is useful. The host checks accepted intent, ownership, stale inputs, and prior delivery immediately before delivery. Delivery, consumption, action, and verified outcome remain separate observations.
 
 Implementation sequence: MAT-026–032 establish interfaces, rendering, packets, stages, receipts, qualification, and optional transport; MAT-033–034 add shadow question families; MAT-035 adds bounded investigation. Their acceptance evidence is defined in the ticket register and [evaluation.md](evaluation.md).
+
+## October 16 research follow-up
+
+The [dated research update](research/jev-watch-2026-10-16.md) connects VideoJev,
+bounded retrieval selection, d1-ultra comparison, and OpenRouter transport to
+this contract and the existing backlog. Matter remains the neutral owner of
+shared semantics and reusable core logic; domain applications retain specialized
+retrieval, media execution, calculations, and action authority.
+
+Apply candidate selection through an explicitly defined family. None is relative
+to the supplied candidate universe, and a dynamic option set requires its own
+meaning and qualification scope. Keep generic passage selection in the host
+retrieval/preparation adapter, separate from identity association. Provider and
+gateway comparisons must preserve exact model, transport, preparation, context
+mode, and numeric representation. These recommendations do not expand the
+currently implemented deterministic/recorded binding modes.

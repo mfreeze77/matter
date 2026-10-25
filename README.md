@@ -279,6 +279,7 @@ python examples/time_coverage.py
 | [Rule contract](docs/contracts/rules.md) | Meaning, outcomes, qualification, dependencies, and composition |
 | [Lifecycle contract](docs/contracts/lifecycle.md) | Reassessment, resolution, reopening, attention, and delivery |
 | [JEV design](docs/jev.md) | Replaceable semantic execution and question/version handling |
+| [JEV research update — October 16](docs/research/jev-watch-2026-10-16.md) | VideoJev, retrieval selection, provider/gateway comparisons, application relationships, and existing-ticket mappings |
 | [Evaluation](docs/evaluation.md) | Corpus discipline, baselines, qualification, and outcome measures |
 | [Oil profile](docs/profiles/oil.md) | First integration and existing runtime reuse boundaries |
 | [Civic profile](docs/profiles/civic.md) | Jurisdiction configuration, source claims, and receiver authority |
