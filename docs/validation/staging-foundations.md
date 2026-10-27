@@ -78,3 +78,21 @@ default compatibility, fresh success, missing dependencies and safe refusal of
 unsupported classifications. This enables MAT-015 to retain attempted command
 material in its existing journal while refusing current publication. It adds
 no wire command variant, receipt schema or migration.
+
+The completed MAT-027 review returned six findings, with no warnings. The five
+tracking/rendering/diagnostic issues above were confirmed and fixed; its final
+finding showed that helper functions coerced bare string paths into character
+arrays. Helpers now require explicit lists or tuples before specification
+validation. The expanded 33-case rendering suite passed in 0.245 seconds.
+
+MAT-014 now reports both the admitted ceiling and a conservative true remaining
+budget. A chained-run regression prevents reusing a consumed call allowance.
+Independent review also found incomplete resolver precedence was rejected only
+after evaluation. It is now rejected before preparation or dispatch, with a
+zero-call regression. The expanded 28-case DAG suite passed in 2.462 seconds.
+
+The optional trusted storage precommit hook needed by MAT-016 passed six
+real-SQLite tests in 0.814 seconds. They cover same-transaction observer writes,
+unchanged command manifests, audited reads/watches, replay suppression, rollback,
+failed-handler isolation and scope/phase guards. These focused checks do not
+replace combined regression or the independent review of the hook.

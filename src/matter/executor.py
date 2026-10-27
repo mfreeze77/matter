@@ -67,7 +67,9 @@ class GraphExecutor:
             rule = self.evaluator.rules.resolve(reference)
             self.evaluator.bindings.resolve(rule.value["evaluator_binding"])
         for group in declaration["compositions"]:
-            self.conflicts.resolve(group["resolver"])
+            resolver = self.conflicts.resolve(group["resolver"]).value
+            if resolver["mode"] == "precedence" and not set(group["nodes"]) <= set(resolver["precedence"]):
+                raise ContractError("E_POLICY_INVALID", "The explicit resolver order does not cover every composed node.")
         ceiling = declaration["resource_limits"]
         budget = deepcopy(ceiling) if remaining_budget is None else checked(remaining_budget, required=tuple(ceiling), code="E_POLICY_INVALID")
         if any(type(value) is not int or value < 0 or value > ceiling[key] for key, value in budget.items()):
@@ -294,6 +296,13 @@ class GraphExecutor:
                 resolution["held_gates"] = []
             composition_results.append({"id": group["id"], **resolution})
         elapsed = max(0, math.ceil((self.monotonic() - start) * 1000))
+        remaining = {
+            "max_calls": max(0, budget["max_calls"] - spent["reserved_attempts"]),
+            "max_input_bytes": max(0, budget["max_input_bytes"] - spent["reserved_input_bytes"]),
+            "max_output_bytes": max(0, budget["max_output_bytes"] - spent["reserved_output_bytes"]),
+            "max_evidence": budget["max_evidence"],
+            "max_elapsed_ms": max(0, budget["max_elapsed_ms"] - elapsed),
+        }
         stop_reason = ("cancelled" if stopped() else "elapsed_limit" if self.monotonic() > deadline else
                        "completed" if all(item["status"] == "completed" for item in receipts.values())
                        and all(item["status"] == "resolved" for item in composition_results) else "incomplete")
@@ -303,7 +312,8 @@ class GraphExecutor:
             "nodes": {name: receipts[name] for name in sorted(receipts)},
             "inputs": {name: prepared.value for name, prepared in sorted(prepared_inputs.items())},
             "compositions": composition_results,
-            "resource_reservations": {**spent, "elapsed_ms": elapsed, "remaining_budget": budget},
+            "resource_reservations": {**spent, "elapsed_ms": elapsed,
+                "admitted_budget": budget, "remaining_budget": remaining},
             "limitations": ["Uncommitted graph diagnostics; no action authority or current assessment.",
                             "Synchronous Python bindings and host callbacks require cooperative completion."]}, _completion=_FINISHED_RUN)
 

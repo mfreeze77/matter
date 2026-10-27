@@ -244,6 +244,8 @@ def semantic_diff(before, after, *, certificates=()):
 def association_specification(*, namespace="matter", identity="association", revision="1.0",
                               observation_path=("observation",), candidate_path=("candidate",)):
     """Original unqualified initial association definition; static alternatives only."""
+    if type(observation_path) not in (list, tuple) or type(candidate_path) not in (list, tuple):
+        _fail(["association", "path"], "Packet paths must be explicit lists or tuples of segments.")
     return QuestionSpecification({
         "schema_version": "1.0", "namespace": namespace, "id": identity, "family": "association", "revision": revision,
         "primitive": "choice",
@@ -276,6 +278,8 @@ def comparison_specification(kind, *, revision="1.0", left_path=("left",), right
     }
     if type(kind) is not str or kind not in meanings:
         _fail(["comparison", "kind"], "An explicit topic, matter or occurrence meaning is required.")
+    if type(left_path) not in (list, tuple) or type(right_path) not in (list, tuple):
+        _fail(["comparison", "path"], "Packet paths must be explicit lists or tuples of segments.")
     instruction, affirmative, negative = meanings[kind]
     return QuestionSpecification({
         "schema_version": "1.0", "namespace": "matter", "id": "same-" + kind,

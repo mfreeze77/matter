@@ -39,6 +39,21 @@ def certificate(spec, identity="certificate-a"):
 
 
 class SpecificationTests(unittest.TestCase):
+    def test_helper_paths_reject_string_or_iterable_coercion(self):
+        for function, arguments in (
+            (association_specification, {"observation_path": "observation"}),
+            (association_specification, {"candidate_path": "candidate"}),
+            (comparison_specification, {"left_path": "left"}),
+            (comparison_specification, {"right_path": "right"}),
+            (association_specification, {"candidate_path": iter(["candidate"])}),
+        ):
+            with self.subTest(function=function.__name__, fields=tuple(arguments)):
+                with self.assertRaises(QuestionError) as caught:
+                    function(**arguments) if function is association_specification else function("matter", **arguments)
+                self.assertEqual(caught.exception.code, "E_POLICY_INVALID")
+        self.assertEqual(association_specification(candidate_path=["candidate"]).value,
+                         association_specification(candidate_path=("candidate",)).value)
+
     def test_opaque_id_and_correlation_rename_preserve_visible_meaning(self):
         first = probability_spec()
         second = probability_spec(id="unrelated-route-name", namespace="other-catalogue")

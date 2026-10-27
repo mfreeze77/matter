@@ -120,6 +120,14 @@ the existing attempt receipt's `called` flag: evidence/precondition fallbacks
 are not mislabeled evaluator calls. Output reservations are declared upper
 bounds, not measurements of actual provider usage or returned bytes.
 
+The resource receipt distinguishes `admitted_budget` (the input ceiling) from
+`remaining_budget` (the conservative allowance for a later run). Remaining calls
+subtract reserved attempts, input/output bytes subtract their reservations, and
+elapsed time subtracts the rounded-up observed run duration, all clamped at zero.
+Failed or fallback attempts keep their reservations even when they invoked no
+evaluator. The per-packet evidence cap remains unchanged. Passing that true
+remainder into another run cannot reuse an already reserved call allowance.
+
 A shared elapsed deadline stops later dispatch and composition. A result that
 returns after it is retained as a timed-out diagnostic, even if its individual
 rule completed. Cancellation is latched: a subsequent false poll cannot reopen
@@ -141,6 +149,10 @@ requires a complete explicit node-name order. Install the exact resolver in
 `ConflictResolverRegistry` and admit its reference in the profile/rule conflict
 policies. There is no implicit resolver, confidence ranking, last-writer choice,
 majority vote or probability arithmetic.
+
+Executor preflight checks that a precedence order covers every node in each
+composition before any host preparation or evaluator dispatch. An incomplete
+order fails independently of whether an eventual result would be withheld.
 
 Each optional plan composition declares `id`, exact `resolver`, distinct `nodes`
 with one exact output schema, and explicit `mandatory_gates`. Gates contain

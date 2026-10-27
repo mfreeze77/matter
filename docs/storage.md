@@ -299,6 +299,26 @@ the locking and synchronization SQLite requires; this is an embedded backend,
 not a network filesystem or distributed consensus qualification. Process-death
 tests do not substitute for physical power-loss testing.
 
+## Trusted atomic observers
+
+An optional constructor-installed `SQLiteStore(transaction_hook=callback)` runs
+after a successful host handler and before its receipt/commit, inside the same
+write transaction. It receives actual write before/after pins and validated
+typed change notices, plus a scoped system port for current reads, identity
+lookups, watches and projection writes. It must synchronously return `None`.
+It does not run for failed handlers or exact retries. A refusal rolls back all
+child writes while retaining the failure journal; an unexpected exception rolls
+back the whole command. The port expires as soon as the callback returns.
+
+The hook is trusted host code, installed independently of command data. Ordinary
+handlers still require every preexisting read in `expected_revisions`. System
+reads join the receipt's evidence, absence and watch logs without changing that
+original manifest or command digest. Reads of rolled-back child versions are
+excluded from failure evidence. Hooks use the same scope, projection validation
+and one-write-per-identity constraints; they do not authorize external actions.
+Only configured stores invoke an observer. Reopening without one is a privileged
+host choice, so consumers must still check their direct freshness guards.
+
 ## Reuse and acceptance
 
 The implementation inspected

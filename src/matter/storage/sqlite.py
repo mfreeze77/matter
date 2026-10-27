@@ -257,6 +257,7 @@ class _Transaction(_Snapshot):
         }
         self._expected: dict[tuple[str, str, str], dict[str, Any]] = {}
         self._writes: dict[tuple[str, str, str], dict[str, Any]] = {}
+        self._before_writes: dict[tuple[str, str, str], dict[str, Any] | None] = {}
         self._verified_reads: list[dict[str, Any]] = []
         self._absent_reads: dict[tuple[str, str, str], dict[str, Any]] = {}
         self._watch_queries: list[str] = []
@@ -356,6 +357,11 @@ class _Transaction(_Snapshot):
 
     def _write(self, record: dict[str, Any], previous_version: int | None) -> None:
         identity = _identity(record)
+        if identity not in self._before_writes:
+            self._before_writes[identity] = (
+                self._decode(self._row(entity_ref(record), current=True))
+                if previous_version is not None else None
+            )
         version = record.get("revision", 1)
         self._db.execute(
             "INSERT INTO versions(scope_id,namespace,id,record_type,version,digest,content,command_id) "
@@ -475,6 +481,85 @@ class _Transaction(_Snapshot):
         })
 
 
+class _SystemTransaction:
+    """Scoped, phase-limited port for a constructor-installed host hook.
+
+    The caller's handler never receives this port. Reads are current and
+    recorded as operation evidence; they do not alter the caller's manifest.
+    Only projections may be written, using the same checked writer.
+    """
+
+    def __init__(self, transaction):
+        self._tx = transaction
+        self._active = True
+
+    def _ensure_active(self):
+        if not self._active:
+            raise StorageError("E_STORAGE_UNAVAILABLE", "This system transaction is closed.")
+        self._tx._ensure_active()
+
+    @property
+    def command(self):
+        self._ensure_active()
+        return self._tx.command
+
+    @property
+    def receipt_ref(self):
+        self._ensure_active()
+        return self._tx.receipt_ref
+
+    def get(self, reference):
+        self._ensure_active()
+        tx = self._tx
+        ref = tx._checked_ref(reference)
+        try:
+            record = tx._decode(tx._row(ref, current=True))
+        except StorageError as error:
+            if error.code == "E_NOT_FOUND":
+                tx._absent_reads[_identity(ref)] = entity_ref(ref)
+            raise
+        if ("revision" in ref or "digest" in ref) and not tx._matches(ref, record):
+            raise StorageError("E_REVISION_CONFLICT")
+        actual = pin(record)
+        tx._verified_reads.append(actual)
+        if _identity(ref) not in tx._writes:
+            tx._expected[_identity(ref)] = actual
+        return deepcopy(record)
+
+    def lookup_identity(self, reference):
+        self._ensure_active()
+        ref = self._tx._checked_identity_ref(reference)
+        # Identity-only lookup must preserve a collision's actual kind.
+        try:
+            record = _Snapshot.lookup_identity(self._tx, ref)
+        except StorageError as error:
+            if error.code == "E_NOT_FOUND":
+                self._tx._absent_reads[_identity(ref)] = ref
+            raise
+        return self.get(pin(record))
+
+    def watchers(self, watch_key):
+        self._ensure_active()
+        _validate_fragment(watch_key, "identifier")
+        self._tx._watch_queries.append(watch_key)
+        view = _Snapshot(self._tx._store, self._tx._db)
+        try:
+            records = view.watchers(watch_key)
+        finally:
+            view._active = False
+        return [self.get(pin(record)) for record in records]
+
+    def put_projection(self, reference, value, *, watch_keys=()):
+        self._ensure_active()
+        ref = self._tx._checked_ref(reference)
+        try:
+            self.get(ref)
+        except StorageError as error:
+            if error.code != "E_NOT_FOUND":
+                raise
+        return self._tx.put_projection(ref, value, watch_keys=watch_keys)
+
+
 class SQLiteStore:
     """A durable database handle restricted to one host-authorized scope.
 
@@ -487,6 +572,7 @@ class SQLiteStore:
     def __init__(
         self, path: str | Path, *, scope_id: str, timeout: float = 5.0,
         fault_hook: Callable[[str], None] | None = None,
+        transaction_hook: Callable[[Any, list[dict[str, Any]]], None] | None = None,
     ) -> None:
         self._scope_id = _validate_fragment(scope_id, "identifier")
         if type(timeout) not in (int, float) or not 0 <= timeout <= 60:
@@ -495,9 +581,12 @@ class SQLiteStore:
             raise StorageError("E_SCHEMA_INVALID", "A durable filesystem database path is required.")
         if fault_hook is not None and not callable(fault_hook):
             raise StorageError("E_SCHEMA_INVALID")
+        if transaction_hook is not None and not callable(transaction_hook):
+            raise StorageError("E_SCHEMA_INVALID")
         self._path = Path(path).absolute()
         self._timeout = float(timeout)
         self._fault_hook = fault_hook
+        self._transaction_hook = transaction_hook
         self._closed = False
         self._local = threading.local()
         try:
@@ -710,6 +799,30 @@ class SQLiteStore:
                             or (result["status"] == "success" and result["receipt"] != transaction.receipt_ref)
                         ):
                             raise StorageError("E_SCHEMA_INVALID", "Handler result identities must match the command.")
+                        if result["status"] == "success" and self._transaction_hook is not None:
+                            changes = [{"cause": "write", "before": [pin(before)] if before else [],
+                                        "after": [pin(record)]}
+                                       for identity, record in transaction._writes.items()
+                                       for before in [transaction._before_writes[identity]]]
+                            for change in result.get("body", {}).get("changes", []):
+                                if type(change) is not dict or set(change) != {"cause", "before", "after"}:
+                                    raise StorageError("E_SCHEMA_INVALID")
+                                _validate_fragment(change["cause"], "change_cause")
+                                for references in (change["before"], change["after"]):
+                                    if type(references) is not list:
+                                        raise StorageError("E_SCHEMA_INVALID")
+                                    for reference in references:
+                                        transaction._checked_ref(_reference(reference, pinned=True))
+                                changes.append(deepcopy(change))
+                            system = _SystemTransaction(transaction)
+                            try:
+                                decision = self._transaction_hook(system, deepcopy(changes))
+                                if decision is not None:
+                                    if hasattr(decision, "close"):
+                                        decision.close()
+                                    raise StorageError("E_POLICY_INVALID", "A transaction hook must synchronously return None.")
+                            finally:
+                                system._active = False
                     except ContractError as exc:
                         if exc.code == "E_STORAGE_UNAVAILABLE":
                             raise
@@ -723,7 +836,10 @@ class SQLiteStore:
                             retriable=failure["retriable"],
                             affected_references=tuple(failure["affected_references"]),
                         ))["error"]
+                        rolled_back = {canonical_bytes(pin(record)) for record in transaction._writes.values()}
                         db.execute("ROLLBACK TO command_mutation")
+                        transaction._verified_reads = [reference for reference in transaction._verified_reads
+                            if canonical_bytes(reference) not in rolled_back]
                         transaction._writes.clear()
                     db.execute("RELEASE command_mutation")
 

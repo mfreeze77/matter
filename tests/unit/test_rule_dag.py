@@ -192,6 +192,19 @@ class RuleDagTests(unittest.TestCase):
         self.assertEqual(outputs[0]["selected_node"], "left")
         self.assertEqual(len(outputs[0]["originals"]), 2)
 
+    def test_incomplete_precedence_is_refused_before_preparation_or_evaluation(self):
+        self.resolver = ConflictResolver("example", "incomplete-order", "1.0", mode="precedence", precedence=["left"])
+        self.helper.resolver = self.resolver.reference
+        self.rule("left")
+        self.rule("right")
+        composition = {"id": "comparison", "resolver": self.resolver.reference,
+            "nodes": ["left", "right"], "mandatory_gates": []}
+        with self.assertRaises(ContractError) as error:
+            self.execute(self.plan(compositions=[composition]))
+        self.assertEqual(error.exception.code, "E_POLICY_INVALID")
+        self.assertEqual(self.prepared_calls, [])
+        self.assertEqual(self.calls, [])
+
     def test_conflicting_qualified_outputs_remain_inspectable_when_quiet(self):
         self.rule("left", function=lambda request: self.response(1))
         self.rule("right", function=lambda request: self.response(2))
@@ -240,6 +253,25 @@ class RuleDagTests(unittest.TestCase):
         self.assertEqual(result["resource_reservations"]["actual_invocations"], 1)
         self.assertEqual(self.calls, ["left"])
         self.assertEqual(result["nodes"]["right"]["status"], "budget_exhausted")
+
+    def test_reported_remaining_budget_subtracts_conservative_reservations(self):
+        self.rule("source")
+        plan = self.plan()
+        budget = plan.value["resource_limits"]
+        self.assertEqual(budget["max_calls"], 1)
+        result = self.execute(plan)
+        resources = result["resource_reservations"]
+        self.assertEqual(resources["admitted_budget"], budget)
+        remaining = resources["remaining_budget"]
+        self.assertEqual(remaining["max_calls"], 0)
+        self.assertEqual(remaining["max_input_bytes"], budget["max_input_bytes"] - resources["reserved_input_bytes"])
+        self.assertEqual(remaining["max_output_bytes"], budget["max_output_bytes"] - resources["reserved_output_bytes"])
+        self.assertEqual(remaining["max_elapsed_ms"], max(0, budget["max_elapsed_ms"] - resources["elapsed_ms"]))
+        self.assertEqual(remaining["max_evidence"], budget["max_evidence"])
+        self.calls.clear()
+        chained = self.execute(plan, remaining_budget=remaining)
+        self.assertEqual(chained["nodes"]["source"]["status"], "budget_exhausted")
+        self.assertEqual(self.calls, [])
 
     def test_failed_source_coverage_cannot_be_outweighed_by_high_impact(self):
         self.rule("coverage", change=lambda value: value["evidence_requirements"].update(require_complete_coverage=True))
