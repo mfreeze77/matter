@@ -13,7 +13,7 @@ from ._rule_values import FrozenValue, descriptor, domain, fragment
 from .assessments import AssessmentService, _Tracked, _read_targets
 from .canonical import canonical_bytes, canonical_digest
 from .claims import ClaimService, read_claim
-from .contracts import ContractError, validate_command, validate_record
+from .contracts import validate_command, validate_record
 from .controls import ControlService, _active, _effect, command_targets
 from .dependencies import (capture_dependencies, register_dependency, registration_ref,
                            recomputation_token, require_current_dependency)
@@ -263,6 +263,10 @@ class LifecycleService:
         validate_record(observation)
         _read_membership(view, observation)
         assessment, lane = self._assessment(view, body["assessment"], profile, now)
+        # Admission requires the selected current lane. The durable domain
+        # result retains this exact proof; replacing a lane later is not by
+        # itself a change to the facts which established the domain state.
+        publication = self.assessments._current_value(lane)["publication"]
         source_pins = list(claim["body"]["attribution"])
         sources = []
         for ref in source_pins:
@@ -317,15 +321,26 @@ class LifecycleService:
                 contains(claim["body"]["applicability"], effective) is not True or
                 compare_times(effective, now) not in {-1, 0}):
             held("The effective time is not established by the declared claim interval.")
-        if not edge["allow_past_effective"] and compare_times(effective, now) != 0:
-            held("This edge does not admit a past-effective transition.")
+        if not edge["allow_past_effective"] and compare_times(effective, assessment["body"]["assessed_as_of"]) == -1:
+            held("This edge does not admit effectivity before its admitted assessment knowledge boundary.")
         if knowledge_eligible(assessment["body"]["assessed_as_of"], now) is not True:
             held("The assessment knowledge cut lies in the future.")
         trigger = edge["trigger"]
         if trigger in {"establish", "resolution", "recurrence"} and seen is not None:
             held("Redelivery of an accepted occurrence cannot change lifecycle state.", idempotent=True)
         if trigger == "recurrence":
-            prior_event = None if prior is None else view.exact(prior["basis"]["occurrence"])
+            prior_event = None if prior is None else view.get(entity_ref(prior["basis"]["occurrence"]))
+            if prior_event is not None:
+                _read_membership(view, prior_event)
+                prior_receipt = view.get(prior["last_transition"])
+                details = prior_receipt["body"]["details"]
+                if details != domain("lifecycle-transition", details["value"]):
+                    _fail("The prior lifecycle chronology lacks its original proof.", "E_EVIDENCE_INVALID")
+                proof = details["value"]["assessment_publication"]["value"]["preparation"]
+                anchors = [record for record in proof["records"] if entity_ref(record) == entity_ref(prior_event)]
+                if (len(anchors) != 1 or pin(anchors[0]) != prior["basis"]["occurrence"] or
+                        anchors[0]["body"]["occurred_at"] != prior_event["body"]["occurred_at"]):
+                    held("The prior happening's chronology changed and requires explicit correction.", True)
             if (prior_event is None or compare_times(observation["body"]["occurred_at"], prior_event["body"]["occurred_at"]) != 1):
                 held("Reopening requires a distinct later happening, not later delivery.")
             if compare_times(observation["body"]["occurred_at"], now) not in {-1, 0}:
@@ -361,7 +376,7 @@ class LifecycleService:
                 _fail("The host decision selector could not establish authority.", "E_AUTHORITY_REQUIRED")
             if valid is not True:
                 _fail("The host decision does not authorize this exact transition.", "E_AUTHORITY_REQUIRED")
-        positive = [body["matter"], pin(lane), body["assessment"], request["claim"], request["occurrence"], *source_pins]
+        positive = [body["matter"], body["assessment"], request["claim"], request["occurrence"], *source_pins]
         manifest = capture_dependencies(view, scope_id=self.scope_id, as_of=now, positive=positive,
             control_token=token, controls=self.controls)
         complete_targets = _read_targets(command, [pin(item) for item in view.records.values()])
@@ -378,6 +393,7 @@ class LifecycleService:
         return {"profile": profile, "definition": definition, "edge": edge, "address": address,
             "prior": prior, "previous": previous, "previous_registration": prior_registration,
             "state": state, "revision": revision, "manifest": manifest, "hold": hold, "already": already,
+            "assessment_publication": domain("assessment-publication", publication),
             "event": _event_ref(address, observation)}
 
     def prepare(self, command, *, profile, condition, claim, occurrence, token, decision=None, access_context=None):
@@ -426,7 +442,8 @@ class LifecycleService:
                 "from_state": result["state"], "to_state": result["edge"]["to_state"], "lifecycle_revision": result["revision"] + 1,
                 "effective_at": command["body"]["effective_at"], "knowledge_at": now, "basis": basis,
                 "previous_transition": None if result["prior"] is None else result["prior"]["last_transition"],
-                "decision": request["decision"], "control_token": request["token"]}
+                "decision": request["decision"], "control_token": request["token"],
+                "assessment_publication": result["assessment_publication"]}
             receipt = tx.insert({"schema_version": "1.0", "record_type": "receipt", "scope_id": self.scope_id,
                 "namespace": NAMESPACE, "id": "transition-" + canonical_digest(command, "matter.lifecycle-command.v1"),
                 "provenance": {"origin": "system", "producer": _ENGINE, "recorded_at": now,
@@ -464,6 +481,31 @@ class LifecycleService:
             self.assessments.access.require_current(view, context, references=[detail["matter"], *detail["basis"].values()])
         return receipt
 
+    def _basis(self, view, state, receipt, now):
+        """Recheck original admitted facts without requiring the old lane.
+
+        This proof was copied only from the actual selected current lane in
+        _inspect, before the immutable transition receipt was inserted. It is
+        never accepted from a request or replaced with a freshly captured token.
+        """
+        assessment = validate_record(view.exact(state["basis"]["assessment"]))
+        wrapped = receipt["body"]["details"]["value"]["assessment_publication"]
+        if wrapped != domain("assessment-publication", wrapped["value"]):
+            _fail("The lifecycle basis has an unknown admission proof.", "E_EVIDENCE_INVALID")
+        publication = wrapped["value"]
+        preparation = self.assessments._preparation(publication["preparation"])
+        request = preparation["request"]["body"]
+        if (assessment["record_type"] != "assessment" or assessment["id"] != publication["assessment_id"] or
+                assessment["body"]["matter"] != state["matter"] or assessment["body"]["profile"] != state["profile"] or
+                request["matter"] != state["matter"] or request["profile"] != state["profile"]):
+            _fail("The lifecycle basis is not the originally admitted assessment.", "E_EVIDENCE_INVALID")
+        registration = _lookup(view, registration_ref(assessment))
+        if registration is not None:
+            require_current_dependency(view, pin(registration), as_of=now, controls=self.controls)
+        admission = self.assessments._guards(view, preparation, publication["graph"], now)
+        self.assessments._require_fresh_result(view, publication, assessment, now, admission)
+        return assessment
+
     def current(self, matter, *, profile, condition, read_token=None, access_context=None):
         with self.storage.snapshot() as snapshot:
             return self.read_current(snapshot, matter, profile=profile, condition=condition,
@@ -482,13 +524,13 @@ class LifecycleService:
         if record is None:
             return None
         state = self._value(record)
-        self._audit_state(view, state, read_token=read_token, access_context=access_context)
+        receipt = self._audit_state(view, state, read_token=read_token, access_context=access_context)
         if state["profile"] != profile or state["condition"] != condition or entity_ref(state["matter"]) != entity_ref(matter):
             _fail(code="E_DEPENDENCY_STALE")
         now = fragment(self.clock(), "known_time")
         require_current_dependency(view, registration_ref(record), as_of=now, controls=self.controls)
         view.exact(state["matter"])
-        self._assessment(view, state["basis"]["assessment"], self.profiles.resolve(profile), now)
+        self._basis(view, state, receipt, now)
         lineage = self.claims._lineage(view, state["basis"]["claim"])
         superseded = [ref for item in lineage for ref in item.get("supersedes", [])]
         if state["basis"]["claim"] in superseded or len([item for item in lineage if pin(item) not in superseded]) != 1:

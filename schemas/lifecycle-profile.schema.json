@@ -174,11 +174,11 @@
             "items": {
               "enum": [
                 "source",
-                "adapter",
                 "host",
+                "adapter",
+                "evaluator",
                 "derived",
-                "system",
-                "model"
+                "system"
               ]
             },
             "minItems": 1,

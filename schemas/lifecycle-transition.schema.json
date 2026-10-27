@@ -18,7 +18,8 @@
     "basis",
     "previous_transition",
     "decision",
-    "control_token"
+    "control_token",
+    "assessment_publication"
   ],
   "properties": {
     "schema_version": {
@@ -99,6 +100,9 @@
       ]
     },
     "control_token": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
+    },
+    "assessment_publication": {
       "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
     }
   }

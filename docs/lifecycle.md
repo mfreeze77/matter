@@ -28,6 +28,8 @@ description, named states with roles (`open`, `resolved`, `unknown`,
 Pointers are data selectors, with RFC 6901 escaping. They execute no code.
 The selected condition can include circumstances such as an operation's exact
 scope; matching a topical name alone supplies no implied correspondence.
+Origin selectors use the actual core vocabulary, including `evaluator`.
+Admitting evaluator evidence still supplies no host authority or capability.
 Changing any declaration changes its definition and edge fingerprints.
 `definition.edge_reference(edge_id)` returns the exact request selector.
 Duplicate state or edge identities, undeclared states, unavailable schemas and
@@ -96,6 +98,12 @@ Install the existing `InvalidationHook` on every participating store handle to
 invalidate registered attention or queued host derivatives in that same commit.
 This ticket implements the registration seam; it sends no advice or message.
 
+The receipt retains the exact original publication proof copied from that
+selected lane. The lifecycle's semantic dependencies include the admitted
+assessment and its actual sources, rather than the replaceable current-lane
+pointer. Reassessing equivalent evidence in the same lane therefore does not
+change an already established domain fact or its logical lifecycle revision.
+
 An exact command retry returns its durable journal result. A fresh command
 for precisely the same currently valid basis and edge returns
 `already_applied` without a new transition. Different evidence, effectivity or
@@ -115,6 +123,11 @@ reopen a resolved condition. A recurrence edge requires a distinct accepted
 occurrence with a known happening time later than the prior basis occurrence,
 and an effective time at or after the previous condition transition. A new ID
 for an older happening does not pass this guard.
+Routine revision of the prior occurrence's membership does not permanently
+block recurrence. The service reads its current accepted grouping, retains that
+revision in the transaction read set, and compares its happening time against
+the original snapshot retained in the transition proof. A changed happening
+time requires explicit correction rather than a guessed chronology.
 
 A retraction edge must explicitly leave a resolved state for unknown or open,
 accept an `unknown` assessed proposition, and select a new claim which
@@ -140,13 +153,24 @@ as its effective time. The interval must contain that instant; the request
 must supply the exact same value. The occurrence timestamp is not silently
 promoted into proposition effectivity. Future effectivity is held, and source
 availability must be known and no later than the assessment's knowledge cut.
+When `allow_past_effective` is false, effectivity cannot precede that fixed
+assessment knowledge cut. It need not equal two changing preparation/commit
+clock readings. The exact claim-start equality and no-future-effectivity guard
+still apply.
 A late-discovered recovery can therefore be effective yesterday while its
 receipt records today's actual commit knowledge time. Clock regression between
 preparation and commit is refused.
 
 `current(matter, profile=..., condition=...)` returns the actual current
 projection, or `None` for an unseen condition. It checks registered transitive
-freshness, the actual current assessment and the current claim correction head.
+freshness, the originally admitted assessment and the current claim correction
+head. The original publication's source, qualification, time, context and
+control guards are rerun at the actual read time. An expired original
+certificate, corrected source, changed negative watch or revoked original
+control stays stale even if a new assessment or certificate exists. Selecting a
+new current assessment lane alone does not invalidate the domain state. New
+transitions still require the selected current assessment.
+
 Stale state is a failure rather than a resolved answer. `read_current(view,
 matter, *, profile, condition, ...)` performs the same guards through a caller's
 consistent view and opens no fallback snapshot. Callers retain all discovered
@@ -159,6 +183,10 @@ resolution or correction; an effective cut filters declared effectivity.
 Historical receipts are not rewritten and do not assert present validity.
 Only the selected exact profile's receipts are returned. No automatic version
 migration or certificate transfer is performed.
+
+Retained publication proofs count against the existing 8-MiB unique-record read
+budget and 4,096-record limit, including history traversal. A large history is
+refused explicitly when that budget is exceeded; it is not silently truncated.
 
 Reads audit present host read permission. A caller may supply an original
 `read_token` to current/history; raw storage and service handles remain trusted

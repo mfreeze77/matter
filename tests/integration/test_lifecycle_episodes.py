@@ -4,11 +4,10 @@ from copy import deepcopy
 import unittest
 from unittest.mock import patch
 
-from matter.assessments import AssessmentService
-from matter.authority import AuthorityPolicy, CAPABILITIES, CONTROL_KINDS
 from matter.canonical import canonical_bytes
 from matter.claims import ClaimService
-from matter.controls import ControlService, command_targets
+from matter.controls import ControlService
+from matter.evaluators import BindingRegistry, QualificationRegistry
 from matter.dependencies import (capture_dependencies, capture_freshness, register_dependency,
                                  registration_ref, require_freshness)
 from matter.invalidation import InvalidationHook
@@ -17,7 +16,7 @@ from matter.observations import ObservationIngestor
 from matter.occurrences import OccurrenceService
 from matter.planner import RulePlan
 from matter.profiles import ProfileDefinition, ProfileRegistry
-from matter.rules import SchemaRegistry
+from matter.rules import RuleRegistry, SchemaRegistry
 from matter.storage import SQLiteStore, StorageError, entity_ref, pin
 
 from claim_helpers import claim_command
@@ -25,7 +24,7 @@ from control_helpers import control_command
 from integration.helpers import _in_scope, create_command, domain_value, fixture, projection_ref
 from integration import test_assessment_commit as assessment_fixture
 from observation_helpers import known_time, observation_command
-from occurrence_helpers import declared, grouping_command, grouping_policy, occurrence_input
+from occurrence_helpers import declared, grouping_command, grouping_policy, occurrence_input, replacement
 from rule_helpers import NOW, EARLY, LATE, component, schema
 
 
@@ -139,12 +138,13 @@ class LifecycleEpisodes(unittest.TestCase):
         self.remember(record)
         return record
 
-    def assess(self, claim, occurrence, *, status="supported", purpose=None):
+    def assess(self, claim, occurrence, *, status="supported", purpose=None, extra=(), qualified=False):
         f = self.f
-        request = f.request(evidence=[pin(claim), pin(occurrence)])
+        request = f.request(evidence=[pin(claim), pin(occurrence), *extra])
         request["body"]["purpose"] = purpose or component("condition-purpose-" + claim["body"]["value"]["value"]["condition"]["key"])
-        prepared = f.prepare(request=request, extra=[pin(claim), pin(occurrence)])
-        command = f.command(prepared, interpretations=[{"node": "evidence", "claim": pin(claim),
+        prepared = f.prepare(request=request, extra=[pin(claim), pin(occurrence), *extra])
+        run = f.qualified_graph(prepared) if qualified else None
+        command = f.command(prepared, run, interpretations=[{"node": "evidence", "claim": pin(claim),
             "labels": {"example:positive": status}, "evidence_standard": f.profile.component_references["evidence"]}])
         result = f.service.commit(command)
         self.assertEqual(result["status"], "success", result)
@@ -248,9 +248,9 @@ class LifecycleEpisodes(unittest.TestCase):
     def test_old_occurrence_redelivery_stays_resolved_but_new_happening_reopens(self):
         initial, recovery, recovered_event, _, _, _ = self.resolved()
         old_claim, old_event = initial[:2]
-        # Assessing redelivered evidence today does not turn its old occurrence
-        # into a fresh happening. A separate lane preserves the current basis.
-        assessment = self.assess(old_claim, old_event, purpose=component("redelivery-check"))
+        # Even replacing the SAME current assessment lane with redelivered
+        # evidence does not turn an old occurrence into a fresh happening.
+        assessment = self.assess(old_claim, old_event)
         _, replay = self.apply("recur", old_claim, old_event, assessment)
         self.assertEqual(replay.get("outcome"), "held_for_evidence", replay)
         self.assertEqual(self.current()["value"]["value"]["state"], "example:resolved")
@@ -268,7 +268,7 @@ class LifecycleEpisodes(unittest.TestCase):
         self.resolved()
         source, occurrence = self.event("late-published-old-event", at=EARLY, available_at=NOW)
         claim = self.claim("late-published-old-event", self.condition_a, "present", source, effective=EARLY)
-        assessment = self.assess(claim, occurrence, purpose=component("old-event-purpose"))
+        assessment = self.assess(claim, occurrence)
         _, result = self.apply("recur", claim, occurrence, assessment)
         self.assertEqual(result.get("outcome"), "held_for_evidence", result)
         self.assertEqual(self.current()["value"]["value"]["state"], "example:resolved")
@@ -427,9 +427,10 @@ class LifecycleEpisodes(unittest.TestCase):
             fresh = capture_freshness(view, registration_ref(address), as_of=f.now, controls=f.controls)
         source, occurrence = self.event("queue-recovery", at=NOW)
         claim = self.claim("queue-recovery", self.condition_a, "recovered", source, effective=NOW)
-        assessment = self.assess(claim, occurrence, purpose=component("independent-recovery-lane"))
+        assessment = self.assess(claim, occurrence)
         # The old lifecycle/queue remains fresh until this transition replaces
-        # that state; publishing this independent assessment did not touch it.
+        # that state; replacing the current assessment lane alone is not a
+        # domain state change and cannot invalidate this queue's lifecycle basis.
         with f.storage.snapshot() as view:
             require_freshness(view, fresh, as_of=f.now, controls=f.controls)
         command, result = self.apply("resolve", claim, occurrence, assessment)
@@ -464,6 +465,104 @@ class LifecycleEpisodes(unittest.TestCase):
         edited["edges"][-1]["assessment_statuses"] = ["refuted"]
         with self.assertRaises(StorageError):
             LifecycleDefinition(edited, schemas=self.f.schemas)
+        edited = self.definition.value
+        edited["edges"][0]["allowed_origins"] = ["evaluator"]
+        admitted = LifecycleDefinition(edited, schemas=self.f.schemas)
+        self.assertEqual(admitted.value["edges"][0]["allowed_origins"], ["evaluator"])
+        edited["edges"][0]["allowed_origins"] = ["model"]
+        with self.assertRaises(ValueError):
+            LifecycleDefinition(edited, schemas=self.f.schemas)
+
+    def test_equivalent_same_lane_reassessment_preserves_independent_domain_state(self):
+        _, claim, occurrence, original_assessment, _, result = self.resolved()
+        state = self.current()
+        original_receipt = self.f.storage.get(result["body"]["transition_receipt"])
+        paraphrase = self.f.observe("equivalent-paraphrase")
+        self.remember(paraphrase)
+        refreshed = self.assess(claim, occurrence, extra=[pin(paraphrase)])
+        self.assertNotEqual(pin(refreshed), pin(original_assessment))
+        selected = self.f.service.current(self.f.subject, profile=self.f.profile.reference,
+            purpose=refreshed["body"]["purpose"], audience=refreshed["body"]["audience"])
+        self.assertEqual(selected, refreshed)
+        # Domain state remains exactly the prior admitted result, including
+        # its logical revision and old immutable assessment/qualification proof.
+        self.assertEqual(self.current(), state)
+        self.assertEqual(self.f.storage.get(pin(original_receipt)), original_receipt)
+        self.assertEqual(self.f.storage.get(registration_ref(state))["value"]["value"]["status"], "current")
+        self.assertEqual(len(self.lifecycle.history(self.f.subject, profile=self.f.profile.reference, condition=self.condition_a)), 2)
+
+    def test_retained_basis_rechecks_original_certificate_expiry_without_lane_reliance(self):
+        f = self.f
+        f.binding_instance = f.recorded(identity="qualified-assessment")
+        f.rule_instance = f.rule(f.binding_instance)
+        f.rules, f.bindings = RuleRegistry([f.rule_instance]), BindingRegistry([f.binding_instance])
+        self.install_profile(self.definition)
+        f.active_certificate = f.certificate(f.rule_instance, f.binding_instance)
+        f.service.qualifications = QualificationRegistry([f.active_certificate])
+        source, occurrence = self.event("qualified-basis")
+        claim = self.claim("qualified-basis", self.condition_a, "present", source)
+        assessment = self.assess(claim, occurrence, qualified=True)
+        _, result = self.apply("establish", claim, occurrence, assessment)
+        self.assertEqual(result.get("outcome"), "applied", result)
+        original = self.current()
+        f.now = deepcopy(LATE)
+        with self.assertRaises(StorageError) as expired:
+            self.current()
+        self.assertEqual(expired.exception.code, "E_DEPENDENCY_STALE")
+        self.assertEqual(f.storage.get(pin(original)), original)
+        # Installing a different fresh certificate cannot qualify the old
+        # retained judgment which explicitly used its expired certificate.
+        fresh = f.certificate(f.rule_instance, f.binding_instance,
+            change=lambda value: value.update(valid_until=FUTURE))
+        fresh["reference"]["version"] = "2.0"
+        f.service.qualifications = QualificationRegistry([fresh])
+        with self.assertRaises(StorageError) as replaced:
+            self.current()
+        self.assertEqual(replaced.exception.code, "E_DEPENDENCY_STALE")
+
+    def test_nonpast_effectivity_uses_stable_assessment_cut_across_advancing_clock(self):
+        self.install_profile(self.make_definition(change=lambda value: value["edges"][0].update(allow_past_effective=False)))
+        source, occurrence = self.event("nonpast", at=NOW, available_at=NOW)
+        claim = self.claim("nonpast", self.condition_a, "present", source, effective=NOW)
+        assessment = self.assess(claim, occurrence)
+        command = self.command("establish", claim, occurrence, assessment)
+        # Actual preparation and commitment are different clock readings. The
+        # fixed admitted knowledge cut, not a changing wallclock equality, is
+        # the declared no-backdating boundary.
+        self.f.now = deepcopy(LATE)
+        result = self.lifecycle.transition(command)
+        self.assertEqual(result.get("outcome"), "applied", result)
+        detail = self.f.storage.get(result["body"]["transition_receipt"])["body"]["details"]["value"]
+        self.assertEqual(detail["effective_at"], NOW)
+        self.assertEqual(detail["knowledge_at"], LATE)
+        source, occurrence = self.event("backdated", at=EARLY, available_at=EARLY)
+        claim = self.claim("backdated", self.condition_b, "present", source, effective=EARLY)
+        assessment = self.assess(claim, occurrence)
+        _, held = self.apply("establish", claim, occurrence, assessment)
+        self.assertEqual(held.get("outcome"), "held_for_evidence", held)
+        self.assertIsNone(self.current(self.condition_b))
+
+    def test_genuine_recurrence_after_routine_prior_occurrence_membership_revision(self):
+        _, _, recovery, _, _, _ = self.resolved()
+        extra = self.f.observe("second-report-of-recovery")
+        self.remember(extra)
+        command = grouping_command("extend-recovery-membership", scope_id=self.f.storage.scope_id,
+            replacements=[replacement(recovery, [*recovery["body"]["observations"], pin(extra)])],
+            assignments=[declared(extra)])
+        result = self.occurrences.commit(self.occurrences.prepare(command))
+        self.assertEqual(result.get("outcome"), "committed", result)
+        updated = self.f.storage.get(entity_ref(recovery))
+        self.assertEqual(updated["revision"], recovery["revision"] + 1)
+        self.assertEqual(updated["body"]["occurred_at"], recovery["body"]["occurred_at"])
+        self.f.now = deepcopy(LATE)
+        source, recurrence = self.event("recurrence-after-membership", at=LATE, available_at=LATE)
+        claim = self.claim("recurrence-after-membership", self.condition_a, "present", source, effective=LATE)
+        assessment = self.assess(claim, recurrence)
+        prepared = self.command("recur", claim, recurrence, assessment)
+        self.assertIn(pin(updated), prepared["expected_revisions"])
+        result = self.lifecycle.transition(prepared)
+        self.assertEqual(result.get("outcome"), "applied", result)
+        self.assertEqual(self.current()["value"]["value"]["state"], "example:open")
 
 
 if __name__ == "__main__":
