@@ -385,7 +385,7 @@ A delivered result names the observed transport milestone; it does not assert co
 
 ## Fixtures, verification, and remaining boundaries
 
-The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares the validity of standalone record, command, result, and intentionally invalid examples. The [inventory](../../tests/fixtures/contracts/inventory.json) lists the supported kinds, operations, outcome pairs, and error codes. The current manifest contains **224 fixtures: 166 valid and 58 intentionally invalid**. All examples are synthetic. Their zero-valued digest placeholders establish shape only and are not evidence that source bytes or referenced schemas exist.
+The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares the validity of standalone record, command, result, and intentionally invalid examples. The [inventory](../../tests/fixtures/contracts/inventory.json) lists the supported kinds, operations, outcome pairs, and error codes. The current manifest contains **227 fixtures: 169 valid and 58 intentionally invalid**. All examples are synthetic. Their zero-valued digest placeholders establish shape only and are not evidence that source bytes or referenced schemas exist.
 
 The examples cover every record kind, every command, every permitted success pair, every semantic error code, and additional unknown-time, failed/unknown/qualified judgment cases. Invalid examples include storage failure disguised as `no_match`, embedded execution failure in a semantic success, empty scope, unknown time with an invented value, failed judgment with a conclusion, absent qualification certificate, unsafe revision, missing dependency pin, malformed source digest, undeclared command fields, incompatible availability/locator declarations, ineligible association members, newline-suffixed digests or scope identifiers, missing reproducibility fields, fabricated digests for unproduced outputs, missing evidence locators, and negative resource ceilings.
 
@@ -508,7 +508,32 @@ without changing the twelve core record kinds. Its six schemas bind the
 [evaluation report](../../schemas/semantic-qualification-evaluation.schema.json),
 [original admission context](../../schemas/semantic-qualification-request.schema.json),
 and [admission projection](../../schemas/semantic-qualification-admission.schema.json).
-The current inventory is **30 operations, 60 successful outcome pairs and 88 JSON
-Schema resources**. The [qualification API](../semantic-qualification.md) checks
+At MAT-031 the inventory reached **30 operations, 60 successful outcome pairs
+and 88 JSON Schema resources**. The [qualification API](../semantic-qualification.md) checks
 actual certificate applicability; these synthetic contracts issue no certificate
 and establish no provider accuracy.
+
+## Durable delivery contracts
+
+MAT-021 adds three truthful dispatch result stages: `leased`, `authorized`, and
+`recorded`. Lease ownership and durable authorization are distinct from observed
+`delivered` success. Recording a failure, unknown outcome, consumption, action,
+verified outcome or usefulness observation does not imply a successful send.
+The outer high-level dispatch can report `E_DELIVERY_UNKNOWN` after its actual
+unknown observation is durable. Existing delivered/withheld branches are retained.
+
+The portable inventory is **30 operations and 63 success pairs**, with 12 core
+record kinds and 19 error codes. Ten packaged private contracts bind
+[transport capabilities](../../schemas/delivery-transport.schema.json),
+[destination authority](../../schemas/delivery-destination.schema.json),
+[immutable intents](../../schemas/delivery-intent.schema.json),
+[fenced slots](../../schemas/delivery-slot.schema.json),
+[operation requests](../../schemas/delivery-request.schema.json),
+[operation results](../../schemas/delivery-result.schema.json),
+[atomic authorization](../../schemas/delivery-authorization.schema.json),
+[attempt history](../../schemas/delivery-attempt.schema.json),
+[transport observations](../../schemas/delivery-transport-result.schema.json) and
+[bound outcome evidence](../../schemas/delivery-observation.schema.json).
+These bring the package to 98 schema resources. Structural validation is separate
+from the actual delivery acceptance evidence in [MAT-021](../../tickets/MAT-021.md);
+no new core record kind, command variant or SQLite migration is introduced.

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/delivery-transport-result.schema.json",
+  "title": "Matter delivery-transport-result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "receipt_id",
+    "at",
+    "milestone",
+    "reason"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "delivered",
+        "failed",
+        "delivery_unknown",
+        "not_found"
+      ]
+    },
+    "receipt_id": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+        }
+      ]
+    },
+    "at": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+    },
+    "milestone": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespaced_name"
+        }
+      ]
+    },
+    "reason": {
+      "enum": [
+        "transport:accepted",
+        "transport:rejected",
+        "transport:timeout",
+        "transport:unavailable",
+        "transport:not_found",
+        "transport:unknown"
+      ]
+    }
+  }
+}

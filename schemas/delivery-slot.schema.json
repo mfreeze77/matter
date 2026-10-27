@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/delivery-slot.schema.json",
+  "title": "Matter delivery-slot v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "intent",
+    "equivalence_key",
+    "delivery_key",
+    "state",
+    "lease",
+    "reservation",
+    "authorization",
+    "last_observation",
+    "fence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "intent": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+    },
+    "equivalence_key": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+    },
+    "delivery_key": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "state": {
+      "enum": [
+        "queued",
+        "leased",
+        "authorized",
+        "delivery_unknown",
+        "delivered",
+        "failed",
+        "withheld"
+      ]
+    },
+    "lease": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "worker",
+            "token",
+            "fence",
+            "expires_at"
+          ],
+          "properties": {
+            "worker": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+            },
+            "token": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+            },
+            "fence": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+            },
+            "expires_at": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+            }
+          }
+        }
+      ]
+    },
+    "reservation": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+        }
+      ]
+    },
+    "authorization": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+        }
+      ]
+    },
+    "last_observation": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+        }
+      ]
+    },
+    "fence": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+    }
+  }
+}

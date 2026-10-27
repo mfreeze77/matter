@@ -12,7 +12,7 @@ from .assessments import AssessmentService, _Tracked
 from .canonical import canonical_bytes, canonical_digest
 from .claims import read_claim
 from .contexts import _active, _binding, _condition, _context_targets, _refs
-from .contracts import validate_command, validate_record, validate_result
+from .contracts import command_digest, validate_command, validate_record, validate_result
 from .controls import command_targets
 from .dependencies import capture_dependencies, recomputation_token, register_dependency, registration_ref, require_current_dependency
 from .dispositions import DispositionDefinition, disposition_scope_ref
@@ -529,6 +529,107 @@ class AttentionService:
                 self.access.require_current(view, payload["request"]["access_context"], audience=audience)
                 self.access.require_current(view, access_context, references=[payload["assessment"]], audience=audience)
             return record
+
+    def stage_observed_delivery(self, tx, decision, delivery_receipt, *, authorization, authorization_proof):
+        """Record a fact from an already authorized MAT-021 send in a host tx.
+
+        This does not authorize new work or renew its original token. A late
+        cancellation must not erase an actual transport observation. The
+        immutable reserved storage receipt binds the supplied journal proof;
+        public history/read APIs retain their present permission checks.
+        """
+        from .outbox import (authorization_value, OBSERVATION_EXTENSION,
+                             REQUEST_EXTENSION as DELIVERY_REQUEST)
+        self._access_boundary()
+        if tx.command["scope_id"] != self.scope_id:
+            _fail("E_SCOPE_FORBIDDEN")
+        authorization = fragment(authorization, "receipt_dependency")
+        auth_record = validate_record(tx.get(authorization))
+        auth = authorization_value(auth_record)
+        token = _value("control-token", auth["control_token"])
+        if (token["scope_id"] != self.scope_id or token["capability"] != "delivery" or
+                tx.command["actor"] != token["actor"] or
+                tx.command["authority"] != entity_ref(token["authority"])):
+            _fail("E_AUTHORITY_REQUIRED")
+        if type(authorization_proof) is not dict or set(authorization_proof) != {"command", "result"}:
+            _fail("E_EVIDENCE_INVALID")
+        command = validate_command(authorization_proof["command"])
+        result = validate_result(authorization_proof["result"])
+        operation_receipt = validate_record(tx.get(auth_record["creation_receipt"]))
+        details = _value("storage-receipt-details", operation_receipt["body"]["details"])
+        dispatch_request = _value("delivery-request", command.get("extensions", {}).get(DELIVERY_REQUEST))
+        if (command["operation"] != "dispatch" or command["scope_id"] != self.scope_id or
+                command["idempotency_key"] != auth["authorization_key"] or
+                command["command_id"] != auth_record["body"]["operation_id"] or
+                command["actor"] != token["actor"] or command["authority"] != entity_ref(token["authority"]) or
+                dispatch_request["action"] != "authorize" or dispatch_request["intent"] != auth["intent"] or
+                command["body"]["intent"] != auth["intent"] or
+                result["operation"] != "dispatch" or result["operation_id"] != command["command_id"] or
+                result["status"] != "success" or result["outcome"] != "authorized" or
+                result["body"]["authorization"] != authorization or
+                result["body"]["attention_budget"] != auth["attention_budget"] or
+                entity_ref(operation_receipt) != result["receipt"] or
+                operation_receipt["namespace"] != "matter.storage" or
+                operation_receipt["body"]["operation_id"] != command["command_id"] or
+                details["command_digest"] != command_digest(command) or
+                details["result_digest"] != canonical_digest(result, "result.dispatch.v1") or
+                authorization not in details["writes"] or auth["attention_budget"] not in details["writes"] or
+                auth["baseline"] not in details["read_set"]):
+            _fail("E_EVIDENCE_INVALID")
+        allocation = tx.get(auth["attention_budget"])
+        held = _value("budget-reservation", allocation["value"])
+        if held["status"] != "committed" or held["token"] != auth["control_token"]:
+            _fail("E_EVIDENCE_INVALID")
+        decision = fragment(decision, "receipt_dependency")
+        record = validate_record(tx.get(decision))
+        value = _value("attention-decision", record["body"]["details"])
+        if (decision != auth["decision"] or record["provenance"]["producer"] != _ENGINE or
+                value["scope_id"] != self.scope_id or value["treatment"] == "quiet" or
+                any(not _same(value[key], auth[key]) for key in
+                    ("assessment", "purpose", "audience", "material_contract", "material_digest")) or
+                entity_ref(value["matter"]) != auth["matter"] or
+                canonical_digest(value["material"], "matter.attention-material.v1") != auth["material_digest"]):
+            _fail("E_EVIDENCE_INVALID")
+        receipt = validate_record(tx.get(fragment(delivery_receipt, "receipt_dependency")))
+        milestone = _value("attention-delivery-milestone", receipt["body"]["details"])
+        observation = _value("delivery-observation", receipt.get("extensions", {}).get(OBSERVATION_EXTENSION))
+        if (receipt["scope_id"] != self.scope_id or receipt["provenance"]["origin"] != "host" or
+                receipt["provenance"]["producer"] != auth["producer"] or receipt["body"]["stage"] != "delivered" or
+                receipt["body"]["outcome"] != auth["milestone"] or
+                observation["authorization"] != authorization or observation["status"] != "delivered" or
+                any(not _same(observation[key], auth[key]) for key in ("intent", "destination", "transport", "delivery_key")) or
+                milestone["decision"] != decision or milestone["milestone"] != "delivered" or
+                any(not _same(milestone[key], auth[key]) for key in ("assessment", "matter", "purpose", "audience", "material_digest")) or
+                receipt["provenance"]["recorded_at"] != observation["observed_at"] or
+                receipt["body"]["recorded_at"] != observation["observed_at"]):
+            _fail("E_EVIDENCE_INVALID")
+        now = fragment(self.clock(), "known_time")
+        at = milestone["delivered_at"]
+        if (compare_times(observation["observed_at"], now) > 0 or
+                compare_times(observation["observed_at"], auth["authorized_at"]) < 0 or
+                compare_times(at, observation["observed_at"]) > 0 or compare_times(at, value["at"]) < 0):
+            _fail("E_EVIDENCE_INVALID")
+        ordered = observation["ordering"] == "transport_time"
+        if (ordered and (observation["reported_at"]["state"] != "known" or
+                         not _same(at, observation["reported_at"]))) or (not ordered and not _same(at, observation["observed_at"])):
+            _fail("E_EVIDENCE_INVALID")
+        address = delivered_baseline_ref(auth["matter"], purpose=auth["purpose"], audience=auth["audience"])
+        current = _lookup(tx, address)
+        if current is None or entity_ref(auth["baseline"]) != address:
+            _fail("E_EVIDENCE_INVALID")
+        prior = _value("attention-baseline", current["value"])["delivered"]
+        if prior is not None and (not ordered or compare_times(at, prior["delivered_at"]) <= 0):
+            if ordered or pin(current) != auth["baseline"]:
+                return {"baseline": pin(current), "advanced": False, "reason": "older_or_unordered_milestone"}
+        if not ordered and pin(current) != auth["baseline"]:
+            return {"baseline": pin(current), "advanced": False, "reason": "baseline_changed_without_transport_order"}
+        baseline = {"schema_version": "1.0", "scope_id": self.scope_id, "policy": value["policy"],
+            "matter": auth["matter"], "purpose": auth["purpose"], "audience": auth["audience"],
+            "assessment": auth["assessment"], "material_contract": value["material_contract"],
+            "material": value["material"], "material_digest": value["material_digest"], "decision": decision,
+            "delivery_receipt": pin(receipt), "delivered_at": at}
+        stored = tx.put_projection(address, domain("attention-baseline", {"delivered": baseline}))
+        return {"baseline": pin(stored), "advanced": True, "reason": "authorized_observed_milestone"}
 
     def _delivery(self, view, request, state, now):
         receipt = validate_record(view.get(request["delivery_receipt"]))
