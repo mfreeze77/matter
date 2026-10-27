@@ -113,12 +113,24 @@ another policy's last writer. It checks current read permission and all original
 semantic/control/negative/time/qualification guards again before returning the
 immutable stored assessment. Old records remain readable through privileged
 historical storage even when their lane is no longer usable.
+Both transaction admission and current consumption rebuild qualification and
+graph dependent completeness, propositions, proposals and evidence gaps at the
+actual current time. Any change refuses the result, including an unmapped node
+in an otherwise incomplete graph; its previously admitted proposals cannot
+survive an expired certificate.
 
 Policy/profile changes produce `policy_change`; changed selected evidence
 produces `new_evidence`; exact purpose/audience changes have their own labels.
-These are declared input-change classifications, not newly observed external
-events. An unchanged assessment context with no changed evidence, policy,
-subject or temporal cut is refused rather than fabricated as a new event.
+Additional semantic claim/staged prerequisite changes produce
+`evidence_correction`, candidate-set changes `association_correction`, negative
+registration changes `coverage_change`, and changed actual host control
+generations `disposition_change`. The service retains a flat `prior_basis`
+alongside the prior command and checks it against the actual previous lane in
+the writer transaction. New empty control target slots and token capture times
+do not fabricate disposition changes. These classifications describe declared
+input changes, not new external events or new source authority from a model
+attempt. Changes outside the command body can refresh at the same knowledge cut;
+a truly unchanged semantic basis remains refused.
 
 `attempt(idempotency_key)` returns the durable original command, typed result and
 actual operation receipt under current read authority. Failed commands retain
@@ -165,7 +177,12 @@ returns a `CacheResult`. On a hit it preserves the original source attempt/raw
 result and rechecks actual field equivalence, negative dependencies and the
 **original** cached control token. A fresh token for another target with the
 same epoch cannot renew stale upstream work. A stale cache is an explicit
-refusal, not an automatic provider fallback.
+refusal for that original attempt. The v2 cache address binds the semantic
+projection plus the entire original control context except its capture time.
+A separately authorized fresh context gets a distinct slot and can compute
+again without changing or renewing the old attempt. The callback still receives
+only the declared semantic projection. Stable contexts preserve declared
+audience, title and clock independence.
 
 Qualification is freshly classified at consumption time using the exact rule,
 binding, task and admitted certificate registry. `.response` exposes that current
@@ -174,14 +191,24 @@ its origin. Unknown conclusions stay unknown. Expired qualification stays
 expired. Neither structural validity nor a cache hit grants action authority.
 
 Pass cache results to `prepare_commit(..., cache_entries=[...])` to stage them
-with the assessment. An entry is keyed by the exact declared semantic
-projection. A title-only matter revision can reuse a computation that never
+with the assessment. Transaction staging validates hit/miss metadata, observed
+stored pin, original attempt identity and current qualification before writing.
+An entry is keyed by its declared semantic projection and original control
+context generation. A title-only matter revision can reuse a computation that never
 received the title, while a title-reading computation gets a different key.
 Audience-independent support can be shared across audiences; an audience-reading
 judgment cannot. Moving through one temporal equivalence class preserves the
 key, while crossing a declared boundary changes it. Whole assessments always
 bind the fresh matter/context revisions even when a semantic computation is
 reused.
+
+A concurrent fill can conservatively refuse publication: if two assessments
+both captured the same key's absence and computed independently, the first may
+commit while the second returns durable `E_DEPENDENCY_STALE`. The second
+transaction cannot adopt a newly appeared undeclared cache row. Its original
+attempt remains in the refusal journal; exact retry returns that refusal. A new
+host attempt captures the winner's pin and can publish a hit without computing
+again. The winning cached attempt remains immutable.
 
 ## Proof and qualification limits
 

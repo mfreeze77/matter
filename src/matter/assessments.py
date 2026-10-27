@@ -219,6 +219,27 @@ class AssessmentService:
                             if _identity(ref) not in proof or _identity(ref) in declared)
         return _read_targets(preparation["request"], refs)
 
+    @staticmethod
+    def _basis(preparation):
+        """Flat semantic comparison material, never recursive prior history."""
+        body = preparation["request"]["body"]
+        dependencies = preparation["current_dependencies"]
+        selected = {_identity(ref) for ref in [body["matter"], *body["evidence"]["references"], *dependencies["candidate_sets"]]}
+        return {"plan": canonical_digest(preparation["plan"], "matter.assessment-plan-basis.v1"),
+            "extra_dependencies": _unique_refs(ref for ref in dependencies["positive"] if _identity(ref) not in selected),
+            "candidate_sets": _unique_refs(dependencies["candidate_sets"]),
+            "negative_registrations": _unique_refs(dependencies["negative_registrations"]),
+            "staged": _unique_refs(ref for snapshot in preparation["staged_snapshots"] for ref in snapshot["references"]
+                                   if ref["record_type"] == "judgment"),
+            "cache_projections": _sorted({"definition": item["definition"], "projected": item["projected"]}
+                                          for item in preparation["cache_inputs"]),
+            # Merely selecting a new target with no control history is an
+            # input change, not a new host disposition. Nonempty generations,
+            # exact grants/policies and applicable controls remain explicit.
+            "control_context": {**{key: value for key, value in preparation["token"].items()
+                                    if key not in {"captured_at", "targets", "fences"}},
+                                "fences": [item for item in preparation["token"]["fences"] if item["pin"] is not None]}}
+
     def _plan(self, raw, profile):
         conditions = [{key: edge[key] for key in ("from", "to", "accepted_labels", "accepted_statuses", "require_qualified")}
                       for edge in raw["edges"] if edge["kind"] == "conditional"]
@@ -230,7 +251,7 @@ class AssessmentService:
 
     def _preparation(self, value):
         data = checked(value, required=("schema_version", "request", "plan", "token", "control_contexts", "captured_at",
-            "records", "reads", "absent", "watch_queries", "current_dependencies", "lane", "previous", "prior_assessment", "prior_request",
+            "records", "reads", "absent", "watch_queries", "current_dependencies", "lane", "previous", "prior_assessment", "prior_request", "prior_basis",
             "cache_inputs", "staged_snapshots", "proof_reads"),
             code="E_EVIDENCE_INVALID")
         if data["schema_version"] != "1.0" or len(canonical_bytes(data)) > 8388608:
@@ -258,6 +279,14 @@ class AssessmentService:
         expected_lane = assessment_current_ref(self.scope_id, body["matter"], profile=body["profile"], purpose=body["purpose"], audience=body.get("audience"))
         if data["lane"] != expected_lane or any(ref["scope_id"] != self.scope_id for ref in reads):
             _fail(code="E_SCOPE_FORBIDDEN")
+        if data["prior_assessment"] is None:
+            if data["prior_request"] is not None or data["prior_basis"] is not None or data["previous"] is not None:
+                _fail("A new lane cannot invent a prior semantic basis.", "E_EVIDENCE_INVALID")
+        else:
+            checked(data["prior_basis"], required=("plan", "extra_dependencies", "candidate_sets", "negative_registrations",
+                "staged", "cache_projections", "control_context"), code="E_EVIDENCE_INVALID")
+            if type(data["prior_request"]) is not dict or data["previous"] is None:
+                _fail("A continuing lane must retain its actual prior semantic basis.", "E_EVIDENCE_INVALID")
         dependencies = checked(data["current_dependencies"], required=("positive", "candidate_sets", "negative_registrations"), code="E_EVIDENCE_INVALID")
         nominated = [body["matter"], *body["evidence"]["references"], *dependencies["candidate_sets"]]
         if any(ref not in dependencies["positive"] for ref in nominated) or any(ref not in reads for ref in dependencies["positive"]):
@@ -356,6 +385,7 @@ class AssessmentService:
                     "negative_registrations": _unique_refs(registrations)},
                 "lane": address, "previous": None if previous is None else pin(previous),
                 "prior_assessment": None if prior is None else prior["assessment"], "prior_request": prior_request,
+                "prior_basis": None if prior is None else self._basis(prior["preparation"]),
                 "cache_inputs": cache_inputs, "staged_snapshots": [], "proof_reads": proof_reads}
             self.controls.require_current(view, token, capability="assessment", targets=self._read_targets(data), as_of=now)
         if len(canonical_bytes(data)) > body["budget"]["max_bytes"]:
@@ -458,6 +488,7 @@ class AssessmentService:
             _fail("Graph node and input inventories do not match the compiled plan.")
         captured = {_identity(ref): ref for ref in preparation["reads"]}
         bundles, usable = [], {}
+        frozen_view = FrozenAssessmentView(preparation)
         for name in plan.value["order"]:
             node = checked(graph["nodes"][name], required=("node", "rule", "status", "reason", "error_code", "input_digest",
                 "upstream_input_digests", "judgment", "attempt_receipt"), optional=("final_admission", "final_edge_admissions"),
@@ -482,7 +513,6 @@ class AssessmentService:
             for ref in packet["dependencies"]["positive"]:
                 if captured.get(_identity(ref)) != ref:
                     _fail("The graph read a record outside the captured assessment snapshot.", "E_EVIDENCE_INVALID")
-            frozen_view = FrozenAssessmentView(preparation)
             for evidence in packet["evidence"]:
                 if evidence["record"] != frozen_view.get(evidence["reference"]):
                     _fail("A rule input altered the captured source snapshot.", "E_EVIDENCE_INVALID")
@@ -611,6 +641,13 @@ class AssessmentService:
             causes.append("new_evidence")
         if before["matter"] != after["matter"] and not causes:
             causes.append("evidence_correction")
+        prior, current = preparation["prior_basis"], self._basis(preparation)
+        for field, cause in (("plan", "policy_change"), ("control_context", "disposition_change"),
+            ("negative_registrations", "coverage_change"), ("candidate_sets", "association_correction"),
+            ("extra_dependencies", "evidence_correction"), ("staged", "evidence_correction"),
+            ("cache_projections", "evidence_correction")):
+            if prior[field] != current[field] and cause not in causes:
+                causes.append(cause)
         if not causes:
             if before["assessed_as_of"] != after["assessed_as_of"]:
                 causes.append("temporal_transition")
@@ -759,6 +796,13 @@ class AssessmentService:
         with self.storage.snapshot() as view:
             self._input_current(view, value, prepared.value, fragment(as_of, "known_time"))
 
+    def _require_fresh_result(self, view, publication, assessment, now):
+        fresh, _ = self._proposal(publication["preparation"], publication["graph"],
+            publication["interpretations"], publication["assessment_id"], now, publication["cache_entries"], view=view)
+        fields = ("evaluation_state", "stop_reason", "propositions", "proposals", "evidence_gaps")
+        if any(fresh["body"][field] != assessment["body"][field] for field in fields):
+            _fail("A published result no longer has its original admissible graph state.", "E_DEPENDENCY_STALE")
+
     def commit(self, command):
         command = validate_command(command)
         if command["operation"] != "commit_assessment" or command["scope_id"] != self.scope_id:
@@ -783,9 +827,7 @@ class AssessmentService:
                 if tx.get(pin(record)) != record:
                     _fail("A retained snapshot differs from its actual stored revision.", "E_EVIDENCE_INVALID")
             profile, bundles, usable = self._guards(tx, preparation, graph, now)
-            if any(not usable.get(mapping["node"], False) and expected["body"]["propositions"][index]["status"] != "unknown"
-                   for index, mapping in enumerate(publication["interpretations"])):
-                _fail("A formerly admitted conclusion is no longer usable.", "E_DEPENDENCY_STALE")
+            self._require_fresh_result(tx, publication, expected, now)
             try:
                 current = tx.get(preparation["lane"])
             except StorageError as error:
@@ -797,7 +839,8 @@ class AssessmentService:
             if current is not None:
                 prior = self._current_value(current)
                 if (prior["assessment"] != preparation["prior_assessment"] or
-                        prior["preparation"]["request"]["body"] != preparation["prior_request"]):
+                        prior["preparation"]["request"]["body"] != preparation["prior_request"] or
+                        self._basis(prior["preparation"]) != preparation["prior_basis"]):
                     _fail("The prior assessment basis changed inside the retained input.", "E_EVIDENCE_INVALID")
             children, ids = [], set()
             for name, bundle in bundles:
@@ -876,12 +919,10 @@ class AssessmentService:
             body = value["preparation"]["request"]["body"]
             if body["profile"] != profile or body["purpose"] != purpose or body.get("audience") != audience:
                 _fail("The lane holds a different exact policy or contextual revision.", "E_DEPENDENCY_STALE")
-            _, _, usable = self._guards(view, value["preparation"], value["publication"]["graph"], self._now())
+            now = self._now()
+            self._guards(view, value["preparation"], value["publication"]["graph"], now)
             stored = validate_record(view.get(value["assessment"]))
-            if ((stored["body"]["evaluation_state"] == "complete" and not all(usable.values())) or
-                    any(not usable.get(mapping["node"], False) and stored["body"]["propositions"][index]["status"] != "unknown"
-                        for index, mapping in enumerate(value["publication"]["interpretations"]))):
-                _fail("A published conclusion no longer has admissible qualification or graph prerequisites.", "E_DEPENDENCY_STALE")
+            self._require_fresh_result(view, value["publication"], stored, now)
             return stored
 
     def attempt(self, idempotency_key):

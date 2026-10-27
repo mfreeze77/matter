@@ -148,3 +148,46 @@ semantic reads. General freshness does not grant qualification or authority.
 The tested backend for this batch is SQLite. A neutral storage port is not
 evidence of an implemented or qualified PostgreSQL adapter. Provider calls,
 private corpora and downstream repository changes remain outside these checks.
+
+## Initial combined run and review remediation
+
+The first frozen runtime/package/test input set contained 421 files. The full
+suite passed **986 tests in 393.403 seconds** with the canonical physical
+temporary directory. JavaScript verified 26 canonical and eight exact-source
+vectors; all three synthetic walkthroughs passed. The isolated dev13 wheel ran
+the ten existing examples and all seven selected new behavioral test modules
+outside the checkout; all 110 Python/SQL/schema resources matched source bytes.
+Rechecking the frozen inputs reported zero changes.
+
+Those results are preliminary, because independent review then identified
+three confirmed assessment/cache issues: late qualification could leave an
+unmapped node's proposals/current state usable, an invalidated control context
+permanently occupied a semantic cache address, and cache-result metadata was
+accepted without checking actual transaction state. They are being corrected
+with new behavioral regressions; the initial passing suite does not waive them.
+The invalidation review also identified an unnecessary loose schema-directory
+copy in the installed check. It is removed, and the installed check asserts
+that only packaged schemas are available.
+
+Root source review found that fallback itself could parse a malformed cached
+scope-fence value and roll back an admitted control. The replacement fence now
+needs only the verified storage revision, preserving history and fresh-pin
+refusal without trusting the damaged domain payload. That remediation and its
+actual control-service regressions are in progress. Final source changes
+require another frozen combined run and installed-wheel verification.
+
+The completed assessment review artifact covered nine selected files over two
+passes with no warnings. Its raw findings contain seven distinct claims (the
+summary merges two claims at the same cache line). Six are accepted and fixed:
+fresh usability-dependent fields at commit/current, control-generation cache
+slots, strict cache metadata/qualification checks, complete flat prior-basis
+cause classification, one frozen view per graph, and misleading dead helper
+parameters/imports. The expanded 42-case suite passed in 55.920 seconds.
+
+The seventh claim proposes accepting a competing cache fill. The existing
+checked-read contract instead conservatively refuses an assessment whose
+original cache absence changed: the new entry was not an original declared
+read. No undeclared-read bypass is added. The new concurrency regression
+proves the refusal is durable, the winner is immutable, and a new appropriately
+captured attempt publishes a hit without another computation. This limitation
+is explicit in the API and ticket receipt.

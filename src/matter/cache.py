@@ -47,6 +47,14 @@ def cache_ref(scope_id, key):
             "record_type": PROJECTION_TYPE, "id": "cache-" + fragment(key, "sha256")}
 
 
+def _key(request):
+    # A new authorized attempt gets a distinct slot after a control generation
+    # changes. Capture time alone must not defeat declared clock independence.
+    context = {key: value for key, value in request["token"].items() if key != "captured_at"}
+    return canonical_digest({"projected": request["projected"], "control_context": context},
+                            "matter.semantic-cache-key.v2")
+
+
 class SemanticComputationDefinition(FrozenValue):
     """Exact rule/binding/preparation plus the only fields a callback can read."""
     __slots__ = ()
@@ -106,7 +114,7 @@ class CacheInput(FrozenValue):
 
     @property
     def key(self):
-        return canonical_digest(self.value["projected"], "matter.semantic-cache-key.v1")
+        return _key(self.value)
 
     @property
     def projected(self):
@@ -280,7 +288,7 @@ class SemanticCache:
             entry = checked(stored["value"]["value"], required=("schema_version", "scope_id", "key", "request",
                 "returned", "source_attempt_id", "created_at"))
             if (stored["value"] != domain("cache-entry", entry) or entry["key"] != request.key or
-                    canonical_digest(entry["request"]["projected"], "matter.semantic-cache-key.v1") != entry["key"] or
+                    _key(entry["request"]) != entry["key"] or
                     entity_ref(stored) != reference):
                 raise StorageError("E_EVIDENCE_INVALID")
             self._current(view, entry["request"], data, now)
@@ -297,9 +305,9 @@ class SemanticCache:
         request = data["current_input"]
         self._current(tx, entry["request"], request, as_of)
         self._validate_returned(entry["returned"], request)
-        if canonical_digest(request["projected"], "matter.semantic-cache-key.v1") != entry["key"]:
+        if _key(request) != entry["key"]:
             raise StorageError("E_EVIDENCE_INVALID")
-        if canonical_digest(entry["request"]["projected"], "matter.semantic-cache-key.v1") != entry["key"]:
+        if _key(entry["request"]) != entry["key"]:
             raise StorageError("E_EVIDENCE_INVALID")
         reference = cache_ref(entry["scope_id"], entry["key"])
         try:
@@ -308,6 +316,12 @@ class SemanticCache:
             if error.code != "E_NOT_FOUND":
                 raise
             previous = None
+        if (type(data["cache_hit"]) is not bool or data["cache_hit"] != (previous is not None) or
+                data["stored"] != (pin(previous) if previous is not None else None) or
+                data["source_attempt_id"] != entry["source_attempt_id"]):
+            raise StorageError("E_EVIDENCE_INVALID", "Cache result metadata does not match the actual original attempt and stored entry.")
+        if data["qualification"] != self._classification(entry, as_of):
+            raise StorageError("E_DEPENDENCY_STALE", "Cache qualification changed before transaction admission.")
         if previous is None:
             return tx.put_projection(reference, domain("cache-entry", entry))
         if previous["value"] != domain("cache-entry", entry):

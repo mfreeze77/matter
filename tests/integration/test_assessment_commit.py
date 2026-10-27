@@ -5,10 +5,10 @@ from copy import deepcopy
 from threading import Event
 import unittest
 
-from matter.assessments import AssessmentService, PUBLICATION_EXTENSION, assessment_current_ref
+from matter.assessments import AssessmentService, PUBLICATION_EXTENSION
 from matter.authority import AuthorityPolicy, CAPABILITIES, CONTROL_KINDS
 from matter.cache import SemanticCache, SemanticComputationDefinition, cache_ref
-from matter.canonical import canonical_bytes, canonical_digest, source_digest
+from matter.canonical import source_digest
 from matter.controls import ControlService, command_targets
 from matter.contracts import ContractError
 from matter.evaluators import BindingRegistry, QualificationRegistry, RecordedBinding, prepare_input
@@ -22,7 +22,7 @@ from claim_helpers import claim_command, relation_command, acceptance_command
 from control_helpers import control_command
 from integration.helpers import _in_scope, create_command, domain_value, fixture, record_input
 from matter_helpers import metadata_command
-from rule_helpers import RuleTestCase, NOW, EARLY, LATE, component
+from rule_helpers import RuleTestCase, NOW, LATE, component
 
 
 class AssessmentCommitTests(RuleTestCase):
@@ -108,10 +108,13 @@ class AssessmentCommitTests(RuleTestCase):
         return service.prepare(request, token=token, plan=plan or self.plan, extra_dependencies=extra, cache_queries=queries,
                                negative_dependencies=negative, control_contexts=control_contexts)
 
-    def graph_run(self, prepared, *, binding=None, rule=None, function=None, runner=None):
+    def graph_run(self, prepared, *, binding=None, rule=None, runner=None, unavailable_node=None):
         rule = rule or self.rule_instance
-        runner = runner or self.runner([rule], [binding or self.binding_instance], qualifications=self.service.qualifications, clock=lambda: deepcopy(self.now))
+        runner = runner or self.runner([self.rules.resolve(ref) for ref in self.plan.value["nodes"].values()],
+            [binding or self.binding_instance], qualifications=self.service.qualifications, clock=lambda: deepcopy(self.now))
         def build(name, upstream):
+            if name == unavailable_node:
+                raise StorageError("E_EVIDENCE_UNAVAILABLE", "Synthetic unavailable independent graph input.")
             return prepare_input(prepared.view, rule, schemas=self.schemas, scope_id=self.storage.scope_id,
                 proposition={"schema": self.input_schema.reference, "value": {"enabled": True}},
                 evidence=[self.evidence()], coverage={"status": "complete", "snapshot": component("coverage")},
@@ -316,7 +319,7 @@ class AssessmentCommitTests(RuleTestCase):
             schemas=self.schemas, controls=self.controls, qualifications=qualifications)
         return definition, cache
 
-    def cache_compute(self, prepared, definition, cache, calls, *, audience=None, label="example:positive", status="applicable", qualification=None, context=()):
+    def cache_compute(self, prepared, definition, cache, calls, *, label="example:positive", status="applicable", qualification=None):
         request = next(value for value in prepared.cache_inputs if value.value["definition"] == definition.reference)
         def compute(projected):
             calls.append(deepcopy(projected))
@@ -337,7 +340,7 @@ class AssessmentCommitTests(RuleTestCase):
             stored_cache = self.storage.get(cache_ref(self.storage.scope_id, result.entry["key"]))
             second_audience = component("audience-second-" + str(sensitive))
             second = self.prepare(request=self.request(audience=second_audience), extra=[pin(stored_cache)])
-            result2 = self.cache_compute(second, definition, cache, calls, audience=second_audience)
+            result2 = self.cache_compute(second, definition, cache, calls)
             self.assertEqual(len(calls), 2 if sensitive else 1)
             self.assertEqual(result2.cache_hit, not sensitive)
             self.assertNotIn("delivery_wrapper", str(calls))
@@ -437,10 +440,89 @@ class AssessmentCommitTests(RuleTestCase):
         fresh = self.controls.capture(actor=self.actor, authority=entity_ref(self.authority), capability="assessment",
             targets=[entity_ref(self.subject), entity_ref(self.source)])
         self.assertEqual(fresh["control_epoch"], first.token["control_epoch"])
+        with self.storage.snapshot() as view:
+            with self.assertRaises(StorageError) as error:
+                cache.get_or_compute(view, first.cache_inputs[0], compute=lambda value: self.fail("stale input compute"),
+                    attempt_id="stale-original-must-not-run", as_of=self.now)
+            self.assertEqual(error.exception.code, "E_DEPENDENCY_STALE")
+        second = self.prepare(request=self.request(audience=component("different-target-audience")))
+        fresh_result = self.cache_compute(second, definition, cache, calls)
+        self.assertFalse(fresh_result.cache_hit)
+        self.assertNotEqual(fresh_result.entry["key"], result.entry["key"])
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(self.service.commit(self.command(second, cache_entries=[fresh_result]))["status"], "success")
+        self.assertEqual(self.storage.get(cache_ref(self.storage.scope_id, result.entry["key"]))["value"]["value"], result.entry)
+
+    def test_same_cut_control_generation_refresh_computes_new_slot_without_renewing_old_attempt(self):
+        definition, cache = self.cache_fixture()
+        self.service.cache = cache
+        calls = []
+        first = self.prepare()
+        original = self.cache_compute(first, definition, cache, calls)
+        published = self.service.commit(self.command(first, cache_entries=[original]))
+        self.assertEqual(published["status"], "success", published)
+        old_assessment = self.storage.get(published["body"]["assessment"])
+        old_cache = self.storage.get(cache_ref(self.storage.scope_id, original.entry["key"]))
+        correction = _in_scope(control_command("fresh-cache-generation", self.authority, targets=[self.subject],
+            action="invalidate", now=self.now), self.storage.scope_id)
+        correction["actor"] = self.actor
+        correction["body"]["control"]["body"]["actor"] = self.actor
+        self.assertEqual(self.controls.apply(self.controls.prepare(correction))["status"], "success")
+        fresh = self.prepare()
+        recomputed = self.cache_compute(fresh, definition, cache, calls)
+        self.assertFalse(recomputed.cache_hit)
+        self.assertEqual(len(calls), 2)
+        self.assertNotEqual(original.entry["key"], recomputed.entry["key"])
+        result = self.service.commit(self.command(fresh, cache_entries=[recomputed]))
+        self.assertEqual(result["status"], "success", result)
+        current = self.storage.get(result["body"]["assessment"])
+        self.assertEqual(current["body"]["causes"], ["disposition_change"])
+        self.assertEqual(current["body"]["assessed_as_of"], old_assessment["body"]["assessed_as_of"])
+        self.assertEqual(current["body"]["prior_assessment"], pin(old_assessment))
+        self.assertEqual(self.storage.get(pin(old_assessment)), old_assessment)
+        self.assertEqual(self.storage.get(pin(old_cache)), old_cache)
+
+    def test_same_cut_extra_claim_change_is_evidence_correction_and_prior_basis_is_checked(self):
+        first_result = self.claims.append(self.claims.prepare(claim_command("extra-first", "extra-first", self.subject, self.source)))
+        first_claim = self.storage.get(first_result["body"]["claim"])
+        _, _, prior = self.publish(extra=[pin(first_claim)])
+        second_result = self.claims.append(self.claims.prepare(claim_command("extra-second", "extra-second", self.subject, self.source,
+            value="corrected synthetic proposition")))
+        second_claim = self.storage.get(second_result["body"]["claim"])
+        prepared = self.prepare(extra=[pin(second_claim)])
+        command = self.command(prepared)
+        self.assertIn("evidence_correction", command["body"]["assessment"]["body"]["causes"])
+        self.assertNotIn("new_evidence", command["body"]["assessment"]["body"]["causes"])
+        self.assertNotIn("temporal_transition", command["body"]["assessment"]["body"]["causes"])
+        # Rebuild an internally consistent command with a forged flat previous
+        # basis: only the writer's actual previous-lane check can reject it.
+        from matter.assessments import PreparedAssessment, _PREPARED
+        altered = prepared.value
+        altered["prior_basis"]["extra_dependencies"] = []
+        forged = PreparedAssessment(altered, _admission=_PREPARED)
+        refused = self.service.commit(self.service.prepare_commit(forged, self.graph_run(prepared),
+            command_id="forged-prior-basis", idempotency_key="forged-prior-basis", assessment_id="forged-prior-basis"))
+        self.assertEqual(refused["error"]["code"], "E_EVIDENCE_INVALID", refused)
+        result = self.service.commit(command)
+        self.assertEqual(result["status"], "success", result)
+        self.assertEqual(self.storage.get(result["body"]["assessment"])["body"]["prior_assessment"], pin(prior))
+        self.assertEqual(self.storage.get(pin(prior)), prior)
+
+    def test_same_cut_added_negative_scope_is_coverage_change_and_unchanged_refresh_is_refused(self):
+        _, _, prior = self.publish()
+        watch = self.absence_watch()
+        prepared = self.prepare(negative=[pin(watch)])
+        command = self.command(prepared)
+        self.assertEqual(command["body"]["assessment"]["body"]["causes"], ["coverage_change"])
+        result = self.service.commit(command)
+        self.assertEqual(result["status"], "success", result)
+        stored = self.storage.get(result["body"]["assessment"])
+        self.assertEqual(stored["body"]["prior_assessment"], pin(prior))
+        self.assertEqual(self.storage.get(pin(prior)), prior)
+        unchanged = self.prepare(negative=[pin(watch)])
         with self.assertRaises(StorageError) as error:
-            self.prepare(request=self.request(audience=component("different-target-audience")))
-        self.assertEqual(error.exception.code, "E_DEPENDENCY_STALE")
-        self.assertEqual(len(calls), 1)
+            self.command(unchanged)
+        self.assertIn("Unchanged assessment inputs", str(error.exception))
 
     def test_frozen_view_refuses_uncaptured_reference_instead_of_claiming_absence(self):
         prepared = self.prepare()
@@ -449,23 +531,44 @@ class AssessmentCommitTests(RuleTestCase):
             prepared.view.get(unknown)
         self.assertEqual(error.exception.code, "E_EVIDENCE_UNAVAILABLE")
 
-    def qualified_graph(self, prepared, *, claim):
+    def qualified_graph(self, prepared, *, proposals=(), unavailable_node=None):
         packet = self.packet(self.rule_instance, view=prepared.view, subject=pin(self.subject), control_token=prepared.token,
                              as_of=prepared.value["request"]["body"]["assessed_as_of"])
         recorded = self.recorded([{"input_digest": packet.digest, "response": self.response(
-            qualification={"status": "qualified", "certificate": self.active_certificate["reference"]})}], identity="qualified-assessment")
+            qualification={"status": "qualified", "certificate": self.active_certificate["reference"]},
+            proposals=list(proposals))}], identity="qualified-assessment")
         self.binding_instance = recorded
         self.bindings = BindingRegistry([recorded])
         self.service.bindings = self.bindings
-        return self.graph_run(prepared, binding=recorded)
+        return self.graph_run(prepared, binding=recorded, unavailable_node=unavailable_node)
 
-    def configure_qualified_rule(self):
+    def configure_qualified_rule(self, *, proposals=False, incomplete=False):
         self.binding_instance = self.recorded(identity="qualified-assessment")
-        self.rule_instance = self.rule(self.binding_instance)
+        def permissions(value):
+            if proposals:
+                value["consequence_permissions"] = [self.proposal_schema.reference]
+                value["outcomes"][0]["implications"] = [self.proposal_schema.reference]
+        self.rule_instance = self.rule(self.binding_instance, change=permissions)
         self.rules, self.bindings = RuleRegistry([self.rule_instance]), BindingRegistry([self.binding_instance])
         self.profile = self.make_profile(self.rule_instance)
+        if incomplete:
+            raw = self.profile.value
+            unavailable = self.rule(self.binding_instance, identity="unavailable-rule")
+            self.rules = RuleRegistry([self.rule_instance, unavailable])
+            raw["components"]["evidence"]["rules"].append(unavailable.reference)
+            raw["components"]["evidence"]["outputs"].append({"name": "example:unavailable", "rule": unavailable.reference,
+                "schema": unavailable.value["output_schema"], "accepted_labels": ["example:positive"], "accepted_statuses": ["applicable"]})
+            for limits in (raw["resource_limits"], raw["components"]["evidence"]["resource_limits"]):
+                for field in ("max_calls", "max_input_bytes", "max_output_bytes", "max_elapsed_ms"):
+                    limits[field] *= 2
+            self.profile = ProfileDefinition(raw, rules=self.rules, schemas=self.schemas,
+                allowed_data_scopes=[self.storage.scope_id], allowed_capabilities=self.rule_instance.value["consequence_permissions"],
+                conflict_resolvers=[self.rule_instance.value["conflict_policy"]])
         self.profiles = ProfileRegistry([self.profile])
-        self.plan = RulePlan(self.profile, rules=self.rules, schemas=self.schemas, nodes={"evidence": self.rule_instance.reference})
+        nodes = {"evidence": self.rule_instance.reference}
+        if incomplete:
+            nodes["unavailable"] = unavailable.reference
+        self.plan = RulePlan(self.profile, rules=self.rules, schemas=self.schemas, nodes=nodes)
         self.active_certificate = self.certificate(self.rule_instance, self.binding_instance)
         self.service = self.make_service(qualifications=QualificationRegistry([self.active_certificate]))
         result = self.claims.append(self.claims.prepare(claim_command("qualified-claim", "qualified-claim", self.subject, self.source)))
@@ -477,7 +580,7 @@ class AssessmentCommitTests(RuleTestCase):
     def test_fresh_qualified_claim_materializes_but_expiry_prevents_later_current_use(self):
         claim, mapping = self.configure_qualified_rule()
         prepared = self.prepare(extra=[pin(claim)])
-        run = self.qualified_graph(prepared, claim=claim)
+        run = self.qualified_graph(prepared)
         command = self.command(prepared, run, interpretations=[mapping])
         result = self.service.commit(command)
         self.assertEqual(result["status"], "success", result)
@@ -492,7 +595,7 @@ class AssessmentCommitTests(RuleTestCase):
     def test_serialized_claim_cannot_be_demoted_to_proof_only_dependency(self):
         claim, mapping = self.configure_qualified_rule()
         prepared = self.prepare(extra=[pin(claim)])
-        command = self.command(prepared, self.qualified_graph(prepared, claim=claim), interpretations=[mapping])
+        command = self.command(prepared, self.qualified_graph(prepared), interpretations=[mapping])
         preparation = command["extensions"][PUBLICATION_EXTENSION]["value"]["preparation"]
         preparation["current_dependencies"]["positive"].remove(pin(claim))
         preparation["proof_reads"].append(pin(claim))
@@ -506,13 +609,123 @@ class AssessmentCommitTests(RuleTestCase):
     def test_qualification_expiring_between_evaluation_and_commit_is_durable_stale(self):
         claim, mapping = self.configure_qualified_rule()
         prepared = self.prepare(extra=[pin(claim)])
-        run = self.qualified_graph(prepared, claim=claim)
+        run = self.qualified_graph(prepared)
         command = self.command(prepared, run, interpretations=[mapping])
         self.now = deepcopy(LATE)
         result = self.service.commit(command)
         self.assertEqual(result["error"]["code"], "E_DEPENDENCY_STALE")
         self.assertEqual(self.service.attempt(command["idempotency_key"])["result"], result)
         self.assertIsNone(self.service.current(self.subject, profile=self.profile.reference, purpose=self.purpose, audience=self.audience))
+
+    def expiry_without_mapping(self, *, incomplete, publish_first):
+        claim, _ = self.configure_qualified_rule(proposals=True, incomplete=incomplete)
+        prepared = self.prepare()
+        proposal = {"schema": self.proposal_schema.reference, "value": {"reason": "Synthetic qualified review proposal."}}
+        graph = self.qualified_graph(prepared, proposals=[proposal],
+            unavailable_node="unavailable" if incomplete else None)
+        command = self.command(prepared, graph)
+        self.assertEqual(command["body"]["assessment"]["body"]["propositions"], [])
+        self.assertEqual(command["body"]["assessment"]["body"]["proposals"], [proposal])
+        self.assertEqual(command["body"]["assessment"]["body"]["evaluation_state"], "incomplete" if incomplete else "complete")
+        stored = None
+        if publish_first:
+            result = self.service.commit(command)
+            self.assertEqual(result["status"], "success", result)
+            stored = self.storage.get(result["body"]["assessment"])
+            self.assertEqual(self.service.current(self.subject, profile=self.profile.reference,
+                purpose=self.purpose, audience=self.audience), stored)
+        self.now = deepcopy(LATE)
+        if publish_first:
+            with self.assertRaises(StorageError) as error:
+                self.service.current(self.subject, profile=self.profile.reference, purpose=self.purpose, audience=self.audience)
+            self.assertEqual(error.exception.code, "E_DEPENDENCY_STALE")
+            self.assertEqual(self.storage.get(pin(stored)), stored)
+        else:
+            result = self.service.commit(command)
+            self.assertEqual(result["error"]["code"], "E_DEPENDENCY_STALE", result)
+            self.assertEqual(self.service.attempt(command["idempotency_key"])["result"], result)
+            with self.assertRaises(StorageError) as missing:
+                self.storage.get(prepared.value["lane"])
+            self.assertEqual(missing.exception.code, "E_NOT_FOUND")
+
+    def test_complete_unmapped_qualified_proposal_expiry_prevents_publication(self):
+        self.expiry_without_mapping(incomplete=False, publish_first=False)
+
+    def test_incomplete_unmapped_qualified_proposal_expiry_prevents_publication(self):
+        self.expiry_without_mapping(incomplete=True, publish_first=False)
+
+    def test_complete_unmapped_qualified_proposal_expiry_prevents_current_use(self):
+        self.expiry_without_mapping(incomplete=False, publish_first=True)
+
+    def test_incomplete_unmapped_qualified_proposal_expiry_prevents_current_use(self):
+        self.expiry_without_mapping(incomplete=True, publish_first=True)
+
+    def test_cache_stage_rejects_edited_result_metadata_against_actual_state(self):
+        definition, cache = self.cache_fixture()
+        self.service.cache = cache
+        prepared = self.prepare()
+        result = self.cache_compute(prepared, definition, cache, [])
+        graph = self.graph_run(prepared)
+        for index, changes in enumerate((
+            {"cache_hit": True}, {"cache_hit": 0}, {"stored": pin(self.source)},
+            {"source_attempt_id": "invented-attempt"}, {"qualification": {"status": "qualified"}},
+        )):
+            with self.subTest(changes=changes):
+                edited = result.value
+                edited.update(changes)
+                command = self.service.prepare_commit(prepared, graph, command_id=f"edited-cache-{index}",
+                    idempotency_key=f"edited-cache-key-{index}", assessment_id=f"edited-cache-assessment-{index}", cache_entries=[edited])
+                refused = self.service.commit(command)
+                self.assertEqual(refused["error"]["code"], "E_DEPENDENCY_STALE" if "qualification" in changes else "E_EVIDENCE_INVALID", refused)
+                with self.assertRaises(StorageError) as missing:
+                    self.storage.get(prepared.value["lane"])
+                self.assertEqual(missing.exception.code, "E_NOT_FOUND")
+        self.assertEqual(self.service.commit(self.command(prepared, graph, cache_entries=[result]))["status"], "success")
+        second = self.prepare(request=self.request(audience=component("cache-hit-metadata-audience")))
+        hit = self.cache_compute(second, definition, cache, [])
+        self.assertTrue(hit.cache_hit)
+        second_graph = self.graph_run(second)
+        for index, changes in enumerate(({"cache_hit": False}, {"cache_hit": 1}, {"stored": None})):
+            edited = hit.value
+            edited.update(changes)
+            command = self.service.prepare_commit(second, second_graph, command_id=f"edited-hit-{index}",
+                idempotency_key=f"edited-hit-key-{index}", assessment_id=f"edited-hit-assessment-{index}", cache_entries=[edited])
+            refused = self.service.commit(command)
+            self.assertEqual(refused["error"]["code"], "E_EVIDENCE_INVALID", refused)
+
+    def test_concurrent_cache_fill_refuses_original_attempt_then_fresh_attempt_reuses_winner(self):
+        definition, cache = self.cache_fixture()
+        self.service.cache = cache
+        calls = []
+        first = self.prepare(request=self.request(audience=component("cache-race-first")))
+        second = self.prepare(request=self.request(audience=component("cache-race-second")))
+        first_result = self.cache_compute(first, definition, cache, calls)
+        second_result = self.cache_compute(second, definition, cache, calls)
+        self.assertFalse(first_result.cache_hit)
+        self.assertFalse(second_result.cache_hit)
+        self.assertEqual(first_result.entry["key"], second_result.entry["key"])
+        first_command = self.command(first, cache_entries=[first_result])
+        second_command = self.command(second, cache_entries=[second_result])
+        self.assertEqual(self.service.commit(first_command)["status"], "success")
+        winner = self.storage.get(cache_ref(self.storage.scope_id, first_result.entry["key"]))
+        refused = self.service.commit(second_command)
+        self.assertEqual(refused["error"]["code"], "E_DEPENDENCY_STALE", refused)
+        journal = self.service.attempt(second_command["idempotency_key"])
+        self.assertEqual(journal["command"]["extensions"][PUBLICATION_EXTENSION]["value"]["cache_entries"][0]["entry"]["source_attempt_id"],
+            second_result.entry["source_attempt_id"])
+        self.assertEqual(journal["result"], refused)
+        self.assertEqual(self.service.commit(second_command), refused)
+        self.assertIsNone(self.service.current(self.subject, profile=self.profile.reference, purpose=self.purpose,
+            audience=component("cache-race-second")))
+        fresh = self.prepare(request=self.request(audience=component("cache-race-second")))
+        reused = self.cache_compute(fresh, definition, cache, calls)
+        self.assertTrue(reused.cache_hit)
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(reused.value["source_attempt_id"], first_result.value["source_attempt_id"])
+        result = self.service.commit(self.command(fresh, cache_entries=[reused]))
+        self.assertEqual(result["status"], "success", result)
+        self.assertEqual(self.storage.get(result["body"]["assessment"])["body"]["resource_use"]["value"]["cache_hits"], 1)
+        self.assertEqual(self.storage.get(pin(winner)), winner)
 
     def test_declared_time_condition_crossing_prevents_commit(self):
         deadline = {**NOW, "value": "2026-10-10T13:00:00Z"}
