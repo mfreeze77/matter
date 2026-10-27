@@ -121,3 +121,12 @@ The next implementation milestone is MAT-029 staged semantic execution over
 actual committed resource allocations. A frozen follow-up review is checking
 `880a887..9691f11` in the isolated checkout while this work continues; its result
 has not yet been reported as clean. Hosted CI is not a merge gate.
+
+
+The frozen committed `d934647` snapshot passed **1,132 tests in 1,335.361
+seconds**, exit 0, with physical `TMPDIR`. Logs and the command receipt are
+`attention-scheduling-stages-full.log` and `.json` in the external task directory.
+It includes the lifecycle, access, attention, timer and stage review fixes,
+and predates MAT-030/031/032. The last timer boundary-drift delta subsequently
+passed its two targeted checks in 28.405 seconds; later semantic additions still
+require their combined regression and package checks.

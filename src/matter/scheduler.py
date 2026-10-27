@@ -104,6 +104,7 @@ class Scheduler:
         return command_targets({**command, "expected_revisions": sorted([pin(item) for item in view.records.values()], key=canonical_bytes)})
 
     def _history_access(self, view, command):
+        self.attention._access_boundary()
         if self.attention.access is None:
             return
         firing = _lookup(view, _firing_ref(self.scope_id, command["body"]["firing_key"]))
@@ -178,6 +179,7 @@ class Scheduler:
         return command
 
     def _fire(self, view, command, request, now):
+        self.attention._access_boundary()
         row = view.exact(command["body"]["timer"])
         state = _value(row, "timer-state")
         definition = self._definition(state["definition"])
@@ -334,7 +336,7 @@ class Scheduler:
                 targets.extend(state["token"]["value"]["targets"])
             targets = sorted({canonical_bytes(entity_ref(item)): entity_ref(item) for item in targets}.values(), key=canonical_bytes)
             self.controls._audit(view, command, targets)
-            if command["operation"] == "fire_timer" and self.attention.access is not None:
+            if command["operation"] == "fire_timer":
                 self._history_access(view, command)
         return self.storage.execute(command, handler, replay_guard=audit, dependency_error_code="E_DEPENDENCY_STALE")
 

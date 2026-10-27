@@ -292,6 +292,7 @@ class TimerBudgetTests(unittest.TestCase):
         policy = HostAccessPolicy(scope_id=self.f.storage.scope_id, audiences=[self.a.audience_ref], providers=[],
             grants=[{"reference": pin(self.f.source), "audiences": [self.a.audience_ref], "providers": []}])
         self.a.service.access = AccessService(policy=policy, controls=self.f.controls)
+        self.a.service.assessments.access = self.a.service.access
         refused = self.scheduler.execute(command)
         self.assertEqual(refused["status"], "failure", refused)
         self.assertEqual(refused["error"]["code"], "E_AUTHORITY_REQUIRED")
@@ -300,6 +301,30 @@ class TimerBudgetTests(unittest.TestCase):
         with self.assertRaises(ContractError) as inspected:
             self.scheduler.prepare_fire(old)
         self.assertEqual(inspected.exception.code, "E_AUTHORITY_REQUIRED")
+
+    def test_underlying_access_boundary_drift_blocks_fire_history_and_exact_replay(self):
+        assessment, _, _, _ = self.a.assess("access-boundary-drift")
+        timer, definition, token, _ = self.schedule(assessment)
+        self.f.now = deepcopy(T1)
+        command = self.fire_command(timer, definition, token, assessment)
+        result = self.scheduler.execute(command)
+        self.assertEqual(result.get("outcome"), "fired", result)
+        policy = HostAccessPolicy(scope_id=self.f.storage.scope_id, audiences=[self.a.audience_ref], providers=[],
+            grants=[{"reference": pin(self.f.source), "audiences": [self.a.audience_ref], "providers": []}])
+        # Install the underlying source boundary while deliberately retaining
+        # an old attention adapter. It must refuse instead of skipping history.
+        self.a.service.assessments.access = AccessService(policy=policy, controls=self.f.controls)
+        self.assertIsNone(self.a.service.access)
+        refused = self.scheduler.execute(command)
+        self.assertEqual(refused["status"], "failure", refused)
+        self.assertEqual(refused["error"]["code"], "E_POLICY_INVALID")
+        current = self.f.storage.get(entity_ref(timer))
+        duplicate = self.command("fire_timer", {"timer": pin(current),
+            "firing_key": result["body"]["firing"]["id"], "attention_command": None})
+        with self.assertRaises(ContractError) as inspected:
+            self.scheduler.prepare_fire(duplicate)
+        self.assertEqual(inspected.exception.code, "E_POLICY_INVALID")
+        self.assertEqual(self.f.storage.get(entity_ref(timer)), current)
 
     def test_timer_cannot_mislabel_its_actual_assessment_rule_versions(self):
         assessment, _, _, _ = self.a.assess("bound-rule-versions")
