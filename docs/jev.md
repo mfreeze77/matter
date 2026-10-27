@@ -6,7 +6,7 @@ Status: implementation contract. MAT-026 supplies the bounded offline
 merged in PR #15 at `c755dd9`. The current task branch implements
 [stages](semantic-stages.md), [durable receipts](semantic-receipts.md) and
 [runtime admission](semantic-qualification.md) for MAT-029–031; the optional
-MAT-032 transport is being integrated. See [actual progress](validation/live-roadmap.md)
+[MAT-032 transport](semantic-typesafe.md) supplies one optional TypeSafe HTTP path. See [actual progress](validation/live-roadmap.md)
 for completed checks and remaining gates. No model has empirical qualification,
 and no deployed live attention policy is claimed. The source notes are
 [matterbrainstormspec](../matterbrainstormspec) and [matterjevmesh](../matterjevmesh).
