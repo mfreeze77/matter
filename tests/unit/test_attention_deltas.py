@@ -4,6 +4,8 @@ from copy import deepcopy
 import unittest
 
 from matter.attention import AttentionPolicy, decide_attention, project_material
+from matter.contracts import ContractError
+from matter.dispositions import disposition_scope_ref
 from matter.storage import pin
 from integration.helpers import record_input
 from rule_helpers import component
@@ -62,6 +64,28 @@ class AttentionDeltaTests(unittest.TestCase):
         self.assertEqual(self.project([first, conflict])[0]["condition"], {"status": "unknown", "value": None})
         foreign = self.claim("foreign", subject={**self.claim("template")["body"]["subject"], "id": "other-matter"})
         self.assertEqual(self.project([foreign])[0]["condition"], {"status": "unknown", "value": None})
+        material, selections, values = self.project([])
+        decision = decide_attention(self.policy, self.assessment, values, material, None, purpose_active=True,
+            audience_active=True, audience_reference=component("human"), audience_kind="human", owned=False,
+            lifecycle_role=None, dispositions=[], selections=selections)
+        self.assertIn("insufficient_evidence", decision["reasons"])
+
+    def test_correction_cannot_borrow_an_unchanged_or_nonmaterial_field(self):
+        claim = self.claim("ordinary-change", signal="recovered")
+        material, selections, values = self.project([claim])
+        baseline = {"material": {"condition": {"status": "supported", "value": "present"}},
+                    "material_contract": self.policy.material_contract}
+        result = decide_attention(self.policy, self.assessment, values, material, baseline, purpose_active=True,
+            audience_active=True, audience_reference=component("human"), audience_kind="human", owned=False,
+            lifecycle_role=None, dispositions=[], selections=selections, linked_fields={"other-nonmaterial-field"})
+        self.assertNotEqual(result["treatment"], "correction")
+        # Merely changing a projection contract cannot make a reassertion into
+        # a source correction when the named material value did not change.
+        baseline = {"material": deepcopy(material), "material_contract": component("different-material-contract")}
+        result = decide_attention(self.policy, self.assessment, values, material, baseline, purpose_active=True,
+            audience_active=True, audience_reference=component("human"), audience_kind="human", owned=False,
+            lifecycle_role=None, dispositions=[], selections=selections, linked_fields={"condition"})
+        self.assertNotEqual(result["treatment"], "correction")
 
     def test_low_confidence_or_unknown_alone_never_requests_a_person(self):
         claim = self.claim("uncertain")
@@ -83,3 +107,65 @@ class AttentionDeltaTests(unittest.TestCase):
         self.assertEqual(decision["treatment"], "quiet")
         self.assertTrue({"no_active_purpose", "no_material_change", "already_delivered", "incomplete_coverage",
                          "disposition_applies", "deferred_until_checkpoint"} <= set(decision["reasons"]))
+
+    def test_policy_namespaces_and_delivery_outcomes_match_consuming_core_contracts(self):
+        for field in ("namespace", "disposition_namespace"):
+            for invalid in ("1ops", "@ops", "+"):
+                value = self.policy.value
+                value[field] = invalid
+                with self.subTest(field=field, invalid=invalid), self.assertRaises(ContractError):
+                    AttentionPolicy(value)
+        value = self.policy.value
+        value.update(namespace="acme_ops", disposition_namespace="host_dispositions")
+        value["delivery_producers"][0]["outcome"] = "host_ops:delivered"
+        valid = AttentionPolicy(value)
+        self.assertEqual(valid.reference["namespace"], "acme_ops")
+        link = {"reference": component("context"), "context": {
+            "scope_id": self.assessment["scope_id"], "namespace": "host_contexts", "record_type": "matter:projection", "id": "scope", "revision": 1}}
+        self.assertEqual(disposition_scope_ref(namespace=valid.value["disposition_namespace"], kind="acknowledgement",
+            matter={key: self.matter[key] for key in ("scope_id", "namespace", "record_type", "id")},
+            purpose=link, audience=link, subject=pin(self.claim("subject")))["namespace"], "host_dispositions")
+        value["delivery_producers"][0]["outcome"] = "delivered"
+        with self.assertRaises(ContractError):
+            AttentionPolicy(value)
+
+    def test_exact_json_conditions_and_admitted_values_distinguish_false_and_zero(self):
+        for condition, other in ((False, 0), ({"flag": False}, {"flag": 0})):
+            value = self.policy.value
+            value["fields"][0]["condition"] = condition
+            policy = AttentionPolicy(value)
+            claim = self.claim("different-type-condition")
+            claim["body"]["value"]["value"]["condition"] = other
+            self.assessment["body"]["propositions"] = [{"claim": pin(claim), "status": "supported", "evidence_standard": component("standard")}]
+            material, selections, _ = project_material(policy, self.assessment, [claim])
+            self.assertEqual(selections["condition"], [])
+            self.assertEqual(material["condition"]["status"], "unknown")
+        value = self.policy.value
+        value["fields"][0]["accepted_values"] = [0]
+        policy = AttentionPolicy(value)
+        claim = self.claim("false-is-not-zero", signal=False)
+        self.assessment["body"]["propositions"] = [{"claim": pin(claim), "status": "supported", "evidence_standard": component("standard")}]
+        material, selections, values = project_material(policy, self.assessment, [claim])
+        decision = decide_attention(policy, self.assessment, values, material, None, purpose_active=True, audience_active=True,
+            audience_reference=component("human"), audience_kind="human", owned=False, lifecycle_role=None,
+            dispositions=[], selections=selections)
+        self.assertEqual(decision["treatment"], "quiet")
+        self.assertIn("no_relevance", decision["reasons"])
+
+    def test_false_to_zero_is_an_actual_material_delta_including_nested_values(self):
+        for before, after in ((False, 0), ({"flag": False}, {"flag": 0})):
+            definition = self.policy.value
+            definition["fields"][0]["accepted_values"] = [before, after]
+            policy = AttentionPolicy(definition)
+            claim = self.claim("typed-material", signal=before)
+            self.assessment["body"]["propositions"] = [{"claim": pin(claim), "status": "supported", "evidence_standard": component("standard")}]
+            old, _, _ = project_material(policy, self.assessment, [claim])
+            changed = self.claim("typed-material-next", signal=after)
+            self.assessment["body"]["propositions"][0]["claim"] = pin(changed)
+            material, selections, values = project_material(policy, self.assessment, [changed])
+            result = decide_attention(policy, self.assessment, values, material,
+                {"material": old, "material_contract": policy.material_contract}, purpose_active=True, audience_active=True,
+                audience_reference=component("human"), audience_kind="human", owned=False, lifecycle_role=None,
+                dispositions=[], selections=selections)
+            self.assertEqual(result["changed_fields"], ["condition"])
+            self.assertEqual(result["treatment"], "update")

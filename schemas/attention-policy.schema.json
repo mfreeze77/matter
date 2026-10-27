@@ -22,7 +22,7 @@
       "const": "1.0"
     },
     "namespace": {
-      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespace"
     },
     "id": {
       "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
@@ -115,7 +115,7 @@
       ]
     },
     "disposition_namespace": {
-      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespace"
     },
     "decision": {
       "anyOf": [
@@ -171,7 +171,7 @@
             "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
           },
           "outcome": {
-            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespaced_name"
           }
         }
       },

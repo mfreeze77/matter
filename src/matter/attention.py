@@ -38,6 +38,10 @@ def _stable(reference):
     return {key: reference[key] for key in ("namespace", "id")}
 
 
+def _same(left, right):
+    return canonical_bytes(left) == canonical_bytes(right)
+
+
 def _address(matter, policy, purpose, audience, *, baseline=False):
     key = {"matter": entity_ref(matter), "purpose": _stable(purpose), "audience": _stable(audience)}
     if not baseline:
@@ -103,7 +107,7 @@ def project_material(policy, assessment, claims):
             if (data["subject"] != entity_ref(body["matter"]) or data["predicate"] != field["predicate"]
                     or data["value"]["schema"] != field["claim_schema"]):
                 continue
-            if _pointer(data["value"]["value"], field["condition_pointer"]) == field["condition"]:
+            if _same(_pointer(data["value"]["value"], field["condition_pointer"]), field["condition"]):
                 matches.append(claim)
         superseded = {canonical_bytes(ref) for claim in matches for ref in claim.get("supersedes", [])}
         matches = [claim for claim in matches if canonical_bytes(pin(claim)) not in superseded]
@@ -120,16 +124,18 @@ def project_material(policy, assessment, claims):
 
 def decide_attention(policy, assessment, values, material, baseline, *, purpose_active, audience_active,
                      audience_reference, audience_kind, owned, lifecycle_role, dispositions, preference=None,
-                     linked_correction=False, owned_by_audience=False):
+                     linked_fields=(), owned_by_audience=False, selections=None):
     """Deterministic neutral treatments; no confidence-to-human escalation."""
     body = assessment["body"]
     previous = None if baseline is None else baseline["material"]
-    changed = sorted(material) if previous is None else sorted(name for name in set(material) | set(previous) if material.get(name) != previous.get(name))
+    changed = sorted(material) if previous is None else sorted(name for name in set(material) | set(previous)
+        if name not in material or name not in previous or not _same(material[name], previous[name]))
+    changed_values = set(changed)
     if baseline is not None and baseline["material_contract"] != policy.material_contract:
         changed = sorted(material)
     def admitted(field):
         value = values[field["name"]]
-        return value["status"] in field["accepted_statuses"] and value["value"] in field["accepted_values"]
+        return value["status"] in field["accepted_statuses"] and any(_same(value["value"], allowed) for allowed in field["accepted_values"])
     active = {role: any(role in field["roles"] and admitted(field) for field in policy.value["fields"])
               for role in ("relevance", "critical", "owned_next_step")}
     reasons = []
@@ -143,7 +149,10 @@ def decide_attention(policy, assessment, values, material, baseline, *, purpose_
         reasons.extend(["no_material_change", "already_delivered"])
     if not active["relevance"]:
         reasons.append("no_relevance")
-    if body["evaluation_state"] != "complete" or body["evidence_gaps"] or any(v["status"] in {"unknown", "mixed"} for v in values.values()):
+    uncertain = any(values[field["name"]]["status"] in {"unknown", "mixed"} and (
+        bool({"material", "relevance"} & set(field["roles"])) or selections is None or bool(selections.get(field["name"])))
+        for field in policy.value["fields"])
+    if body["evaluation_state"] != "complete" or body["evidence_gaps"] or uncertain:
         reasons.append("insufficient_evidence")
     if body["evidence_selection"]["coverage"]["status"] != "complete":
         reasons.append("incomplete_coverage")
@@ -157,7 +166,7 @@ def decide_attention(policy, assessment, values, material, baseline, *, purpose_
             reasons.append("deferred_until_checkpoint")
     if preference is not None:
         reasons.append("preference_applies")
-    correction = baseline is not None and bool(changed) and linked_correction
+    correction = baseline is not None and bool(changed_values & set(linked_fields))
     decision = policy.value["decision"]
     decision_ready = (decision is not None and decision["audience"] == audience_reference and audience_kind in {"human", "role"}
         and any(field["name"] == decision["field"] and admitted(field) for field in policy.value["fields"]))
@@ -203,6 +212,10 @@ class AttentionService:
     def __init__(self, storage, *, assessments, policies, controls, clock, lifecycle=None, access=None):
         if not isinstance(assessments, AssessmentService) or assessments.controls is not controls or storage is not assessments.storage:
             _fail()
+        if access is None:
+            access = assessments.access
+        elif access is not assessments.access:
+            _fail()
         self.storage, self.scope_id, self.assessments, self.controls = storage, storage.scope_id, assessments, controls
         self.policies, self.clock, self.lifecycle, self.access = tuple(policies), clock, lifecycle, access
         if not callable(clock) or not self.policies or len(self.policies) > 128 or any(not isinstance(p, AttentionPolicy) for p in self.policies):
@@ -220,6 +233,10 @@ class AttentionService:
             _fail()
         return matches[0]
 
+    def _access_boundary(self):
+        if self.access is not self.assessments.access:
+            _fail()
+
     def _command(self, command):
         value = validate_command(command)
         if value["operation"] != "assess" or value["scope_id"] != self.scope_id:
@@ -231,6 +248,7 @@ class AttentionService:
         return _value("attention-request", wrapped)
 
     def _inspect(self, view, command, request, now, *, original):
+        self._access_boundary()
         policy = self._policy(request["policy"])
         token = _value("control-token", request["token"])
         if self.access is None and request["access_context"] is not None:
@@ -293,7 +311,7 @@ class AttentionService:
         previous_registration = None if previous is None else _lookup(view, registration_ref(address))
         baseline_record = _lookup(view, baseline_address)
         baseline = None if baseline_record is None else _value("attention-baseline", baseline_record["value"])["delivered"]
-        linked_correction = False
+        linked_fields = set()
         if baseline is not None:
             if (baseline["material_digest"] != canonical_digest(baseline["material"], "matter.attention-material.v1")
                     or entity_ref(baseline["matter"]) != entity_ref(command["body"]["matter"])
@@ -304,14 +322,16 @@ class AttentionService:
             if delivered["provenance"]["producer"] != _ENGINE:
                 _fail("E_EVIDENCE_INVALID")
             prior_decision = _value("attention-decision", delivered["body"]["details"])
-            if (prior_decision["assessment"] != baseline["assessment"] or prior_decision["material"] != baseline["material"]
+            if (prior_decision["assessment"] != baseline["assessment"] or not _same(prior_decision["material"], baseline["material"])
                     or prior_decision["material_digest"] != baseline["material_digest"]):
                 _fail("E_EVIDENCE_INVALID")
             for field in policy.value["fields"]:
+                if "material" not in field["roles"]:
+                    continue
                 old_selected = {canonical_bytes(ref) for ref in prior_decision["selections"].get(field["name"], [])}
                 selected = {canonical_bytes(ref) for ref in selections[field["name"]]}
                 if selected & old_selected and set(assessment["body"]["causes"]) & _CORRECTIONS:
-                    linked_correction = True
+                    linked_fields.add(field["name"])
                 pending = [ref for claim in claims if canonical_bytes(pin(claim)) in selected for ref in claim.get("supersedes", [])]
                 seen = set()
                 while pending:
@@ -328,10 +348,10 @@ class AttentionService:
                             or data["value"]["schema"] != field["claim_schema"]):
                         continue
                     self.assessments.schemas.validate(data["value"])
-                    if _pointer(data["value"]["value"], field["condition_pointer"]) != field["condition"]:
+                    if not _same(_pointer(data["value"]["value"], field["condition_pointer"]), field["condition"]):
                         continue
                     if key in old_selected:
-                        linked_correction = True
+                        linked_fields.add(field["name"])
                     pending.extend(prior_claim.get("supersedes", []))
         if original and ((None if previous is None else pin(previous)) != request["previous"]
                          or (None if baseline_record is None else pin(baseline_record)) != request["baseline"]):
@@ -357,8 +377,8 @@ class AttentionService:
         decision = decide_attention(policy, assessment, values, material, baseline, purpose_active=_active(purpose["definition"], now),
             audience_active=_active(audience["definition"], now), audience_reference=audience["reference"],
             audience_kind=audience["definition"]["content"]["audience_kind"], owned=owned,
-            lifecycle_role=role, dispositions=active_dispositions, preference=preferred, linked_correction=linked_correction,
-            owned_by_audience=owned_by_audience)
+            lifecycle_role=role, dispositions=active_dispositions, preference=preferred, linked_fields=linked_fields,
+            owned_by_audience=owned_by_audience, selections=selections)
         all_public = [*command_targets({**command, "expected_revisions": [pin(item) for item in view.records.values()]}),
                       *candidate_slots, *[target for group in bindings.values() for b in group for target in _context_targets(b)]]
         capability = "delivery" if request["action"] == "record_delivered" else "assessment"
@@ -453,6 +473,7 @@ class AttentionService:
                 "dependencies": staged["dependencies"]})}
             return validate_result(result)
         def audit(view):
+            self._access_boundary()
             self.controls._audit(view, command, _refs([*command_targets(command), *request["token"]["value"]["targets"]]))
             if self.access is not None:
                 self.access.require_history(view, request["access_context"], references=[request["assessment"]])
@@ -462,6 +483,7 @@ class AttentionService:
 
     def read(self, token, reference, *, access_context=None):
         """Permission-checked historical decision; not a new current verdict."""
+        self._access_boundary()
         with self.storage.snapshot() as view:
             record = validate_record(view.get(reference))
             payload = _value("attention-decision", record["body"]["details"])
@@ -480,6 +502,7 @@ class AttentionService:
 
     def current(self, matter, *, policy, purpose, audience, read_token, access_context=None):
         """Current deterministic decision, with actual assessment/lifecycle gates."""
+        self._access_boundary()
         selected = self._policy(getattr(policy, "reference", policy))
         with self.storage.snapshot() as snapshot:
             view = _Reads(snapshot, self.scope_id)

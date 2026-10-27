@@ -6,9 +6,9 @@ import unittest
 from matter.attention import AttentionPolicy, AttentionService, RESULT_EXTENSION, _address
 from matter.canonical import canonical_bytes
 from matter.contexts import ContextService
-from matter.dependencies import registration_ref
 from matter.dispositions import DispositionService, disposition_ref, disposition_scope_ref
 from matter.identity_dependencies import _value
+from matter.contracts import ContractError
 from matter.storage import StorageError, entity_ref, pin
 from matter._rule_values import domain
 
@@ -48,6 +48,23 @@ class AudienceAttentionTests(unittest.TestCase):
         claim = self.episode.claim(identity, self.episode.condition_a, signal, source, supersedes=supersedes, confidence=confidence)
         assessment = self.episode.assess(claim, occurrence, status=status, purpose=self.purpose_ref)
         return assessment, claim, source, occurrence
+
+    def assess_claims(self, claims, occurrence, *, statuses=None):
+        request = self.f.request(evidence=[*[pin(claim) for claim in claims], pin(occurrence)])
+        prepared = self.f.prepare(request=request, extra=[*[pin(claim) for claim in claims], pin(occurrence)])
+        command = self.f.command(prepared, interpretations=[{"node": "evidence", "claim": pin(claim),
+            "labels": {"example:positive": (statuses or {}).get(claim["id"], "supported")},
+            "evidence_standard": self.f.profile.component_references["evidence"]} for claim in claims])
+        result = self.f.service.commit(command)
+        self.assertEqual(result["status"], "success", result)
+        assessment = self.f.storage.get(result["body"]["assessment"])
+        self.episode.remember(assessment, *[self.f.storage.get(ref) for ref in assessment["body"]["judgments"]])
+        return assessment
+
+    def install_policy(self, value):
+        self.policy = AttentionPolicy(value)
+        self.service = AttentionService(self.f.storage, assessments=self.f.service, policies=[self.policy], controls=self.f.controls,
+            clock=lambda: deepcopy(self.f.now), lifecycle=self.episode.lifecycle)
 
     def targets(self, assessment, *, subject=None):
         values = list(self.episode.public.values()) + [entity_ref(assessment)]
@@ -159,6 +176,57 @@ class AudienceAttentionTests(unittest.TestCase):
         self.assertEqual(value["treatment"], "quiet")
         self.assertIn("insufficient_evidence", value["reasons"])
         self.assertIsNone(value["decision_request"])
+
+    def test_absent_auxiliary_is_inactive_but_selected_unknown_or_conflict_preserves_a_gap(self):
+        value = self.policy.value
+        auxiliary = {**deepcopy(value["fields"][0]), "name": "escalation", "condition": self.episode.condition_b,
+                     "roles": ["critical", "owned_next_step"]}
+        value["fields"].append(auxiliary)
+        value["decision"] = {"field": "escalation", "audience": self.audience_ref,
+            "prompt": "Choose a reserved synthetic option.", "options": [
+                {"schema": component("option"), "value": "a"}, {"schema": component("option"), "value": "b"}],
+            "why_host_cannot_settle": "This exact decision is reserved to this audience."}
+        self.install_policy(value)
+        first, claim, source, occurrence = self.assess("supported-without-escalation")
+        routine, _, _, _ = self.evaluate(first)
+        self.assertEqual(routine["treatment"], "update")
+        self.assertNotIn("insufficient_evidence", routine["reasons"])
+        self.assertEqual(routine["selections"]["escalation"], [])
+        unknown = self.episode.claim("unknown-escalation", self.episode.condition_b, "present", source)
+        incomplete = self.assess_claims([claim, unknown], occurrence, statuses={unknown["id"]: "unknown"})
+        quiet, _, _, _ = self.evaluate(incomplete)
+        self.assertEqual(quiet["treatment"], "quiet")
+        self.assertIn("insufficient_evidence", quiet["reasons"])
+        conflict = self.episode.claim("conflicting-escalation", self.episode.condition_b, "recovered", source)
+        conflicted = self.assess_claims([claim, unknown, conflict], occurrence)
+        quiet, _, _, _ = self.evaluate(conflicted)
+        self.assertEqual(quiet["treatment"], "quiet")
+        self.assertIn("insufficient_evidence", quiet["reasons"])
+
+    def test_unchanged_field_correction_does_not_reclassify_another_changed_field(self):
+        value = self.policy.value
+        value["fields"].append({**deepcopy(value["fields"][0]), "name": "other", "condition": self.episode.condition_b,
+                               "roles": ["material"]})
+        self.install_policy(value)
+        first, claim_a, source, occurrence = self.assess("multi-field-initial")
+        claim_b = self.episode.claim("multi-field-original-b", self.episode.condition_b, "present", source)
+        initial = self.assess_claims([claim_a, claim_b], occurrence)
+        _, delivered, _, _ = self.evaluate(initial)
+        self.deliver(initial, self.milestone(delivered))
+        reasserted_a = self.episode.claim("reasserted-a", self.episode.condition_a, "present", source, supersedes=[claim_a])
+        ordinary_b = self.episode.claim("ordinary-b", self.episode.condition_b, "recovered", source)
+        ordinary = self.assess_claims([reasserted_a, ordinary_b], occurrence)
+        routine, _, _, _ = self.evaluate(ordinary)
+        self.assertEqual(routine["changed_fields"], ["other"])
+        self.assertEqual(routine["treatment"], "update")
+        self.assertNotIn("correction_delta", routine["reasons"])
+        unknown_b = self.episode.claim("unknown-b", self.episode.condition_b, "retracted", source)
+        uncertain = self.assess_claims([reasserted_a, unknown_b], occurrence, statuses={unknown_b["id"]: "unknown"})
+        quiet, _, _, _ = self.evaluate(uncertain)
+        self.assertEqual(quiet["changed_fields"], ["other"])
+        self.assertEqual(quiet["treatment"], "quiet")
+        self.assertIn("insufficient_evidence", quiet["reasons"])
+        self.assertNotIn("correction_delta", quiet["reasons"])
 
     def test_host_origin_and_successful_delivered_milestone_are_mandatory(self):
         assessment, _, _, _ = self.assess("delivery-guard")
@@ -317,7 +385,14 @@ class AudienceAttentionTests(unittest.TestCase):
             grants=[{"reference": ref, "audiences": [self.audience_ref], "providers": []} for ref in admitted])
         access = AccessService(policy=policy, controls=f.controls, current_read=f.storage.snapshot)
         f.service.access = access
-        self.service.access = access
+        # Omitting access= must inherit the assessment boundary, not disable it.
+        self.service = AttentionService(f.storage, assessments=f.service, policies=[self.policy], controls=f.controls,
+            clock=lambda: deepcopy(f.now), lifecycle=episode.lifecycle)
+        self.assertIs(self.service.access, access)
+        with self.assertRaises(StorageError) as mismatched:
+            AttentionService(f.storage, assessments=f.service, policies=[self.policy], controls=f.controls,
+                clock=lambda: deepcopy(f.now), access=AccessService(policy=policy, controls=f.controls))
+        self.assertEqual(mismatched.exception.code, "E_POLICY_INVALID")
 
         def original_context(capability, references, assessment=None):
             targets = list(episode.public.values()) if assessment is None else self.targets(assessment)
@@ -370,12 +445,22 @@ class AudienceAttentionTests(unittest.TestCase):
         references = [pin(assessment), *admitted]
         token, context = original_context("assessment", references, assessment=assessment)
         selected_lifecycle = {"profile": f.profile.reference, "condition": episode.condition_a}
+        # The original assessment carries its own valid context. The new
+        # attention attempt still needs its target-audience source context.
+        with self.assertRaises(ContractError) as missing:
+            self.prepare(assessment, token=token)
+        self.assertEqual(missing.exception.code, "E_AUTHORITY_REQUIRED")
         prepared = self.prepare(assessment, token=token, access_context=context, lifecycle=selected_lifecycle)
         result = self.service.evaluate(prepared)
         self.assertEqual(result["status"], "success", result)
         self.assertIn("recovery_established", result["extensions"][RESULT_EXTENSION]["value"]["reasons"])
         current_address = _address(f.subject, self.policy.reference, self.purpose_ref, self.audience_ref)
         previous = f.storage.get(current_address)
+        decision = f.storage.get(result["extensions"][RESULT_EXTENSION]["value"]["decision"])
+        read_token = f.controls.capture(actor=f.actor, authority=entity_ref(f.authority), capability="read", targets=self.targets(assessment))
+        self.assertEqual(self.service.read(read_token, pin(decision)), decision)
+        self.assertEqual(self.service.current(f.subject, policy=self.policy, purpose=self.purpose_ref, audience=self.audience_ref,
+            read_token=read_token, access_context=context), decision)
         pending = self.prepare(assessment, token=token, access_context=context, lifecycle=selected_lifecycle)
         denied = _in_scope(control_command("deny-access-attention-source", f.authority, targets=[source_b],
             action="deny", capabilities=["read"], now=f.now), f.storage.scope_id)
@@ -386,6 +471,11 @@ class AudienceAttentionTests(unittest.TestCase):
         self.assertEqual(refused["status"], "failure")
         self.assertIn(refused["error"]["code"], {"E_AUTHORITY_REQUIRED", "E_DEPENDENCY_STALE"})
         self.assertEqual(f.storage.get(current_address), previous)
+        with self.assertRaises(ContractError):
+            self.service.read(read_token, pin(decision))
+        with self.assertRaises(ContractError):
+            self.service.current(f.subject, policy=self.policy, purpose=self.purpose_ref, audience=self.audience_ref,
+                read_token=read_token, access_context=context)
         replay = self.service.evaluate(prepared)
         self.assertEqual(replay["error"]["code"], "E_AUTHORITY_REQUIRED")
         self.assertEqual(f.storage.command_receipt(prepared["idempotency_key"])["result"], result)

@@ -23,6 +23,13 @@ plus admitted proposition statuses. Equivalent current claims collapse;
 incompatible matches remain unknown. Selected claim pins remain in the receipt
 and dependencies, but do not become the material identity.
 
+An auxiliary critical, ownership or decision field with no selected assertion is
+inactive, rather than automatically making the entire assessment inadequate.
+Selected unknown/conflicting auxiliary evidence still records an evidence gap;
+missing material/relevance fields remain insufficient. Conditions, accepted
+values and material comparisons use canonical typed JSON equality, so `false`
+and `0` (including nested values) are distinct.
+
 Material comparison therefore ignores source paraphrases, new claim IDs,
 attempt IDs, internal computation time and wording outside the declared value
 selectors. The material contract binds the named selectors; policy IDs and
@@ -37,6 +44,9 @@ is bounded to 128 links per field. This permits a retraction/unknown correction
 without a new positive event. An unrelated new unknown assertion without that
 correspondence does not become a correction merely because a coarse assessment
 cause changed.
+The correspondence must belong to the material field whose value actually
+changed. A reassertion of unchanged field A cannot classify an ordinary or
+uncertain change in field B as a correction.
 
 ## Prepare, evaluate and inspect
 
@@ -152,6 +162,9 @@ metadata needs its own exact host grants; derived assessment/source ancestry
 must also be permitted to the selected audience. Present READ denial blocks
 publication and historical disclosure, preserving the original journal rather
 than relabeling denial as quiet/no relevant matter.
+Omitting `access=` inherits the assessment service's boundary. An explicit
+conflicting boundary or later boundary drift is refused; omission cannot disable
+audience/source checks for evaluation, current reads, history or replay.
 
 `stage(transaction, prepared_attention_command)` is the view-local deterministic
 seam used by `evaluate` and by the timer service. The enclosing trusted command
