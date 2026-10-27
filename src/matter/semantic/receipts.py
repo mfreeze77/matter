@@ -573,10 +573,14 @@ class ExecutionReceiptStore:
                 if (domain("control-token", token)["value"] != retained["control_token"] or
                         canonical_bytes(supplied_access) != canonical_bytes(retained["access_context"])):
                     _fail("E_AUTHORITY_REQUIRED")
+                try:
+                    same_allocation = canonical_bytes(allocation) == canonical_bytes(retained["allocation"])
+                    same_retry = canonical_bytes(retry_of) == canonical_bytes(retained["retry_of"])
+                except (ValueError, TypeError, RecursionError):
+                    _fail("E_IDEMPOTENCY_CONFLICT")
                 if (value["request_digest"] != self._request_digest(request) or
                         retained["logical_request_id"] != logical_request_id or retained["attempt_id"] != attempt_id or
-                        _refs(list(parents)) != retained["parents"] or allocation != retained["allocation"] or
-                        retry_of != retained["retry_of"]):
+                        _refs(list(parents)) != retained["parents"] or not same_allocation or not same_retry):
                     _fail("E_IDEMPOTENCY_CONFLICT")
                 # Exact historical recovery keeps its original context. A
                 # cancellation need not conceal history, but a new consumer or

@@ -624,6 +624,8 @@ class DurableExecutionTests(unittest.TestCase):
             "attempt_id": "same-attempt", "allocation": self.stage.reservation}
         changes = ({"parents": [original["execution"]]}, {"retry_of": original["execution"]},
                    {"allocation": {**self.stage.reservation, "scope_id": "foreign-scope"}},
+                   {"allocation": {**self.stage.reservation, "revision": True}},
+                   {"allocation": {**self.stage.reservation, "revision": float(self.stage.reservation["revision"])}},
                    {"access_context": {"different": "consumer"}})
         for changed in changes:
             with self.subTest(changed=tuple(changed)):
