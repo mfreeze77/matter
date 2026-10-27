@@ -279,7 +279,7 @@ class _Transaction(_Snapshot):
             return reference["revision"] == record.get("revision")
         return reference.get("digest") == snapshot_digest(record)
 
-    def _check_reads(self) -> None:
+    def _check_reads(self, *, conflict_code: str = "E_REVISION_CONFLICT") -> None:
         for reference in self._command["expected_revisions"]:
             self._checked_ref(reference)
             identity = _identity(reference)
@@ -292,9 +292,9 @@ class _Transaction(_Snapshot):
             except StorageError as exc:
                 if exc.code != "E_NOT_FOUND":
                     raise
-                raise StorageError("E_REVISION_CONFLICT") from None
+                raise StorageError(conflict_code) from None
             if not self._matches(reference, record):
-                raise StorageError("E_REVISION_CONFLICT")
+                raise StorageError(conflict_code)
             self._verified_reads.append(reference)
 
     def get(self, reference: dict[str, Any]) -> dict[str, Any]:
@@ -643,7 +643,8 @@ class SQLiteStore:
             affected_references=references, detail=exc.detail,
         )
 
-    def execute(self, command: dict[str, Any], handler: CommandHandler, *, replay_guard=None) -> dict[str, Any]:
+    def execute(self, command: dict[str, Any], handler: CommandHandler, *, replay_guard=None,
+                dependency_error_code: str = "E_REVISION_CONFLICT") -> dict[str, Any]:
         """Atomically execute or replay a command; never retry the handler here.
 
         A handled semantic refusal is durable with no child writes. Unexpected
@@ -652,6 +653,10 @@ class SQLiteStore:
         caller must retry the original command to discover its durable outcome.
         """
         command = validate_command(command)
+        if type(dependency_error_code) is not str or dependency_error_code not in (
+            "E_REVISION_CONFLICT", "E_DEPENDENCY_STALE"
+        ):
+            raise ContractError("E_POLICY_INVALID", "An admitted dependency conflict classification is required.")
         digest = command_digest(command)
         if not callable(handler):
             raise TypeError("A synchronous command handler is required.")
@@ -697,7 +702,7 @@ class SQLiteStore:
 
                     db.execute("SAVEPOINT command_mutation")
                     try:
-                        transaction._check_reads()
+                        transaction._check_reads(conflict_code=dependency_error_code)
                         result = validate_result(handler(transaction))
                         if (
                             result["operation"] != command["operation"]

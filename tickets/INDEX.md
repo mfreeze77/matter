@@ -20,7 +20,7 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-012: Implement provider-neutral rule and judgment interfaces](MAT-012.md) | rules | 2 | P0 | done | done | MAT-002, MAT-007, MAT-010, MAT-011 |
 | [MAT-013: Version policy profiles and validate semantic compatibility](MAT-013.md) | rules | 2 | P0 | done | done | MAT-012 |
 | [MAT-014: Execute staged rule graphs with explicit conflict composition](MAT-014.md) | rules | 2 | P0 | in_progress | in_progress | MAT-012, MAT-013 |
-| [MAT-015: Commit revision-bound assessments and reusable semantic caches](MAT-015.md) | rules | 2 | P0 | planned | waiting | MAT-003, MAT-008, MAT-010, MAT-013, MAT-014 |
+| [MAT-015: Commit revision-bound assessments and reusable semantic caches](MAT-015.md) | rules | 2 | P0 | in_progress | in_progress | MAT-003, MAT-008, MAT-010, MAT-013, MAT-014 |
 | [MAT-016: Invalidate dependencies transitively including absence and candidate scopes](MAT-016.md) | core | 2 | P0 | planned | waiting | MAT-003, MAT-009, MAT-010, MAT-015 |
 | [MAT-017: Apply evidence-backed lifecycle transitions, resolution, and reopening](MAT-017.md) | core | 3 | P0 | planned | waiting | MAT-007, MAT-009, MAT-010, MAT-011, MAT-013, MAT-015, MAT-016 |
 | [MAT-018: Bind purposes, audiences, and dispositions independently](MAT-018.md) | rules | 3 | P0 | planned | waiting | MAT-005, MAT-011, MAT-013, MAT-015, MAT-016 |

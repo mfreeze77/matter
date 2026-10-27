@@ -98,7 +98,9 @@ to model-visible instructions. Hosts must also keep excluded content out of the
 selected `state` they send to an executor. Without a source manifest, truncation
 has an explicit `not_supplied` status rather than claiming complete coverage.
 
-The renderer does not truncate. Exceeding the output budget fails explicitly.
+The renderer does not truncate. Exceeding the output byte budget or the existing
+MAT-026 limit of 65,536 instruction characters fails explicitly with
+`E_BUDGET_EXHAUSTED`, even if the selected byte allowance is larger.
 Only installed renderer ID/version pairs can render; an unknown renderer cannot
 fall back to a familiar version. Both question and manifest are retained in the
 result's canonical bytes. Durable persistence is the consuming host's operation.

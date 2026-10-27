@@ -14,8 +14,8 @@
   },
   "counts_by_status": {
     "done": 15,
-    "in_progress": 3,
-    "planned": 62
+    "in_progress": 4,
+    "planned": 61
   },
   "tickets": [
     {
@@ -278,7 +278,7 @@
       "track": "rules",
       "phase": 2,
       "priority": "P0",
-      "status": "planned",
+      "status": "in_progress",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-003",
@@ -290,7 +290,7 @@
       "requirements": [
         "CORE-14"
       ],
-      "readiness": "waiting",
+      "readiness": "in_progress",
       "path": "records/MAT-015.json"
     },
     {

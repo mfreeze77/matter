@@ -1,0 +1,11 @@
+{
+  "mode": "synthetic_contract",
+  "scope": "synthetic:occurrence-grouping",
+  "cases": [
+    {"id": "late-cancellation", "input": "A cancellation is available one nanosecond after the cutoff but describes an older event.", "expected": {"reason": "not_yet_available", "required_coverage": "incomplete"}},
+    {"id": "mandatory-counterexample", "input": "The declared required counterexample role has no selected source.", "expected": {"missing_role": "synthetic:counterexample", "coverage": "incomplete"}},
+    {"id": "oversized-counterexample", "input": "The required counterexample exceeds the source-byte profile by one or more bytes.", "expected": {"reason": "source_byte_limit", "coverage": "incomplete", "partial_text": false}},
+    {"id": "copy-summary-lineage", "input": "Original observation, copied log and two derived summaries share one accepted occurrence and root group.", "expected": {"observations": 4, "occurrences": 1, "provenance_groups": 1}},
+    {"id": "foreign-project-scope", "input": "A candidate has similar project text but a different scope pin.", "expected": {"error": "E_SCOPE_FORBIDDEN"}}
+  ]
+}

@@ -622,7 +622,7 @@ class GuardedStorage:
                 present[_key(reference)] = reference
         return validate_command(command)
 
-    def execute(self, command, handler, *, replay_guard=None):
+    def execute(self, command, handler, *, replay_guard=None, dependency_error_code="E_REVISION_CONFLICT"):
         if not callable(handler) or (replay_guard is not None and not callable(replay_guard)):
             raise TypeError("Synchronous command and replay handlers are required.")
         command = validate_command(command)
@@ -640,4 +640,5 @@ class GuardedStorage:
             self.controls._audit(view, command, targets)
             if replay_guard is not None:
                 replay_guard(view)
-        return self._storage.execute(command, guarded, replay_guard=audit)
+        return self._storage.execute(command, guarded, replay_guard=audit,
+                                     dependency_error_code=dependency_error_code)

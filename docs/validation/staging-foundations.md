@@ -60,3 +60,21 @@ with specific behavioral regressions before combined qualification. It also
 identified a reference to these then-uncommitted notes and a package description
 advertising modules not yet committed; the notes are now committed and the
 description names only existing implemented features.
+
+MAT-014's expanded 26-case focused suite passed in 1.757 seconds after root
+review required final edge qualification checks. A certificate expiring after
+child execution now blocks that descendant at final consumption while retaining
+the original attempts; required and conditional paths are both covered.
+MAT-027's two implementation review fixes have specific regressions, and its
+expanded 32-case suite passed in 0.175 seconds. MAT-028's 22 focused tests passed
+in 11.273 seconds, using actual SQLite, payload and citation/provenance APIs,
+separate processes over the same snapshots, and the MAT-027 renderer.
+
+A generic storage opt-in maps initial changed/missing read pins to
+`E_DEPENDENCY_STALE` without changing the default, read enforcement, command
+identity or historical retry outcome. Five focused storage tests passed in
+0.374 seconds, including durable refusal/restart/retry with no handler effect,
+default compatibility, fresh success, missing dependencies and safe refusal of
+unsupported classifications. This enables MAT-015 to retain attempted command
+material in its existing journal while refusing current publication. It adds
+no wire command variant, receipt schema or migration.

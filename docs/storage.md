@@ -88,6 +88,18 @@ use independent operation connections. A transaction or snapshot object cannot
 be reused after its context ends. Historical and journal queries belong to a
 snapshot, avoiding an unchecked read route through the transaction interface.
 
+An assessment host can select
+`execute(command, handler, dependency_error_code="E_DEPENDENCY_STALE")` to
+classify changed or missing declared dependency pins as stale preparation. The
+default remains `E_REVISION_CONFLICT`. These are the only admitted options;
+neither disables pin checks or changes duplicate-read validation. The option
+affects the initial read-set check only. An exact journal retry returns its
+historical result even if the host selects a different classification today.
+`GuardedStorage` forwards the option while retaining its original control and
+disclosure checks. Failed commands retain their exact submitted body in the
+journal, so a service can audit an uncommitted attempted result without
+publishing it or inventing a successful operation.
+
 ## Records, identity, and history
 
 An opaque ID is unique within `(scope_id, namespace)`, regardless of its record

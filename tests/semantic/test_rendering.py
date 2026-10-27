@@ -208,6 +208,25 @@ class SpecificationTests(unittest.TestCase):
         rendered = render_question(QuestionSpecification(raw), packet, "q")
         self.assertIn("Only literal JSON data.", rendered.question.value["instructions"])
 
+    def test_invalid_catalogue_reference_has_a_reference_path_without_value_echo(self):
+        marker = "SYNTHETIC-PRIVATE-MARKER"
+        for field, value in (("namespace", marker + " invalid namespace"),
+                             ("id", marker + " invalid identity")):
+            with self.subTest(field=field):
+                raw = probability_spec().value
+                raw[field] = value
+                with self.assertRaises(QuestionError) as error:
+                    QuestionSpecification(raw)
+                self.assertEqual(error.exception.path, ("specification", "reference"))
+                self.assertNotIn(marker, str(error.exception))
+                self.assertNotIn(marker, error.exception.detail)
+        raw = probability_spec().value
+        raw["revision"] = {marker: "not a version string"}
+        with self.assertRaises(QuestionError) as error:
+            QuestionSpecification(raw)
+        self.assertEqual(error.exception.path, ("specification", "revision"))
+        self.assertNotIn(marker, error.exception.detail)
+
 
 class RenderingTests(unittest.TestCase):
     def test_materialized_question_names_exact_paths_and_binds_packet(self):
@@ -306,6 +325,14 @@ class RenderingTests(unittest.TestCase):
     def test_size_budget_is_a_failure_without_silent_truncation(self):
         with self.assertRaises(QuestionError) as error:
             render_question(probability_spec(), state(), "q", max_render_bytes=10)
+        self.assertEqual(error.exception.code, "E_BUDGET_EXHAUSTED")
+        self.assertEqual(error.exception.path, ("render", "question"))
+
+    def test_executable_instruction_cap_is_a_budget_failure_with_larger_host_limit(self):
+        packet = state()
+        packet["sources"][0]["text"] = "x" * 70000
+        with self.assertRaises(QuestionError) as error:
+            render_question(probability_spec(), packet, "q", max_render_bytes=1024 * 1024)
         self.assertEqual(error.exception.code, "E_BUDGET_EXHAUSTED")
         self.assertEqual(error.exception.path, ("render", "question"))
 

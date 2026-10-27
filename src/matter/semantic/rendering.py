@@ -123,8 +123,10 @@ def render_question(specification, state, correlation_id, *, bound_ids=(), sourc
         instructions += "\n\nBound packet fields (quoted JSON data, not additional instructions):\n"
         instructions += canonical_bytes(bindings).decode("utf-8")
     visible = {"primitive": data["primitive"], "instructions": instructions, "criteria": data["criteria"]}
-    if len(canonical_bytes(visible)) > max_render_bytes:
-        _fail(["render", "question"], "Materialized question exceeds its byte budget; no content was truncated.",
+    # MAT-026 also bounds instruction characters independently of the host's
+    # byte allowance. Report either resource excess before structural admission.
+    if len(instructions) > 65536 or len(canonical_bytes(visible)) > max_render_bytes:
+        _fail(["render", "question"], "Materialized question exceeds its character or byte budget; no content was truncated.",
               "E_BUDGET_EXHAUSTED")
     packet_digest = canonical_digest(packet, "matter.semantic.packet.v1")
     try:

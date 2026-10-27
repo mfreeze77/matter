@@ -129,10 +129,13 @@ class QuestionSpecification(_Frozen):
                       "primitive": data["primitive"], "instructions": data["instructions"],
                       "criteria": data["criteria"], "specification_digest": "0" * 64,
                       "rendering_revision": data["renderer"]["version"], "packet_digest": "0" * 64, "bound_ids": []})
+        except ValueError:
+            _fail(["specification", "criteria"], "The specification must satisfy its exact primitive contract.")
+        try:
             fragment({"namespace": data["namespace"], "id": data["id"], "version": data["revision"],
                       "digest": "0" * 64}, "component_ref")
         except ValueError:
-            _fail(["specification", "criteria"], "The specification must satisfy its exact primitive contract.")
+            _fail(["specification", "reference"], "The catalogue identity and revision must form a valid exact reference.")
         _static_criteria(data["criteria"], ["specification", "criteria"])
         if data["family"] == "association":
             if data["primitive"] != "choice" or tuple(option["id"] for option in data["criteria"]) != ASSOCIATION_OUTCOMES:
