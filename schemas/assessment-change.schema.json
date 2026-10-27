@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/assessment-change.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "cause",
+    "prior",
+    "profile"
+  ],
+  "properties": {
+    "cause": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/change_cause"
+    },
+    "prior": {
+      "oneOf": [
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/assessment_dependency"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "profile": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    }
+  }
+}

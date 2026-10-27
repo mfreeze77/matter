@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/assessment-gap.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "node",
+    "reason",
+    "error_code"
+  ],
+  "properties": {
+    "node": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "error_code": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}
