@@ -90,6 +90,9 @@ Manifest contents have separate meanings:
   `read_access` separately captures required source READ fences under that
   original actor/authority. A freshness registration is not assessment admission:
   the actual assessment token must cover its semantic inputs independently.
+  Registered derivatives retain source READ guards transitively; their generated
+  judgment/assessment identities do not require new static source grants.
+  Receipt/control bookkeeping likewise does not become a source READ target.
 - `scope_fence` retains an exact generation or its explicit absence. It protects
   against a bounded observer fallback on the immediate host control path.
 
@@ -161,6 +164,24 @@ and bounded freshness-read attempts. The storage system port checks a reverse
 bucket's SQL identity-row limit **before** materializing its records.
 Ordinary source mutations may refuse explicitly when graph capacity is exceeded.
 
+Temporal watches contain only current registrations and index the earliest
+known next-check/expiry deadline. The exact UTC ordering preserves nanoseconds
+and supported four-digit years without floating-point timestamp conversion.
+Each timed registration uses 77 deadline-prefix keys plus one capacity key;
+each hook boundary queries a disjoint prefix cover through the current instant,
+loading due registrations without loading unrelated future payloads. Invalidation
+removes temporal membership while retaining object/query/control watches for
+further recomputation fences. Historical judgments therefore do not accumulate
+in a global time scan. No background scheduler is introduced.
+
+A scope generation admits at most 512 live timed registrations. Admission is
+checked atomically; exceeding this cap refuses only the new registration, and
+ordinary intake can continue. Cohort proof rows enter the checked read set, not
+semantic dependency edges. Temporal keys also bind the captured scope fence,
+so registrations from a prior fallback generation do not consume renewed
+capacity. This explicit capacity and 78 watch keys per timed registration are
+the tradeoff for bounded operation using the existing exact-key storage port.
+
 An already-admitted `record_control` cannot be rolled back merely because a
 model/derivative graph is too large or its metadata is invalid. On a semantic
 observer failure, the hook advances a small scoped generation fence in the
@@ -169,6 +190,14 @@ then refuse until recomputed against that generation. This conservative
 fallback may invalidate unrelated work in that scope; it does not fabricate
 individual queued cancellations or traverse an unbounded graph. Storage outages
 remain explicit durability failures.
+
+Fallback generation is derived from the old fence's verified storage revision,
+not its obsolete domain payload. A structurally valid projection with an unknown
+or malformed fence declaration can therefore be replaced by a valid fence
+without blocking the admitted control. Its old revision remains historical.
+Freshness compares exact fence pins/absence, so it cannot accept an older guard
+merely because malformed epoch data was discarded. Raw database integrity
+failures remain storage errors; this is not a corruption bypass.
 
 After the host explicitly restores required permissions, a recomputation can
 capture a new original token, the current scope fence and exact old registration

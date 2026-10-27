@@ -11,6 +11,7 @@ from matter.coverage import CoverageService
 from matter.dependencies import (
     capture_dependencies, capture_freshness, read_registration, recomputation_token,
     register_dependency, registration_ref, require_current_dependency, require_freshness, scope_fence_ref,
+    time_watch, temporal_watch_keys, due_time_watch_keys,
 )
 from matter.invalidation import InvalidationHook
 from matter.matters import MatterService
@@ -254,6 +255,109 @@ class DependencyCoverageTests(GraphFixture, CoverageTestCase):
         self.assertTrue(self.value(latest)["recompute_pending"])
         self.assertEqual(self.storage.get(pin(first)), first)
 
+    def test_historical_temporal_registrations_do_not_poison_intake_or_recomputation(self):
+        archived = []
+        unknown = {"state": "unknown", "reason": "not_applicable"}
+        def at(hour):
+            return {"state": "known", "value": f"2026-10-08T{hour:02d}:00:00Z", "precision": "second"}
+        with patch("matter.dependencies.MAX_LIVE_TEMPORAL", 2), patch("matter.invalidation.MAX_DEPENDENCIES", 4):
+            for index in range(6):
+                deadline = at(15 + index)
+                target, original = self.host(f"historical-time-{index}", time_conditions=[{
+                    "condition": component(f"historical-{index}"), "next_check_at": deadline, "expires_at": unknown}])
+                self.graph_now = deadline
+                self.arrival(f"expire-history-{index}")
+                registration = self.storage.get(registration_ref(target))
+                self.assertEqual(self.value(registration)["status"], "invalidated")
+                self.assertNotIn(time_watch(self.storage.scope_id), registration["watch_keys"])
+                self.assertFalse(any(key.startswith("dependency-time-prefix-") for key in registration["watch_keys"]))
+                with self.storage.snapshot() as view:
+                    read_registration(view, pin(registration))
+                archived.append((target, registration))
+            self.assertEqual(self.storage.watchers(time_watch(self.storage.scope_id)), [])
+            deadline = at(21)
+            condition = {"condition": component("post-history"), "next_check_at": deadline, "expires_at": unknown}
+            future, fresh_registration = self.host("post-history-live", time_conditions=[condition])
+            self.arrival("post-history-intake")
+            self.fresh(fresh_registration)
+            target, old_registration = archived[0]
+            with self.storage.snapshot() as view:
+                previous = recomputation_token(view, pin(old_registration))
+                manifest = capture_dependencies(view, scope_id=self.storage.scope_id, as_of=self.graph_now,
+                                                time_conditions=[condition])
+            command = create_command("repair-after-history", "repair-history-record", scope_id=self.storage.scope_id,
+                expected_revisions=unique_refs([*manifest.read_pins, pin(target), previous["value"]["registration"]]))
+            def handler(tx):
+                record = tx.insert(tx.command["body"]["matter"])
+                fresh = tx.put_projection(entity_ref(target), domain_value({"recomputed_after_history": True}))
+                register_dependency(tx, pin(fresh), manifest, as_of=self.graph_now, previous=previous)
+                return tx.success("created", {"matter": pin(record)})
+            result = self.storage.execute(command, handler)
+            self.assertEqual(result["status"], "success", result)
+            current = self.storage.get(registration_ref(target))
+            self.assertIn(time_watch(self.storage.scope_id), current["watch_keys"])
+            self.fresh(current)
+            self.assertEqual(len(self.storage.watchers(time_watch(self.storage.scope_id))), 2)
+
+    def test_future_temporal_payloads_are_not_loaded_by_unrelated_intake(self):
+        unknown = {"state": "unknown", "reason": "not_applicable"}
+        futures = [self.host(f"future-index-{index}", time_conditions=[{
+            "condition": component(f"future-{index}"), "next_check_at": T4, "expires_at": unknown}])[1] for index in range(5)]
+        loaded, requested = [], []
+        hook = self.hook
+        class Probe:
+            def __init__(self, transaction):
+                self.transaction = transaction
+            def __getattr__(self, name):
+                return getattr(self.transaction, name)
+            def watchers(self, key, *, limit=512):
+                requested.append(key)
+                result = self.transaction.watchers(key, limit=limit)
+                if key.startswith("dependency-time-prefix-"):
+                    loaded.extend(pin(record) for record in result)
+                return result
+        def traced(transaction, changes):
+            return hook(Probe(transaction), changes)
+        # Five live future rows exceed this hook cohort limit. The old global
+        # temporal scan would refuse this three-write ordinary intake.
+        with patch.object(self.storage, "_transaction_hook", traced), patch("matter.invalidation.MAX_DEPENDENCIES", 4):
+            _, command, result = self.arrival("future-independent-arrival")
+        self.assertEqual(result["status"], "success")
+        self.assertNotIn(time_watch(self.storage.scope_id), requested)
+        self.assertTrue(any(key.startswith("dependency-time-prefix-") for key in requested))
+        self.assertEqual(loaded, [])
+        receipt = self.storage.command_receipt(command["idempotency_key"])["receipt"]
+        for registration in futures:
+            self.assertNotIn(pin(registration), receipt["body"]["evidence"])
+            self.fresh(registration)
+
+    def test_live_temporal_capacity_refuses_only_the_new_registration(self):
+        condition = {"condition": component("live-capacity"), "next_check_at": T4,
+                     "expires_at": {"state": "unknown", "reason": "not_applicable"}}
+        with patch("matter.dependencies.MAX_LIVE_TEMPORAL", 2):
+            first, first_reg = self.host("capacity-time-one", time_conditions=[condition])
+            second, second_reg = self.host("capacity-time-two", time_conditions=[condition])
+            with self.storage.snapshot() as view:
+                manifest = capture_dependencies(view, scope_id=self.storage.scope_id, as_of=self.graph_now,
+                                                time_conditions=[condition])
+            target = projection_ref("over-live-capacity", self.storage.scope_id)
+            command = create_command("over-live-capacity", "over-capacity-record", scope_id=self.storage.scope_id,
+                                     expected_revisions=manifest.read_pins)
+            def handler(tx):
+                record = tx.insert(tx.command["body"]["matter"])
+                fresh = tx.put_projection(target, domain_value({"too_many_live_timers": True}))
+                register_dependency(tx, pin(fresh), manifest, as_of=self.graph_now)
+                return tx.success("created", {"matter": pin(record)})
+            result = self.storage.execute(command, handler)
+            self.assertEqual(result["error"]["code"], "E_BUDGET_EXHAUSTED")
+            with self.assertRaises(StorageError) as caught:
+                self.storage.get(target)
+            self.assertEqual(caught.exception.code, "E_NOT_FOUND")
+            self.arrival("ordinary-after-capacity-refusal")
+            self.fresh(first_reg)
+            self.fresh(second_reg)
+            self.assertEqual(len(self.storage.watchers(time_watch(self.storage.scope_id))), 2)
+
 
 class DependencyOccurrenceTests(GraphFixture, OccurrenceTestCase):
     def setUp(self):
@@ -372,6 +476,67 @@ class DependencyAssessmentTests(GraphFixture, unittest.TestCase):
             fixture.service.current(fixture.subject, profile=fixture.profile.reference,
                                     purpose=fixture.purpose, audience=fixture.audience)
 
+    def test_hooked_publication_with_source_restricted_static_policy_keeps_transitive_read_guards(self):
+        from matter.assessments import assessment_current_ref
+        from matter.authority import AuthorityPolicy, CAPABILITIES, CONTROL_KINDS
+        fixture = self.fixture
+        policy = AuthorityPolicy(self.storage.scope_id, actors=[fixture.actor], authorities=[pin(fixture.authority)],
+            capabilities=CAPABILITIES, control_kinds=CONTROL_KINDS,
+            targets=[entity_ref(fixture.subject), entity_ref(fixture.source)])
+        fixture.controls = ControlService(self.storage, policy=policy, clock=lambda: deepcopy(self.graph_now))
+        self.hook.controls = fixture.controls
+        fixture.service = fixture.make_service()
+        _, _, assessment = fixture.publish()
+        judgment = self.storage.get(assessment["body"]["judgments"][0])
+        lane = self.storage.get(assessment_current_ref(self.storage.scope_id, fixture.subject,
+            profile=fixture.profile.reference, purpose=fixture.purpose, audience=fixture.audience))
+        judgment_registration = self.storage.get(registration_ref(judgment))
+        assessment_registration = self.storage.get(registration_ref(assessment))
+        lane_registration = self.storage.get(registration_ref(lane))
+        self.assertIn(pin(fixture.source), [entry["reference"] for entry in self.value(judgment_registration)["manifest"]["read_access"]])
+        for registration in (assessment_registration, lane_registration):
+            self.fresh(registration)
+            guarded = [entry["reference"] for entry in self.value(registration)["manifest"]["read_access"]]
+            self.assertNotIn(pin(judgment), guarded)
+            self.assertNotIn(pin(assessment), guarded)
+        self.assertEqual(fixture.service.current(fixture.subject, profile=fixture.profile.reference,
+            purpose=fixture.purpose, audience=fixture.audience), assessment)
+        self.assertEqual(self.deny_read("restricted-policy-source-denial")["status"], "success")
+        for target in (judgment, assessment, lane):
+            self.assertEqual(self.state(target)["status"], "invalidated")
+        self.assert_stale(lane_registration)
+
+    def test_invalidated_old_published_judgments_leave_live_temporal_index(self):
+        from matter.planner import RulePlan
+        from matter.profiles import ProfileRegistry
+        from matter.rules import RuleRegistry
+        from rule_helpers import LATE
+        fixture = self.fixture
+        condition = {"condition": component("published-deadline"), "next_check_at": deepcopy(LATE),
+                     "expires_at": {"state": "unknown", "reason": "not_applicable"}}
+        fixture.rule_instance = fixture.rule(fixture.binding_instance, change=lambda definition: definition.update(temporal_dependencies=[condition]))
+        fixture.rules = RuleRegistry([fixture.rule_instance])
+        fixture.profile = fixture.make_profile(fixture.rule_instance)
+        fixture.profiles = ProfileRegistry([fixture.profile])
+        fixture.plan = RulePlan(fixture.profile, rules=fixture.rules, schemas=fixture.schemas,
+                               nodes={"evidence": fixture.rule_instance.reference})
+        fixture.service = fixture.make_service()
+        _, _, assessment = fixture.publish()
+        judgment = self.storage.get(assessment["body"]["judgments"][0])
+        original = self.storage.get(registration_ref(judgment))
+        self.assertIn(time_watch(self.storage.scope_id), original["watch_keys"])
+        self.graph_now = deepcopy(LATE)
+        fixture.now = deepcopy(LATE)
+        # A real trusted host control is one ordinary transaction boundary for
+        # checking due work; no synthetic scheduler or provider is introduced.
+        self.deny_read("expire-published-read")
+        invalidated = self.storage.get(registration_ref(judgment))
+        self.assertEqual(self.value(invalidated)["status"], "invalidated")
+        self.assertNotIn(time_watch(self.storage.scope_id), invalidated["watch_keys"])
+        self.assertFalse(any(key.startswith("dependency-time-prefix-") for key in invalidated["watch_keys"]))
+        self.assertEqual(self.storage.get(pin(original)), original)
+
+
     def test_read_access_loss_invalidates_source_required_derivative_and_descendant(self):
         fixture = self.fixture
         token = fixture.controls.capture(actor=fixture.actor, authority=entity_ref(fixture.authority), capability="read",
@@ -471,6 +636,49 @@ class DependencyAssessmentTests(GraphFixture, unittest.TestCase):
             self.assertEqual(caught.exception.code, "E_AUTHORITY_REQUIRED")
         self.assertEqual(self.storage.get(pin(fixture.source)), fixture.source)
 
+    def repair_malformed_fence_during_control(self, malformed):
+        fixture = self.fixture
+        token = fixture.controls.capture(actor=fixture.actor, authority=entity_ref(fixture.authority), capability="read",
+                                         targets=[entity_ref(fixture.source)])
+        target, registration = self.host("damaged-fence-target", positive=[pin(fixture.source)], control_token=token)
+        with self.storage.snapshot() as view:
+            freshness = capture_freshness(view, pin(registration), as_of=self.graph_now, controls=fixture.controls)
+        address = scope_fence_ref(self.storage.scope_id)
+        # This is valid privileged storage data with an invalid *domain*
+        # declaration, not raw SQLite corruption or bypassed digest checks.
+        with SQLiteStore(self.database, scope_id=self.storage.scope_id) as raw:
+            command = create_command("seed-malformed-fence", "seed-fence-record", scope_id=self.storage.scope_id)
+            def seed(tx):
+                subject = tx.insert(tx.command["body"]["matter"])
+                tx.put_projection(address, malformed)
+                return tx.success("created", {"matter": pin(subject)})
+            self.assertEqual(raw.execute(command, seed)["status"], "success")
+            old = raw.get(address)
+        with patch("matter.invalidation.MAX_DEPENDENCIES", 1):
+            denied = self.deny_read("deny-with-malformed-fence")
+        self.assertEqual(denied["status"], "success", denied)
+        repaired = self.storage.get(address)
+        self.assertEqual(repaired["value"]["value"]["epoch"], old["revision"] + 1)
+        self.assertEqual(repaired["revision"], old["revision"] + 1)
+        self.assertEqual(repaired["value"]["value"]["reason"], "control_graph_fallback")
+        self.assertEqual(self.storage.get(pin(old)), old)
+        with self.storage.snapshot() as view:
+            with self.assertRaises(StorageError) as caught:
+                require_freshness(view, freshness, as_of=self.graph_now, controls=fixture.controls)
+            self.assertEqual(caught.exception.code, "E_DEPENDENCY_STALE")
+            with self.assertRaises(StorageError) as caught:
+                fixture.controls._view(view, actor=fixture.actor, authority=entity_ref(fixture.authority),
+                                      capability="read", targets=[entity_ref(fixture.source)], now=self.graph_now)
+            self.assertEqual(caught.exception.code, "E_AUTHORITY_REQUIRED")
+
+    def test_unknown_scope_fence_schema_cannot_roll_back_admitted_control(self):
+        self.repair_malformed_fence_during_control(domain_value({"obsolete": "unknown fence schema"}))
+
+    def test_malformed_scope_fence_value_cannot_roll_back_admitted_control(self):
+        from matter._rule_values import runtime_schema
+        self.repair_malformed_fence_during_control({"schema": runtime_schema("dependency-scope-fence")[0],
+                                                  "value": {"epoch": "not-a-counter"}})
+
     def test_recomputation_recovers_after_scope_fallback_and_second_fallback_fences_it(self):
         from control_helpers import control_command
         from integration.helpers import _in_scope
@@ -541,6 +749,32 @@ class DependencyAssessmentTests(GraphFixture, unittest.TestCase):
         self.fresh(self.storage.get(registration_ref(current)))
         self.assertEqual(self.storage.get(pin(original)), original)
         self.assertEqual(current["value"]["value"]["assessment"], pin(replacement))
+
+
+class TemporalPrefixTests(unittest.TestCase):
+    def test_exact_nanosecond_due_boundaries_and_supported_utc_dates(self):
+        scope = "synthetic:temporal-prefix"
+        for before, due in (
+            ("0001-01-01T00:00:00.000000000Z", "0001-01-01T00:00:00.000000001Z"),
+            ("1969-12-31T23:59:59.999999998Z", "1969-12-31T23:59:59.999999999Z"),
+            ("1969-12-31T23:59:59.999999999Z", "1970-01-01T00:00:00.000000000Z"),
+            ("9999-12-31T23:59:59.999999998Z", "9999-12-31T23:59:59.999999999Z"),
+        ):
+            with self.subTest(due=due):
+                instant = lambda value: {"state": "known", "value": value, "precision": "nanosecond"}
+                condition = {"condition": component("exact-boundary"), "next_check_at": instant(due),
+                             "expires_at": {"state": "unknown", "reason": "not_reported"}}
+                indexed = set(temporal_watch_keys(scope, [condition]))
+                self.assertEqual(len(indexed), 77)
+                self.assertEqual(indexed & set(due_time_watch_keys(scope, instant(before))), set())
+                self.assertEqual(len(indexed & set(due_time_watch_keys(scope, instant(due)))), 1)
+
+    def test_expiry_before_next_check_is_indexed_at_the_earlier_deadline(self):
+        condition = {"condition": component("independent-boundaries"), "next_check_at": T4, "expires_at": T3}
+        indexed = set(temporal_watch_keys("synthetic:earlier-expiry", [condition]))
+        self.assertFalse(indexed & set(due_time_watch_keys("synthetic:earlier-expiry", T2)))
+        self.assertEqual(len(indexed & set(due_time_watch_keys("synthetic:earlier-expiry", T3))), 1)
+
 
 
 if __name__ == "__main__":

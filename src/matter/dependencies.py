@@ -8,22 +8,24 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from ._rule_values import FrozenValue, bounded, checked, domain, fragment, same, unique
+from ._rule_values import FrozenValue, bounded, domain, fragment, unique
 from .canonical import canonical_bytes, canonical_digest, loads
 from .candidate_sets import matches, require_current_candidates, _snapshot_references
 from .controls import _checked as checked_control
 from .coverage import _specification, match_observation
 from .identity_dependencies import _value
 from .negative_dependencies import require_current_negative_dependency
-from .source_catalogs import catalog_observations, read_catalog, source_key
+from .source_catalogs import catalog_observations, read_catalog, source_catalog_ref
 from .storage import PROJECTION_TYPE, StorageError, entity_ref, pin
 from .storage.base import _validate_projection
-from .time import compare_times
+from .time import compare_times, known_time_key
 
 
 NAMESPACE = "matter.dependencies"
 MAX_DEPENDENCIES = 4096
 MAX_REASONS = 128
+MAX_LIVE_TEMPORAL = 512
+_TIME_BITS = 77
 
 
 def _fail(detail="The scoped dependency registration is invalid.", code="E_EVIDENCE_INVALID"):
@@ -67,8 +69,44 @@ def query_watch(scope, source):
     return "dependency-query-" + canonical_digest({"scope": scope, "source": source}, "matter.dependency-query-watch.v1")
 
 
-def time_watch(scope):
-    return "dependency-time-" + canonical_digest(scope, "matter.dependency-time-watch.v1")
+def time_watch(scope, scope_fence=None):
+    """Capacity-only cohort: live temporal registrations, never a hook scan."""
+    return "dependency-time-" + canonical_digest({"scope": scope, "scope_fence": scope_fence}, "matter.dependency-time-watch.v1")
+
+
+def _time_bits(instant):
+    # Fixed-width UTC decimal order matches chronological order, including
+    # pre-1970/minimum dates. Preserve all nine fractional digits without a
+    # timestamp float or platform datetime conversion. 23 decimal digits fit
+    # in 77 bits for every supported four-digit Gregorian year.
+    main, fraction = known_time_key(instant)
+    digits = "".join(character for character in main if character.isdigit()) + fraction
+    return format(int(digits), f"0{_TIME_BITS}b")
+
+
+def _time_prefix_watch(scope, prefix, scope_fence):
+    return "dependency-time-prefix-" + canonical_digest({"scope": scope, "scope_fence": scope_fence}, "matter.dependency-time-prefix-scope.v1") + "-" + prefix
+
+
+def temporal_deadline(conditions):
+    values = [condition["next_check_at"] for condition in conditions]
+    values.extend(condition["expires_at"] for condition in conditions if condition["expires_at"]["state"] == "known")
+    return min(values, key=known_time_key)
+
+
+def temporal_watch_keys(scope, conditions, scope_fence=None):
+    bits = _time_bits(temporal_deadline(conditions))
+    return [_time_prefix_watch(scope, bits[:length], scope_fence) for length in range(1, _TIME_BITS + 1)]
+
+
+def due_time_watch_keys(scope, now, scope_fence=None):
+    """Disjoint exact-key prefix cover of the inclusive interval [0, now].
+
+    A due registration belongs to exactly one returned prefix. Future
+    registrations share none, so their rows/payloads are never loaded.
+    """
+    bits = _time_bits(now)
+    return [_time_prefix_watch(scope, bits[:index] + "0", scope_fence) for index, bit in enumerate(bits) if bit == "1"] + [_time_prefix_watch(scope, bits, scope_fence)]
 
 
 def _lookup(view, reference):
@@ -197,7 +235,12 @@ def capture_dependencies(view, *, scope_id, as_of, positive=(), contexts=(), can
         controls.require_current(reads, token, capability=token["capability"], targets=token["targets"], as_of=now)
         value["control_token"] = token
         for reference in [*value["positive"], *value["contexts"]]:
-            if reference["record_type"] != PROJECTION_TYPE and not reference["namespace"].startswith("matter.controls"):
+            # Registered derivatives retain their source guards transitively;
+            # their newly created identities are not additional source grants.
+            # Receipts/controls are bookkeeping, as in command_targets.
+            if (reference["record_type"] not in {PROJECTION_TYPE, "receipt", "control"}
+                    and not reference["namespace"].startswith("matter.controls")
+                    and _lookup(reads, registration_ref(reference)) is None):
                 access = controls._view(reads, actor=token["actor"], authority=entity_ref(token["authority"]),
                                         capability="read", targets=[entity_ref(reference)], now=now)
                 value["read_access"].append({"reference": reference, "fences": access["fences"]})
@@ -207,18 +250,25 @@ def capture_dependencies(view, *, scope_id, as_of, positive=(), contexts=(), can
             parent = _lookup(reads, registration_ref(reference))
             if parent is not None:
                 require_current_dependency(reads, pin(parent), as_of=now, controls=controls)
+    if value["time_conditions"]:
+        # Admission consults this bounded live cohort under the write lock.
+        # Retain its current rows as transaction proof reads, not as semantic
+        # dependency edges; an unrelated future timer must not invalidate work.
+        for record in reads.watchers(time_watch(scope, value["scope_fence"])):
+            read_registration(reads, pin(record))
     if len(canonical_bytes(value)) > 2_097_152:
         _fail(code="E_BUDGET_EXHAUSTED")
     return DependencyManifest(value, sorted(reads.records.values(), key=canonical_bytes), _captured=True)
 
 
-def watch_keys(manifest, target):
+def watch_keys(manifest, target, status="current"):
     result = {object_watch(ref) for name in ("positive", "contexts", "candidate_sets", "negative_registrations") for ref in manifest[name]}
     result.add(object_watch(target))
     for query in manifest["queries"]:
         result.update(query_watch(manifest["scope_id"], source) for source in query["specification"]["eligible_sources"])
-    if manifest["time_conditions"]:
-        result.add(time_watch(manifest["scope_id"]))
+    if status == "current" and manifest["time_conditions"]:
+        result.add(time_watch(manifest["scope_id"], manifest["scope_fence"]))
+        result.update(temporal_watch_keys(manifest["scope_id"], manifest["time_conditions"], manifest["scope_fence"]))
     token = manifest["control_token"]
     if token is not None:
         result.update(object_watch(item["reference"]) for item in token["fences"])
@@ -232,7 +282,7 @@ def read_registration(view, reference):
     record = _validate_projection(view.get(entity_ref(ref)))
     body = _value("dependency-registration", record["value"])
     if (record["namespace"] != NAMESPACE or body["scope_id"] != ref["scope_id"] or
-            entity_ref(record) != registration_ref(body["target"]) or record["watch_keys"] != watch_keys(body["manifest"], body["target"]) or
+            entity_ref(record) != registration_ref(body["target"]) or record["watch_keys"] != watch_keys(body["manifest"], body["target"], body["status"]) or
             body["manifest"]["scope_id"] != body["scope_id"] or body["target"]["scope_id"] != body["scope_id"] or
             (body["status"] == "current") == bool(body["recompute_pending"])):
         _fail()
@@ -247,7 +297,6 @@ def read_registration(view, reference):
             _fail()
         for entry in query["catalogs"]:
             if entry["pin"] is not None:
-                from .source_catalogs import source_catalog_ref
                 _scoped(body["scope_id"], entry["pin"], "projection_dependency")
                 if entity_ref(entry["pin"]) != source_catalog_ref(body["scope_id"], entry["source"]):
                     _fail()
@@ -400,6 +449,14 @@ def register_dependency(tx, target, manifest, *, as_of, controls=None, previous=
             _fail("Recomputation must retain the exact previous registration token.", "E_DEPENDENCY_STALE")
     elif previous is not None:
         _fail("A previous registration token cannot name an absent target.", "E_DEPENDENCY_STALE")
+    if data["time_conditions"]:
+        # Existing ports expose exact watch cohorts. The maintained invariant
+        # bounds this capacity-only cohort to 512 live rows; invalidation removes
+        # its membership. Count under the write lock before admitting a new row.
+        # System-port default retrieval also bounds this cohort before loading.
+        live = tx.watchers(time_watch(scope, data["scope_fence"]))
+        if len(live) >= MAX_LIVE_TEMPORAL and not any(entity_ref(record) == address for record in live):
+            _fail("The live temporal cohort is full; only this registration is refused.", "E_BUDGET_EXHAUSTED")
     # Follow reverse target registrations to reject cycles before publication.
     seen = set()
     dependencies = [*data["positive"], *data["contexts"], *data["candidate_sets"], *data["negative_registrations"]]

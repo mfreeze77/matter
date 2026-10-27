@@ -379,6 +379,34 @@ class AssessmentCommitTests(RuleTestCase):
             self.assertEqual(len(calls), 2 if boundaries else 1)
             self.assertEqual(result2.cache_hit, not boundaries)
 
+    def test_same_lane_cache_deadline_crossing_is_temporal_transition_without_evidence_change(self):
+        deadline = {**NOW, "value": "2026-10-10T13:00:00Z"}
+        definition, cache = self.cache_fixture(boundaries=[deadline])
+        self.service.cache = cache
+        calls = []
+        first = self.prepare()
+        first_result = self.cache_compute(first, definition, cache, calls)
+        published = self.service.commit(self.command(first, cache_entries=[first_result]))
+        self.assertEqual(published["status"], "success", published)
+        prior = self.storage.get(published["body"]["assessment"])
+        original_cache = self.storage.get(cache_ref(self.storage.scope_id, first_result.entry["key"]))
+        self.now = deepcopy(deadline)
+        second = self.prepare()
+        second_result = self.cache_compute(second, definition, cache, calls)
+        self.assertFalse(second_result.cache_hit)
+        self.assertEqual(len(calls), 2)
+        command = self.command(second, cache_entries=[second_result])
+        self.assertEqual(command["body"]["assessment"]["body"]["causes"], ["temporal_transition"])
+        result = self.service.commit(command)
+        self.assertEqual(result["status"], "success", result)
+        current = self.service.current(self.subject, profile=self.profile.reference, purpose=self.purpose, audience=self.audience)
+        self.assertEqual(current["body"]["evidence_selection"], prior["body"]["evidence_selection"])
+        self.assertEqual(current["body"]["causes"], ["temporal_transition"])
+        self.assertEqual([change["cause"] for change in current["body"]["material_changes"]], ["temporal_transition"])
+        self.assertEqual(current["body"]["prior_assessment"], pin(prior))
+        self.assertEqual(self.storage.get(pin(prior)), prior)
+        self.assertEqual(self.storage.get(pin(original_cache)), original_cache)
+
     def test_cached_unknown_stays_unknown_and_does_not_invent_a_source_attempt(self):
         recorded = self.recorded(identity="unknown-cache-model")
         rule = self.rule(recorded)

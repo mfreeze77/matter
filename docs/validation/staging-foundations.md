@@ -191,3 +191,28 @@ read. No undeclared-read bypass is added. The new concurrency regression
 proves the refusal is durable, the winner is immutable, and a new appropriately
 captured attempt publishes a hit without another computation. This limitation
 is explicit in the API and ticket receipt.
+
+## Bounded final closeout
+
+The assessment follow-up review completed both passes with no warnings. Its
+incorrect deadline cause label is fixed; temporal cache classes now produce
+`temporal_transition`, verified by publication into the same lane across a
+deadline. Duplicate graph verification was removed. Conservative cache misses
+across different original operator/target contexts remain an explicit safe
+tradeoff; projection-scoped token optimization is deferred. The final focused
+assessment suite passed 43 tests in 56.072 seconds.
+
+The invalidation review completed both passes across all 12 selected files
+without warnings. The historical temporal-cohort wedge is fixed with a bounded
+live, generation-scoped exact temporal index. Invalidated historical nodes no
+longer consume live admission or get scanned on every transaction. The fixed
+512-live admission cap and prefix-key cost are documented in the API. The
+restricted-static-policy publication failure was reproduced, then fixed by
+checking registered derivatives transitively instead of demanding a new source
+READ grant for generated output IDs. Source READ denial still invalidates their
+descendants. The final focused invalidation suite passed 34 tests in 28.103
+seconds, including the malformed-fence fallback repairs. No further feature
+expansion, PostgreSQL implementation or live provider work is part of closeout.
+
+Final combined regression, wheel verification and remediation review results
+will follow. Earlier passing runs are retained as preliminary evidence only.

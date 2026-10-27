@@ -131,6 +131,9 @@ do not fabricate disposition changes. These classifications describe declared
 input changes, not new external events or new source authority from a model
 attempt. Changes outside the command body can refresh at the same knowledge cut;
 a truly unchanged semantic basis remains refused.
+Declared cache temporal classes are compared separately: crossing a clock
+boundary produces `temporal_transition`, preserving the distinction from an
+evidence correction when the selected sources have not changed.
 
 `attempt(idempotency_key)` returns the durable original command, typed result and
 actual operation receipt under current read authority. Failed commands retain
@@ -183,6 +186,10 @@ A separately authorized fresh context gets a distinct slot and can compute
 again without changing or renewing the old attempt. The callback still receives
 only the declared semantic projection. Stable contexts preserve declared
 audience, title and clock independence.
+This address is conservative: a different operator or an additional assessment
+target can cause a miss even when the selected semantic projection is identical.
+Sharing across those control scopes is a deferred optimization; the service
+preserves the entire original token and does not narrow or recapture it.
 
 Qualification is freshly classified at consumption time using the exact rule,
 binding, task and admitted certificate registry. `.response` exposes that current

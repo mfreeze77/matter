@@ -52,7 +52,6 @@ jobs:
           cp examples/ready_foundations.py "$RUNNER_TEMP/matter-ready-foundations.py"
           cp tests/fixtures/evaluation/episodes.jsonl "$RUNNER_TEMP/matter-synthetic-episodes.jsonl"
           cp -R tests "$RUNNER_TEMP/tests"
-          cp -R schemas "$RUNNER_TEMP/schemas"
           cd "$RUNNER_TEMP"
           python - <<'PY'
           from importlib.resources import files
@@ -65,6 +64,7 @@ jobs:
           from matter.storage import SQLiteStore, entity_ref, pin
 
           assert Path(matter.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
+          assert not Path("schemas").exists()
 
           for kind in ("record", "command", "result"):
               assert schema_for(kind)["$schema"] == "https://json-schema.org/draft/2020-12/schema"

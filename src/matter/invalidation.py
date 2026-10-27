@@ -16,13 +16,13 @@ from .canonical import canonical_bytes, canonical_digest
 from .contracts import ContractError, validate_record
 from .coverage import match_observation
 from .dependencies import (
-    MAX_DEPENDENCIES, MAX_REASONS, NAMESPACE, _current, _fail, _identity, _lookup, _scoped,
+    MAX_DEPENDENCIES, MAX_REASONS, _current, _fail, _identity, _lookup, _scoped, _scope_fence,
     capture_dependencies, object_watch, query_watch, read_registration, recomputation_token,
-    register_dependency, registration_ref, scope_fence_ref, time_watch,
+    register_dependency, registration_ref, scope_fence_ref, due_time_watch_keys, watch_keys,
 )
 from .identity_dependencies import _value
 from .source_catalogs import source_key
-from .storage import PROJECTION_TYPE, StorageError, entity_ref, pin
+from .storage import PROJECTION_TYPE, entity_ref, pin
 from .time import compare_times
 
 
@@ -148,7 +148,11 @@ class InvalidationHook:
             # invalidates freshness even when full traversal was not possible.
             address = scope_fence_ref(tx.command["scope_id"])
             old = _lookup(tx, address)
-            prior = 0 if old is None else _value("dependency-scope-fence", old["value"])["epoch"]
+            # The storage envelope/revision is already verified. The obsolete
+            # domain payload may itself be damaged derivative metadata; parsing
+            # it here would repeat the failure that the control fallback must
+            # bypass. Freshness binds the exact projection pin, not this value.
+            prior = 0 if old is None else old["revision"]
             tx.put_projection(address, domain("dependency-scope-fence", {"scope_id": tx.command["scope_id"],
                 "epoch": prior + 1, "reason": "control_graph_fallback", "receipt": tx.receipt_ref}))
 
@@ -214,12 +218,15 @@ class InvalidationHook:
                     for query in current["value"]["value"]["manifest"]["queries"]:
                         if pin(observation) not in query["seen"] and match_observation(observation, query["specification"]) is not False:
                             mark(pin(current), notice)
-        for registration in tx.watchers(time_watch(scope), limit=MAX_DEPENDENCIES):
-            body = read_registration(tx, pin(registration))["value"]["value"]
-            due = [condition for condition in body["manifest"]["time_conditions"] if compare_times(now, condition["next_check_at"]) >= 0 or (condition["expires_at"]["state"] == "known" and compare_times(now, condition["expires_at"]) >= 0)]
-            if due:
-                identity = canonical_digest({"target": body["target"], "conditions": due}, "matter.dependency-due.v1")
-                mark(pin(registration), {"id": identity, "cause": "temporal_transition", "receipt": tx.receipt_ref, "before": [], "after": []})
+        current_fence = _scope_fence(tx, scope)
+        fence_pin = None if current_fence is None else pin(current_fence)
+        for key in due_time_watch_keys(scope, now, fence_pin):
+            for registration in tx.watchers(key, limit=MAX_DEPENDENCIES):
+                body = read_registration(tx, pin(registration))["value"]["value"]
+                due = [condition for condition in body["manifest"]["time_conditions"] if compare_times(now, condition["next_check_at"]) >= 0 or (condition["expires_at"]["state"] == "known" and compare_times(now, condition["expires_at"]) >= 0)]
+                if due:
+                    identity = canonical_digest({"target": body["target"], "conditions": due}, "matter.dependency-due.v1")
+                    mark(pin(registration), {"id": identity, "cause": "temporal_transition", "receipt": tx.receipt_ref, "before": [], "after": []})
         while queue:
             reference, reason, logical = queue.popleft()
             visit = (_identity(reference), reason["id"], logical)
@@ -237,7 +244,8 @@ class InvalidationHook:
             if not entry["changed"]:
                 continue
             body, original = entry["body"], entry["record"]
-            tx.put_projection(entity_ref(original), domain("dependency-registration", body), watch_keys=original["watch_keys"])
+            tx.put_projection(entity_ref(original), domain("dependency-registration", body),
+                              watch_keys=watch_keys(body["manifest"], body["target"], body["status"]))
             target = body["target"]
             if target["record_type"] == PROJECTION_TYPE and target["namespace"] == "matter.assessments":
                 lane = tx.get(entity_ref(target))
