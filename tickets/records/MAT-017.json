@@ -4,7 +4,7 @@
   "track": "core",
   "phase": 3,
   "priority": "P0",
-  "status": "in_progress",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "lifecycle",
@@ -78,7 +78,11 @@
     "matterjevmesh"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "2026-10-27: Versioned lifecycle transitions require corresponding current evidence, preserve occurrence identity and retractions, and use the shared current-assessment freshness gate. Actual acceptance evidence and limitations: docs/validation/MAT-017.md.",
+      "Integrated dev14 checks: 1,157 tests passed in the isolated installed environment; 39 checkout-tooling tests passed from the repository. Full installed discovery retained 29 checkout-only walkthrough-schema lookup errors; see docs/validation/live-roadmap.md for exact contexts, commands and limits. All 162 packaged Python/SQL/schema files match source, including 88 schemas; no provider SDK was installed.",
+      "Independent two-pass source reviews completed with no skipped groups or warnings; confirmed findings and the final test gap were fixed and verified. Tracked in PR #16 (https://github.com/mfreeze77/matter/pull/16). These are synthetic mechanism/conformance checks, with no new live provider request, empirical certificate issuance or provider qualification."
+    ]
   }
 }

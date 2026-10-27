@@ -3,10 +3,11 @@
 Status: implementation contract. MAT-026 supplies the bounded offline
 [typed executor boundary](semantic-executor.md). MAT-027 and MAT-028 add
 [versioned questions](semantic-questions.md) and [bounded packets](semantic-packets.md),
-merged in PR #15 at `c755dd9`. The current task branch implements
+merged in PR #15 at `c755dd9`. MAT-029–031 implement
 [stages](semantic-stages.md), [durable receipts](semantic-receipts.md) and
-[runtime admission](semantic-qualification.md) for MAT-029–031; the optional
-[MAT-032 transport](semantic-typesafe.md) supplies one optional TypeSafe HTTP path. See [actual progress](validation/live-roadmap.md)
+[runtime admission](semantic-qualification.md). The
+[MAT-032 transport](semantic-typesafe.md) supplies one optional TypeSafe HTTP path.
+See [actual progress](validation/live-roadmap.md)
 for completed checks and remaining gates. No model has empirical qualification,
 and no deployed live attention policy is claimed. The source notes are
 [matterbrainstormspec](../matterbrainstormspec) and [matterjevmesh](../matterjevmesh).

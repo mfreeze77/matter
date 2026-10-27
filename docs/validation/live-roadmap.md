@@ -6,8 +6,8 @@ The current batch starts from PR #15 merged at `c755dd9`. It implements
 Matter-owned MAT-017/018, then MAT-019/020 and MAT-029/030/031/032 in canonical
 dependency order, with MAT-072 access/egress guards before real/private input.
 PostgreSQL, civic/DIAT work and MAT-039/040 evaluation remain out of scope.
-Tickets remain in progress until their actual acceptance evidence and relevant
-checks are recorded. Hosted CI is informative; the operator does not require
+All nine tickets are now recorded done after their acceptance, review and
+verification contexts below. Hosted CI is informative; the operator does not require
 waiting for it before authorized merges.
 
 ## Bounded synthetic live diagnostic
@@ -50,8 +50,8 @@ independent review. No repeated hosted reruns or CI-only debugging is planned.
 
 The task branch records context/disposition implementation in `1796790`, access
 controls and the shared current-assessment reader in `e134e9d`, and lifecycle
-integration in `e974bf0`. Canonical MAT-017/018/072 remain in progress until the
-combined checks and independent review findings have been reconciled.
+integration in `e974bf0`. At this development milestone MAT-017/018/072 remained in progress while
+combined checks and independent review findings were reconciled.
 
 Focused local evidence on 2026-10-27:
 
@@ -203,3 +203,55 @@ The receipt remediation passed 33 focused checks in 78.406 seconds and 91
 portable checks in 6.647 seconds. Its final three-file two-pass review covers
 `ba59098..60b0e75`. The local task footprint is approximately 49 MiB, below the
 1-GiB task budget and with more than 50 GiB free reserve.
+
+## Final completion and remaining limits
+
+Completed: **MAT-017, MAT-018, MAT-019, MAT-020, MAT-029, MAT-030, MAT-031,
+MAT-032 and MAT-072**. [PR #16](https://github.com/mfreeze77/matter/pull/16)
+tracks this batch; hosted CI is informational under the operator's merge instruction.
+The backlog now has **29 done and 51 planned**, with no in-progress/blocked records.
+Of the 51 planned items, 29 belong to Matter and 22 are cross-repository roadmap
+tracking. Those repositories were not implemented or deployed by this batch.
+
+Final runtime/schema source is `60b0e75`. Its isolated dev14 wheel SHA-256 is
+`e0689ca870017dc6ad4ad89cbb374366985d6ffcccc67e59a23921e934f396cd`.
+All 162 Python/SQL/schema files match source bytes, including 88 packaged schemas;
+73 Matter modules import within the fresh environment with no provider SDK.
+The runtime dependencies/jsonschema were available. The root build environment
+initially lacked setuptools; cached setuptools 84.2.1 supplied the existing build
+requirement. No environment blocker remains for the completed ticket scope.
+
+Full installed discovery ran **1,196 tests in 1,555.793 seconds**, exit 1, with
+**29 errors**. Every error is the existing checkout-only walkthrough default's
+`schemas/walkthrough.schema.json` lookup under the installed interpreter's library
+directory, in `test_hardening` or `test_repository`. This is not a green full run.
+The other **1,157 tests passed**. The two affected modules contain 39 tests;
+`PYTHONPATH=tests .venv/bin/python -m unittest test_hardening test_repository -v`
+passed all **39 in 0.931 seconds** in the supported checkout context. Their fixture
+lookup behavior was not changed into a broader packaging implementation. The
+installed CLI with an explicit `--root` passed validation and all three synthetic
+walkthroughs. The combined receipt, original failure trace and successful rerun
+remain in external `combined-validation.json`, `roadmap-final-full.*` and
+`checkout-scaffold-rerun.log`; the failure is retained rather than relabeled a pass.
+
+`b1b490d` is a test/documentation-only delta: each of ten malformed journal cases
+now independently exercises its intended counter/shape failure. The affected
+behavioral test passed in 2.733 seconds. Runtime and schemas stayed byte-identical
+to the tested wheel. The initial receipt/admission review covered 28 selected files
+with four findings: three confirmed defects were fixed and the inferred positive-only
+stage restriction was rejected against the explicit host predicate contract.
+The adapter/admission follow-up reviewed all 9 files in two passes with zero
+findings/warnings. Receipt remediation reviewed all 3 files in two passes and
+found the masked test assertion; its final one-file two-pass review returned zero
+findings/warnings. No review group was skipped. Earlier foundation, attention,
+timer and stage review remediations are recorded above and in each ticket receipt.
+
+Repository render/validation and the independent JavaScript verifier passed
+(26 canonical and 8 exact-source vectors). Source review, synthetic checks,
+recorded replay, live connectivity and empirical qualification remain separate.
+The single earlier Oil live smoke succeeded; **the new Matter adapter has only
+synthetic/injected and recorded-response tests, with zero additional live calls**.
+MAT-039/040 empirical evaluation/qualification, PostgreSQL, MAT-046 and DIAT remain
+deferred. Full delivery/outbox and other later backlog work are not completed by
+this segment. Real/private evidence was not sent; future egress requires installed
+MAT-072 policy and current original host authority. Credentials remain outside Git.
