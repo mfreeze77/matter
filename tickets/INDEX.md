@@ -26,7 +26,7 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-018: Bind purposes, audiences, and dispositions independently](MAT-018.md) | rules | 3 | P0 | done | done | MAT-005, MAT-011, MAT-013, MAT-015, MAT-016 |
 | [MAT-019: Evaluate attention eligibility against the last delivered baseline](MAT-019.md) | rules | 3 | P0 | done | done | MAT-015, MAT-016, MAT-017, MAT-018 |
 | [MAT-020: Schedule temporal reevaluation with durable resource and attention budgets](MAT-020.md) | core | 3 | P0 | done | done | MAT-003, MAT-010, MAT-011, MAT-014, MAT-016, MAT-019 |
-| [MAT-021: Deliver through a freshness-checked outbox with independent outcome receipts](MAT-021.md) | core | 3 | P0 | planned | ready | MAT-003, MAT-011, MAT-016, MAT-019, MAT-020 |
+| [MAT-021: Deliver through a freshness-checked outbox with independent outcome receipts](MAT-021.md) | core | 3 | P0 | in_progress | in_progress | MAT-003, MAT-011, MAT-016, MAT-019, MAT-020 |
 | [MAT-022: Support bounded evidence-gap investigation without forced human escalation](MAT-022.md) | rules | 4 | P1 | planned | ready | MAT-010, MAT-011, MAT-012, MAT-014, MAT-016, MAT-020 |
 | [MAT-023: Expose consistent projections and decision explanations](MAT-023.md) | core | 4 | P1 | planned | waiting | MAT-003, MAT-007, MAT-009, MAT-015, MAT-016, MAT-017, MAT-019, MAT-021 |
 | [MAT-024: Build chronological replay and language-neutral conformance fixtures](MAT-024.md) | core | 4 | P0 | planned | waiting | MAT-002, MAT-010, MAT-014, MAT-015, MAT-016, MAT-017, MAT-019, MAT-020, MAT-021, MAT-023 |

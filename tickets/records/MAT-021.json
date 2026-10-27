@@ -4,7 +4,7 @@
   "track": "core",
   "phase": 3,
   "priority": "P0",
-  "status": "planned",
+  "status": "in_progress",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "delivery",
@@ -38,17 +38,17 @@
     {
       "id": "AC-1",
       "criterion": "Recovery or cancellation before dispatch prevents sending queued advice.",
-      "verification": "Block a fake transport boundary and mutate state."
+      "verification": "Use synchronized injected transports and actual control/source/context mutations around the documented atomic authorization point. Before that point assert zero sends; after irreversible sending preserve the observed outcome and invalidation history."
     },
     {
       "id": "AC-2",
       "criterion": "Ambiguous send outcomes cannot fabricate success or blind duplicate-free retry.",
-      "verification": "Test transports with and without idempotency or receipt lookup."
+      "verification": "Inject timeout and process failure before/after claim, external acceptance and local receipt commit; exercise all declared idempotency/lookup combinations, stable-key scope/expiry and unavailable lookup. Unknown stays unknown without blind resend or baseline advancement."
     },
     {
       "id": "AC-3",
       "criterion": "Competing equivalent intents cannot repeat the same delivered delta.",
-      "verification": "Race workers and inspect fencing, reservations, and baseline receipts."
+      "verification": "Race separate SQLite workers over distinct equivalent intent IDs, expired leases and resumed stale workers; inspect actual transport call counts/keys, reservations and baseline receipts, including an unresolved earlier send."
     }
   ],
   "artifacts": [
@@ -61,7 +61,11 @@
     "Withheld intents do not advance baseline.",
     "Audience change before dispatch invalidates intent.",
     "Delivered does not imply consumption, repair, or usefulness.",
-    "Cancellation after completed send preserves actual transport history."
+    "Cancellation after completed send preserves actual transport history.",
+    "Source/permission/baseline changes before authorization refuse sending under the original context; no token renewal.",
+    "Restart after an ambiguous external acceptance retains delivery_unknown and conservatively charged capacity.",
+    "A late or uncertain-order reconciliation cannot overwrite newer delivered knowledge.",
+    "Missing configured transport refuses before claiming work; exact replay checks current READ authority without redispatch."
   ],
   "risks": [
     "A local transaction cannot make arbitrary external transport exactly-once."
