@@ -226,3 +226,43 @@ due-plus-future rows; ordinary sweep uses the verified fence pin while operator
 controls explicitly repair malformed metadata. The expanded 36-case invalidation
 suite passed in 30.438 seconds. Final verification below applies to this last
 repair, not merely to the preceding 1005-case source set.
+
+## Final source and executed merge gates
+
+Runtime candidate: `090a7be2a04e51c37c84a417bf55ac903ea62d67`.
+The final 421-file input manifest was unchanged after installed checks; its
+SHA-256 is `a603c7fad8839a3c4b4251ac0c09fcf9ef414a64225e935faa0dbc81d5851224`.
+
+The full local suite passed 1008 tests in 440.693 seconds on the immediately
+preceding `9a277c7` source. The final clock-only change then passed all 37
+invalidation tests in 35.894 seconds, including the new actual-publication
+boundary regression. The final installed dev13 wheel ran all ten examples and
+183 selected tests (32 DAG, 33 rendering, 22 packets, 44 assessment, 37
+invalidation, five conflict-classification, ten system-hook), outside the
+checkout with no loose schema directory. All 110 Python/SQL/schema resources
+matched final source bytes. Wheel SHA-256:
+`ac54372894fb21013c9b2b574ec8111f30afa4cddec7df89c73465e54f39f4f7`.
+JavaScript verified 26 canonical and eight exact-source vectors, and all three
+synthetic walkthroughs passed. The canonical physical TMPDIR workaround avoids
+the pre-existing macOS path-alias backup assertion; no storage behavior was
+changed for that assertion. Installed jsonschema/referencing dependencies were
+available; there was no missing-package blocker.
+
+All supported implementation files were covered by the staged two-pass
+independent reviews recorded above. The last cause-label follow-up reviewed
+both selected files with zero findings/warnings; the final clock follow-up
+reviewed both selected files with zero findings/warnings. Earlier material
+findings were fixed and tested; conservative cross-context cache misses and
+concurrent-fill stale refusal remain documented tradeoffs. Markdown exclusions
+were read manually and local documentation links/schema inventories validated.
+GitHub CI on the submitted final head remains an explicit merge gate; its
+result is recorded in the PR, not inferred from these local runs.
+
+MAT-014/015/016/027/028 are complete within their bounded synthetic mechanism
+scopes. MAT-029 remains waiting on MAT-020; MAT-030/031/032 retain their declared
+chain, and MAT-039/040 retain provider-family, replay/split and qualification
+prerequisites. MAT-017/018 then MAT-019/020 are the next core prerequisites for
+that integrated path. None of the 22 cross-repository roadmap items was changed.
+PostgreSQL is deferred; only SQLite is implemented here. No live JEV/TypeSafe
+call, private corpus, provider qualification, production timing qualification
+or downstream deployment is claimed. No retained merged branch was deleted.
