@@ -5,7 +5,7 @@ control, assessment publication, or external-delivery capability.
 """
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
-from threading import Event
+from threading import Event, Lock
 import math
 import time
 
@@ -81,18 +81,30 @@ class GraphExecutor:
         scope = None
         pending = list(declaration["order"])
         cancellation = Event()
+        cancellation_lock = Lock()
+        stop_diagnostics = []
 
         def stopped():
-            if cancellation.is_set():
-                return True
-            if cancelled is None:
-                return False
-            answer = cancelled()
-            if type(answer) is not bool:
-                raise ContractError("E_POLICY_INVALID", "The host cancellation query must return a boolean.")
-            if answer:
-                cancellation.set()
-            return answer
+            with cancellation_lock:
+                if cancellation.is_set():
+                    return True
+                if cancelled is None:
+                    return False
+                try:
+                    answer = cancelled()
+                except Exception:
+                    stop_diagnostics.append({"stage": "cancellation_query", "reason": "callback_failed",
+                        "error_code": "E_POLICY_INVALID"})
+                    cancellation.set()
+                    return True
+                if type(answer) is not bool:
+                    stop_diagnostics.append({"stage": "cancellation_query", "reason": "non_boolean_result",
+                        "error_code": "E_POLICY_INVALID"})
+                    cancellation.set()
+                    return True
+                if answer:
+                    cancellation.set()
+                return answer
 
         def admission(name, selector):
             receipt = receipts[name]
@@ -309,6 +321,7 @@ class GraphExecutor:
         status = "completed" if stop_reason == "completed" else "incomplete"
         return GraphRun({"schema_version": "1.0", "run_id": run_id, "scope_id": scope, "plan": plan.reference,
             "profile": declaration["profile"], "status": status, "stop_reason": stop_reason,
+            "stop_diagnostics": stop_diagnostics,
             "nodes": {name: receipts[name] for name in sorted(receipts)},
             "inputs": {name: prepared.value for name, prepared in sorted(prepared_inputs.items())},
             "compositions": composition_results,

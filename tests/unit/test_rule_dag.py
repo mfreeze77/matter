@@ -443,6 +443,63 @@ class RuleDagTests(unittest.TestCase):
         self.assertEqual(self.prepared_calls, ["source"])
         self.assertEqual(self.calls, ["source"])
 
+    def test_bad_stop_poll_after_binding_preserves_attempt_and_call_accounting(self):
+        for raises in (True, False):
+            self.setUp()
+            finished = Event()
+            self.rule("source", function=lambda request: (finished.set(), self.response())[1])
+            def cancelled():
+                if finished.is_set():
+                    if raises:
+                        raise RuntimeError("private operator detail")
+                    return "invalid private result"
+                return False
+            result = self.execute(cancelled=cancelled)
+            self.assertEqual(result["stop_reason"], "cancelled")
+            self.assertEqual(result["nodes"]["source"]["status"], "cancelled")
+            self.assertEqual(result["nodes"]["source"]["judgment"]["body"]["execution_status"], "completed")
+            self.assertIsNotNone(result["nodes"]["source"]["attempt_receipt"])
+            self.assertEqual(result["resource_reservations"]["actual_invocations"], 1)
+            self.assertEqual(result["resource_reservations"]["reserved_attempts"], 1)
+            self.assertEqual(result["stop_diagnostics"], [{"stage": "cancellation_query",
+                "reason": "callback_failed" if raises else "non_boolean_result", "error_code": "E_POLICY_INVALID"}])
+            self.assertNotIn("private", str(result["stop_diagnostics"]))
+
+    def test_initial_bad_stop_poll_fails_closed_without_preparation_or_invocation(self):
+        for raises in (True, False):
+            self.setUp()
+            self.rule("source")
+            def cancelled():
+                if raises:
+                    raise RuntimeError("private initial failure")
+                return None
+            result = self.execute(cancelled=cancelled)
+            self.assertEqual(result["stop_reason"], "cancelled")
+            self.assertEqual(result["nodes"]["source"]["status"], "cancelled")
+            self.assertIsNone(result["nodes"]["source"]["judgment"])
+            self.assertEqual(result["resource_reservations"]["actual_invocations"], 0)
+            self.assertEqual(result["resource_reservations"]["reserved_attempts"], 0)
+            self.assertEqual(self.prepared_calls, [])
+            self.assertEqual(self.calls, [])
+            self.assertEqual(len(result["stop_diagnostics"]), 1)
+
+    def test_final_stop_poll_failure_returns_all_completed_attempt_diagnostics(self):
+        finished = Event()
+        self.rule("source", function=lambda request: (finished.set(), self.response())[1])
+        after_attempt = []
+        def cancelled():
+            if finished.is_set():
+                after_attempt.append(True)
+                if len(after_attempt) > 1:
+                    raise RuntimeError("private final failure")
+            return False
+        result = self.execute(cancelled=cancelled)
+        self.assertEqual(result["stop_reason"], "cancelled")
+        self.assertEqual(result["resource_reservations"]["actual_invocations"], 1)
+        self.assertEqual(result["nodes"]["source"]["judgment"]["body"]["execution_status"], "completed")
+        self.assertIsNotNone(result["nodes"]["source"]["attempt_receipt"])
+        self.assertEqual(result["stop_diagnostics"][0]["reason"], "callback_failed")
+
     def test_shared_elapsed_deadline_retains_late_attempt_as_unusable_diagnostic(self):
         self.rule("source", function=lambda request: (time.sleep(0.02), self.response())[1])
         plan = self.plan()

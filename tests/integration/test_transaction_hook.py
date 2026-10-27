@@ -119,6 +119,62 @@ class TransactionHookTests(unittest.TestCase):
         result = self.store.execute(create_command("decision", "another"), create_matter)
         self.assertEqual(result["error"]["code"], "E_POLICY_INVALID")
 
+    def test_preexisting_watch_reads_are_audited_and_watch_replacement_is_atomic(self):
+        target = projection_ref("preexisting-watcher")
+        replacement_key = "watch:replacement"
+        refused_key = "watch:refused"
+        def seed(tx):
+            stored = tx.insert(tx.command["body"]["matter"])
+            tx.put_projection(target, domain_value({"state": "original"}), watch_keys=(WATCH_KEY,))
+            return tx.success("created", {"matter": pin(stored)})
+        self.store.execute(create_command("watch-seed", "watch-seed-subject"), seed)
+        original = self.store.get(target)
+        def hook(tx, changes):
+            self.assertEqual(tx.watchers(WATCH_KEY), [original])
+            tx.put_projection(target, domain_value({"state": "updated"}), watch_keys=(replacement_key,))
+        self.reopen(hook)
+        command = create_command("watch-hook", "watch-hook-subject")
+        result = self.store.execute(command, create_matter)
+        self.assertEqual(result["status"], "success", result)
+        current = self.store.get(target)
+        self.assertEqual(current["revision"], original["revision"] + 1)
+        self.assertEqual(self.store.watchers(WATCH_KEY), [])
+        self.assertEqual(self.store.watchers(replacement_key), [current])
+        journal = self.store.command_receipt(command["idempotency_key"])
+        self.assertEqual(journal["command"], command)
+        self.assertEqual(journal["receipt"]["body"]["details"]["value"]["read_set"], [])
+        self.assertIn(pin(original), journal["receipt"]["body"]["evidence"])
+        self.assertIn(pin(current), journal["receipt"]["body"]["evidence"])
+        def refuse(tx, changes):
+            tx.put_projection(target, domain_value({"state": "refused"}), watch_keys=(refused_key,))
+            raise StorageError("E_DEPENDENCY_STALE")
+        self.reopen(refuse)
+        refused = self.store.execute(create_command("watch-refusal", "watch-refusal-subject"), create_matter)
+        self.assertEqual(refused["error"]["code"], "E_DEPENDENCY_STALE")
+        self.assertEqual(self.store.get(target), current)
+        self.assertEqual(self.store.watchers(replacement_key), [current])
+        self.assertEqual(self.store.watchers(refused_key), [])
+
+    def test_every_public_held_system_port_operation_is_closed_after_hook_phase(self):
+        held = []
+        self.reopen(lambda tx, changes: held.append(tx))
+        result = self.store.execute(create_command("held-port", "held-subject"), create_matter)
+        self.assertEqual(result["status"], "success", result)
+        target = projection_ref("held-target")
+        operations = {
+            "command": lambda: held[0].command,
+            "receipt_ref": lambda: held[0].receipt_ref,
+            "get": lambda: held[0].get(entity_ref(self.original)),
+            "lookup_identity": lambda: held[0].lookup_identity(entity_ref(self.original)),
+            "watchers": lambda: held[0].watchers(WATCH_KEY),
+            "put_projection": lambda: held[0].put_projection(target, domain_value({"bad": True})),
+        }
+        for name, operation in operations.items():
+            with self.subTest(operation=name):
+                with self.assertRaises(StorageError) as error:
+                    operation()
+                self.assertEqual(error.exception.code, "E_STORAGE_UNAVAILABLE")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -133,6 +133,12 @@ returns after it is retained as a timed-out diagnostic, even if its individual
 rule completed. Cancellation is latched: a subsequent false poll cannot reopen
 the run. Successful early results keep their actual attempt records.
 
+A host stop-query exception or non-boolean response also latches cancellation.
+The run retains a fixed safe entry in `stop_diagnostics`, never exception text
+or the invalid response. A failed poll after a binding returns cannot discard
+its raw judgment, attempt receipt or actual invocation count; an initially
+failed poll prevents preparation and dispatch.
+
 Host preparation runs serially; evaluator/currentness/control callbacks can run
 concurrently and need thread-safe, fresh host handles. `max_workers=1` supports
 serial handles. The thread pool joins its workers. Synchronous Python callbacks
