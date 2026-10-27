@@ -226,12 +226,16 @@ class Storage(Protocol):
     def scope_id(self) -> str: ...
 
     def execute(self, command: dict[str, Any], handler: CommandHandler, *,
-                replay_guard: Callable[[Snapshot], None] | None = None) -> dict[str, Any]:
+                replay_guard: Callable[[Snapshot], None] | None = None,
+                dependency_error_code: str = "E_REVISION_CONFLICT") -> dict[str, Any]:
         """Execute, or authorize disclosure of a prior result inside its transaction.
 
         replay_guard is trusted local synchronous code, called only for an
         exact prior command. It receives a read-only current snapshot. A
         refusal does not modify the earlier command, result or receipt.
+        dependency_error_code may select E_DEPENDENCY_STALE for a changed
+        declared read set. It changes error classification, never read checks
+        or historical retry results.
         """
         ...
 

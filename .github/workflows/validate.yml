@@ -35,7 +35,7 @@ jobs:
         run: node tests/fixtures/canonical/verify.mjs
       - name: Run synthetic lifecycle walkthroughs
         run: python -m matter demo all
-      - name: Verify installed evidence, identity, policies, typed execution and frozen corpora outside the checkout
+      - name: Verify installed evidence, assessment and semantic APIs outside the checkout
         run: |
           python -m pip wheel . --no-deps --wheel-dir "$RUNNER_TEMP/matter-wheel"
           python -m pip install --force-reinstall --no-deps "$RUNNER_TEMP"/matter-wheel/*.whl
@@ -51,14 +51,20 @@ jobs:
           cp examples/trusted_controls.py "$RUNNER_TEMP/matter-trusted-controls.py"
           cp examples/ready_foundations.py "$RUNNER_TEMP/matter-ready-foundations.py"
           cp tests/fixtures/evaluation/episodes.jsonl "$RUNNER_TEMP/matter-synthetic-episodes.jsonl"
+          cp -R tests "$RUNNER_TEMP/tests"
           cd "$RUNNER_TEMP"
           python - <<'PY'
           from importlib.resources import files
           from pathlib import Path
           import sqlite3
+          import sys
           import tempfile
+          import matter
           from matter.contracts import decode_command, error_result, schema_for
           from matter.storage import SQLiteStore, entity_ref, pin
+
+          assert Path(matter.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
+          assert not Path("schemas").exists()
 
           for kind in ("record", "command", "result"):
               assert schema_for(kind)["$schema"] == "https://json-schema.org/draft/2020-12/schema"
@@ -121,3 +127,10 @@ jobs:
           python matter-rule-evaluation.py
           python matter-trusted-controls.py
           python matter-ready-foundations.py matter-synthetic-episodes.jsonl
+          python -m unittest discover -s tests -p test_rule_dag.py -v
+          python -m unittest discover -s tests -p test_rendering.py -v
+          python -m unittest discover -s tests -p test_packets.py -v
+          python -m unittest discover -s tests -p test_assessment_commit.py -v
+          python -m unittest discover -s tests -p test_dependency_invalidation.py -v
+          python -m unittest discover -s tests -p test_dependency_conflict_code.py -v
+          python -m unittest discover -s tests -p test_transaction_hook.py -v

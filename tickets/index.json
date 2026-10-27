@@ -13,8 +13,8 @@
     "rules": 7
   },
   "counts_by_status": {
-    "done": 15,
-    "planned": 65
+    "done": 20,
+    "planned": 60
   },
   "tickets": [
     {
@@ -259,7 +259,7 @@
       "track": "rules",
       "phase": 2,
       "priority": "P0",
-      "status": "planned",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-012",
@@ -268,7 +268,7 @@
       "requirements": [
         "CORE-13"
       ],
-      "readiness": "ready",
+      "readiness": "done",
       "path": "records/MAT-014.json"
     },
     {
@@ -277,7 +277,7 @@
       "track": "rules",
       "phase": 2,
       "priority": "P0",
-      "status": "planned",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-003",
@@ -289,7 +289,7 @@
       "requirements": [
         "CORE-14"
       ],
-      "readiness": "waiting",
+      "readiness": "done",
       "path": "records/MAT-015.json"
     },
     {
@@ -298,7 +298,7 @@
       "track": "core",
       "phase": 2,
       "priority": "P0",
-      "status": "planned",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-003",
@@ -309,7 +309,7 @@
       "requirements": [
         "CORE-15"
       ],
-      "readiness": "waiting",
+      "readiness": "done",
       "path": "records/MAT-016.json"
     },
     {
@@ -332,7 +332,7 @@
       "requirements": [
         "CORE-16"
       ],
-      "readiness": "waiting",
+      "readiness": "ready",
       "path": "records/MAT-017.json"
     },
     {
@@ -353,7 +353,7 @@
       "requirements": [
         "CORE-17"
       ],
-      "readiness": "waiting",
+      "readiness": "ready",
       "path": "records/MAT-018.json"
     },
     {
@@ -581,7 +581,7 @@
       "track": "jev",
       "phase": 2,
       "priority": "P0",
-      "status": "planned",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-026",
@@ -592,7 +592,7 @@
         "JEV-03",
         "JEV-08"
       ],
-      "readiness": "ready",
+      "readiness": "done",
       "path": "records/MAT-027.json"
     },
     {
@@ -601,7 +601,7 @@
       "track": "jev",
       "phase": 2,
       "priority": "P0",
-      "status": "planned",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-027",
@@ -615,7 +615,7 @@
         "JEV-15",
         "EVAL-01"
       ],
-      "readiness": "waiting",
+      "readiness": "done",
       "path": "records/MAT-028.json"
     },
     {
@@ -1790,7 +1790,7 @@
       "requirements": [
         "OPS-01"
       ],
-      "readiness": "waiting",
+      "readiness": "ready",
       "path": "records/MAT-072.json"
     },
     {

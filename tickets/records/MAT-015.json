@@ -4,7 +4,7 @@
   "track": "rules",
   "phase": 2,
   "priority": "P0",
-  "status": "planned",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "assessments",
@@ -77,7 +77,11 @@
     "docs/contracts/core.md"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "2026-10-27: implemented canonical scope; 44 assessment/cache tests passed. Actual behavioral acceptance and limitations are recorded in docs/validation/MAT-015.md.",
+      "Combined local regression passed 1008 tests before the final clock-only delta; that delta passed the final 37-case module suite. Final isolated dev13 wheel passed ten examples and 183 selected behavioral tests; all 110 runtime/schema resources matched source bytes. See docs/validation/staging-foundations.md for source identities and exact evidence.",
+      "Two-pass independent review covered the changed implementation; material findings were fixed and verified, with final narrow follow-ups reporting no findings or warnings. Submitted-head CI remains a merge gate. These are synthetic interface/mechanism checks, not live provider calls or provider/runtime qualification."
+    ]
   }
 }

@@ -88,6 +88,18 @@ use independent operation connections. A transaction or snapshot object cannot
 be reused after its context ends. Historical and journal queries belong to a
 snapshot, avoiding an unchecked read route through the transaction interface.
 
+An assessment host can select
+`execute(command, handler, dependency_error_code="E_DEPENDENCY_STALE")` to
+classify changed or missing declared dependency pins as stale preparation. The
+default remains `E_REVISION_CONFLICT`. These are the only admitted options;
+neither disables pin checks or changes duplicate-read validation. The option
+affects the initial read-set check only. An exact journal retry returns its
+historical result even if the host selects a different classification today.
+`GuardedStorage` forwards the option while retaining its original control and
+disclosure checks. Failed commands retain their exact submitted body in the
+journal, so a service can audit an uncommitted attempted result without
+publishing it or inventing a successful operation.
+
 ## Records, identity, and history
 
 An opaque ID is unique within `(scope_id, namespace)`, regardless of its record
@@ -286,6 +298,32 @@ already blocked in the operating system. The local filesystem must implement
 the locking and synchronization SQLite requires; this is an embedded backend,
 not a network filesystem or distributed consensus qualification. Process-death
 tests do not substitute for physical power-loss testing.
+
+## Trusted atomic observers
+
+An optional constructor-installed `SQLiteStore(transaction_hook=callback)` runs
+after a successful host handler and before its receipt/commit, inside the same
+write transaction. It receives actual write before/after pins and validated
+typed change notices, plus a scoped system port for current reads, identity
+lookups, watches and projection writes. It must synchronously return `None`.
+It does not run for failed handlers or exact retries. A refusal rolls back all
+child writes while retaining the failure journal; an unexpected exception rolls
+back the whole command. The port expires as soon as the callback returns.
+
+The hook is trusted host code, installed independently of command data. Ordinary
+handlers still require every preexisting read in `expected_revisions`. System
+reads join the receipt's evidence, absence and watch logs without changing that
+original manifest or command digest. Reads of rolled-back child versions are
+excluded from failure evidence. Hooks use the same scope, projection validation
+and one-write-per-identity constraints; they do not authorize external actions.
+Only configured stores invoke an observer. Reopening without one is a privileged
+host choice, so consumers must still check their direct freshness guards.
+
+System-port `watchers(key, limit=512)` bounds a cohort before materializing
+records. The explicit integer limit may be 1–4096; a larger cohort returns
+`E_BUDGET_EXHAUSTED`. Normal snapshot/handler watch contracts are unchanged.
+The [dependency observer](dependencies.md) uses a scoped freshness fence as its
+bounded fallback so graph capacity cannot roll back an admitted host control.
 
 ## Reuse and acceptance
 

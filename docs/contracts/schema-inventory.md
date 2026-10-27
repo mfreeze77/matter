@@ -411,3 +411,26 @@ a supplied token as authentication. Old v1 control fixtures remain structurally
 valid; their arbitrary effect descriptor does not make them executable controls.
 See [trusted controls](../controls.md) for scope conjunction, explicit releases,
 current-time enforcement, exact replay and the future dispatch binding seam.
+
+## Assessment publication and registered validity
+
+MAT-015 uses the existing core `assess`/`commit_assessment` variants and adds
+these exact packaged domain-value schemas:
+
+- [assessment-publication](../../schemas/assessment-publication.schema.json): retained preparation, graph, original attempts and explicit interpretations.
+- [assessment-current](../../schemas/assessment-current.schema.json): one exact policy/purpose/audience lane with its immutable assessment pin and validity state.
+- [assessment-resources](../../schemas/assessment-resources.schema.json): actual binding invocation counts, elapsed time and cache hits.
+- [assessment-change](../../schemas/assessment-change.schema.json): explicit material-change cause and prior assessment/profile basis.
+- [assessment-gap](../../schemas/assessment-gap.schema.json): held node and typed failure reason.
+- [cache-entry](../../schemas/cache-entry.schema.json): declared projected inputs, original response/raw-result reference, source attempt and original control context.
+
+MAT-016 adds three internal projection/token contracts:
+
+- [dependency-registration](../../schemas/dependency-registration.schema.json): exact target, positive/query/candidate/absence/time/control manifest, validity epoch and bounded reasons.
+- [freshness-token](../../schemas/freshness-token.schema.json): exact registration/target/epoch binding for current use or guarded recomputation.
+- [dependency-scope-fence](../../schemas/dependency-scope-fence.schema.json): conservative graph-generation fallback that preserves an admitted host control when bounded traversal cannot complete.
+
+These schemas add no core record kind or database migration. They do not grant
+source authority, provider qualification or permission for external delivery.
+See [assessments](../assessments.md) and [dependencies](../dependencies.md) for
+the corresponding runtime checks and their configured-host boundaries.

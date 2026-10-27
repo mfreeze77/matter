@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/assessment-current.schema.json",
+  "title": "assessment-current",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "assessment",
+    "preparation",
+    "publication",
+    "invalidation"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "status": {
+      "enum": [
+        "current",
+        "invalidated"
+      ]
+    },
+    "assessment": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/assessment_dependency"
+    },
+    "preparation": {
+      "type": "object"
+    },
+    "publication": {
+      "type": "object"
+    },
+    "invalidation": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object"
+        }
+      ]
+    }
+  }
+}

@@ -1,12 +1,14 @@
 # Rule, profile, and assessment contract
 
-MAT-012 implements the bounded rule/evaluator interface described in [the runtime API](../rules.md): immutable definitions, detached inputs, deterministic and recorded bindings, direct prerequisite admission, and uncommitted attempt receipts. Policy composition, assessment publication, transitive invalidation, live providers, and qualification issuance remain later milestones. The governing sections below include those planned contracts; structural or deterministic interface conformance does not qualify the assessment engine.
-
-MAT-013 adds immutable versioned profile definitions, separate component
-fingerprints, static validation and explicit supersession notices through the
-[profile API](../profiles.md). These declarations do not execute a rule graph,
-publish an assessment or transfer a qualification certificate. MAT-014 and
-later tickets retain those runtime responsibilities.
+MAT-012 implements the bounded [rule/evaluator interface](../rules.md).
+MAT-013 adds exact [versioned profiles](../profiles.md); MAT-014 executes
+[typed rule graphs](../composition.md) with explicit conflict resolution.
+MAT-015 supplies [revision-bound publication and semantic caches](../assessments.md),
+and MAT-016 supplies [registered transitive invalidation and freshness gates](../dependencies.md).
+These mechanisms retain original attempts, source scope and host control context.
+Live providers and qualification issuance remain later milestones. Structural
+validation and synthetic behavioral conformance do not establish provider
+accuracy, whole-runtime qualification or live usefulness.
 
 Sources: [matterbrainstormspec](../../matterbrainstormspec), sections 2–7, and [matterjevmesh](../../matterjevmesh), sections 1–8. Read [core](core.md) for identities and time, and [lifecycle](lifecycle.md) for consequences and delivery. The core is provider-neutral. No Jev-specific client behavior is specified here.
 

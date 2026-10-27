@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/dependency-scope-fence.schema.json",
+  "title": "Matter dependency scope fence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scope_id",
+    "epoch",
+    "reason",
+    "receipt"
+  ],
+  "properties": {
+    "scope_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "epoch": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+    },
+    "reason": {
+      "const": "control_graph_fallback"
+    },
+    "receipt": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_ref"
+    }
+  }
+}
