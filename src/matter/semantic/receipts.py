@@ -567,10 +567,21 @@ class ExecutionReceiptStore:
             old = _lookup(view, address)
             if old is not None:
                 value = _value(old, "semantic-execution-attempt")
-                if value["request_digest"] != self._request_digest(request):
-                    _fail("E_IDEMPOTENCY_CONFLICT")
                 record = view.get(value["execution"])
-                self._audit(view, self._details(record))
+                retained = self._details(record)
+                supplied_access = getattr(access_context, "value", access_context)
+                if (domain("control-token", token)["value"] != retained["control_token"] or
+                        canonical_bytes(supplied_access) != canonical_bytes(retained["access_context"])):
+                    _fail("E_AUTHORITY_REQUIRED")
+                if (value["request_digest"] != self._request_digest(request) or
+                        retained["logical_request_id"] != logical_request_id or retained["attempt_id"] != attempt_id or
+                        _refs(list(parents)) != retained["parents"] or allocation != retained["allocation"] or
+                        retry_of != retained["retry_of"]):
+                    _fail("E_IDEMPOTENCY_CONFLICT")
+                # Exact historical recovery keeps its original context. A
+                # cancellation need not conceal history, but a new consumer or
+                # new work lineage cannot borrow the original reader's rights.
+                self._audit(view, retained)
                 reference = pin(record)
                 existing = {"status": value["phase"], "execution": reference, "dispatched": False, "reused": value["phase"] == "reused"}
         if existing is not None:
@@ -582,7 +593,7 @@ class ExecutionReceiptStore:
             material = self._details(original)
             value = self._metadata(request, token=token, logical_request_id=logical_request_id, attempt_id=attempt_id,
                 phase="reused", result=self.replay(pin(original)), access_context=access_context, allocation=allocation,
-                parents=parents, source_execution=pin(original))
+                parents=parents, source_execution=pin(original), retry_of=retry_of)
             # Exact reuse identity intentionally omits ephemeral Batch IDs. The
             # immutable original result keeps its ORIGINAL batch digest/context.
             value["result"] = material["result"]

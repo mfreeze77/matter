@@ -595,3 +595,63 @@ class DurableExecutionTests(unittest.TestCase):
         with self.assertRaises(ContractError) as history_error:
             self.service.read(child["body"]["execution"])
         self.assertEqual(history_error.exception.code, "E_AUTHORITY_REQUIRED")
+
+    def test_recovering_existing_attempt_rejects_other_consumer_without_source_read_rights(self):
+        from matter.authority import AuthorityPolicy
+        from matter.controls import ControlService
+        original = self.run_attempt("actor-a-attempt")
+        actor_b = {**self.f.actor, "id": "different-consumer"}
+        policy_b = AuthorityPolicy(self.f.storage.scope_id, actors=[actor_b], authorities=[pin(self.f.authority)],
+            capabilities=["assessment"], targets=[entity_ref(self.stage.candidate)])
+        controls_b = ControlService(self.f.storage, policy=policy_b, clock=lambda: self.f.now)
+        token_b = controls_b.capture(actor=actor_b, authority=entity_ref(self.f.authority), capability="assessment",
+            targets=[entity_ref(self.stage.candidate)])
+        with self.f.storage.snapshot() as view:
+            with self.assertRaises(ContractError):
+                controls_b._view(view, actor=actor_b, authority=entity_ref(self.f.authority), capability="read",
+                    targets=[entity_ref(self.f.source)], now=self.f.now)
+        with self.assertRaises(ContractError) as refused:
+            self.service.run(self.request, executor=self.stage.spy, token=token_b, logical_request_id="logical",
+                attempt_id="actor-a-attempt", allocation=self.stage.reservation)
+        self.assertEqual(refused.exception.code, "E_AUTHORITY_REQUIRED")
+        self.assertNotIn(self.f.source["id"], str(refused.exception))
+        self.assertEqual(self.run_attempt("actor-a-attempt")["execution"], original["execution"])
+        self.assertEqual(len(self.stage.calls), 1)
+
+    def test_recovering_attempt_rejects_changed_lineage_allocation_and_access_context(self):
+        original = self.run_attempt("same-attempt")
+        baseline = {"executor": self.stage.spy, "token": self.stage.token, "logical_request_id": "logical",
+            "attempt_id": "same-attempt", "allocation": self.stage.reservation}
+        changes = ({"parents": [original["execution"]]}, {"retry_of": original["execution"]},
+                   {"allocation": {**self.stage.reservation, "scope_id": "foreign-scope"}},
+                   {"access_context": {"different": "consumer"}})
+        for changed in changes:
+            with self.subTest(changed=tuple(changed)):
+                with self.assertRaises(ContractError) as refused:
+                    self.service.run(self.request, **{**baseline, **changed})
+                self.assertEqual(refused.exception.code, "E_AUTHORITY_REQUIRED" if "access_context" in changed else "E_IDEMPOTENCY_CONFLICT")
+        self.assertEqual(self.run_attempt("same-attempt")["execution"], original["execution"])
+        self.assertEqual(len(self.stage.calls), 1)
+
+    def test_reused_retry_recovers_exact_original_lineage_after_cancellation(self):
+        from control_helpers import control_command
+        from integration.helpers import _in_scope
+        first = self.run_attempt("original")
+        reused = self.run_attempt("requested-retry", retry_of=first["execution"])
+        self.assertEqual(reused["status"], "reused", reused)
+        metadata = self.service.read(reused["execution"])["body"]["details"]["value"]
+        self.assertEqual(metadata["retry_of"], first["execution"])
+        self.assertEqual(metadata["source_execution"], first["execution"])
+        self.assertEqual(self.run_attempt("requested-retry", retry_of=first["execution"])["execution"], reused["execution"])
+        with self.assertRaises(ContractError) as changed:
+            self.run_attempt("requested-retry")
+        self.assertEqual(changed.exception.code, "E_IDEMPOTENCY_CONFLICT")
+        stop = _in_scope(control_command("cancel-recovered-attempt", self.f.authority, targets=[self.f.source],
+            action="cancel", now=self.f.now), self.f.storage.scope_id)
+        stop["actor"] = self.f.actor; stop["body"]["control"]["body"]["actor"] = self.f.actor
+        self.assertEqual(self.f.controls.apply(self.f.controls.prepare(stop))["status"], "success")
+        historical = self.run_attempt("requested-retry", retry_of=first["execution"])
+        self.assertEqual(historical["execution"], reused["execution"])
+        self.assertFalse(historical["dispatched"])
+        self.assertEqual(self.run_attempt("original")["execution"], first["execution"])
+        self.assertEqual(len(self.stage.calls), 1)

@@ -148,3 +148,11 @@ The immutable stored receipt and original result are unchanged. This derived
 view is for stage consumption; it is not accepted as another physical execution
 observation by the recorder. Choose the predispatch `run` path or the explicit
 post-I/O stage observer according to the actual host execution path.
+
+Recovering an existing logical/attempt ID requires the same original control token,
+access context, normalized actual parent pins, allocation and retry lineage, as
+well as the original submitted request. Another caller/context is refused before
+returning historical data; work-lineage changes conflict with idempotency.
+Unchanged original context can still inspect authorized historical evidence after
+cancellation, without dispatch or fresh qualification. A requested retry satisfied
+by cache preserves `retry_of` alongside `source_execution` in its reuse observation.
