@@ -594,6 +594,51 @@ class DependencyAssessmentTests(GraphFixture, unittest.TestCase):
             self.assertIn(4, capacity_limits)
             self.assertEqual(len(self.storage.watchers(time_watch(self.storage.scope_id))), 2)
 
+    def test_hook_admission_and_sweep_share_one_instant_across_clock_boundary(self):
+        from matter.planner import RulePlan
+        from matter.profiles import ProfileRegistry
+        from matter.rules import RuleRegistry
+        from rule_helpers import LATE
+        fixture = self.fixture
+        before = {"state": "known", "value": "2026-10-10T12:00:00.000000000Z", "precision": "nanosecond"}
+        due = {**before, "value": "2026-10-10T12:00:00.000000001Z"}
+        unknown = {"state": "unknown", "reason": "not_applicable"}
+        condition = {"condition": component("clock-boundary-publication"), "next_check_at": LATE, "expires_at": unknown}
+        fixture.rule_instance = fixture.rule(fixture.binding_instance, change=lambda definition: definition.update(temporal_dependencies=[condition]))
+        fixture.rules = RuleRegistry([fixture.rule_instance])
+        fixture.profile = fixture.make_profile(fixture.rule_instance)
+        fixture.profiles = ProfileRegistry([fixture.profile])
+        fixture.plan = RulePlan(fixture.profile, rules=fixture.rules, schemas=fixture.schemas,
+                               nodes={"evidence": fixture.rule_instance.reference})
+        fixture.service = fixture.make_service()
+        self.graph_now = deepcopy(before)
+        fixture.now = deepcopy(before)
+        reads = []
+        def advancing_clock():
+            self.graph_now = deepcopy(before if not reads else due)
+            reads.append(deepcopy(self.graph_now))
+            return deepcopy(self.graph_now)
+        with patch("matter.dependencies.MAX_LIVE_TEMPORAL", 2), patch("matter.invalidation.MAX_LIVE_TEMPORAL", 2):
+            old, _ = self.host("clock-boundary-old", time_conditions=[{
+                "condition": component("clock-boundary-old"), "next_check_at": due, "expires_at": unknown}])
+            prepared = fixture.prepare()
+            command = fixture.command(prepared)
+            self.hook.clock = advancing_clock
+            result = fixture.service.commit(command)
+            self.assertEqual(result["error"]["code"], "E_BUDGET_EXHAUSTED", result)
+            self.assertEqual(reads, [before])
+            self.assertEqual(self.state(old)["status"], "current")
+            self.assertEqual(len(self.storage.watchers(time_watch(self.storage.scope_id))), 1)
+            # A new attempt at the reached boundary frees exactly the rows its
+            # own sweep will invalidate; no unrelated write is needed to recover.
+            self.graph_now = deepcopy(due)
+            fixture.now = deepcopy(due)
+            self.hook.clock = lambda: deepcopy(self.graph_now)
+            _, _, assessment = fixture.publish()
+            self.assertEqual(self.state(old)["status"], "invalidated")
+            self.fresh(self.storage.get(registration_ref(assessment)))
+            self.assertEqual(len(self.storage.watchers(time_watch(self.storage.scope_id))), 2)
+
 
     def test_read_access_loss_invalidates_source_required_derivative_and_descendant(self):
         fixture = self.fixture

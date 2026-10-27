@@ -97,9 +97,8 @@ class InvalidationHook:
             _fail(code="E_POLICY_INVALID")
         self.clock, self.controls = clock or _now, controls
 
-    def _capture(self, tx, target, *, positive=(), contexts=(), candidate_sets=(), negative=(), conditions=(), token=None):
+    def _capture(self, tx, target, *, now, positive=(), contexts=(), candidate_sets=(), negative=(), conditions=(), token=None):
         tx = _RegistrationView(tx)
-        now = fragment(self.clock(), "known_time")
         manifest = capture_dependencies(tx, scope_id=tx.command["scope_id"], as_of=now, positive=positive,
             contexts=contexts, candidate_sets=candidate_sets, negative_registrations=negative,
             time_conditions=conditions, control_token=token, controls=self.controls)
@@ -111,7 +110,7 @@ class InvalidationHook:
         previous = None if old is None else recomputation_token(tx, pin(old))
         return register_dependency(tx, target, manifest, as_of=now, controls=self.controls, previous=previous)
 
-    def _register_assessment(self, tx, lane):
+    def _register_assessment(self, tx, lane, *, now):
         """Narrow adapter for actual MAT-015 publication, never arbitrary data."""
         value = _value("assessment-current", lane["value"])
         if value["status"] != "current":
@@ -141,15 +140,15 @@ class InvalidationHook:
                     _fail("A published judgment lost its original control context.", "E_POLICY_INVALID")
             manifest = judgment["body"]["dependency_manifest"]
             positive = [ref for ref in manifest["positive"] if _identity(ref) not in proof_only]
-            record = self._capture(tx, reference, positive=positive, negative=packet["negative_registrations"],
+            record = self._capture(tx, reference, now=now, positive=positive, negative=packet["negative_registrations"],
                                    conditions=manifest["time_conditions"], token=original_token)
             created.add(_identity(record))
         semantic = [*dependencies["positive"], *assessment["body"]["judgments"]]
-        record = self._capture(tx, pin(assessment), positive=semantic, candidate_sets=dependencies["candidate_sets"],
+        record = self._capture(tx, pin(assessment), now=now, positive=semantic, candidate_sets=dependencies["candidate_sets"],
                                negative=dependencies["negative_registrations"],
                                conditions=assessment["body"]["dependency_manifest"]["time_conditions"], token=preparation["token"])
         created.add(_identity(record))
-        record = self._capture(tx, pin(lane), positive=[pin(assessment)], token=preparation["token"])
+        record = self._capture(tx, pin(lane), now=now, positive=[pin(assessment)], token=preparation["token"])
         created.add(_identity(record))
         return created
 
@@ -194,7 +193,7 @@ class InvalidationHook:
                 if reference["namespace"] == "matter.assessments" and reference["record_type"] == PROJECTION_TYPE:
                     lane = _current(tx, scope, reference)
                     if lane["value"]["value"].get("status") == "current":
-                        new_registrations.update(self._register_assessment(tx, lane))
+                        new_registrations.update(self._register_assessment(tx, lane, now=now))
         staged, queue, visited = {}, deque(), set()
 
         def record(reference):

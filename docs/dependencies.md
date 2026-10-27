@@ -180,6 +180,9 @@ that sweeps expired work can also replace it without requiring an unrelated
 write first. During a multi-registration publication, the system view permits
 a bounded 1024-row transient cohort (512 old due plus 512 new future rows) until
 the hook flushes invalidations; future admission remains capped at 512.
+Automatic publication uses one hook planning instant for every registration's
+timer admission and the due sweep. Crossing a deadline during that planning
+cannot exclude a row from capacity while leaving it outside the same sweep.
 Exceeding this cap refuses only the new registration, and ordinary intake can
 continue. Cohort proof rows enter the checked read set, not
 semantic dependency edges. Temporal keys also bind the captured scope fence,
