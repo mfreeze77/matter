@@ -95,8 +95,9 @@ class ContextScopeTests(unittest.TestCase):
             "audience_kind": "host_agent", "purposes": [], "responsibilities": [], "preferences": []}))
         return purpose, observer, worker
 
-    def disposition(self, kind, purpose, audience, *, subject=None, until=None, status="active", decision=None):
-        selected = self.select([purpose, audience]).value["components"]
+    def disposition(self, kind, purpose, audience, *, subject=None, until=None, status="active", decision=None, read_targets=()):
+        selected = self.contexts.capture(self.read_token([self.fixture.subject, purpose, audience, *read_targets]),
+            [pin(purpose), pin(audience)]).value["components"]
         return DispositionDefinition({"schema_version": "1.0", "namespace": "example:dispositions", "kind": kind,
             "matter": entity_ref(self.fixture.subject), "purpose": {"reference": selected[0]["reference"], "context": pin(purpose)},
             "audience": {"reference": selected[1]["reference"], "context": pin(audience)},
@@ -169,7 +170,10 @@ class ContextScopeTests(unittest.TestCase):
         selection = self.dispositions.read(token, pin(deferred))
         self.assertTrue(selection.value["active"])
         human = self.consumer("deferred-human", contexts=selection.dependencies, conditions=selection.time_conditions)
-        other = self.consumer("unrelated-worker", contexts=self.select([purpose, worker]).dependencies)
+        worker_ack, _, _ = self.publish(self.disposition("acknowledgement", purpose, worker), service=self.dispositions)
+        worker_selection = self.dispositions.read(self.disposition_token(worker_ack, purpose, worker), pin(worker_ack))
+        self.assertNotEqual(entity_ref(worker_ack), entity_ref(deferred))
+        other = self.consumer("unrelated-worker", contexts=worker_selection.dependencies, conditions=worker_selection.time_conditions)
         self.fixture.now = deepcopy(until)
         expired = self.dispositions.read(token, pin(deferred))
         self.assertFalse(expired.value["active"])
@@ -180,6 +184,72 @@ class ContextScopeTests(unittest.TestCase):
         self.consumer("expiry-boundary-trigger")
         self.assertEqual(self.state(human), "invalidated")
         self.assertEqual(self.state(other), "current")
+
+    def test_disposition_binds_context_revision_and_expiry_instead_of_only_its_slot(self):
+        purpose, _, _ = self.publish(self.definition("purpose", until={"state": "known", "value": "2026-10-11T12:00:00Z", "precision": "second"}))
+        audience, _, _ = self.publish(self.definition("audience", "context-bound-observer"))
+        acknowledged, _, _ = self.publish(self.disposition("acknowledgement", purpose, audience), service=self.dispositions)
+        selection = self.dispositions.read(self.disposition_token(acknowledged, purpose, audience), pin(acknowledged))
+        self.assertIn(pin(purpose), selection.dependencies)
+        self.assertIn(pin(audience), selection.dependencies)
+        self.assertTrue(any(condition["next_check_at"]["value"] == "2026-10-11T12:00:00Z" for condition in selection.time_conditions))
+        consumer = self.consumer("context-bound-disposition", contexts=selection.dependencies, conditions=selection.time_conditions)
+        changed, _, _ = self.publish(self.definition("audience", "context-bound-observer", version="2.0"), previous=pin(audience))
+        self.assertEqual(self.state(consumer), "invalidated")
+        historical = self.dispositions.read(self.disposition_token(acknowledged, purpose, changed), pin(acknowledged))
+        self.assertFalse(historical.value["active"])
+        self.assertFalse(historical.value["scope_current"])
+        self.fixture.now = {"state": "known", "value": "2026-10-11T12:00:00Z", "precision": "second"}
+        self.assertFalse(self.dispositions.read(self.disposition_token(acknowledged, purpose, changed), pin(acknowledged)).value["active"])
+
+    def test_historical_disposition_withdrawal_retains_all_original_scope_read_guards(self):
+        from control_helpers import control_command
+        from integration.helpers import _in_scope
+        definition = self.definition("purpose", until={"state": "known", "value": "2026-10-11T12:00:00Z", "precision": "second"})
+        value = definition.value
+        value["applies_to"].append(entity_ref(self.fixture.source))
+        purpose, _, _ = self.publish(ContextDefinition(value))
+        audience, _, _ = self.publish(self.definition("audience", "withdrawal-observer"))
+        # The original accepted control retains even the extra scope source,
+        # which is absent from the disposition's direct matter/subject fields.
+        old_definition = self.disposition("acknowledgement", purpose, audience, subject=pin(self.fixture.subject), read_targets=[self.fixture.source])
+        old, _, _ = self.publish(old_definition, service=self.dispositions)
+        changed, _, _ = self.publish(self.definition("audience", "withdrawal-observer", version="2.0"), previous=pin(audience))
+        self.fixture.now = {"state": "known", "value": "2026-10-11T12:00:00Z", "precision": "second"}
+        withdrawn = old_definition.value
+        withdrawn["status"] = "withdrawn"
+        def permission(identity, action, supersedes=()):
+            command = _in_scope(control_command(identity, self.fixture.authority, targets=[self.fixture.source],
+                action=action, capabilities=["read"], supersedes=supersedes, now=self.fixture.now), self.storage.scope_id)
+            command["actor"] = deepcopy(self.fixture.actor)
+            command["body"]["control"]["body"]["actor"] = deepcopy(self.fixture.actor)
+            result = self.controls.apply(self.controls.prepare(command))
+            self.assertEqual(result["status"], "success")
+            return result
+        denial = permission("deny-retained-context-source", "deny")
+        with self.assertRaises(StorageError) as error:
+            self.publish(DispositionDefinition(withdrawn), previous=pin(old), service=self.dispositions)
+        self.assertEqual(error.exception.code, "E_AUTHORITY_REQUIRED")
+        permission("restore-retained-context-source", "allow", supersedes=[denial["body"]["control"]])
+        prepared = self.dispositions.prepare(DispositionDefinition(withdrawn), command_id="retained-proof-withdrawal",
+            idempotency_key="retained-proof-withdrawal", actor=self.fixture.actor, authority=entity_ref(self.fixture.authority), previous=pin(old))
+        for mode in ("shrink", "expand"):
+            forged = deepcopy(prepared)
+            forged["idempotency_key"] += "-" + mode
+            forged["command_id"] += "-" + mode
+            forged["body"]["control"]["id"] += "-" + mode
+            targets = forged["body"]["control"]["extensions"]["matter:context-targets"]["value"]["targets"]
+            if mode == "shrink":
+                targets.remove(entity_ref(self.fixture.source))
+            else:
+                targets.append({**entity_ref(self.fixture.source), "id": "unrelated-unread-source"})
+            refused = self.dispositions.commit(forged)
+            self.assertEqual(refused["error"]["code"], "E_AUTHORITY_REQUIRED")
+            self.assertEqual(self.storage.get(disposition_ref(old_definition)), old)
+        replacement, _, _ = self.publish(DispositionDefinition(withdrawn), previous=pin(old), service=self.dispositions)
+        self.assertEqual(self.storage.get(pin(old)), old)
+        self.assertEqual(self.storage.get(disposition_ref(old_definition)), replacement)
+        self.assertEqual(replacement["value"]["value"]["definition"]["status"], "withdrawn")
 
     def test_acknowledgement_is_not_agreement_repair_or_lifecycle_change(self):
         purpose, observer, _ = self.purpose_and_audiences()

@@ -20,6 +20,7 @@ from .time import compare_times
 _ENGINE = {"namespace": "matter", "id": "host-contexts", "version": "1.0",
            "digest": canonical_digest({"implementation": "matter.contexts.v1"}, "matter.component.v1")}
 _UNBOUNDED = {"state": "unknown", "reason": "not_applicable"}
+_TARGETS_EXTENSION = "matter:context-targets"
 
 
 def _fail(code="E_EVIDENCE_INVALID"):
@@ -27,7 +28,7 @@ def _fail(code="E_EVIDENCE_INVALID"):
 
 
 def _namespace(value):
-    name = fragment(value, "identifier")
+    name = fragment(value, "namespace")
     if name == "matter" or name.startswith("matter."):
         _fail("E_SCOPE_FORBIDDEN")
     return name
@@ -128,6 +129,27 @@ def _record_targets(record):
         "authority": record["body"]["authority"], "expected_revisions": [], "body": {"control": control}})
 
 
+def _retained_targets(control):
+    if control["provenance"]["origin"] != "host" or control["provenance"]["producer"] != _ENGINE:
+        _fail("E_EVIDENCE_INVALID")
+    wrapped = control.get("extensions", {}).get(_TARGETS_EXTENSION)
+    if wrapped is None:
+        _fail("E_EVIDENCE_UNAVAILABLE")
+    targets = _value("context-targets", wrapped)["targets"]
+    if targets != _targets(control["scope_id"], _refs(targets)):
+        _fail("E_EVIDENCE_INVALID")
+    return targets
+
+
+def _mutation_targets(command, targets):
+    bare = deepcopy(command)
+    extensions = bare["body"]["control"].get("extensions", {})
+    extensions.pop(_TARGETS_EXTENSION, None)
+    if not extensions:
+        bare["body"]["control"].pop("extensions", None)
+    return _targets(command["scope_id"], _refs([*targets, *command_targets(bare)]))
+
+
 def _refs(values):
     return sorted({canonical_bytes(entity_ref(ref)): entity_ref(ref) for ref in values}.values(), key=canonical_bytes)
 
@@ -192,7 +214,9 @@ class _MutationService:
         return command, payload
 
     def _authorize(self, view, command, targets):
-        targets = _targets(self.scope_id, _refs([*targets, *command_targets(command)]))
+        targets = _mutation_targets(command, targets)
+        if _retained_targets(command["body"]["control"]) != targets:
+            _fail("E_AUTHORITY_REQUIRED")
         self.controls.policy.authorize(view, actor=command["actor"], authority=command["authority"], targets=targets,
             control_kind=command["body"]["control"]["body"]["control_kind"])
         self.controls._audit(view, command, targets)
@@ -205,9 +229,11 @@ class _MutationService:
         with self.storage.snapshot() as snapshot:
             view = _Collector(snapshot, include)
             state = self._state(view, command, payload, preparing=True)
-            self._authorize(view, command, state["targets"])
             if state["old"] is not None:
                 command["body"]["control"]["supersedes"] = [state["old_control"]]
+            command["body"]["control"].setdefault("extensions", {})[_TARGETS_EXTENSION] = domain(
+                "context-targets", {"targets": _mutation_targets(command, state["targets"])})
+            self._authorize(view, command, state["targets"])
         command["expected_revisions"] = sorted(pins.values(), key=canonical_bytes)
         return self.controls.prepare(command)
 

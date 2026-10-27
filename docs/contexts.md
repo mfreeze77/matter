@@ -148,12 +148,32 @@ transition. Superseding a disposition requires its exact prior slot revision.
 An authorized `status: "withdrawn"` replacement preserves the original record
 and does not fabricate recovery evidence.
 
+Applicability also requires the bound purpose/audience pointers to remain
+current and their intervals to be active. A selection exposes those exact
+pointer/version dependencies and future interval guards, in addition to the
+disposition slot. A context revision or expiry can therefore invalidate its
+consumer even when the disposition itself has not changed; an authorized
+historical read then reports it inactive.
+
+Withdrawal of an exact old slot remains possible after a linked context is
+revised or expires. Each new mutation retains its complete host-derived public
+target set in the immutable control's strict `matter:context-targets` extension.
+Prepare derives this proof, commit rederives and compares it, and withdrawal
+reauthorizes/READ-audits every retained target from the actual prior control.
+It never reads an obsolete mutable pointer inside the write transaction or
+accepts a caller-shrunk target list. Legacy controls without that proof fail
+closed for withdrawal when the complete old scope cannot be reconstructed.
+
 `read` returns applicability, exact disposition dependency and future interval
 guards. To compute current work, use the current slot and bind those dependencies
 to the consumer. A historical read remains historical evidence. Absence is an
 explicit `E_NOT_FOUND`, not a completeness claim over all dispositions. Hosts
 that depend on absence must derive their exact candidate slots and retain the
 corresponding original control-fence guards; no global disposition scan exists.
+`disposition_scope_ref(namespace=..., kind=..., matter=..., purpose=...,
+audience=..., subject=...)` derives the same exact slot without constructing a
+fictional accepted disposition. This permits callers to guard each relevant
+missing candidate through its original control-fence absence.
 
 ## Host authority, reads and replay
 

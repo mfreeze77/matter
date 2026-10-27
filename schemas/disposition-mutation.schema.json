@@ -31,7 +31,7 @@
           "const": "1.0"
         },
         "namespace": {
-          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespace"
         },
         "kind": {
           "enum": [
