@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/lifecycle-request.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profile",
+    "condition",
+    "claim",
+    "occurrence",
+    "decision",
+    "token",
+    "previous",
+    "previous_registration",
+    "captured_at"
+  ],
+  "properties": {
+    "profile": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    },
+    "condition": {},
+    "claim": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/claim_dependency"
+    },
+    "occurrence": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/occurrence_dependency"
+    },
+    "decision": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
+        }
+      ]
+    },
+    "token": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
+    },
+    "previous": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+        }
+      ]
+    },
+    "previous_registration": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
+        }
+      ]
+    },
+    "captured_at": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+    },
+    "access_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "scope_id",
+        "policy",
+        "audience",
+        "provider",
+        "token",
+        "references",
+        "dependencies"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "scope_id": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+        },
+        "policy": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+        },
+        "audience": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+        },
+        "provider": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+            }
+          ]
+        },
+        "token": {
+          "title": "Matter control token v1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scope_id",
+            "actor",
+            "authority",
+            "policy",
+            "capability",
+            "targets",
+            "control_epoch",
+            "captured_at",
+            "fences",
+            "controls",
+            "active_controls"
+          ],
+          "properties": {
+            "scope_id": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+            },
+            "actor": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/actor_ref"
+            },
+            "authority": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+            },
+            "policy": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+            },
+            "capability": {
+              "enum": [
+                "association",
+                "merge",
+                "correction",
+                "transition",
+                "read",
+                "delivery",
+                "assessment",
+                "write"
+              ]
+            },
+            "targets": {
+              "type": "array",
+              "items": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/entity_ref"
+              }
+            },
+            "control_epoch": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+            },
+            "captured_at": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+            },
+            "fences": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "target",
+                  "reference",
+                  "pin"
+                ],
+                "properties": {
+                  "target": {
+                    "oneOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/entity_ref"
+                      }
+                    ]
+                  },
+                  "reference": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/entity_ref"
+                  },
+                  "pin": {
+                    "oneOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "controls": {
+              "type": "array",
+              "items": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
+              }
+            },
+            "active_controls": {
+              "type": "array",
+              "items": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
+              }
+            }
+          }
+        },
+        "references": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+          }
+        }
+      }
+    }
+  }
+}
