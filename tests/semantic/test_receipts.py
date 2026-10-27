@@ -729,10 +729,13 @@ class DurableExecutionTests(unittest.TestCase):
         address = attempt_ref(self.f.storage.scope_id, "logical", "source")
         original = self.f.storage.get(address)
         valid = deepcopy(original["value"])
-        mutations = [({"calls": -5, "elapsed_ms": -100000}, "completed"), ({"calls": "1"}, "completed"),
-            ({"calls": True}, "completed"), ({"unrecognized": 0}, "completed"),
-            ({key: value for key, value in valid["value"]["caps"].items() if key != "calls"}, "started"),
-            ({}, "started"), (valid["value"]["caps"], "not-a-phase")]
+        full = valid["value"]["caps"]
+        mutations = [({**full, "calls": -5}, "completed"), ({**full, "elapsed_ms": -100000}, "completed"),
+            ({**full, "calls": "1"}, "completed"), ({**full, "calls": True}, "completed"),
+            ({**full, "unrecognized": 0}, "completed"), ({"calls": -5}, "observed"),
+            ({"unrecognized": 0}, "reused"),
+            ({key: value for key, value in full.items() if key != "calls"}, "started"),
+            ({}, "started"), (full, "not-a-phase")]
         def privileged_fixture_write(payload, suffix):
             # Deliberately bypass the private schema constructor to simulate a
             # malformed imported journal through the real generic storage port.
@@ -745,7 +748,7 @@ class DurableExecutionTests(unittest.TestCase):
                 return tx.success("created", {"matter": pin(subject)})
             self.assertEqual(self.f.storage.execute(command, handler)["status"], "success")
         for index, (caps, phase) in enumerate(mutations):
-            with self.subTest(index=index):
+            with self.subTest(index=index, phase=phase, caps=caps):
                 malformed = deepcopy(valid); malformed["value"].update(caps=caps, phase=phase)
                 privileged_fixture_write(malformed, "bad-" + str(index))
                 with self.assertRaises(ContractError) as refused:
