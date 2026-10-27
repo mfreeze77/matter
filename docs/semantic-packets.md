@@ -141,8 +141,9 @@ preserve uncertainty, without future source IDs or text.
 
 All exposed JSON is detached. Caller mutation cannot change the frozen packet
 or profile. Preparation performs no durable assessment commit, transitive
-invalidation, certificate issuance or provider admission. Those later gates
-must retain the exact packet/profile/preparation/audit identities and perform
-their own currentness and authority checks.
+invalidation, certificate issuance or provider admission. The
+[receipt store](semantic-receipts.md) and [admission service](semantic-qualification.md)
+retain exact packet/profile/preparation/audit identities and perform their own
+currentness and authority checks.
 
 See the [MAT-028 receipt](validation/MAT-028.md) for executed synthetic evidence.

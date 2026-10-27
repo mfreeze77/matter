@@ -127,8 +127,11 @@ unknown rather than claiming zero calls.
 
 A reservation is one work assignment. Hosts must not invoke this uncommitted
 runner repeatedly with a fresh copy of the same envelope to reset capacity.
-Durable attempt idempotency and exact reuse belong to MAT-030. This synchronous
-runtime cannot preempt a Python callback that ignores cancellation.
+Use MAT-030's [receipt store](semantic-receipts.md) for durable pre-I/O claiming,
+attempt idempotency and exact reuse. Its `view_result` supplies the current-batch
+view to this planner; a cache hit retains the original execution and adds zero
+new calls. This synchronous runtime cannot preempt a Python callback that ignores
+cancellation.
 
 `StageRun.value` retains the plan/reservation identity, exact prepared inputs,
 batch requests/results, parent trace IDs, ignored questions, timed gate
