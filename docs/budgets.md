@@ -76,6 +76,11 @@ prepared loser receives a conflict; the service does not silently refresh or
 retry it. A fresh request can then observe `budget_limited`. Exact command retry
 returns the durable journal result and does not renew an allocation or prove a
 new invocation occurred. Reservation identities cannot be recycled for new work.
+Settlement retry audits the actual original allocation snapshot's stored work
+targets, including after its current projection has advanced to released or
+committed. Caller cleanup hints cannot omit those READ checks. Historical
+inspection does not require the old work token to become current again, but a
+present target READ denial still prevents disclosure.
 
 ## Execute within one committed allocation
 
@@ -123,7 +128,9 @@ gates.
 
 An account has at most 512 live unused holds through the existing exact-key
 watch index. Checked operations retain at most 4,096 records and 8 MiB of unique
-record data. Exceeding a bound is an explicit budget refusal. Historical rows
+record data. Each unique record's bytes are counted once; duplicate reads retain
+the existing exact-pin conflict checks without repeatedly serializing the whole
+prior read set under the writer lock. Exceeding a bound is an explicit budget refusal. Historical rows
 remain available after finalization; they leave the live cohort.
 
 The [MAT-020 receipt](validation/MAT-020.md) records real SQLite races,

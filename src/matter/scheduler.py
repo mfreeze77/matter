@@ -11,7 +11,7 @@ from ._rule_values import FrozenValue, descriptor, domain, fragment
 from .attention import AttentionService
 from .budgets import _Reads, _lookup, _value, milliseconds
 from .canonical import canonical_bytes, canonical_digest
-from .contracts import validate_command
+from .contracts import ContractError, validate_command
 from .controls import ControlService, command_targets
 from .dependencies import capture_dependencies
 from .storage import PROJECTION_TYPE, StorageError, entity_ref, pin
@@ -89,10 +89,12 @@ class Scheduler:
         definition = TimerDefinition(value)
         if definition.value["matter"]["scope_id"] != self.scope_id:
             _fail("E_SCOPE_FORBIDDEN")
+        return definition
+
+    def _require_installed(self, definition):
         self.attention.assessments.profiles.resolve(definition.value["profile"])
         for reference in definition.value["rules"]:
             self.attention.assessments.rules.resolve(reference)
-        return definition
 
     def _capture(self, view, definition, token, now):
         return capture_dependencies(view, scope_id=self.scope_id, as_of=now,
@@ -149,6 +151,7 @@ class Scheduler:
         if old is not None and (definition.value["generation"] <= old["definition"]["generation"] or
                                 definition.value["semantic_version"] == old["definition"]["semantic_version"]):
             _fail("E_POLICY_INVALID")
+        self._require_installed(definition)
         self.controls.require_current(view, token, capability="assessment", targets=targets, as_of=now)
         assessment, lane = self.attention.assessments.read_current(view, definition.value["assessment"], definition.value["profile"], as_of=now)
         if any(assessment["body"].get(key) != definition.value[key] for key in ("matter", "profile", "purpose", "audience")):
@@ -201,6 +204,12 @@ class Scheduler:
             return row, state, definition, [], ("inert", "expired")
         if -milliseconds(now, request["captured_at"]) > definition.value["max_clock_skew_ms"]:
             _fail("E_DEPENDENCY_STALE")
+        try:
+            self._require_installed(definition)
+        except ContractError as error:
+            if error.code != "E_POLICY_INVALID":
+                raise
+            return row, state, definition, [], ("inert", "original_policy_unavailable")
         try:
             self.controls.require_current(view, token, capability="assessment", targets=token["targets"], as_of=now)
             manifest = self._capture(view, definition, token, now)
@@ -263,6 +272,8 @@ class Scheduler:
         if type(wrapped) is not dict or wrapped != domain("timer-request", wrapped.get("value")):
             _fail()
         request = wrapped["value"]
+        if request["token"] != domain("control-token", request["token"]["value"]):
+            _fail("E_AUTHORITY_REQUIRED")
         def handler(tx):
             view, now = _Reads(tx, self.scope_id), fragment(self.clock(), "known_time")
             if command["operation"] == "schedule_timer":
@@ -315,7 +326,14 @@ class Scheduler:
             return tx.success("fired", {"timer": pin(stored), "firing": pin(firing), "scheduled_at": due[-1]["at"],
                 "actual_at": now, "coalesced_count": len(due), "attention_decision": staged["decision"]})
         def audit(view):
-            self.controls._audit(view, command, command_targets(command))
+            targets = [*command_targets(command), *request["token"]["value"]["targets"]]
+            if command["operation"] == "fire_timer":
+                # Snapshot replay supports the exact old timer pin after the
+                # firing/cancel operation has revisioned its current projection.
+                state = _value(view.get(command["body"]["timer"]), "timer-state")
+                targets.extend(state["token"]["value"]["targets"])
+            targets = sorted({canonical_bytes(entity_ref(item)): entity_ref(item) for item in targets}.values(), key=canonical_bytes)
+            self.controls._audit(view, command, targets)
             if command["operation"] == "fire_timer" and self.attention.access is not None:
                 self._history_access(view, command)
         return self.storage.execute(command, handler, replay_guard=audit, dependency_error_code="E_DEPENDENCY_STALE")

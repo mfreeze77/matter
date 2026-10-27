@@ -10,7 +10,8 @@ from unittest.mock import patch
 from matter._rule_values import domain
 from matter.access import AccessService, HostAccessPolicy
 from matter.assessments import AssessmentService
-from matter.attention import AttentionService
+from matter.attention import AttentionPolicy, AttentionService
+from matter.authority import AuthorityPolicy
 from matter.budgets import BudgetDefinition, BudgetService, REQUEST_EXTENSION as BUDGET_REQUEST, budget_ref
 from matter.contexts import ContextDefinition
 from matter.contracts import ContractError
@@ -18,6 +19,8 @@ from matter.controls import ControlService
 from matter.invalidation import InvalidationHook
 from matter.scheduler import Scheduler, TimerDefinition, firing_key, timer_ref
 from matter.rules import RuleRegistry
+from matter.profiles import ProfileRegistry
+from matter.planner import RulePlan
 from matter.storage import SQLiteStore, StorageError, entity_ref, pin
 
 from control_helpers import control_command
@@ -307,6 +310,124 @@ class TimerBudgetTests(unittest.TestCase):
             self.schedule(assessment, rules=[unused.reference])
         self.assertEqual(error.exception.code, "E_EVIDENCE_INVALID")
         self.assertEqual(self.scheduler.due(), [])
+
+    def restrict_authority(self, targets):
+        prior = self.f.controls.policy.definition
+        self.f.controls.policy = AuthorityPolicy(self.f.storage.scope_id, actors=prior["actors"],
+            authorities=prior["authorities"], capabilities=prior["capabilities"],
+            control_kinds=prior["control_kinds"], targets=targets)
+
+    def deny_read(self, identity):
+        command = _in_scope(control_command(identity, self.f.authority, targets=[self.f.subject],
+            action="deny", capabilities=["read"], now=self.f.now), self.f.storage.scope_id)
+        command["actor"] = self.f.actor
+        command["body"]["control"]["body"]["actor"] = self.f.actor
+        result = self.f.controls.apply(self.f.controls.prepare(command))
+        self.assertEqual(result["status"], "success", result)
+
+    def test_settlement_replay_uses_historical_allocation_targets_not_release_hint(self):
+        self.restrict_authority([entity_ref(self.f.subject)])
+        held, original, _ = self.reserve("scoped-release")
+        release = self.command("settle_budget", {"reservation": pin(held), "action": "release"})
+        token = original["extensions"][BUDGET_REQUEST]["value"]["token"]["value"]
+        release = self.budgets.prepare(release, token=token)
+        # Unused-capacity cleanup is authenticated against the stored work
+        # targets. Its caller context cannot omit those targets on later replay.
+        release["extensions"][BUDGET_REQUEST]["value"]["token"]["value"]["targets"] = []
+        released = self.budgets.execute(release)
+        self.assertEqual(released.get("outcome"), "released", released)
+        self.assertEqual(self.budgets.execute(release), released)
+        self.assertGreater(self.f.storage.get(entity_ref(held))["revision"], held["revision"])
+        held, original, _ = self.reserve("scoped-commit")
+        commit, committed = self.settle(held, original, "commit")
+        self.assertEqual(committed.get("outcome"), "committed", committed)
+        self.assertEqual(self.budgets.execute(commit), committed)
+        self.deny_read("deny-scoped-budget-replay")
+        for command in (release, commit):
+            refused = self.budgets.execute(command)
+            self.assertEqual(refused["status"], "failure", refused)
+            self.assertEqual(refused["error"]["code"], "E_AUTHORITY_REQUIRED")
+
+    def test_scope_restricted_empty_attention_fire_replays_audit_original_timer_targets(self):
+        assessment, _, _, _ = self.a.assess("scoped-timer-history")
+        timer, definition, token, _ = self.schedule(assessment, identity="completed-history")
+        inert_timer, inert_definition, inert_token, _ = self.schedule(assessment, identity="inert-history")
+        self.f.now = deepcopy(T1)
+        fired = self.scheduler.execute(self.fire_command(timer, definition, token, assessment))
+        self.assertEqual(fired.get("outcome"), "fired", fired)
+        # Tightening the host ceiling invalidates work tokens, while keeping
+        # actual historical READ permission for precisely these stored targets.
+        self.restrict_authority(token["targets"])
+        current = self.f.storage.get(entity_ref(timer))
+        duplicate = self.command("fire_timer", {"timer": pin(current), "firing_key": fired["body"]["firing"]["id"], "attention_command": None})
+        duplicate = self.scheduler.prepare_fire(duplicate)
+        already = self.scheduler.execute(duplicate)
+        self.assertEqual(already.get("outcome"), "already_fired", already)
+        self.assertEqual(self.scheduler.execute(duplicate), already)
+        inert = self.command("fire_timer", {"timer": pin(inert_timer),
+            "firing_key": firing_key(inert_definition, inert_definition.value["checkpoints"][0]), "attention_command": None})
+        inert = self.scheduler.prepare_fire(inert)
+        withheld = self.scheduler.execute(inert)
+        self.assertEqual(withheld.get("outcome"), "inert", withheld)
+        self.assertEqual(self.scheduler.execute(inert), withheld)
+        self.deny_read("deny-scoped-fire-replay")
+        for command in (duplicate, inert):
+            refused = self.scheduler.execute(command)
+            self.assertEqual(refused["status"], "failure", refused)
+            self.assertEqual(refused["error"]["code"], "E_AUTHORITY_REQUIRED")
+
+    def test_restart_discovers_healthy_timer_with_orphaned_rules_and_cancels_missing_profile(self):
+        old_assessment, _, _, _ = self.a.assess("old-registry-version")
+        orphan, old_definition, _, _ = self.schedule(old_assessment, identity="orphan-fire")
+        cancel, cancel_definition, cancel_token, _ = self.schedule(old_assessment, identity="orphan-cancel")
+        f = self.f
+        old_profile, old_rule = f.profile, f.rule_instance
+        current_rule = f.rule(f.binding_instance, identity="current-only-rule")
+        current_profile = f.make_profile(current_rule, identity="current-only-profile")
+        f.rules = RuleRegistry([old_rule, current_rule])
+        f.profiles = ProfileRegistry([old_profile, current_profile])
+        f.profile, f.rule_instance = current_profile, current_rule
+        f.plan = RulePlan(current_profile, rules=f.rules, schemas=f.schemas, nodes={"evidence": current_rule.reference})
+        f.service.rules, f.service.profiles = f.rules, f.profiles
+        value = self.a.policy.value
+        value.update(id="current-only-attention", profile=current_profile.reference)
+        self.a.policy = AttentionPolicy(value)
+        self.a.service = AttentionService(f.storage, assessments=f.service, policies=[self.a.policy],
+            controls=f.controls, clock=lambda: deepcopy(f.now))
+        self.scheduler = Scheduler(f.storage, attention=self.a.service, controls=f.controls, clock=lambda: deepcopy(f.now))
+        healthy_assessment, _, _, _ = self.a.assess("healthy-registry-version")
+        healthy, healthy_definition, healthy_token, _ = self.schedule(healthy_assessment, identity="healthy-fire")
+        before_calls = len(f.calls)
+        f.rules = RuleRegistry([current_rule])
+        f.service.rules = f.rules
+        f.now = deepcopy(T1)
+        # First restart keeps the old profile but has dropped its exact rule.
+        with self.restarted() as restarted:
+            self.assertEqual({item["timer"]["id"] for item in restarted.due()}, {orphan["id"], cancel["id"], healthy["id"]})
+            command = self.command("fire_timer", {"timer": pin(orphan),
+                "firing_key": firing_key(old_definition, old_definition.value["checkpoints"][0]), "attention_command": None})
+            result = restarted.execute(restarted.prepare_fire(command))
+            self.assertEqual(result.get("outcome"), "inert", result)
+            self.assertEqual(result["body"]["reason"], "original_policy_unavailable")
+        # A second reopen also drops the old profile. The other orphan can still
+        # be administratively cancelled, and the healthy timer still fires.
+        f.profiles = ProfileRegistry([current_profile])
+        f.service.profiles = f.profiles
+        with self.restarted() as restarted:
+            self.assertEqual({item["timer"]["id"] for item in restarted.due()}, {cancel["id"], healthy["id"]})
+            command = self.command("schedule_timer", {"action": "cancel",
+                "timer": domain("timer-definition", cancel_definition.value), "previous": pin(cancel)})
+            result = restarted.execute(restarted.prepare_schedule(command, token=cancel_token))
+            self.assertEqual(result.get("outcome"), "cancelled", result)
+            self.assertEqual([item["timer"]["id"] for item in restarted.due()], [healthy["id"]])
+            inner = self.a.prepare(healthy_assessment, token=healthy_token)
+            command = self.command("fire_timer", {"timer": pin(healthy),
+                "firing_key": firing_key(healthy_definition, healthy_definition.value["checkpoints"][0]),
+                "attention_command": domain("operation-command", inner)})
+            result = restarted.execute(restarted.prepare_fire(command))
+            self.assertEqual(result.get("outcome"), "fired", result)
+            self.assertEqual(restarted.due(), [])
+        self.assertEqual(len(f.calls), before_calls)
 
 
 if __name__ == "__main__":

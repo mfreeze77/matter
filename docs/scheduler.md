@@ -77,6 +77,11 @@ Exact command retry returns the journal result. A new inspection of the same
 firing key returns `already_fired` with its original receipt and decision,
 without reevaluating attention. A key bound to another definition/generation
 cannot stand in for the current condition.
+Fire retries audit both the original request targets and the actual historical
+timer's stored targets, even when no attention command is supplied. This keeps
+target-scoped authority usable for `already_fired` and `inert` retries and
+preserves current READ denials. Historical inspection does not refresh an old
+work token or rerun attention.
 
 `not_due` leaves the cursor unchanged. Expired, cancelled or invalidated
 original contexts produce an explicit `inert` result rather than fabricated
@@ -84,6 +89,14 @@ evaluation. Missing attention preparation records its unavailable reason and
 leaves the condition pending. Current READ denial remains a refusal. A new
 equal-epoch token cannot replace the original timer context, even if it currently
 has sufficient scope.
+
+Discovery interprets the bounded timer declaration without resolving historical
+profile or rule versions. Creating or replacing a timer still requires those
+versions installed and admitted. If an active old condition's exact policy is
+no longer installed, fire records `inert` with `original_policy_unavailable` and
+removes it from the active cohort. Current host authority can also cancel it
+without reinstalling old semantic rules. One orphan cannot block discovery or
+execution of another healthy condition after restart.
 
 Source/access eligibility is checked by the actual attention stage. With an
 installed access boundary, existing-firing inspection and exact replay also use

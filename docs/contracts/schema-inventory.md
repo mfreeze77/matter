@@ -474,7 +474,7 @@ MAT-020 adds [timer definition](../../schemas/timer-definition.schema.json),
 [request](../../schemas/timer-request.schema.json), [state](../../schemas/timer-state.schema.json),
 [manifest](../../schemas/timer-manifest.schema.json), and [firing](../../schemas/timer-firing.schema.json)
 contracts. Separate budget resources bind [policy](../../schemas/budget-policy.schema.json),
-[amounts](../../schemas/budget-amounts.schema.json), [requests](../../schemas/budget-request.schema.json),
+[requests](../../schemas/budget-request.schema.json),
 [accounts](../../schemas/budget-account.schema.json), and [reservations](../../schemas/budget-reservation.schema.json).
 See [scheduling](../scheduler.md) and [budgets](../budgets.md).
 
@@ -483,5 +483,6 @@ The four additive v1 operations are `schedule_timer`, `fire_timer`,
 from trusted control input. Existing operation branches and twelve core record
 kinds are preserved; readers that do not recognize a new operation refuse it.
 The portable inventory now has **28 operations and 58 successful outcome pairs**.
-The package has **80 JSON Schema resources** at this milestone. These shapes
+The package has **79 JSON Schema resources** at this milestone. These shapes
 and their synthetic fixtures establish no external delivery or provider accuracy.
+

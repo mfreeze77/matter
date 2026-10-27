@@ -47,9 +47,16 @@ def _lookup(view, reference):
 
 
 class _Reads(_Tracked):
+    def __init__(self, view, scope):
+        super().__init__(view, scope)
+        self.bytes = 0
+
     def _remember(self, value):
+        identity = tuple(value[key] for key in ("scope_id", "namespace", "id"))
+        if identity not in self.records:
+            self.bytes += len(canonical_bytes(value))
         result = super()._remember(value)
-        if len(self.records) > 4096 or sum(len(canonical_bytes(item)) for item in self.records.values()) > 8388608:
+        if len(self.records) > 4096 or self.bytes > 8388608:
             _fail("E_BUDGET_EXHAUSTED")
         return result
 
@@ -269,7 +276,15 @@ class BudgetService:
             return tx.success(status, {"reservation": pin(stored), "reason": "Conservative allocation " + status + ".",
                 "remaining": remaining, "next_eligible_at": next_at})
         def audit(view):
-            self.controls._audit(view, command, command_targets(command))
+            targets = command_targets(command)
+            if command["operation"] == "settle_budget":
+                # A journal retry reads the actual original allocation snapshot,
+                # even after settlement revisions it. Release's caller token is
+                # not an authoritative declaration of that work's read targets.
+                allocation = _value(view.get(command["body"]["reservation"]), "budget-reservation")
+                targets.extend(allocation["targets"])
+            targets = sorted({canonical_bytes(entity_ref(item)): entity_ref(item) for item in targets}.values(), key=canonical_bytes)
+            self.controls._audit(view, command, targets)
         return self.storage.execute(command, handler, replay_guard=audit, dependency_error_code="E_DEPENDENCY_STALE")
 
     def require_committed(self, view, reference, *, as_of=None):
