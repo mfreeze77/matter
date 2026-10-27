@@ -1,0 +1,84 @@
+# .oil/repo_profile.yaml (IO2-131): how this repository shapes its tickets, commits and docs.
+# Committed. Written by the agent running the oildrop skill; read by Oil's deterministic code.
+# No machine paths, no secrets. Check it with: oildrop profile --check
+schema: oil.repo-profile.v1
+tickets:
+  roots: [tickets, docs/decisions]
+  exclude:
+    - tickets/INDEX.md
+    - tickets/README.md
+    # owned by other repositories (owner_repo in tickets/records): not intent for this one
+    - tickets/MAT-047.md
+    - tickets/MAT-051.md
+    - tickets/MAT-052.md
+    - tickets/MAT-053.md
+    - tickets/MAT-054.md
+    - tickets/MAT-055.md
+    - tickets/MAT-056.md
+    - tickets/MAT-057.md
+    - tickets/MAT-058.md
+    - tickets/MAT-059.md
+    - tickets/MAT-060.md
+    - tickets/MAT-061.md
+    - tickets/MAT-062.md
+    - tickets/MAT-063.md
+    - tickets/MAT-064.md
+    - tickets/MAT-065.md
+    - tickets/MAT-066.md
+    - tickets/MAT-067.md
+    - tickets/MAT-068.md
+    - tickets/MAT-069.md
+    - tickets/MAT-070.md
+    - tickets/MAT-071.md
+  schemes:
+    - {name: mat, kind: id, id: 'MAT-\d{3}', file: '^(?P<id>MAT-\d{3})$'}
+    - {name: decision, kind: number, id: '\d{4}', file: '^(?P<id>\d{4})-[a-z]'}
+commits:
+  subject: ADDRESSES
+  body: MENTIONS
+  branch: ADDRESSES
+  trailers: ADDRESSES
+  notes: ADDRESSES
+sections:
+  intent: [Purpose, In scope, Implementation, Acceptance criteria, Required test cases, Risks, Decision,
+           Consequences]
+  skip: [Scope boundaries, Sources, Existing work to inspect and reuse, Planned artifacts, Context]
+  as_built: [Completion evidence]
+  default: keep
+docs:
+  dirs: [docs]
+provenance:
+  written_by: {agent: claude-code, model: claude-opus-5-5}
+  written_at: '2026-10-26'
+  from_commit: fa2bb632056253904299475fea004ab3c9b094ff
+  method: >-
+    Read AGENTS.md, tickets/README.md, the ticket template fields, MAT-010 (done) and MAT-071 (largest) in
+    full, decision 0001, the heading census and owner_repo of all 80 MAT tickets, git log of all 36 commits
+    and every branch; then oildrop profile --check (focus MAT-010, MAT-002), clean and identical with
+    --neutralise-heuristics.
+  rationale:
+    tickets: >-
+      Tickets are tickets/MAT-NNN.md, rendered from canonical tickets/records/MAT-NNN.json (JSON is not read;
+      the rendered Markdown carries the same text). INDEX.md and README.md are generated listings, not
+      tickets. The 22 tickets whose owner_repo is another repository (MAT-047 crawler, MAT-051..065 DIAT,
+      MAT-066..071 Oil; all planned at from_commit) are excluded: AGENTS.md scopes tickets to their declared
+      owner, so their intent does not govern this repository's code. Re-profile when ownership changes.
+      docs/decisions holds numbered decision records (0001-core-ownership.md); commits never cite them, so
+      they are a number scheme with no commit label.
+    commits: >-
+      Work commits name the ticket in the subject (Implement MAT-010, MAT-012:, Merge MAT-011:) and on the
+      branch (feat/mat-010-time-coverage). PR merge subjects carry a GitHub PR number (#13), which is not a
+      ticket; no number scheme is labelled, so it is never read as one. Body ids stay MENTIONS (owner rule).
+    sections: >-
+      Every MAT ticket uses the same eleven headings. Purpose, scope, implementation steps, acceptance
+      criteria, required test cases and risks state intended behaviour. Scope boundaries lists what a ticket
+      does NOT do; Oil reads any heading containing "scope" as in-scope and the profile cannot mark it
+      out-of-scope, so it is skipped rather than inverted. Sources, reuse pointers and planned artifact paths
+      are references, not behaviour (Oil reads ticket paths only under "Files" headings, so ticket intent here
+      arrives without path scope either way). The rendered-file comment above each ticket's first section is
+      kept by the claim reader; it is true of every ticket file and accepted on purpose. Completion evidence
+      is dated run logs mixed with as-built behaviour, so it is filtered sentence by sentence. Decision records state intent under
+      Decision and Consequences; Context is background.
+    docs: >-
+      docs/ holds the governing contracts, design notes, validation reports and research. examples/ is
+      runnable code with one Markdown file, so it is left to the core's default ingestion.
