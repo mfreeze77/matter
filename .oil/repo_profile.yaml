@@ -42,7 +42,9 @@ commits:
 sections:
   intent: [Purpose, In scope, Implementation, Acceptance criteria, Required test cases, Risks, Decision,
            Consequences]
-  skip: [Scope boundaries, Sources, Existing work to inspect and reuse, Planned artifacts, Context]
+  out_of_scope: [Scope boundaries]
+  files: [Planned artifacts]
+  skip: [Sources, Existing work to inspect and reuse, Context]
   as_built: [Completion evidence]
   default: keep
 docs:
@@ -50,7 +52,7 @@ docs:
 provenance:
   written_by: {agent: claude-code, model: claude-opus-5-5}
   written_at: '2026-10-26'
-  from_commit: fa2bb632056253904299475fea004ab3c9b094ff
+  from_commit: 138c4727a06565fbe3d70ff3262246d4c4a37b35
   method: >-
     Read AGENTS.md, tickets/README.md, the ticket template fields, MAT-010 (done) and MAT-071 (largest) in
     full, decision 0001, the heading census and owner_repo of all 80 MAT tickets, git log of all 36 commits
@@ -72,11 +74,11 @@ provenance:
     sections: >-
       Every MAT ticket uses the same eleven headings. Purpose, scope, implementation steps, acceptance
       criteria, required test cases and risks state intended behaviour. Scope boundaries lists what a ticket
-      does NOT do; Oil reads any heading containing "scope" as in-scope and the profile cannot mark it
-      out-of-scope, so it is skipped rather than inverted. Sources, reuse pointers and planned artifact paths
-      are references, not behaviour (Oil reads ticket paths only under "Files" headings, so ticket intent here
-      arrives without path scope either way). The rendered-file comment above each ticket's first section is
-      kept by the claim reader; it is true of every ticket file and accepted on purpose. Completion evidence
+      does NOT do, so it is declared out_of_scope (read with negative polarity, never asked as a claim).
+      Planned artifacts lists the files each ticket owns, so it is declared files: those paths scope the
+      ticket's decisions. Sources and reuse pointers are references, not behaviour. The rendered-file comment
+      above each ticket's first section is kept by the claim reader; it is true of every ticket file and
+      accepted on purpose. Completion evidence
       is dated run logs mixed with as-built behaviour, so it is filtered sentence by sentence. Decision records state intent under
       Decision and Consequences; Context is background.
     docs: >-
