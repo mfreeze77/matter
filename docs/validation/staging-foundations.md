@@ -255,8 +255,8 @@ reviewed both selected files with zero findings/warnings. Earlier material
 findings were fixed and tested; conservative cross-context cache misses and
 concurrent-fill stale refusal remain documented tradeoffs. Markdown exclusions
 were read manually and local documentation links/schema inventories validated.
-GitHub CI on the submitted final head remains an explicit merge gate; its
-result is recorded in the PR, not inferred from these local runs.
+The operator explicitly waived waiting for GitHub CI before merge. No CI
+success is inferred from the local results recorded here.
 
 MAT-014/015/016/027/028 are complete within their bounded synthetic mechanism
 scopes. MAT-029 remains waiting on MAT-020; MAT-030/031/032 retain their declared
@@ -266,3 +266,12 @@ that integrated path. None of the 22 cross-repository roadmap items was changed.
 PostgreSQL is deferred; only SQLite is implemented here. No live JEV/TypeSafe
 call, private corpus, provider qualification, production timing qualification
 or downstream deployment is claimed. No retained merged branch was deleted.
+
+## Merged closeout
+
+PR [#15](https://github.com/mfreeze77/matter/pull/15) merged into `main` at
+`c755dd991a9323fa89419a2f9a02aee011f6098b` on 2026-10-27. The operator explicitly
+instructed merging without waiting for GitHub CI; that instruction supersedes
+earlier CI merge-gate wording in these chronological notes. Local checks and
+review evidence above remain the evidence actually executed. The merge tree
+matched the reviewed head, and the local checkout was synchronized cleanly.

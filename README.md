@@ -21,8 +21,8 @@ and qualification outcomes; it grants no action authority.
 See the [rule API](docs/rules.md) for exact prerequisite mapping, historical
 knowledge cuts, current admission gates, certificate allowlists, and cooperative
 elapsed limits. The [MAT-012 validation receipt](docs/validation/MAT-012.md)
-distinguishes interface checks from provider qualification and future assessment
-publication. Run the neutral synthetic example with:
+distinguishes interface checks from provider qualification; assessment
+publication is documented in the [assessment API](docs/assessments.md). Run the neutral synthetic example with:
 
 ```bash
 python examples/rule_evaluation.py
@@ -221,7 +221,7 @@ whole artifact and returns concrete reasons for invalid or unavailable evidence.
 
 Acceptance revisions preserve original citations and every historical decision.
 Claim corrections and relation updates emit durable dependency-change notices;
-the later assessment invalidation engine remains a separate ticket. See the
+configured MAT-016 observers consume those notices for registered transitive invalidation. See the
 [claims and citation API](docs/claims.md) for receipt, authority, retry, correction,
 and adapter contracts. Run its complete installed-package example with:
 
@@ -250,7 +250,7 @@ Rejections and protected separations persist across new proposals and restarts.
 They can revoke an existing attachment atomically; an explicit release requires
 correction authority and preserves the prior decisions. Exact retry returns its
 historical result without undoing a later rejection. These bounded decisions do
-not implement the general control-epoch or assessment-invalidation engines.
+use the separate [trusted control](docs/controls.md) and [dependency invalidation](docs/dependencies.md) boundaries.
 See the [association API](docs/associations.md) and run the synthetic example:
 
 ```bash
@@ -273,8 +273,8 @@ a fresh merge still has to pass all remaining guards.
 
 Registered assessments and host projections become invalidated in the same
 transaction as identity changes. Their former merged views remain readable
-through exact historical dependencies. The general transitive invalidation and
-delivery engines remain later tickets. See the [identity correction API](docs/identity-corrections.md)
+through exact historical dependencies. MAT-016 supplies general registered
+transitive invalidation; delivery remains later work. See the [identity correction API](docs/identity-corrections.md)
 and run the complete installed-package example:
 
 ```bash
