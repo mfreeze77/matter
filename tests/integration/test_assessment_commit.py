@@ -264,6 +264,37 @@ class AssessmentCommitTests(RuleTestCase):
         self.assertEqual(error.exception.code, "E_DEPENDENCY_STALE")
         self.assertEqual(self.storage.get(pin(old)), old)
 
+    def test_view_local_current_guard_rejects_superseded_assessment_and_changed_source(self):
+        _, _, old = self.publish()
+        with self.storage.snapshot() as view:
+            current, lane = self.service.read_current(view, pin(old), self.profile, as_of=self.now)
+            self.assertEqual(current, old)
+            self.assertEqual(lane["value"]["value"]["assessment"], pin(old))
+        self.source = self.observe("view-local-replacement-source")
+        _, _, replacement = self.publish()
+        with self.storage.snapshot() as view:
+            with self.assertRaises(StorageError) as error:
+                self.service.read_current(view, pin(old), self.profile, as_of=self.now)
+            self.assertEqual(error.exception.code, "E_DEPENDENCY_STALE")
+            self.assertEqual(self.service.read_current(view, pin(replacement), self.profile)[0], replacement)
+        self.rename_subject()
+        with self.storage.snapshot() as view:
+            with self.assertRaises(StorageError) as error:
+                self.service.read_current(view, pin(replacement), self.profile)
+            self.assertEqual(error.exception.code, "E_DEPENDENCY_STALE")
+
+    def test_view_local_current_guard_checks_present_source_read_authority(self):
+        _, _, stored = self.publish()
+        denial = _in_scope(control_command("deny-view-local-source-read", self.authority, targets=[self.source],
+            action="deny", capabilities=["read"], now=self.now), self.storage.scope_id)
+        denial["actor"] = self.actor
+        denial["body"]["control"]["body"]["actor"] = self.actor
+        self.assertEqual(self.controls.apply(self.controls.prepare(denial))["status"], "success")
+        with self.storage.snapshot() as view:
+            with self.assertRaises(StorageError) as error:
+                self.service.read_current(view, pin(stored), self.profile)
+            self.assertEqual(error.exception.code, "E_AUTHORITY_REQUIRED")
+
     def test_competing_publications_have_one_current_and_one_durable_stale_refusal(self):
         first, second = self.prepare(), self.prepare()
         one, two = self.command(first), self.command(second)

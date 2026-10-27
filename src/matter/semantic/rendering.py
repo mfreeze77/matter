@@ -84,7 +84,7 @@ class RenderedQuestion(_Frozen):
 
 
 def render_question(specification, state, correlation_id, *, bound_ids=(), source_manifest=None,
-                    max_render_bytes=65536):
+                    max_render_bytes=65536, access=None, access_context=None, access_view=None):
     """Bind all required values before producing any executable Question.
 
     Required false and zero values remain valid. Missing, null and empty
@@ -95,6 +95,12 @@ def render_question(specification, state, correlation_id, *, bound_ids=(), sourc
     """
     if not isinstance(specification, QuestionSpecification):
         _fail(["render", "specification"], "A validated immutable specification is required.")
+    if access is not None:
+        if access_context is None or access_view is None:
+            _fail(["render", "access"], "The installed access boundary requires its original context and current read view.", "E_AUTHORITY_REQUIRED")
+        access.require_packet(access_view, access_context, state)
+    elif access_context is not None or access_view is not None or (type(state) is dict and "access_context" in state):
+        _fail(["render", "access"], "An access context requires its installed host boundary.", "E_AUTHORITY_REQUIRED")
     if type(max_render_bytes) is not int or not 1 <= max_render_bytes <= MAX_WIRE_BYTES:
         _fail(["render", "max_render_bytes"], "An explicit bounded byte limit is required.")
     _text(correlation_id, ["render", "correlation_id"])
@@ -148,4 +154,7 @@ def render_question(specification, state, correlation_id, *, bound_ids=(), sourc
                 "bindings": manifest_bindings, "included_sources": source_selection["included"],
                 "excluded_sources": source_selection["excluded"], "truncation": source_selection["truncation"],
                 "missing_prerequisites": [], "renderer_truncation": "none"}
+    if access is not None:
+        context = access.require_packet(access_view, access_context, packet)
+        manifest["access_context"] = context.reference
     return RenderedQuestion({"schema_version": "1.0", "question": question.value, "manifest": manifest}, _factory=True)

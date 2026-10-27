@@ -148,10 +148,11 @@ class CacheResult(FrozenValue):
 class SemanticCache:
     """Read/compute outside writes; stage entries with the assessment transaction."""
 
-    def __init__(self, *, definitions, rules, bindings, schemas, controls, qualifications=None):
+    def __init__(self, *, definitions, rules, bindings, schemas, controls, qualifications=None, access=None):
         if not isinstance(schemas, SchemaRegistry) or not isinstance(rules, RuleRegistry):
             _fail()
         self.rules, self.bindings, self.schemas, self.controls = rules, bindings, schemas, controls
+        self.access = access
         self.qualifications = qualifications or QualificationRegistry()
         values = tuple(definitions)
         if len(values) > 128 or any(not isinstance(item, SemanticComputationDefinition) for item in values):
@@ -167,7 +168,7 @@ class SemanticCache:
         _fail("The exact semantic computation definition is not installed.")
 
     def capture(self, view, definition, *, records, context, token, as_of, negative_dependencies=(),
-                qualification_context=(), citations=()):
+                qualification_context=(), citations=(), access_context=None):
         """Capture only declared fields; absent fields fail rather than default.
 
         `records` maps declaration roles to exact current pins. Full records and
@@ -184,6 +185,15 @@ class SemanticCache:
         expected_roles = {item["record"] for item in definition.value["fields"]}
         if set(records) != expected_roles:
             _fail("Record roles must exactly match the declared projection.")
+        admitted_access = None
+        if self.access is not None:
+            if access_context is None:
+                raise StorageError("E_AUTHORITY_REQUIRED", "The installed cache access boundary requires its original context.")
+            admitted_access = self.access.require_current(view, access_context, references=records.values())
+            if admitted_access.value["token"] != token:
+                raise StorageError("E_AUTHORITY_REQUIRED", "Original cache and access control contexts differ.")
+        elif access_context is not None:
+            raise StorageError("E_AUTHORITY_REQUIRED", "The original cache access boundary is not installed.")
         snapshots, pins = {}, {}
         for role, reference in records.items():
             ref = fragment(reference, "pinned_ref")
@@ -215,14 +225,24 @@ class SemanticCache:
         projected = {"definition": definition.reference, "fields": projected_fields, "context": projected_context,
                      "temporal_class": interval, "negative_registrations": _refs(negative),
                      "qualification_context": qcontext, "citations": exact_citations}
-        return CacheInput({"schema_version": "1.0", "scope_id": self.controls.scope_id, "definition": definition.reference,
+        if admitted_access is not None:
+            projected["access_context"] = admitted_access.reference
+        value = {"schema_version": "1.0", "scope_id": self.controls.scope_id, "definition": definition.reference,
             "projected": projected, "records": pins, "context": context, "token": deepcopy(token),
-            "as_of": now, "negative_dependencies": negative, "qualification_context": qcontext, "citations": exact_citations}, _prepared=True)
+            "as_of": now, "negative_dependencies": negative, "qualification_context": qcontext, "citations": exact_citations}
+        if admitted_access is not None:
+            value["access_context"] = admitted_access.value
+        return CacheInput(value, _prepared=True)
 
     def _current(self, view, original, current, now):
         # The fresh caller input cannot replace the original cached token. Check
         # it separately even if a new token happens to have the same epoch.
         definition = self._definition(original["definition"])
+        if self.access is not None:
+            self.access.require_current(view, original.get("access_context", {}), references=original["records"].values())
+            self.access.require_current(view, current.get("access_context", {}), references=current["records"].values())
+        elif "access_context" in original or "access_context" in current:
+            raise StorageError("E_AUTHORITY_REQUIRED", "The original cache access boundary is not installed.")
         targets = _read_targets(original["records"].values())
         self.controls.require_current(view, original["token"], capability="assessment", targets=targets or original["token"]["targets"], as_of=now)
         if targets:
@@ -231,7 +251,8 @@ class SemanticCache:
         refreshed_refs = {role: pin(view.get(entity_ref(ref))) for role, ref in original["records"].items()}
         refreshed = self.capture(view, definition, records=refreshed_refs, context=current["context"],
             token=original["token"], as_of=now, negative_dependencies=original["negative_dependencies"],
-            qualification_context=current["qualification_context"], citations=current["citations"])
+            qualification_context=current["qualification_context"], citations=current["citations"],
+            access_context=original.get("access_context"))
         if refreshed.projected != current["projected"]:
             raise StorageError("E_DEPENDENCY_STALE", "The original cache computation is no longer semantically equivalent.")
 
@@ -293,6 +314,8 @@ class SemanticCache:
                 raise StorageError("E_EVIDENCE_INVALID")
             self._current(view, entry["request"], data, now)
             self._validate_returned(entry["returned"], data)
+        if self.access is not None:
+            self._current(view, entry["request"], data, now)
         return CacheResult({"cache_hit": stored is not None, "entry": entry,
                             "qualification": self._classification(entry, now),
                             "source_attempt_id": entry["source_attempt_id"],
