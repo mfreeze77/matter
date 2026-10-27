@@ -96,3 +96,28 @@ real-SQLite tests in 0.814 seconds. They cover same-transaction observer writes,
 unchanged command manifests, audited reads/watches, replay suppression, rollback,
 failed-handler isolation and scope/phase guards. These focused checks do not
 replace combined regression or the independent review of the hook.
+
+The composition/packet review completed two passes across all 17 selected
+files with no warnings. Its second confirmed finding concerned a failed or
+non-boolean cancellation poll discarding completed attempts. Polls now latch a
+safe cancellation diagnostic and retain actual attempts/invocation counts.
+Root review also required final-poll time to count in the budget remainder.
+The 32-case DAG suite passed in a separate root rerun (2.588 seconds). A prior
+31-case root rerun caught a wall-clock-sensitive five-millisecond test; a
+controlled clock now verifies both retained late output and blocked descendants.
+
+The observer/hardening review completed two passes across six selected files,
+with no warnings and one low-severity performance finding: prior write heads
+were decoded twice. Before-change pins now use the already-checked revision,
+without an extra read. The expanded eight-case hook suite passed in 0.821
+seconds after that correction, including preexisting-watch audit, atomic watch
+replacement and closure of every public system-port method after its phase.
+The unchanged normal storage transaction suite also passed 21 tests in 2.468
+seconds. Final remediation review remains a combined publication gate.
+
+MAT-015 reached a stable 19-case focused milestone (20.575 seconds), covering
+its three acceptance criteria, unknown/expired cache results and actual stored
+qualified-result expiry. Runtime/source review plus fresh render/validate checks
+admitted MAT-016 development against that API. MAT-015 is adding further
+negative-scope, time and staged-prerequisite cases; neither ticket is marked
+done on this preliminary milestone.

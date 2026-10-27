@@ -257,7 +257,7 @@ class _Transaction(_Snapshot):
         }
         self._expected: dict[tuple[str, str, str], dict[str, Any]] = {}
         self._writes: dict[tuple[str, str, str], dict[str, Any]] = {}
-        self._before_writes: dict[tuple[str, str, str], dict[str, Any] | None] = {}
+        self._before_pins: dict[tuple[str, str, str], dict[str, Any] | None] = {}
         self._verified_reads: list[dict[str, Any]] = []
         self._absent_reads: dict[tuple[str, str, str], dict[str, Any]] = {}
         self._watch_queries: list[str] = []
@@ -357,9 +357,9 @@ class _Transaction(_Snapshot):
 
     def _write(self, record: dict[str, Any], previous_version: int | None) -> None:
         identity = _identity(record)
-        if identity not in self._before_writes:
-            self._before_writes[identity] = (
-                self._decode(self._row(entity_ref(record), current=True))
+        if identity not in self._before_pins:
+            self._before_pins[identity] = (
+                {**entity_ref(record), "revision": previous_version}
                 if previous_version is not None else None
             )
         version = record.get("revision", 1)
@@ -800,10 +800,10 @@ class SQLiteStore:
                         ):
                             raise StorageError("E_SCHEMA_INVALID", "Handler result identities must match the command.")
                         if result["status"] == "success" and self._transaction_hook is not None:
-                            changes = [{"cause": "write", "before": [pin(before)] if before else [],
+                            changes = [{"cause": "write", "before": [before] if before else [],
                                         "after": [pin(record)]}
                                        for identity, record in transaction._writes.items()
-                                       for before in [transaction._before_writes[identity]]]
+                                       for before in [transaction._before_pins[identity]]]
                             for change in result.get("body", {}).get("changes", []):
                                 if type(change) is not dict or set(change) != {"cause", "before", "after"}:
                                     raise StorageError("E_SCHEMA_INVALID")

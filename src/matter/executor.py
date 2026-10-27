@@ -307,7 +307,12 @@ class GraphExecutor:
                 resolution = self.conflicts.resolve(group["resolver"]).compose(originals)
                 resolution["held_gates"] = []
             composition_results.append({"id": group["id"], **resolution})
-        elapsed = max(0, math.ceil((self.monotonic() - start) * 1000))
+        final_cancelled = stopped()
+        finished = self.monotonic()
+        elapsed = max(0, math.ceil((finished - start) * 1000))
+        stop_reason = ("cancelled" if final_cancelled else "elapsed_limit" if finished > deadline else
+                       "completed" if all(item["status"] == "completed" for item in receipts.values())
+                       and all(item["status"] == "resolved" for item in composition_results) else "incomplete")
         remaining = {
             "max_calls": max(0, budget["max_calls"] - spent["reserved_attempts"]),
             "max_input_bytes": max(0, budget["max_input_bytes"] - spent["reserved_input_bytes"]),
@@ -315,9 +320,6 @@ class GraphExecutor:
             "max_evidence": budget["max_evidence"],
             "max_elapsed_ms": max(0, budget["max_elapsed_ms"] - elapsed),
         }
-        stop_reason = ("cancelled" if stopped() else "elapsed_limit" if self.monotonic() > deadline else
-                       "completed" if all(item["status"] == "completed" for item in receipts.values())
-                       and all(item["status"] == "resolved" for item in composition_results) else "incomplete")
         status = "completed" if stop_reason == "completed" else "incomplete"
         return GraphRun({"schema_version": "1.0", "run_id": run_id, "scope_id": scope, "plan": plan.reference,
             "profile": declaration["profile"], "status": status, "stop_reason": stop_reason,

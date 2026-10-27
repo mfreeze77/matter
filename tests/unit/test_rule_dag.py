@@ -500,13 +500,53 @@ class RuleDagTests(unittest.TestCase):
         self.assertIsNotNone(result["nodes"]["source"]["attempt_receipt"])
         self.assertEqual(result["stop_diagnostics"][0]["reason"], "callback_failed")
 
+    def test_final_false_stop_poll_time_is_included_in_elapsed_and_remaining_budget(self):
+        for poll_elapsed in (0.002, 0.025):
+            self.setUp()
+            ticks = [0.0]
+            completed = Event()
+            after_attempt = []
+            self.rule("source", function=lambda request: (completed.set(), self.response())[1])
+            def cancelled():
+                if completed.is_set():
+                    after_attempt.append(True)
+                    if len(after_attempt) == 2:
+                        ticks[0] = poll_elapsed
+                return False
+            evaluator = RuleEvaluator(rules=RuleRegistry(self.rules.values()), bindings=BindingRegistry(self.bindings),
+                schemas=self.helper.schemas, clock=self.clock, monotonic=lambda: 0)
+            plan = self.plan()
+            budget = {**plan.value["resource_limits"], "max_elapsed_ms": 5}
+            result = GraphExecutor(evaluator, clock=self.clock, monotonic=lambda: ticks[0]).execute(
+                plan, prepare=self.prepare, run_id="final-poll-time", check_current=self.current,
+                remaining_budget=budget, cancelled=cancelled).value
+            elapsed_ms = int(poll_elapsed * 1000)
+            self.assertEqual(result["resource_reservations"]["elapsed_ms"], elapsed_ms)
+            self.assertEqual(result["resource_reservations"]["remaining_budget"]["max_elapsed_ms"], max(0, 5 - elapsed_ms))
+            self.assertEqual(result["stop_reason"], "elapsed_limit" if elapsed_ms > 5 else "completed")
+            self.assertEqual(result["nodes"]["source"]["judgment"]["body"]["execution_status"], "completed")
+            self.assertEqual(result["resource_reservations"]["actual_invocations"], 1)
+
     def test_shared_elapsed_deadline_retains_late_attempt_as_unusable_diagnostic(self):
-        self.rule("source", function=lambda request: (time.sleep(0.02), self.response())[1])
+        ticks = [0.0]
+        def complete_after_deadline(request):
+            ticks[0] = 0.020
+            return self.response()
+        source = self.rule("source", function=complete_after_deadline)
+        self.rule("dependent", dependencies=[source])
         plan = self.plan()
-        result = self.execute(plan, remaining_budget={**plan.value["resource_limits"], "max_elapsed_ms": 5})
+        evaluator = RuleEvaluator(rules=RuleRegistry(self.rules.values()), bindings=BindingRegistry(self.bindings),
+            schemas=self.helper.schemas, clock=self.clock, monotonic=lambda: 0)
+        result = GraphExecutor(evaluator, clock=self.clock, monotonic=lambda: ticks[0]).execute(
+            plan, prepare=self.prepare, run_id="shared-deadline", check_current=self.current,
+            remaining_budget={**plan.value["resource_limits"], "max_elapsed_ms": 5}).value
         self.assertEqual(result["stop_reason"], "elapsed_limit")
         self.assertEqual(result["nodes"]["source"]["status"], "timed_out")
         self.assertEqual(result["nodes"]["source"]["judgment"]["body"]["execution_status"], "completed")
+        self.assertEqual(result["nodes"]["dependent"]["status"], "budget_exhausted")
+        self.assertEqual(result["resource_reservations"]["actual_invocations"], 1)
+        self.assertEqual(self.calls, ["source"])
+        self.assertEqual(self.prepared_calls, ["source"])
         self.assertEqual(result["status"], "incomplete")
 
     def test_final_stale_predecessor_withholds_already_executed_descendant(self):
