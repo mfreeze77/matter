@@ -248,7 +248,8 @@ class LifecycleService:
         if retain_previous and (request["previous"] != previous or request["previous_registration"] != prior_registration):
             _fail("The original lifecycle revision or validity generation changed.", "E_DEPENDENCY_STALE")
         prior = None if current is None else self._value(current)
-        if prior is not None and (prior["matter"] != body["matter"] or prior["profile"] != profile.reference or prior["condition"] != request["condition"]):
+        if prior is not None and (prior["matter"] != body["matter"] or prior["profile"] != profile.reference or
+                                  canonical_bytes(prior["condition"]) != canonical_bytes(request["condition"])):
             _fail("The lifecycle lane holds another exact profile or subject revision.", "E_DEPENDENCY_STALE")
         revision = 1 if prior is None else prior["lifecycle_revision"]
         if body["lifecycle_revision"] != revision:
@@ -294,9 +295,9 @@ class LifecycleService:
         else:
             self.schemas.validate(claim["body"]["value"])
             value = claim["body"]["value"]["value"]
-            if _pointer(value, edge["condition_pointer"]) != request["condition"]:
+            if canonical_bytes(_pointer(value, edge["condition_pointer"])) != canonical_bytes(request["condition"]):
                 held("The evidence concerns another condition or circumstances.")
-            if _pointer(value, edge["signal_pointer"]) not in edge["accepted_signals"]:
+            if canonical_bytes(_pointer(value, edge["signal_pointer"])) not in {canonical_bytes(item) for item in edge["accepted_signals"]}:
                 held("The evidence does not establish the declared trigger.")
         if claim["provenance"]["origin"] not in edge["allowed_origins"]:
             held("The claim origin is outside the declared evidence standard.")
@@ -537,7 +538,8 @@ class LifecycleService:
             return None
         state = self._value(record)
         receipt = self._audit_state(view, state, read_token=read_token, access_context=access_context)
-        if state["profile"] != profile or state["condition"] != condition or entity_ref(state["matter"]) != entity_ref(matter):
+        if (state["profile"] != profile or canonical_bytes(state["condition"]) != canonical_bytes(condition) or
+                entity_ref(state["matter"]) != entity_ref(matter)):
             _fail(code="E_DEPENDENCY_STALE")
         now = fragment(self.clock(), "known_time")
         require_current_dependency(view, registration_ref(record), as_of=now, controls=self.controls)
@@ -591,7 +593,7 @@ class LifecycleService:
                 if wrapped != domain("lifecycle-transition", wrapped["value"]):
                     _fail(code="E_EVIDENCE_INVALID")
                 detail = wrapped["value"]
-                if entity_ref(detail["matter"]) != entity_ref(matter) or detail["condition"] != condition:
+                if entity_ref(detail["matter"]) != entity_ref(matter) or canonical_bytes(detail["condition"]) != canonical_bytes(condition):
                     _fail(code="E_EVIDENCE_INVALID")
                 self._audit_state(view, {"last_transition": next_ref}, read_token=read_token, access_context=access_context)
                 if (detail["profile"] == profile and (knowledge_at is None or compare_times(detail["knowledge_at"], knowledge_at) <= 0) and

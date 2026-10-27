@@ -588,6 +588,59 @@ class LifecycleEpisodes(unittest.TestCase):
                     condition=self.condition_a, read_token=token)
         self.assertIn(refused.exception.code, {"E_DEPENDENCY_STALE", "E_AUTHORITY_REQUIRED"})
 
+    def typed_json_profile(self, *, boolean_signal=False):
+        # A real installed union schema admits both JSON types without coercion.
+        self.claim_schema = schema("typed-lifecycle-union", {
+            "condition": {"type": "object", "additionalProperties": False, "required": ["key", "circumstance", "qualifier"],
+                "properties": {"key": {"type": "string"}, "circumstance": {"type": "string"},
+                    "qualifier": {"type": "object", "additionalProperties": False, "required": ["flag"],
+                        "properties": {"flag": {"type": ["boolean", "integer"]}}}}},
+            "signal": {"type": ["string", "boolean", "integer"]},
+        })
+        f = self.f
+        f.schemas = SchemaRegistry([f.input_schema, f.output_schema, f.proposal_schema, self.claim_schema, lifecycle_schema()])
+        def change(value):
+            if boolean_signal:
+                value["edges"][1]["accepted_signals"] = [False]
+        self.install_profile(self.make_definition(change=change))
+
+    def test_nested_boolean_condition_is_not_numeric_zero_correspondence(self):
+        self.typed_json_profile()
+        boolean_condition = {**self.condition_a, "qualifier": {"flag": False}}
+        numeric_condition = {**self.condition_a, "qualifier": {"flag": 0}}
+        self.establish(boolean_condition)
+        before = self.current(boolean_condition)
+        source, occurrence = self.event("numeric-recovery", at=NOW)
+        claim = self.claim("numeric-recovery", numeric_condition, "recovered", source, effective=NOW)
+        assessment = self.assess(claim, occurrence)
+        _, wrong = self.apply("resolve", claim, occurrence, assessment, condition=boolean_condition)
+        self.assertEqual(wrong.get("outcome"), "held_for_evidence", wrong)
+        self.assertEqual(self.current(boolean_condition), before)
+        self.assertIsNone(self.current(numeric_condition))
+        source, occurrence = self.event("boolean-recovery", at=NOW)
+        claim = self.claim("boolean-recovery", boolean_condition, "recovered", source, effective=NOW)
+        assessment = self.assess(claim, occurrence)
+        _, right = self.apply("resolve", claim, occurrence, assessment, condition=boolean_condition)
+        self.assertEqual(right.get("outcome"), "applied", right)
+        self.assertEqual(self.current(boolean_condition)["value"]["value"]["state"], "example:resolved")
+        self.assertEqual(self.lifecycle.history(self.f.subject, profile=self.f.profile.reference, condition=numeric_condition), [])
+
+    def test_boolean_trigger_is_not_numeric_zero_signal(self):
+        self.typed_json_profile(boolean_signal=True)
+        condition = {**self.condition_a, "qualifier": {"flag": False}}
+        self.establish(condition)
+        source, occurrence = self.event("numeric-signal", at=NOW)
+        claim = self.claim("numeric-signal", condition, 0, source, effective=NOW)
+        assessment = self.assess(claim, occurrence)
+        _, wrong = self.apply("resolve", claim, occurrence, assessment)
+        self.assertEqual(wrong.get("outcome"), "held_for_evidence", wrong)
+        self.assertEqual(self.current(condition)["value"]["value"]["state"], "example:open")
+        source, occurrence = self.event("boolean-signal", at=NOW)
+        claim = self.claim("boolean-signal", condition, False, source, effective=NOW)
+        assessment = self.assess(claim, occurrence)
+        _, right = self.apply("resolve", claim, occurrence, assessment)
+        self.assertEqual(right.get("outcome"), "applied", right)
+
 
 if __name__ == "__main__":
     unittest.main()
