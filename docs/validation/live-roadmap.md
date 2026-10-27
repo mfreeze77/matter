@@ -45,3 +45,27 @@ Small source/test/review logs are retained in the external task directory above;
 no corpus, media, model or container downloads are planned. Focused behavioral
 checks precede dependent development, followed by relevant combined checks and
 independent review. No repeated hosted reruns or CI-only debugging is planned.
+
+## Integrated foundation milestones
+
+The task branch records context/disposition implementation in `1796790`, access
+controls and the shared current-assessment reader in `e134e9d`, and lifecycle
+integration in `e974bf0`. Canonical MAT-017/018/072 remain in progress until the
+combined checks and independent review findings have been reconciled.
+
+Focused local evidence on 2026-10-27:
+
+- MAT-017: 15 actual SQLite lifecycle episodes passed in 246.451 seconds after
+  integration with the common assessment gate.
+- MAT-018: 14 scoped context/disposition checks passed in 21.334 seconds.
+- MAT-072: 110 access, assessment, packet and renderer checks passed across the
+  focused runs recorded in its receipt.
+- The shared view-local current reader passed two new behavioral checks in
+  2.939 seconds, then five targeted current/profile/source/read-denial regression
+  checks passed in 6.257 seconds after the public reader adopted the same gate.
+
+A full local regression run is checking committed `e974bf0` in an isolated
+checkout while MAT-019 implementation proceeds. Its result will be recorded
+when the command finishes. No hosted CI rerun or further live call is required
+by this run. These checks establish synthetic local behavior, not empirical
+provider accuracy, real evidence egress or a qualified deployed runtime.

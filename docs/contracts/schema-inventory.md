@@ -70,7 +70,7 @@ MAT-013 adds the [policy profile schema](../../schemas/policy-profile.schema.jso
 for immutable versioned evidence, lifecycle, purpose and audience components.
 The [profile API](../profiles.md) performs exact-reference, graph, scope,
 capability, conflict and budget validation beyond structural schema checks.
-The current package contains **41 JSON Schema resources**. MAT-026's
+At MAT-013 the package contained **41 JSON Schema resources**. MAT-026's
 [typed executor](../semantic-executor.md) and MAT-036's
 [frozen corpus](../evaluation-corpus.md) use their own versioned, closed Python
 validation boundaries without adding a core record or command variant. No
@@ -434,3 +434,27 @@ These schemas add no core record kind or database migration. They do not grant
 source authority, provider qualification or permission for external delivery.
 See [assessments](../assessments.md) and [dependencies](../dependencies.md) for
 the corresponding runtime checks and their configured-host boundaries.
+
+## Lifecycle and independent contexts
+
+MAT-017 adds five exact internal schemas: [profile](../../schemas/lifecycle-profile.schema.json),
+[request](../../schemas/lifecycle-request.schema.json), [state](../../schemas/lifecycle-state.schema.json),
+[transition](../../schemas/lifecycle-transition.schema.json) and
+[occurrence slot](../../schemas/lifecycle-event.schema.json). These bind declared
+edges, actual evidence correspondence, separate effective/knowledge times and
+registered current validity through the [lifecycle API](../lifecycle.md).
+
+MAT-018 adds seven schemas for [context definitions](../../schemas/context-definition.schema.json),
+[mutations](../../schemas/context-mutation.schema.json), [versions](../../schemas/context-version.schema.json),
+[current pointers](../../schemas/context-current.schema.json),
+[disposition definitions](../../schemas/disposition-definition.schema.json),
+[mutations](../../schemas/disposition-mutation.schema.json) and
+[current slots](../../schemas/disposition-current.schema.json).
+They keep purpose/audience/preferences and authenticated dispositions separate
+from source meaning and domain resolution. See [contexts](../contexts.md).
+
+These twelve resources introduce no new core record kind or database migration.
+Their focused validation receipts are [MAT-017](../validation/MAT-017.md) and
+[MAT-018](../validation/MAT-018.md); canonical completion is recorded separately
+from source availability. MAT-072's [access boundary](../access.md) uses closed,
+versioned Python value validation without adding a schema or wire operation.
