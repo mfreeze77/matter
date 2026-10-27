@@ -4,7 +4,7 @@
   "track": "core",
   "phase": 3,
   "priority": "P0",
-  "status": "in_progress",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "delivery",
@@ -87,7 +87,11 @@
     "matterjevmesh"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "2026-10-27: MAT-021 neutral durable outbox, original-context withdrawal, exact caller/allocation binding, fenced dispatch, honest unknown outcomes and independent receipts implemented. Actual commands, review dispositions and limitations: docs/validation/MAT-021.md. Integration tracked in PR #17 (https://github.com/mfreeze77/matter/pull/17).",
+      "Full frozen checkout base dcf1a79 passed 1,237 tests in 2,787.687s with unchanged code/schema/test manifests. Final bounded outcome delta 1590446 passed 2 checkout and 2 installed focused checks with six time/id/source tampering refusals; no full run of that later delta is claimed. Final three-file two-pass review returned zero findings/warnings.",
+      "All 174 packaged runtime/SQL/schema files match integrated source, wheel and isolated installation, including 98 schemas. Corrected-base installed checks passed 8/8. The installed walkthrough default schema lookup still fails; prior 29 full-installed errors remain separate. No new live JEV calls, real notifications, private evidence or empirical qualification."
+    ]
   }
 }
