@@ -472,7 +472,19 @@ class LifecycleService:
         self.controls._view(view, actor=token["actor"], authority=entity_ref(token["authority"]),
                             capability="read", targets=token["targets"], now=fragment(self.clock(), "known_time"), audit=True)
         if read_token is not None:
-            self.controls.require_current(view, read_token, capability="read", targets=token["targets"], as_of=fragment(self.clock(), "known_time"))
+            domain("control-token", read_token)
+            detail = details["value"]
+            proof = detail["assessment_publication"]["value"]
+            targets = {canonical_bytes(ref): ref for ref in self.assessments._read_targets(proof["preparation"], proof["graph"])}
+            for ref in (detail["matter"], *detail["basis"].values()):
+                targets[canonical_bytes(entity_ref(ref))] = entity_ref(ref)
+            targets = sorted(targets.values(), key=canonical_bytes)
+            # An enclosing assessment/attention operation keeps its original
+            # captured capability. Reading still needs its own actual READ
+            # authorization; possession of a work token alone cannot grant it.
+            self.controls.require_current(view, read_token, capability=read_token["capability"], targets=targets,
+                as_of=fragment(self.clock(), "known_time"))
+            self.controls._audit(view, {"actor": read_token["actor"], "authority": entity_ref(read_token["authority"])}, targets)
         if self.assessments.access is not None:
             context = deepcopy(getattr(access_context, "value", access_context))
             if read_token is None or type(context) is not dict or context.get("token") != read_token:
@@ -535,6 +547,11 @@ class LifecycleService:
         superseded = [ref for item in lineage for ref in item.get("supersedes", [])]
         if state["basis"]["claim"] in superseded or len([item for item in lineage if pin(item) not in superseded]) != 1:
             _fail("The current lifecycle basis was corrected.", "E_DEPENDENCY_STALE")
+        if read_token is not None:
+            source_request = receipt["body"]["details"]["value"]["assessment_publication"]["value"]["preparation"]["request"]
+            targets = _read_targets(source_request, [pin(item) for item in view.records.values()])
+            self.controls.require_current(view, read_token, capability=read_token["capability"], targets=targets, as_of=now)
+            self.controls._audit(view, {"actor": read_token["actor"], "authority": entity_ref(read_token["authority"])}, targets)
         return record
 
     def state_role(self, profile, state):

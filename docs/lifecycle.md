@@ -189,8 +189,12 @@ budget and 4,096-record limit, including history traversal. A large history is
 refused explicitly when that budget is exceeded; it is not silently truncated.
 
 Reads audit present host read permission. A caller may supply an original
-`read_token` to current/history; raw storage and service handles remain trusted
-host machinery. With an installed MAT-072 access boundary, transition
+`read_token` to current/history, including an enclosing operation's original
+assessment work token. Its captured capability and scope are checked unchanged,
+and the caller's actor/authority separately needs present READ permission over
+the actual proof and discovered public read closure. The service never converts
+or recaptures a work token. Raw storage and service handles remain trusted host
+machinery. With an installed MAT-072 access boundary, transition
 preparation additionally requires an `access_context` bound to the original
 transition token. Current/history additionally require the original read token
 and matching read access context. Missing contexts fail closed. Stored original

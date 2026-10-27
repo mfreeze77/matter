@@ -564,6 +564,30 @@ class LifecycleEpisodes(unittest.TestCase):
         self.assertEqual(result.get("outcome"), "applied", result)
         self.assertEqual(self.current()["value"]["value"]["state"], "example:open")
 
+    def test_original_assessment_work_token_can_read_lifecycle_but_needs_present_read_permission(self):
+        self.resolved()
+        f = self.f
+        token = f.controls.capture(actor=f.actor, authority=entity_ref(f.authority), capability="assessment",
+            targets=list(self.public.values()))
+        with f.storage.snapshot() as view:
+            state = self.lifecycle.read_current(view, f.subject, profile=f.profile.reference,
+                condition=self.condition_a, read_token=token)
+        self.assertEqual(state["value"]["value"]["state"], "example:resolved")
+        # The original work token is neither converted nor refreshed to read.
+        # A currently applied READ denial must refuse disclosure as well as
+        # any later attempt to use that same old enclosing-operation token.
+        control = _in_scope(control_command("deny-lifecycle-read", f.authority, targets=[f.subject],
+            action="deny", capabilities=["read"], now=NOW), f.storage.scope_id)
+        control["actor"] = f.actor
+        control["body"]["control"]["body"]["actor"] = f.actor
+        result = f.controls.apply(f.controls.prepare(control))
+        self.assertEqual(result["status"], "success", result)
+        with f.storage.snapshot() as view:
+            with self.assertRaises(StorageError) as refused:
+                self.lifecycle.read_current(view, f.subject, profile=f.profile.reference,
+                    condition=self.condition_a, read_token=token)
+        self.assertIn(refused.exception.code, {"E_DEPENDENCY_STALE", "E_AUTHORITY_REQUIRED"})
+
 
 if __name__ == "__main__":
     unittest.main()
