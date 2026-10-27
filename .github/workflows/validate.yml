@@ -35,7 +35,7 @@ jobs:
         run: node tests/fixtures/canonical/verify.mjs
       - name: Run synthetic lifecycle walkthroughs
         run: python -m matter demo all
-      - name: Verify installed evidence, identity, temporal coverage, and watches outside the checkout
+      - name: Verify installed evidence, identity, policies, typed execution and frozen corpora outside the checkout
         run: |
           python -m pip wheel . --no-deps --wheel-dir "$RUNNER_TEMP/matter-wheel"
           python -m pip install --force-reinstall --no-deps "$RUNNER_TEMP"/matter-wheel/*.whl
@@ -49,6 +49,8 @@ jobs:
           cp examples/time_coverage.py "$RUNNER_TEMP/matter-time-coverage.py"
           cp examples/rule_evaluation.py "$RUNNER_TEMP/matter-rule-evaluation.py"
           cp examples/trusted_controls.py "$RUNNER_TEMP/matter-trusted-controls.py"
+          cp examples/ready_foundations.py "$RUNNER_TEMP/matter-ready-foundations.py"
+          cp tests/fixtures/evaluation/episodes.jsonl "$RUNNER_TEMP/matter-synthetic-episodes.jsonl"
           cd "$RUNNER_TEMP"
           python - <<'PY'
           from importlib.resources import files
@@ -118,3 +120,4 @@ jobs:
           python matter-time-coverage.py
           python matter-rule-evaluation.py
           python matter-trusted-controls.py
+          python matter-ready-foundations.py matter-synthetic-episodes.jsonl

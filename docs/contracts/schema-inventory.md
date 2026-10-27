@@ -61,10 +61,20 @@ They reuse the existing judgment and receipt creation inputs; no core record
 kind, command, or result variant is added. Domain schemas use separate exact,
 self-contained resource resolution as described in the [rule API](../rules.md).
 Together with MAT-011's five [control resources](#trusted-control-runtime-schemas),
-the current package contains **40 JSON Schema resources**: three portable
+MAT-012 brought the package to **40 JSON Schema resources**: three portable
 families, thirty-four runtime-specific resources, and three repository-tooling
 schemas. The portable inventory remains twelve record kinds, twenty-four
 command variants, and forty-five successful operation/outcome pairs.
+
+MAT-013 adds the [policy profile schema](../../schemas/policy-profile.schema.json)
+for immutable versioned evidence, lifecycle, purpose and audience components.
+The [profile API](../profiles.md) performs exact-reference, graph, scope,
+capability, conflict and budget validation beyond structural schema checks.
+The current package contains **41 JSON Schema resources**. MAT-026's
+[typed executor](../semantic-executor.md) and MAT-036's
+[frozen corpus](../evaluation-corpus.md) use their own versioned, closed Python
+validation boundaries without adding a core record or command variant. No
+provider accuracy or action permission follows from any structural check.
 
 ## Common record envelope
 
