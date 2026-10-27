@@ -4,7 +4,7 @@
   "track": "jev",
   "phase": 2,
   "priority": "P0",
-  "status": "planned",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "semantic/questions",
@@ -53,7 +53,9 @@
   "artifacts": [
     "src/matter/semantic/questions.py",
     "src/matter/semantic/rendering.py",
-    "tests/semantic/test_rendering.py"
+    "tests/semantic/test_rendering.py",
+    "docs/semantic-questions.md",
+    "docs/validation/MAT-027.md"
   ],
   "tests": [
     "Score level referencing only the previous level is rejected by registry lint.",
@@ -76,7 +78,11 @@
     "https://github.com/libingzheren/Jev-Mem/blob/7ab0c73c6d8f4f611ad252c1e6ba8083f8df0e44/memory/jev_questions.py"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "2026-10-27: implemented immutable exact question specifications/registry, explicit single-pass rendering and field binding manifests, static association outcomes, distinct topic/matter/occurrence definitions and semantic field diffs. All three acceptance criteria have targeted behavioral evidence; no provider call or qualification transfer.",
+      "2026-10-27: 30 rendering/specification tests passed in 0.152s; root independently reran the same 30 tests successfully in 0.162s. Combined existing and new semantic suites passed all 62 tests in 0.245s. Repository validation passed (80 tickets, 104 requirements, 41 schemas, three walkthroughs).",
+      "Candidate-branch focused acceptance unlocks MAT-028 development. Combined full regression, installed-package, independent review and submitted-head CI remain publication/merge gates and are not inferred from these focused runs. See docs/validation/MAT-027.md and docs/validation/staging-foundations.md for executed gate updates and limitations."
+    ]
   }
 }

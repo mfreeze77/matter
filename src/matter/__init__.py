@@ -23,4 +23,4 @@ live in ``matter.rules`` and ``matter.evaluators``. Semantic ranking, policy
 composition, assessment execution and integrations remain backlog work.
 """
 
-__version__ = "0.1.0.dev12"
+__version__ = "0.1.0.dev13"
