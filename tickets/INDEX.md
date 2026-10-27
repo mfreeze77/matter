@@ -32,7 +32,7 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-024: Build chronological replay and language-neutral conformance fixtures](MAT-024.md) | core | 4 | P0 | planned | waiting | MAT-002, MAT-010, MAT-014, MAT-015, MAT-016, MAT-017, MAT-019, MAT-020, MAT-021, MAT-023 |
 | [MAT-025: Qualify the neutral core through adversarial multi-audience episodes](MAT-025.md) | core | 5 | P0 | planned | waiting | MAT-002, MAT-003, MAT-004, MAT-005, MAT-006, MAT-007, MAT-008, MAT-009, MAT-010, MAT-011, MAT-012, MAT-013, MAT-014, MAT-015, MAT-016, MAT-017, MAT-018, MAT-019, MAT-020, MAT-021, MAT-022, MAT-023, MAT-024 |
 | [MAT-026: Define the provider-neutral typed executor](MAT-026.md) | jev | 2 | P0 | done | done | MAT-001, MAT-002, MAT-012 |
-| [MAT-027: Implement versioned question specifications and rendering](MAT-027.md) | jev | 2 | P0 | done | done | MAT-026, MAT-007 |
+| [MAT-027: Implement versioned question specifications and rendering](MAT-027.md) | jev | 2 | P0 | in_progress | in_progress | MAT-026, MAT-007 |
 | [MAT-028: Build bounded source-linked assessment packets](MAT-028.md) | jev | 2 | P0 | in_progress | in_progress | MAT-027, MAT-004, MAT-006, MAT-010 |
 | [MAT-029: Plan independent batches and validated semantic stages](MAT-029.md) | jev | 3 | P0 | planned | waiting | MAT-026, MAT-027, MAT-028, MAT-014, MAT-020 |
 | [MAT-030: Persist judgment receipts and exact execution reuse](MAT-030.md) | jev | 3 | P0 | planned | waiting | MAT-026, MAT-029, MAT-003, MAT-015, MAT-016 |

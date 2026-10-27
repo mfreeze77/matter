@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "matter-foundation"
 version = "0.1.0.dev13"
-description = "Portable evidence, staged rules, versioned semantic questions and assessment contracts for Matter"
+description = "Portable evidence, policy profiles, typed execution, versioned questions and frozen corpora for Matter"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"

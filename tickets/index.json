@@ -13,8 +13,8 @@
     "rules": 7
   },
   "counts_by_status": {
-    "done": 16,
-    "in_progress": 2,
+    "done": 15,
+    "in_progress": 3,
     "planned": 62
   },
   "tickets": [
@@ -582,7 +582,7 @@
       "track": "jev",
       "phase": 2,
       "priority": "P0",
-      "status": "done",
+      "status": "in_progress",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-026",
@@ -593,7 +593,7 @@
         "JEV-03",
         "JEV-08"
       ],
-      "readiness": "done",
+      "readiness": "in_progress",
       "path": "records/MAT-027.json"
     },
     {
