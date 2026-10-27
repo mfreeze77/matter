@@ -169,9 +169,9 @@ def validate_episode(value):
     # timestamps. Require parents earlier in this declared sequence.
     seen = set()
     previous = None
-    for identity in order:
+    for index, identity in enumerate(order):
         observation = observations[identity]
-        path = "episode/observations/" + identity
+        path = f"episode/observations/{index}"
         if not set(observation["parents"]) <= seen:
             _fail(path + "/parents", "Parents must be earlier declared observations in this episode.")
         if observation["available_at"]["state"] == "known":
@@ -201,10 +201,10 @@ def validate_episode(value):
         if identity in occurrences or not set(members) <= observations.keys():
             _fail(path, "Repeated occurrence or unknown observation membership.")
         occurrences[identity] = occurrence
-    for identity, observation in observations.items():
+    for index, (identity, observation) in enumerate(observations.items()):
         actual = {key for key, item in occurrences.items() if identity in item["observation_ids"]}
         if actual != set(observation["occurrence_ids"]):
-            _fail("episode/observations/" + identity + "/occurrence_ids", "Occurrence memberships must agree in both directions.")
+            _fail(f"episode/observations/{index}/occurrence_ids", "Occurrence memberships must agree in both directions.")
     cases = {}
     for i, case in enumerate(_list(episode["cases"], "episode/cases", nonempty=True)):
         path = f"episode/cases/{i}"

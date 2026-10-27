@@ -231,10 +231,28 @@ class ContractTests(unittest.TestCase):
 
     def test_duplicate_object_keys_invalid_encoding_and_unexpected_fields_refused(self):
         batch = make_batch()
-        for raw in (b'{"answers":[],"answers":[],"resolved_model":"m"}', b'\xef\xbb\xbf{}', b'\xff',
-                    b'{"answers":[],"resolved_model":"\\ud800"}', response(batch) + b' {}',
-                    response(batch, change=lambda v: v["answers"][0].update(host_action="send"))):
-            self.assertFalse(normalize_response(batch, raw).primitive_valid)
+        valid = response(batch)
+        self.assertTrue(normalize_response(batch, valid).primitive_valid)
+        malformed = {
+            "duplicate_key": b'{"resolved_model":"ignored",' + valid[1:],
+            "bom": b'\xef\xbb\xbf' + valid,
+            "invalid_utf8": valid.replace(b'"recording-v1"', b'"recording-\xff-v1"'),
+            "unpaired_surrogate": valid.replace(b'"recording-v1"', b'"\\ud800"'),
+            "trailing_data": valid + b' {}',
+        }
+        for case, raw in malformed.items():
+            with self.subTest(case=case):
+                result = normalize_response(batch, raw)
+                self.assertFalse(result.primitive_valid)
+                self.assertEqual(result.value["execution_status"], "failed")
+                self.assertEqual(result.value["faults"], [{"code": "invalid_response", "path": []}])
+                self.assertEqual(result.value["diagnostics"], [])
+        raw = response(batch, change=lambda v: v["answers"][0].update(host_action="send"))
+        result = normalize_response(batch, raw)
+        self.assertFalse(result.primitive_valid)
+        self.assertEqual(result.value["execution_status"], "completed")
+        self.assertEqual(result.value["faults"], [{"code": "invalid_primitive", "path": ["answers", 0]}])
+        self.assertEqual(result.value["diagnostics"][0]["reason"], "invalid_primitive")
 
     def test_question_and_batch_are_deeply_detached_and_immutable(self):
         raw = make_question("choice")

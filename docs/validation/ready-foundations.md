@@ -39,8 +39,10 @@ review; no pre-existing data or branches will be deleted.
 The focused behavioral suites passed: MAT-013 24 tests in 0.212 seconds,
 MAT-026 32 tests in 0.201 seconds (a subsequent run took 0.215 seconds), and
 MAT-036 27 tests in 0.547 seconds. Per-ticket receipts describe their acceptance
-cases and limits. No runtime/schema/test/example/workflow changes followed
-the combined qualification freeze of 393 input files.
+cases and limits. The combined qualification freeze of 393 input files remained
+unchanged through the 824-test pass and initial independent review. Subsequent
+review remediation changed only corpus error paths and two test files. A second
+393-input freeze binds the final remediation qualification.
 
 The first full regression run on 2026-10-27 ran 824 tests in 357.865 seconds:
 823 passed and the unchanged storage-backup path assertion failed. The test
@@ -95,7 +97,68 @@ all 19 selected files were reviewed, every round completed, and there were no
 review warnings. The follow-up will use numeric manifest indices in error paths
 with marker-redaction tests, strengthen malformed response tests to require
 specific faults, and independently exercise decreasing root availability.
-These remediations and their final gates are not yet claimed passed here.
+The remediation outcomes and final gates are recorded below.
 Source review and synthetic checks do not establish provider accuracy or
 live usefulness. No provider evaluation, model download, credential use,
 native integration, assessment engine, rollout or deployment ran.
+
+## Review remediation
+
+The corpus now uses numeric observation positions in every validation error
+path. New marker-ID regressions exercise parent, chronology and membership
+failures and require that neither `detail` nor the exception string contains
+the rejected identifier. The chronology regression first validates increasing
+availability for two independent roots and then rejects descending availability
+at the specific chronology path. Semantic malformed-wire cases now start from
+otherwise valid complete responses and assert exact parser/primitive faults.
+
+The revised corpus suite passed 29 tests in 0.655 seconds, and the revised
+semantic suite passed 32 tests in 0.218 seconds. The focused independent
+two-pass review covered all three changed Python files, returned **zero findings
+and zero warnings**, and completed both rounds. The source review traced numeric
+error positions, downstream callers and each strengthened failure case.
+
+The rebuilt final dev12 wheel has SHA-256
+`f95894fa0875f40f846faceb4047e88d2eccef22572d3bc3b60500b01619d4e5`.
+Its 92 resources match the final frozen source. All ten copied examples passed
+again after force-reinstalling that wheel into the isolated constrained
+environment outside the checkout. The earlier wheel hash above identifies the
+pre-remediation artifact, not the final candidate.
+
+## Final combined result
+
+All **826 tests passed in 344.831 seconds** on Python 3.12.14 using canonical
+`TMPDIR`, from 2026-10-27T02:54:09Z through 02:59:54Z (345.171 seconds wall time).
+This includes all 741 previous cases and 85 foundation cases: 24 profile,
+32 semantic and 29 corpus tests. All 393 final frozen inputs were unchanged
+after the run. The final input-manifest SHA-256 is
+`66f6c833761eb7d80978bdcf5a5235468f6d36b845462f45050ae396f3d4f3da`.
+The final isolated examples took 45.803 seconds, from 02:54:41Z to 02:55:27Z.
+
+Canonical MAT-013, MAT-026 and MAT-036 are complete on this task branch with
+local acceptance evidence. Ticket projections and repository validation are
+checked again after completion metadata changes. MAT-014, MAT-015 and MAT-016
+remain planned; MAT-027 and the civic contract work have their own tickets and
+prerequisites. All 22 cross-repository roadmap items remain unchanged.
+No remote CI result or merge is inferred from local acceptance; submitted-head
+CI is reported in the PR. These interfaces are not an integrated qualified
+assessment runtime, provider accuracy result or live usefulness trial.
+
+## Retained evidence and storage
+
+Raw local logs, frozen manifests, the final wheel and isolated installation are
+retained under the external temporary task directory
+`/var/folders/hn/c0zg49fj73g5bnwl67mj83mm0000gn/T/matter-ready-foundations-fvv8kp_x`.
+Independent-review sessions are
+`~/.ocr-bridge/sessions/20261026-213538-877203` and
+`~/.ocr-bridge/sessions/20261026-215421-55f445`. These paths are local execution
+evidence, not portable requirements or private-corpus destinations. The checked-in
+receipts preserve the commands, outcomes, limits and final artifact identities.
+
+After qualification the volume reported 100 GiB free. Measured logical sizes
+were 46 MiB for the checkout (including its 16 MiB ignored environment and
+generated build output), 19 MiB for the task directory, and about 3 MiB for the
+two review sessions. Compared with the initial 24 MiB checkout, measured retained
+growth is approximately 44 MiB, well below the 1 GiB planned peak. The pip cache
+remained about 690 MiB. These logical directory totals are not an exact APFS
+allocated-space accounting. No pre-existing files or merged branches were deleted.

@@ -166,13 +166,75 @@ class CorpusTests(unittest.TestCase):
         self.manifest["episodes"][2]["occurrences"][0]["observation_ids"] = ["retry-original"]
         self.reject(self.manifest, "/occurrence_ids")
 
-    def test_same_time_order_is_explicit_but_reverse_chronology_fails(self):
+    def test_equal_time_derivation_requires_parent_first(self):
         episode = self.manifest["episodes"][2]
         episode["observations"][1]["available_at"] = time("2026-01-01T00:00:01Z")
         episode["sources"][1]["available_at"] = time("2026-01-01T00:00:01Z")
         validate_episode(episode)
         episode["observations"].reverse()
         self.reject(self.manifest, "/parents")
+
+    def two_root_observations(self):
+        episode = deepcopy(self.manifest["episodes"][0])
+        second = deepcopy(self.manifest["episodes"][1])
+        episode["sources"].extend(second["sources"])
+        episode["observations"].extend(second["observations"])
+        episode["observations"][1]["available_at"] = time("2026-01-01T00:00:02Z")
+        episode["occurrences"].extend(second["occurrences"])
+        return episode
+
+    def test_decreasing_availability_of_root_observations_fails_chronology(self):
+        episode = self.two_root_observations()
+        # Both roots have valid source availability and no parent relationship;
+        # reversing them must exercise chronology, not another earlier guard.
+        validate_episode(episode)
+        episode["observations"].reverse()
+        with self.assertRaises(ContractError) as caught:
+            validate_episode(episode)
+        self.assertIn("episode/observations/1/available_at", caught.exception.detail)
+        self.assertIn("chronological", caught.exception.detail)
+
+    def test_observation_error_paths_do_not_expose_caller_identity(self):
+        marker = "PRIVATE-DESCRIPTIVE-OBSERVATION-MARKER"
+
+        def rename(episode, original):
+            for observation in episode["observations"]:
+                if observation["id"] == original:
+                    observation["id"] = marker
+                observation["parents"] = [marker if item == original else item for item in observation["parents"]]
+            for occurrence in episode["occurrences"]:
+                occurrence["observation_ids"] = [marker if item == original else item for item in occurrence["observation_ids"]]
+            for case in episode["cases"]:
+                case["target_observation_ids"] = [marker if item == original else item for item in case["target_observation_ids"]]
+            for label in episode["labels"]:
+                for evidence in label["evidence"]:
+                    if evidence["observation_id"] == original:
+                        evidence["observation_id"] = marker
+
+        parent = deepcopy(self.manifest["episodes"][2])
+        rename(parent, "retry-copy")
+        validate_episode(parent)
+        parent["observations"][1]["parents"] = ["absent-parent"]
+
+        chronology = self.two_root_observations()
+        rename(chronology, "routine-report")
+        validate_episode(chronology)
+        chronology["observations"].reverse()
+
+        membership = deepcopy(self.manifest["episodes"][0])
+        rename(membership, "routine-report")
+        validate_episode(membership)
+        membership["observations"][0]["occurrence_ids"] = []
+
+        for episode, path in ((parent, "episode/observations/1/parents"),
+                              (chronology, "episode/observations/1/available_at"),
+                              (membership, "episode/observations/0/occurrence_ids")):
+            with self.subTest(path=path):
+                with self.assertRaises(ContractError) as caught:
+                    validate_episode(episode)
+                self.assertTrue(caught.exception.detail.startswith(path + ":"))
+                self.assertNotIn(marker, caught.exception.detail)
+                self.assertNotIn(marker, str(caught.exception))
 
     def test_external_artifact_is_metadata_only_until_bytes_verified(self):
         manifest, key, payload = self.external()
