@@ -151,6 +151,50 @@ class QualificationTests(unittest.TestCase):
                 measure=MEASURE, token=self.token(cert))))
         self.assertEqual(len(self.stage.calls), 1)
 
+    def test_actual_clock_expiry_cannot_be_backdated_and_future_hints_refuse(self):
+        cert = self.certificate()
+        execution = self.run_execution()["execution"]
+        token = self.token(cert)
+        with self.f.storage.snapshot() as view:
+            for method in (
+                lambda: self.service.inspect(view, execution, question_id="support", certificate=cert.reference,
+                    domain_scope=DOMAIN, measure=MEASURE, token=token, as_of=LATE),
+                lambda: self.service.preflight(view, self.request, question_id="support", certificate=cert.reference,
+                    domain_scope=DOMAIN, measure=MEASURE, token=token, as_of=LATE)):
+                with self.assertRaises(StorageError) as error:
+                    method()
+                self.assertEqual(error.exception.code, "E_POLICY_INVALID")
+        self.f.now = deepcopy(LATE)
+        token = self.token(cert)
+        with self.f.storage.snapshot() as view:
+            for hint in (None, EARLY):
+                admission = self.service.inspect(view, execution, question_id="support", certificate=cert.reference,
+                    domain_scope=DOMAIN, measure=MEASURE, token=token, as_of=hint)
+                self.assertEqual(admission.value["reason"], "certificate_expired")
+                self.assertFalse(admission.eligible)
+                preflight = self.service.preflight(view, self.request, question_id="support", certificate=cert.reference,
+                    domain_scope=DOMAIN, measure=MEASURE, token=token, as_of=hint)
+                self.assertEqual(preflight["reason"], "certificate_expired")
+        self.assertEqual(len(self.stage.calls), 1)
+
+    def test_minimum_support_counts_independent_accepted_decisions_per_polarity(self):
+        execution = self.run_execution()["execution"]
+        insufficient = deepcopy(CASES["support"])
+        insufficient.update(episodes=100, minimum_episodes=10, accepted=1, errors=0)
+        boundary = deepcopy(insufficient)
+        boundary["accepted"] = 10
+        for polarity in ("positive", "negative"):
+            with self.subTest(polarity=polarity):
+                supports = {"positive": deepcopy(CASES["support"]), "negative": deepcopy(CASES["support"])}
+                supports[polarity] = insufficient
+                cert = self.certificate(report_changes={"support": supports})
+                decision = self.inspect(execution, cert)
+                self.assertEqual(decision.value["reason"], polarity + "_support_insufficient")
+                self.assertFalse(decision.eligible)
+                supports[polarity] = boundary
+                exact = self.certificate(report_changes={"support": supports})
+                self.assertTrue(self.inspect(execution, exact).eligible)
+
     def test_missing_model_and_certificate_remain_shadow_and_half_abstains(self):
         execution = self.run_execution(probability="0.5")["execution"]
         cert = self.certificate()

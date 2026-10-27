@@ -28,7 +28,9 @@ capability and READ authority. Installation reads a real host-origin receipt
 from a configured review producer and exact pinned artifacts. Its report binds
 the same identity/regions, held-out passed status, independent labels, separate
 polarity support/minimum support, target/lower accuracy and an explicit interval
-method. Runtime checks support and exact arithmetic consistency; it does not fit
+method. Each polarity minimum counts independent accepted episode decisions,
+not its larger pre-threshold cohort: `minimum_episodes <= accepted <= episodes`.
+Runtime checks support and exact arithmetic consistency; it does not fit
 confidence intervals, manufacture evaluation reports or verify empirical accuracy.
 Failed/not-run/teacher-only/insufficient reports remain recordable but unusable.
 Revocation needs present host authority and never waits for model work.
@@ -37,7 +39,9 @@ Revocation needs present host authority and never waits for model work.
 measure=..., token=..., access_context=..., as_of=...)` checks known applicability
 before execution. Success is only `applicable_pending_execution`: actual resolved
 model, exact whole-batch admission and region selection still require the observed
-execution. No token is captured or renewed inside any qualification method.
+execution. Applicability always uses the actual injected host clock: an earlier
+`as_of` sample cannot backdate eligibility, and future hints are refused. No token
+is captured or renewed inside any qualification method.
 
 `inspect(view, execution_pin, question_id=..., certificate=exact_ref_or_none,
 domain_scope=..., measure=..., token=..., as_of=...)` rereads the actual stored

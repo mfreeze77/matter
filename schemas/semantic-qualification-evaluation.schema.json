@@ -290,16 +290,20 @@
               ],
               "properties": {
                 "episodes": {
-                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Independent eligible episodes in this polarity cohort before applying the decision region."
                 },
                 "minimum_episodes": {
-                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Predeclared minimum independent accepted episode decisions for this polarity; must not exceed accepted."
                 },
                 "accepted": {
-                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Independent episode decisions accepted in this polarity region, between minimum_episodes and episodes."
                 },
                 "errors": {
-                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Incorrect accepted decisions for this polarity, not exceeding accepted."
                 },
                 "target_accuracy": {
                   "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
@@ -333,16 +337,20 @@
               ],
               "properties": {
                 "episodes": {
-                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Independent eligible episodes in this polarity cohort before applying the decision region."
                 },
                 "minimum_episodes": {
-                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Predeclared minimum independent accepted episode decisions for this polarity; must not exceed accepted."
                 },
                 "accepted": {
-                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Independent episode decisions accepted in this polarity region, between minimum_episodes and episodes."
                 },
                 "errors": {
-                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Incorrect accepted decisions for this polarity, not exceeding accepted."
                 },
                 "target_accuracy": {
                   "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"

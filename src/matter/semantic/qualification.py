@@ -149,6 +149,14 @@ class SemanticQualificationService(_MutationService):
         if not self.reviewers or len(self.reviewers) > 128:
             _fail("E_POLICY_INVALID")
 
+    def _now(self, as_of=None):
+        # A caller's earlier sample cannot backdate present applicability. Hosts
+        # inject clocks for simulation, as in ControlService._time.
+        now = fragment(self.clock(), "known_time")
+        if as_of is not None and compare_times(fragment(as_of, "known_time"), now) > 0:
+            _fail("E_POLICY_INVALID")
+        return now
+
     def prepare_install(self, certificate, *, command_id, idempotency_key, actor, authority):
         if not isinstance(certificate, SemanticCertificate):
             _fail("E_POLICY_INVALID")
@@ -257,7 +265,7 @@ class SemanticQualificationService(_MutationService):
             support = report["support"][polarity]
             if support is None or not support["passed"]:
                 return "unqualified", polarity + "_support_failed", stored, definition, dependencies
-            if not (1 <= support["minimum_episodes"] <= support["episodes"] and 1 <= support["accepted"] <= support["episodes"]
+            if not (1 <= support["minimum_episodes"] <= support["accepted"] <= support["episodes"]
                     and support["errors"] <= support["accepted"]):
                 return "unqualified", polarity + "_support_insufficient", stored, definition, dependencies
             target, lower = _decimal(support["target_accuracy"]), _decimal(support["lower_accuracy_bound"])
@@ -289,7 +297,7 @@ class SemanticQualificationService(_MutationService):
         return value, "abstained", "undecided_region"
 
     def inspect(self, view, execution, *, question_id, certificate, domain_scope, measure, token, as_of=None, request=None):
-        now = fragment(as_of or self.clock(), "known_time")
+        now = self._now(as_of)
         record = view.get(pin(execution) if type(execution) is dict and "body" in execution else execution)
         if type(execution) is dict and "body" in execution and not _same(record, execution):
             _fail()
@@ -395,7 +403,7 @@ class SemanticQualificationService(_MutationService):
 
     def preflight(self, view, request, *, question_id, certificate, domain_scope, measure, token, access_context=None, as_of=None):
         self.receipts._request(view, request, token, access_context)
-        now = fragment(as_of or self.clock(), "known_time")
+        now = self._now(as_of)
         actual = qualification_identity(request, question_id, domain_scope=domain_scope, measure=measure)
         sources = request["packet"]["dependencies"]
         for reference in sources:
