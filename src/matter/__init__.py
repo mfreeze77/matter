@@ -24,8 +24,11 @@ live in ``matter.profiles``; staged typed execution and explicit conflict
 composition live in ``matter.planner``, ``matter.executor`` and
 ``matter.conflicts``. Versioned semantic questions, bounded source packets and
 offline typed execution live in ``matter.semantic``. Frozen corpus contracts
-live in ``matter.evaluation``. Assessment publication, general invalidation and
-live provider integrations remain separate milestones.
+live in ``matter.evaluation``. Atomic assessment publication and declared caches
+live in ``matter.assessments`` and ``matter.cache``. Registered transitive validity
+and freshness gates live in ``matter.dependencies`` and ``matter.invalidation``.
+Lifecycle, delivery, live provider integrations and qualification issuance remain
+separate milestones.
 """
 
 __version__ = "0.1.0.dev13"

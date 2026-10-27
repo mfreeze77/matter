@@ -538,16 +538,20 @@ class _SystemTransaction:
             raise
         return self.get(pin(record))
 
-    def watchers(self, watch_key):
+    def watchers(self, watch_key, *, limit=512):
         self._ensure_active()
         _validate_fragment(watch_key, "identifier")
+        if type(limit) is not int or not 1 <= limit <= 4096:
+            raise StorageError("E_SCHEMA_INVALID", "A bounded system watch limit is required.")
         self._tx._watch_queries.append(watch_key)
-        view = _Snapshot(self._tx._store, self._tx._db)
-        try:
-            records = view.watchers(watch_key)
-        finally:
-            view._active = False
-        return [self.get(pin(record)) for record in records]
+        rows = self._tx._db.execute(
+            "SELECT namespace,id FROM watches WHERE scope_id=? AND watch_key=? ORDER BY namespace,id LIMIT ?",
+            (self._tx._store.scope_id, watch_key, limit + 1),
+        ).fetchall()
+        if len(rows) > limit:
+            raise StorageError("E_BUDGET_EXHAUSTED", "The system watch cohort exceeds its read budget.")
+        return [self.get({"scope_id": self._tx._store.scope_id, "namespace": row["namespace"],
+                          "id": row["id"], "record_type": PROJECTION_TYPE}) for row in rows]
 
     def put_projection(self, reference, value, *, watch_keys=()):
         self._ensure_active()

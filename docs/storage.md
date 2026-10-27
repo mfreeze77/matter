@@ -319,6 +319,12 @@ and one-write-per-identity constraints; they do not authorize external actions.
 Only configured stores invoke an observer. Reopening without one is a privileged
 host choice, so consumers must still check their direct freshness guards.
 
+System-port `watchers(key, limit=512)` bounds a cohort before materializing
+records. The explicit integer limit may be 1–4096; a larger cohort returns
+`E_BUDGET_EXHAUSTED`. Normal snapshot/handler watch contracts are unchanged.
+The [dependency observer](dependencies.md) uses a scoped freshness fence as its
+bounded fallback so graph capacity cannot roll back an admitted host control.
+
 ## Reuse and acceptance
 
 The implementation inspected

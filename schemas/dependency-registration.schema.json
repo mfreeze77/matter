@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/dependency-registration.schema.json",
+  "title": "Matter dependency-registration v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scope_id",
+    "target",
+    "manifest",
+    "status",
+    "epoch",
+    "reasons",
+    "recompute_pending"
+  ],
+  "properties": {
+    "scope_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "target": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope_id",
+        "positive",
+        "contexts",
+        "candidate_sets",
+        "negative_registrations",
+        "queries",
+        "time_conditions",
+        "control_token",
+        "scope_fence",
+        "read_access"
+      ],
+      "properties": {
+        "scope_id": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+        },
+        "positive": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+          },
+          "maxItems": 4096
+        },
+        "contexts": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+          },
+          "maxItems": 4096
+        },
+        "candidate_sets": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+          },
+          "maxItems": 4096
+        },
+        "negative_registrations": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+          },
+          "maxItems": 4096
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "specification",
+              "catalogs",
+              "seen"
+            ],
+            "properties": {
+              "specification": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/coverage_specification"
+              },
+              "catalogs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "source",
+                    "pin"
+                  ],
+                  "properties": {
+                    "source": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identity_key"
+                    },
+                    "pin": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "maxItems": 64
+              },
+              "seen": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/observation_dependency"
+                },
+                "maxItems": 4096
+              }
+            }
+          },
+          "maxItems": 32
+        },
+        "time_conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_condition"
+          },
+          "maxItems": 128
+        },
+        "control_token": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "scope_fence": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+            }
+          ]
+        },
+        "read_access": {
+          "type": "array",
+          "maxItems": 4096,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "reference",
+              "fences"
+            ],
+            "properties": {
+              "reference": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+              },
+              "fences": {
+                "type": "array",
+                "maxItems": 256,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "target",
+                    "reference",
+                    "pin"
+                  ],
+                  "properties": {
+                    "target": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/entity_ref"
+                        }
+                      ]
+                    },
+                    "reference": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/entity_ref"
+                    },
+                    "pin": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "current",
+        "invalidated"
+      ]
+    },
+    "epoch": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "cause",
+          "receipt",
+          "before",
+          "after"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+          },
+          "cause": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+          },
+          "receipt": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_ref"
+          },
+          "before": {
+            "type": "array",
+            "items": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+            },
+            "maxItems": 4096
+          },
+          "after": {
+            "type": "array",
+            "items": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+            },
+            "maxItems": 4096
+          }
+        }
+      },
+      "maxItems": 128
+    },
+    "recompute_pending": {
+      "type": "boolean"
+    }
+  }
+}

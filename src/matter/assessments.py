@@ -860,6 +860,17 @@ class AssessmentService:
                 raise
             value = self._current_value(record)
             self.controls._audit(view, value["preparation"]["request"], self._read_targets(value["preparation"], value["publication"]["graph"]))
+            # MAT-016 registration is optional for an unconfigured legacy host.
+            # Once present, its scoped fence/correction verdict is mandatory.
+            from .dependencies import registration_ref, require_current_dependency
+            try:
+                registration = view.get(registration_ref(reference))
+            except StorageError as error:
+                if error.code != "E_NOT_FOUND":
+                    raise
+                registration = None
+            if registration is not None:
+                require_current_dependency(view, pin(registration), as_of=self._now(), controls=self.controls)
             if value["status"] != "current":
                 _fail("The assessment lane was invalidated.", "E_DEPENDENCY_STALE")
             body = value["preparation"]["request"]["body"]

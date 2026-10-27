@@ -124,6 +124,8 @@ The resource receipt distinguishes `admitted_budget` (the input ceiling) from
 `remaining_budget` (the conservative allowance for a later run). Remaining calls
 subtract reserved attempts, input/output bytes subtract their reservations, and
 elapsed time subtracts the rounded-up observed run duration, all clamped at zero.
+The final host stop poll completes before the finish timestamp used for elapsed,
+stop reason and remaining time, so polling time cannot be reused by a later run.
 Failed or fallback attempts keep their reservations even when they invoked no
 evaluator. The per-packet evidence cap remains unchanged. Passing that true
 remainder into another run cannot reuse an already reserved call allowance.

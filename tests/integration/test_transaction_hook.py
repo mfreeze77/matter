@@ -109,6 +109,34 @@ class TransactionHookTests(unittest.TestCase):
         self.assertEqual(result["error"]["code"], "E_REVISION_CONFLICT")
         self.assertEqual(calls, [])
 
+    def test_system_watch_limit_refuses_oversized_cohort_without_partial_effects(self):
+        def seed(tx):
+            result = create_matter(tx)
+            for index in range(3):
+                tx.put_projection(projection_ref("watch-" + str(index)), domain_value({"index": index}), watch_keys=(WATCH_KEY,))
+            return result
+        seeded = self.store.execute(create_command("watch-seed", "watch-seed"), seed)
+        self.assertEqual(seeded["status"], "success", seeded)
+        self.reopen(lambda tx, changes: tx.watchers(WATCH_KEY, limit=2))
+        refused = self.store.execute(create_command("too-many", "must-not-exist"), create_matter)
+        self.assertEqual(refused["error"]["code"], "E_BUDGET_EXHAUSTED")
+        with self.assertRaises(StorageError):
+            self.store.get(entity_ref(create_command("unused", "must-not-exist")["body"]["matter"]))
+        observed = []
+        def bounded(tx, changes):
+            observed.extend(tx.watchers(WATCH_KEY, limit=3))
+        self.reopen(bounded)
+        accepted = self.store.execute(create_command("exact-limit", "accepted"), create_matter)
+        self.assertEqual(accepted["status"], "success", accepted)
+        self.assertEqual([row["value"]["value"]["index"] for row in observed], [0, 1, 2])
+
+    def test_system_watch_limit_must_be_a_bounded_integer(self):
+        for index, limit in enumerate((0, -1, True, "2", None, 4097)):
+            with self.subTest(limit=limit):
+                self.reopen(lambda tx, changes: tx.watchers(WATCH_KEY, limit=limit))
+                result = self.store.execute(create_command("bad-limit-" + str(index), "new-" + str(index)), create_matter)
+                self.assertEqual(result["error"]["code"], "E_SCHEMA_INVALID")
+
     def test_hook_cannot_cross_scope_or_escape_phase_or_return_decisions(self):
         def cross_scope(tx, changes):
             tx.get({**entity_ref(self.original), "scope_id": "other"})

@@ -121,3 +121,30 @@ qualified-result expiry. Runtime/source review plus fresh render/validate checks
 admitted MAT-016 development against that API. MAT-015 is adding further
 negative-scope, time and staged-prerequisite cases; neither ticket is marked
 done on this preliminary milestone.
+
+Final focused milestones before combined qualification:
+
+- MAT-015: 33 tests passed in 35.558 seconds, including complete original
+  semantic-target coverage, source READ checks, mapped-claim dependencies,
+  staged-target scope refusal and the MAT-016 current-registration seam.
+- MAT-016: 25 tests passed in 20.177 seconds, including actual assessment
+  publication/invalidation/republication, immutable correction notices,
+  candidate-member changes, scoped query isolation, recomputation races and
+  capacity fallback that preserves an actual operator control.
+- The system observer port now bounds watch cohorts before loading records.
+  Ten tests passed in 0.682 seconds, including over-limit refusal without
+  partial effects and exact-limit success. The normal snapshot/handler watch
+  APIs remain unchanged.
+- The final graph/storage remediation review completed two passes over six
+  selected files with zero findings and no warnings. MAT-015 and MAT-016
+  independent reviews and the final bounded-watch change remain pending here.
+
+Root review required the existing control contract's complete target set;
+READ permission alone does not let a narrow matter token cover additional
+source work. Newly discovered targets require a suitably scoped new attempt,
+not token renewal. Proof-only catalog validation stays distinct from explicit
+semantic reads. General freshness does not grant qualification or authority.
+
+The tested backend for this batch is SQLite. A neutral storage port is not
+evidence of an implemented or qualified PostgreSQL adapter. Provider calls,
+private corpora and downstream repository changes remain outside these checks.
