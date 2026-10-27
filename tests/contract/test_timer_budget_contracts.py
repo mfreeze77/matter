@@ -28,7 +28,7 @@ class TimerBudgetContracts(unittest.TestCase):
         self.assertEqual(len(OLD_OPERATIONS), 24)
         self.assertEqual(set(inventory["operations"]), OLD_OPERATIONS | NEW_OPERATIONS | {"record_semantic_execution", "admit_semantic_result"})
         self.assertEqual(len(inventory["record_kinds"]), 12)
-        self.assertEqual(sum(len(values) for values in SUCCESS_OUTCOMES.values()), 60)
+        self.assertEqual(sum(len(values) for values in SUCCESS_OUTCOMES.values()), 63)
         for operation in OLD_OPERATIONS:
             self.assertEqual(set(inventory["success_outcomes"][operation]), SUCCESS_OUTCOMES[operation])
             self.assertEqual(validate_command(fixture("commands/" + operation + ".json"))["schema_version"], "1.0")

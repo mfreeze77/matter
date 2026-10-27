@@ -1345,6 +1345,24 @@
       "schema": "result",
       "valid": true,
       "description": "Synthetic MAT-031 recorded qualification decision; no provider or action authority."
+    },
+    {
+      "path": "results/dispatch__leased.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-021 leased result; structural validity does not establish actual transport evidence."
+    },
+    {
+      "path": "results/dispatch__authorized.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-021 authorized result; structural validity does not establish actual transport evidence."
+    },
+    {
+      "path": "results/dispatch__recorded.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-021 recorded result; structural validity does not establish actual transport evidence."
     }
   ]
 }
