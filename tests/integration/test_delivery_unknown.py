@@ -65,6 +65,7 @@ class DeliveryUnknown(DeliveryFixture):
         reconciled = self.service.reconcile(auth, command_id="lookup-positive", idempotency_key="lookup-positive")
         self.assertEqual(reconciled.get("outcome"), "delivered", reconciled)
         self.assertEqual(self.service.history(auth)["status"], "delivered")
+        self.assertEqual(self.service.reconcile(auth, command_id="again", idempotency_key="again"), reconciled)
         self.assertEqual(self.transport.calls, [])
         self.assertEqual(len(self.transport.lookups), 2)
 
@@ -88,6 +89,8 @@ class DeliveryUnknown(DeliveryFixture):
         self.assertEqual(recorded.get("outcome"), "recorded", recorded)
         auth = self.f.storage.command_receipt("auth-rejected")["result"]["body"]["authorization"]
         self.assertEqual(self.service.history(auth)["status"], "failed")
+        self.assertEqual(self.service.reconcile(auth, command_id="failed-query", idempotency_key="failed-query"), recorded)
+        self.assertEqual(self.transport.lookups, [])
         self.assertIsNone(self.a.baseline()["value"]["value"]["delivered"])
         self.assertEqual(len(self.transport.calls), 1)
 
@@ -167,3 +170,90 @@ class DeliveryUnknown(DeliveryFixture):
         self.assertEqual(history["status"], "delivered")
         self.assertEqual([r["body"]["stage"] for r in history["observations"]], ["delivered", "consumed", "acted_on", "outcome_verified", "useful"])
         self.assertEqual(len(self.transport.calls), 1)
+
+    def test_lease_expiry_after_authorization_is_definite_system_no_send(self):
+        from matter.outbox import ENGINE
+        from matter.storage import entity_ref
+        intent, lease, prepared = self.authorize(identity="refuse-lease", lease_ms=1000)
+        def expire(auth): self.f.now = deepcopy(lease["expires_at"])
+        with self.assertRaises(StorageError) as refused: self.service.send(prepared, before_io=expire)
+        self.assertEqual(refused.exception.code, "E_DEPENDENCY_STALE")
+        auth = self.f.storage.command_receipt("auth-refuse-lease")["result"]["body"]["authorization"]
+        history = self.service.history(auth)
+        self.assertEqual(history["status"], "failed")
+        fact = history["observations"][0]
+        self.assertEqual(fact["provenance"]["origin"], "system")
+        self.assertEqual(fact["provenance"]["producer"], ENGINE)
+        self.assertEqual(fact["extensions"]["matter:delivery-observation"]["value"]["reason"], "delivery:refused_before_io")
+        allocation = self.f.storage.get(entity_ref(history["authorization"]["body"]["details"]["value"]["attention_budget"]))
+        self.assertEqual(allocation["value"]["value"]["status"], "committed")
+        recorded = self.service.send(prepared)
+        self.assertEqual(recorded.get("outcome"), "recorded")
+        self.assertEqual(self.service.reconcile(auth, command_id="local-failed-query", idempotency_key="local-failed-query"), recorded)
+        self.assertEqual(self.transport.lookups, [])
+        self.assertEqual(self.transport.calls, [])
+        self.enqueue(identity="eligible-after-definite-refusal")
+
+    def test_payload_failure_after_authorization_is_not_a_fabricated_transport_timeout(self):
+        _, _, prepared = self.authorize(identity="refuse-content")
+        def unavailable(auth):
+            digest = self.f.storage.get(auth)["body"]["details"]["value"]["content_digest"]
+            # Delete this fixture's own synthetic blob after authorization,
+            # exercising the real payload store's unavailable path.
+            (self.f.payloads._directory / digest).unlink()
+        with self.assertRaises(StorageError) as refused: self.service.send(prepared, before_io=unavailable)
+        self.assertEqual(refused.exception.code, "E_EVIDENCE_UNAVAILABLE")
+        auth = self.f.storage.command_receipt("auth-refuse-content")["result"]["body"]["authorization"]
+        history = self.service.history(auth)
+        self.assertEqual(history["status"], "failed")
+        self.assertEqual(history["observations"][0]["provenance"]["origin"], "system")
+        self.assertEqual(self.transport.calls, [])
+        self.assertIsNone(self.a.baseline()["value"]["value"]["delivered"])
+
+    def test_ahead_transport_clock_preserves_delivery_fact_without_ordering_baseline_by_it(self):
+        from matter.outbox import OBSERVATION_EXTENSION
+        _, _, prepared = self.authorize(identity="skew")
+        reported = add_milliseconds(self.f.now, 5000)
+        self.transport.callback = lambda **kw: TransportResult({"status": "delivered", "receipt_id": "clock-skew-receipt",
+            "at": reported, "milestone": "example:delivered", "reason": "transport:accepted"})
+        result = self.service.send(prepared)
+        self.assertEqual(result.get("outcome"), "delivered", result)
+        fact = self.f.storage.get(result["body"]["delivery_receipt"])
+        observation = fact["extensions"][OBSERVATION_EXTENSION]["value"]
+        self.assertEqual(observation["reported_at"], reported)
+        self.assertEqual(observation["ordering"], "unavailable")
+        self.assertEqual(self.a.baseline()["value"]["value"]["delivered"]["delivered_at"], self.f.now)
+        self.assertEqual(len(self.transport.calls), 1)
+
+    def test_repeated_uncertainty_is_coalesced_and_cannot_block_later_positive_lookup(self):
+        from matter.outbox import DestinationDefinition, REQUEST_EXTENSION
+        self.transport = SyntheticTransport(lookup={"scope": component("coalesced-lookup"), "reliable_terminal": True})
+        d = self.destination.value; d["transport"] = self.transport.capabilities.reference
+        self.destination = DestinationDefinition(d); self.service = self.make_service()
+        self.transport.callback = lambda **kw: TransportResult(UNKNOWN)
+        _, _, prepared = self.authorize(identity="poll")
+        with self.assertRaises(StorageError): self.service.send(prepared)
+        auth = self.f.storage.command_receipt("auth-poll")["result"]["body"]["authorization"]
+        # A serialized generic observation cannot claim the driver's local proof
+        # that no I/O happened to an already unknown external send.
+        forged = self.service._prepare_refusal(auth, "E_EVIDENCE_UNAVAILABLE")
+        refused = self.service.execute(forged)
+        self.assertEqual(refused["error"]["code"], "E_AUTHORITY_REQUIRED")
+        template = self.service.prepare_observation(auth, TransportResult(UNKNOWN), command_id="poll-template", idempotency_key="poll-template")
+        for index in range(129):
+            self.f.now = add_milliseconds(self.f.now, 1)
+            poll = deepcopy(template); poll["command_id"] = poll["idempotency_key"] = "poll-" + str(index)
+            observed = poll["extensions"][REQUEST_EXTENSION]["value"]["observation"]["value"]
+            observed["observed_at"] = deepcopy(self.f.now)
+            observed["eligibility_at_observation"]["checked_at"] = deepcopy(self.f.now)
+            result = self.service.execute(poll)
+            self.assertEqual(result.get("outcome"), "recorded", result)
+        self.assertEqual(len(self.service.history(auth)["observations"]), 1)
+        key = self.f.storage.get(auth)["body"]["details"]["value"]["delivery_key"]
+        self.transport.seen[key] = TransportResult({"status": "delivered", "receipt_id": "eventual-receipt", "at": deepcopy(self.f.now),
+            "milestone": "example:delivered", "reason": "transport:accepted"})
+        result = self.service.reconcile(auth, command_id="eventual-positive", idempotency_key="eventual-positive")
+        self.assertEqual(result.get("outcome"), "delivered", result)
+        self.assertEqual(len(self.service.history(auth)["observations"]), 2)
+        self.assertEqual(len(self.transport.calls), 1)
+        self.assertEqual(len(self.transport.lookups), 1)

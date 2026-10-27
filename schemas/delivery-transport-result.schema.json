@@ -53,5 +53,103 @@
         "transport:unknown"
       ]
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "reason": {
+            "const": "transport:accepted"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "delivered"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "reason": {
+            "const": "transport:rejected"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "failed"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "reason": {
+            "const": "transport:timeout"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "delivery_unknown"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "reason": {
+            "const": "transport:unavailable"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "delivery_unknown"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "reason": {
+            "const": "transport:unknown"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "delivery_unknown"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "reason": {
+            "const": "transport:not_found"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "not_found"
+          }
+        }
+      }
+    }
+  ]
 }

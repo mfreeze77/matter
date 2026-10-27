@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 from ._rule_values import domain, fragment
 from .attention import AttentionService, _ENGINE as ATTENTION_ENGINE
-from .budgets import BudgetService, _Reads, _lookup, _value as budget_value
+from .budgets import BudgetService, REQUEST_EXTENSION as BUDGET_REQUEST, _Reads, _lookup, _value as budget_value
 from .canonical import canonical_bytes, canonical_digest, source_digest
 from .contracts import ContractError, validate_command, validate_record, validate_result
 from .dependencies import capture_dependencies, _manifest_current, registration_ref, require_current_dependency
@@ -63,6 +63,7 @@ class DeliveryService:
         self.storage, self.scope_id, self.payloads = storage, storage.scope_id, payloads
         self.attention, self.budgets, self.controls, self.clock = attention, budgets, controls, clock
         self.destinations, self.transports = tuple(destinations), tuple(transports)
+        self._refusal_key = object()
         if (not self.destinations or len(self.destinations) > 128 or len(self.transports) > 128 or
                 any(not isinstance(item, DestinationDefinition) for item in self.destinations) or
                 len({canonical_bytes(item.reference) for item in self.destinations}) != len(self.destinations)):
@@ -247,6 +248,19 @@ class DeliveryService:
 
     def _queue(self, tx, command, request):
         value = _value("delivery-intent", request["intent_payload"])
+        token = _value("control-token", value["token"])
+        # These checks precede quiet/duplicate early returns as well as writes.
+        if command["actor"] != token["actor"] or command["authority"] != entity_ref(token["authority"]): fail("E_AUTHORITY_REQUIRED")
+        definition = self.budgets._definition(value["budget"])
+        if (definition.value["kind"] != "attention" or value["amounts"].get("deliveries") != 1 or
+                set(value["amounts"]) != set(definition.value["limits"])): fail("E_POLICY_INVALID")
+        inner = _value("operation-command", request["budget_command"])
+        inner_request = _value("budget-request", inner.get("extensions", {}).get(BUDGET_REQUEST))
+        reservation_id = "delivery-" + canonical_digest({"intent": value["id"], "delta": value["equivalence_key"]}, "matter.delivery-reservation.v1")
+        expected_reserve = {"budget": value["budget"], "reservation_id": reservation_id, "amounts": value["amounts"],
+            "expires_at": value["expires_at"], "targets": token["targets"]}
+        if (inner["operation"] != "reserve_budget" or not _same(inner["body"], expected_reserve) or
+                not _same(inner_request["token"], value["token"])): fail("E_EVIDENCE_INVALID")
         view = _Reads(tx, self.scope_id)
         state, token, _ = self._guards(view, value)
         _, decision = self._decision(view, value["decision"])
@@ -261,7 +275,6 @@ class DeliveryService:
             return self._withheld(tx, (reasons or ["stale_assessment"])[0])
         if slot is not None and slot["state"] not in {"failed", "withheld"}:
             return self._withheld(tx, "already_delivered" if slot["state"] == "delivered" else "deferred_until_checkpoint", intent=slot["intent"], slot=pin(row))
-        inner = _value("operation-command", request["budget_command"])
         staged = self.budgets.stage(tx, inner)
         if staged["outcome"] != "reserved": return self._withheld(tx, "budget_limited", staged["body"]["next_eligible_at"])
         stored = tx.insert(self._intent_input(value, command["command_id"]))
@@ -271,12 +284,12 @@ class DeliveryService:
         current = tx.put_projection(slot_ref(self.scope_id, value["equivalence_key"]), domain("delivery-slot", slot))
         return self._result(tx.success("ready", {"intent": pin(stored), "delivery_key": value["delivery_key"]}), "queued", intent=pin(stored), slot=pin(current))
 
-    def execute(self, command, *, _claimed=None):
+    def execute(self, command, *, _claimed=None, _local_refusal=None):
         command, request = self._checked(command)
         def handler(tx):
             try:
                 if request["action"] == "queue": return self._queue(tx, command, request)
-                return self._stage(tx, command, request, claimed=_claimed)
+                return self._stage(tx, command, request, claimed=_claimed, local_refusal=_local_refusal is self._refusal_key)
             except StorageError as error:
                 if error.code == "E_REVISION_CONFLICT": fail("E_DEPENDENCY_STALE")
                 raise
@@ -352,6 +365,28 @@ class DeliveryService:
                 if pin(view.get(entity_ref(ref))) != ref: fail("E_DEPENDENCY_STALE")
         return self._collect(command, inspect)
 
+    def prepare_withhold(self, intent, *, token, reason, command_id, idempotency_key):
+        """Withdraw unused work under its original identity, without renewal."""
+        fragment(reason, "quiet_reason")
+        command, value = self._maintenance("withhold", intent, token, command_id=command_id, idempotency_key=idempotency_key)
+        with self.storage.snapshot() as view:
+            _, slot = self._slot(view, value)
+            if slot["authorization"] is not None or slot["state"] not in {"queued", "leased"}: fail("E_DELIVERY_UNKNOWN")
+            reservation = pin(view.get(entity_ref(slot["reservation"])))
+        budget = self._header("settle_budget", "release-" + command_id, "release-" + idempotency_key, token,
+            {"reservation": reservation, "action": "release"})
+        budget = self.budgets.prepare(budget, token=token)
+        request = command["extensions"][REQUEST_EXTENSION]["value"]
+        request.update(withheld_reason=reason, budget_command=domain("operation-command", budget))
+        def inspect(view):
+            view.get(intent); view.get(value["decision"]); self._audit(view, value)
+            row, slot = self._slot(view, value)
+            if slot["authorization"] is not None or slot["state"] not in {"queued", "leased"}: fail("E_DELIVERY_UNKNOWN")
+            request["expected_slot"] = pin(row)
+            for ref in budget["expected_revisions"]:
+                if pin(view.get(entity_ref(ref))) != ref: fail("E_DEPENDENCY_STALE")
+        return self._collect(command, inspect)
+
     def _lease(self, slot, lease):
         if (slot is None or slot["lease"] is None or not _same(slot["lease"], lease) or slot["fence"] != lease["fence"] or
                 compare_times(self.clock(), lease["expires_at"]) >= 0): fail("E_DEPENDENCY_STALE")
@@ -366,13 +401,44 @@ class DeliveryService:
         if not _same(command["body"], body): fail()
         return record, value, token
 
-    def _stage(self, tx, command, request, *, claimed=None):
+    def _stage(self, tx, command, request, *, claimed=None, local_refusal=False):
         view = _Reads(tx, self.scope_id)
         record, value, token = self._binding(view, command, request)
-        if request["action"] == "observe": return self._observe(tx, command, request, value)
+        if request["action"] == "observe": return self._observe(tx, command, request, value, local_refusal=local_refusal)
         row, slot = self._slot(view, value)
         if slot is None or slot["intent"] != pin(record): fail("E_DEPENDENCY_STALE")
         if request["expected_slot"] != pin(row): fail("E_DEPENDENCY_STALE")
+        if request["action"] == "withhold":
+            self._audit(view, value)
+            if slot["authorization"] is not None or slot["state"] not in {"queued", "leased"}: fail("E_DELIVERY_UNKNOWN")
+            fragment(request["withheld_reason"], "quiet_reason")
+            inner = _value("operation-command", request["budget_command"])
+            inner_request = _value("budget-request", inner.get("extensions", {}).get(BUDGET_REQUEST))
+            allocation_record = view.get(entity_ref(slot["reservation"]))
+            allocation = budget_value(allocation_record, "budget-reservation")
+            expected = {"budget": value["budget"], "amounts": value["amounts"], "targets": token["targets"],
+                "expires_at": value["expires_at"], "token": value["token"]}
+            if (allocation["status"] not in {"held", "released", "expired"} or
+                    any(not _same(allocation[key], item) for key, item in expected.items()) or
+                    inner["operation"] != "settle_budget" or
+                    not _same(inner["body"], {"reservation": pin(allocation_record), "action": "release"}) or
+                    not _same(inner_request["token"], value["token"])): fail("E_EVIDENCE_INVALID")
+            staged = self.budgets.stage(tx, inner)
+            if staged["outcome"] not in {"released", "expired", "unchanged"}: fail("E_EVIDENCE_INVALID")
+            now = fragment(self.clock(), "known_time")
+            reason = "delivery:" + request["withheld_reason"]
+            observation = tx.insert({"schema_version": "1.0", "record_type": "receipt", "scope_id": self.scope_id,
+                "namespace": NAMESPACE, "id": "withdraw-" + canonical_digest({"intent": pin(record), "slot": pin(row),
+                    "key": command["idempotency_key"]}, "matter.delivery-withdrawal.v1"),
+                "provenance": {"origin": "system", "producer": ENGINE, "recorded_at": now, "parents": [pin(record)]},
+                "body": {"stage": "withheld", "operation_id": command["command_id"], "recorded_at": now,
+                    "outcome": "matter:delivery_withheld", "evidence": [pin(record)],
+                    "details": domain("delivery-result", {"schema_version": "1.0", "status": "withheld", "intent": pin(record),
+                        "slot": pin(row), "lease": None, "authorization": None, "observation": None, "reason": reason})}})
+            slot.update(state="withheld", lease=None, fence=slot["fence"] + 1,
+                reservation=staged["body"]["reservation"], last_observation=pin(observation))
+            current = tx.put_projection(entity_ref(row), domain("delivery-slot", slot))
+            return self._withheld(tx, request["withheld_reason"], intent=pin(record), slot=pin(current), observation=pin(observation))
         state, _, destination = self._guards(view, value)
         if state["decision"]["treatment"] == "quiet": return self._withheld(tx, "stale_assessment", intent=pin(record), slot=pin(row))
         now = fragment(self.clock(), "known_time")
@@ -394,7 +460,16 @@ class DeliveryService:
         if request["action"] != "authorize": fail("E_SCHEMA_INVALID")
         self._lease(slot, request["lease"])
         if slot["state"] != "leased": fail("E_DEPENDENCY_STALE")
-        staged = self.budgets.stage(tx, _value("operation-command", request["budget_command"]))
+        inner = _value("operation-command", request["budget_command"])
+        inner_request = _value("budget-request", inner.get("extensions", {}).get(BUDGET_REQUEST))
+        if (inner["operation"] != "settle_budget" or
+                not _same(inner["body"], {"reservation": slot["reservation"], "action": "commit"}) or
+                not _same(inner_request["token"], value["token"])): fail("E_EVIDENCE_INVALID")
+        allocation = budget_value(view.get(slot["reservation"]), "budget-reservation")
+        expected_allocation = {"budget": value["budget"], "amounts": value["amounts"], "targets": token["targets"],
+            "expires_at": value["expires_at"], "token": value["token"]}
+        if allocation["status"] != "held" or any(not _same(allocation[key], item) for key, item in expected_allocation.items()): fail("E_EVIDENCE_INVALID")
+        staged = self.budgets.stage(tx, inner)
         if staged["outcome"] != "committed": fail("E_BUDGET_EXHAUSTED")
         transport = self._transport(destination)
         if not _same(staged["body"]["reservation"], pin(tx.get(staged["body"]["reservation"]))): fail()
@@ -421,7 +496,7 @@ class DeliveryService:
                 "parents": _pins([pin(record), value["decision"], decision["assessment"], staged["body"]["reservation"]])},
             "body": {"stage": "operation", "operation_id": command["command_id"], "recorded_at": now, "outcome": "matter:delivery_authorized",
                 "evidence": value["dependencies"], "details": domain("delivery-authorization", authorization)}})
-        tx.put_projection(self._attempt_ref(auth), domain("delivery-attempt", {"authorization": pin(auth), "status": "authorized", "current": None, "observations": []}))
+        tx.put_projection(self._attempt_ref(auth), domain("delivery-attempt", {"authorization": pin(auth), "status": "authorized", "current": None, "completion_key": None, "observations": []}))
         slot.update(state="authorized", reservation=staged["body"]["reservation"], authorization=pin(auth))
         current = tx.put_projection(entity_ref(row), domain("delivery-slot", slot))
         if claimed is not None: claimed.append(pin(auth))
@@ -439,7 +514,7 @@ class DeliveryService:
         else:
             details = domain("delivery-observation", observation)
         identity = "observation-" + canonical_digest({"authorization": authorization, "value": observation, "evidence": evidence}, "matter.delivery-observation.v1")
-        stage = status if status in {"delivered", "delivery_unknown", "withheld", "consumed", "acted_on", "outcome_verified", "useful"} else "operation"
+        stage = status if status in {"delivered", "delivery_unknown", "consumed", "acted_on", "outcome_verified", "useful"} else "operation"
         return {"schema_version": "1.0", "scope_id": self.scope_id, "namespace": NAMESPACE, "record_type": "receipt", "id": identity,
             "provenance": {"origin": "host" if producer != ENGINE else "system", "producer": producer, "recorded_at": now,
                 "parents": _pins([authorization, auth["intent"], *evidence])},
@@ -457,10 +532,11 @@ class DeliveryService:
         except ContractError as error:
             return {"status": "invalidated", "error_code": error.code, "checked_at": checked_at}
 
-    def prepare_observation(self, authorization, result, *, command_id, idempotency_key, kind="transport", evidence=(), producer=None, withheld_reason=None):
+    def prepare_observation(self, authorization, result, *, command_id, idempotency_key, kind="transport", evidence=(), producer=None):
         # Trusted adapter/factual-write boundary. No current work token is
         # recaptured or required to report what an authorized transport did.
         if not isinstance(result, TransportResult): fail("E_SCHEMA_INVALID")
+        if kind != "transport": fail("E_AUTHORITY_REQUIRED")
         with self.storage.snapshot() as snapshot:
             view = _Reads(snapshot, self.scope_id)
             auth_record = view.get(authorization); auth = authorization_value(auth_record)
@@ -470,19 +546,19 @@ class DeliveryService:
             proof = {"command": journal["command"], "result": journal["result"]}
         now = fragment(self.clock(), "known_time")
         data = result.value
-        if data["at"]["state"] == "known" and compare_times(data["at"], now) > 0: fail()
         status = data["status"]
         if status == "not_found": status = "delivery_unknown"
         if status == "delivered" and data["milestone"] != auth["milestone"]: fail()
         observation = {"schema_version": "1.0", "authorization": authorization, "intent": auth["intent"],
             "destination": auth["destination"], "transport": auth["transport"], "delivery_key": auth["delivery_key"], "status": status,
             "receipt_id": data["receipt_id"], "reported_at": data["at"], "observed_at": now,
-            "ordering": "transport_time" if data["at"]["state"] == "known" else "unavailable", "reason": data["reason"],
+            "ordering": "transport_time" if data["at"]["state"] == "known" and
+                compare_times(auth["authorized_at"], data["at"]) <= 0 and compare_times(data["at"], now) <= 0 else "unavailable", "reason": data["reason"],
             "eligibility_at_observation": self._eligibility_observation(value)}
         command, _ = self._maintenance_for_fact(auth, value, token, command_id, idempotency_key)
         request = command["extensions"][REQUEST_EXTENSION]["value"]
         request.update(authorization=authorization, authorization_proof=proof, observation=domain("delivery-observation", observation),
-            observation_kind=kind, evidence=_pins(evidence), outcome_producer=producer, withheld_reason=withheld_reason)
+            observation_kind=kind, evidence=_pins(evidence), outcome_producer=producer)
         def inspect(view):
             self._fact_reads(view, authorization, auth, value, evidence)
             row, _ = self._slot(view, value)
@@ -509,19 +585,24 @@ class DeliveryService:
         _lookup(view, entity_ref(auth["baseline"]))
         for ref in evidence: view.get(ref)
 
-    def _observe(self, tx, command, request, value):
+    def _observe(self, tx, command, request, value, *, local_refusal=False):
         auth_record = tx.get(request["authorization"]); auth = authorization_value(auth_record)
         if auth["intent"] != request["intent"] or not _same(auth["lease"], request["lease"]): fail()
         observation = _value("delivery-observation", request["observation"])
         if (observation["authorization"] != pin(auth_record) or observation["intent"] != auth["intent"] or
                 any(observation[key] != auth[key] for key in ("destination", "transport", "delivery_key")) or
                 compare_times(observation["observed_at"], self.clock()) > 0 or compare_times(observation["observed_at"], auth["authorized_at"]) < 0): fail()
-        if observation["reported_at"]["state"] == "known" and compare_times(observation["reported_at"], observation["observed_at"]) > 0: fail()
+        if observation["ordering"] == "transport_time" and (observation["reported_at"]["state"] != "known" or
+                compare_times(observation["reported_at"], observation["observed_at"]) > 0 or
+                compare_times(observation["reported_at"], auth["authorized_at"]) < 0): fail()
         attempt_record = tx.get(self._attempt_ref(auth_record)); attempt = _value("delivery-attempt", attempt_record["value"])
-        if attempt["authorization"] != pin(auth_record) or len(attempt["observations"]) >= 128: fail("E_BUDGET_EXHAUSTED")
+        if attempt["authorization"] != pin(auth_record): fail()
         status = observation["status"]
         producer = auth["producer"] if request["outcome_producer"] is None else request["outcome_producer"]
-        if producer != auth["producer"]: fail("E_AUTHORITY_REQUIRED")
+        if request["observation_kind"] == "refusal":
+            if (not local_refusal or producer != ENGINE or status != "failed" or
+                    observation["reason"] != "delivery:refused_before_io"): fail("E_AUTHORITY_REQUIRED")
+        elif producer != auth["producer"]: fail("E_AUTHORITY_REQUIRED")
         if request["observation_kind"] == "outcome":
             if status not in {"consumed", "acted_on", "outcome_verified", "useful"}: fail()
             if attempt["status"] != "delivered" or not request["evidence"]: fail()
@@ -530,17 +611,28 @@ class DeliveryService:
                 if (source["record_type"] != "receipt" or source["provenance"]["origin"] != "host" or
                         source["provenance"]["producer"] != producer or source["body"]["stage"] != status or
                         pin(auth_record) not in source["body"]["evidence"]): fail("E_AUTHORITY_REQUIRED")
-        elif request["observation_kind"] != "transport" or status not in {"delivered", "failed", "delivery_unknown"}: fail()
+        elif request["observation_kind"] not in {"transport", "refusal"} or status not in {"delivered", "failed", "delivery_unknown"}: fail()
+        if request["observation_kind"] == "transport":
+            TransportResult({"status": "not_found" if status == "delivery_unknown" and observation["reason"] == "transport:not_found" else status,
+                "receipt_id": observation["receipt_id"], "at": observation["reported_at"],
+                "milestone": auth["milestone"] if status == "delivered" else None, "reason": observation["reason"]})
+        if request["observation_kind"] == "transport" and status == "delivery_unknown" and attempt["status"] == "delivery_unknown":
+            # The new poll remains in the command journal. Repeated uncertainty
+            # is not new corroboration and cannot consume terminal headroom.
+            row = tx.get(slot_ref(self.scope_id, value["equivalence_key"]))
+            return self._result(tx.success("recorded", {"delivery_receipt": attempt["current"], "status": status}), status,
+                intent=auth["intent"], slot=pin(row), authorization=pin(auth_record), observation=attempt["current"])
+        if len(attempt["observations"]) >= 128: fail("E_BUDGET_EXHAUSTED")
         stored = tx.insert(self._observation_input(pin(auth_record), auth, observation, request["evidence"], operation_id=command["command_id"], producer=producer))
         if status == "delivered":
             self.attention.stage_observed_delivery(tx, auth["decision"], pin(stored), authorization=pin(auth_record), authorization_proof=request["authorization_proof"])
         attempt["observations"].append(pin(stored))
-        if request["observation_kind"] == "transport":
+        if request["observation_kind"] in {"transport", "refusal"}:
             if attempt["status"] == "delivered" and status != "delivered": fail("E_EVIDENCE_INVALID")
-            attempt.update(status=status, current=pin(stored))
+            attempt.update(status=status, current=pin(stored), completion_key=command["idempotency_key"])
         tx.put_projection(entity_ref(attempt_record), domain("delivery-attempt", attempt))
         row = tx.get(slot_ref(self.scope_id, value["equivalence_key"])); slot = _value("delivery-slot", row["value"])
-        if request["observation_kind"] == "transport" and (slot["authorization"] == pin(auth_record) or status == "delivered"):
+        if request["observation_kind"] in {"transport", "refusal"} and (slot["authorization"] == pin(auth_record) or status == "delivered"):
             if slot["state"] != "delivered" or status == "delivered":
                 slot.update(state=status, last_observation=pin(stored))
                 current = tx.put_projection(entity_ref(row), domain("delivery-slot", slot))
@@ -552,18 +644,48 @@ class DeliveryService:
         return self._result(tx.success("recorded", {"delivery_receipt": pin(stored), "status": status}), status,
             intent=auth["intent"], slot=pin(current), authorization=pin(auth_record), observation=pin(stored))
 
+    def _prepare_refusal(self, authorization, code):
+        with self.storage.snapshot() as view:
+            auth = authorization_value(view.get(authorization))
+            value = self._intent(view.get(auth["intent"]))
+            token = _value("control-token", value["token"])
+            journal = view.command_receipt(auth["authorization_key"])
+        now = fragment(self.clock(), "known_time")
+        identity = "refused-" + authorization["id"]
+        observation = {"schema_version": "1.0", "authorization": authorization, "intent": auth["intent"],
+            "destination": auth["destination"], "transport": auth["transport"], "delivery_key": auth["delivery_key"],
+            "status": "failed", "receipt_id": None, "reported_at": now, "observed_at": now,
+            "ordering": "unavailable", "reason": "delivery:refused_before_io",
+            "eligibility_at_observation": {"status": "invalidated", "error_code": code, "checked_at": now}}
+        command, _ = self._maintenance_for_fact(auth, value, token, identity, identity)
+        request = command["extensions"][REQUEST_EXTENSION]["value"]
+        request.update(authorization=authorization, authorization_proof={"command": journal["command"], "result": journal["result"]},
+            observation=domain("delivery-observation", observation), observation_kind="refusal", outcome_producer=ENGINE)
+        def inspect(view):
+            self._fact_reads(view, authorization, auth, value, [])
+            row, _ = self._slot(view, value)
+            request["expected_slot"] = pin(row)
+        return self._collect(command, inspect)
+
     def _content(self, value):
         payload = self.payloads.read(value["content"])
         if payload.status != "available" or source_digest(payload.data) != value["content_digest"]: fail("E_EVIDENCE_UNAVAILABLE")
         return payload.data
+
+    def _completion(self, view, attempt):
+        if attempt["status"] in {"authorized", "delivery_unknown"}: fail("E_DELIVERY_UNKNOWN")
+        if attempt["completion_key"] is None: fail()
+        journal = view.command_receipt(attempt["completion_key"])
+        result = validate_result(journal["result"])
+        if result["status"] != "success" or result.get("body", {}).get("delivery_receipt") != attempt["current"]: fail()
+        return result
 
     def _reported(self, authorization):
         with self.storage.snapshot() as view:
             auth = authorization_value(view.get(authorization))
             value = self._intent(view.get(auth["intent"])); self._audit(view, value)
             record = view.get(self._attempt_ref(authorization)); status = _value("delivery-attempt", record["value"])
-            if status["status"] in {"authorized", "delivery_unknown"}: fail("E_DELIVERY_UNKNOWN")
-            return status
+            return self._completion(view, status)
 
     def send(self, prepared_authorization, *, before_io=None, after_io=None):
         command, request = self._checked(prepared_authorization)
@@ -583,18 +705,27 @@ class DeliveryService:
         authorization = result["body"]["authorization"]
         if not claimed:
             return self._reported(authorization)
-        if before_io is not None: before_io(authorization)
-        with self.storage.snapshot() as snapshot:
-            view = _Reads(snapshot, self.scope_id)
-            auth_record = view.get(authorization); auth = authorization_value(auth_record)
-            row, slot = self._slot(view, value)
-            self._lease(slot, auth["lease"])
-            if slot["authorization"] != authorization or slot["state"] != "authorized": fail("E_DEPENDENCY_STALE")
-            self._guards(view, value)
-            self.budgets.require_committed(view, auth["attention_budget"])
         try:
-            observed = transport.send(destination=self._destination(value["destination"]), delivery_key=value["delivery_key"],
-                content=self._content(value), authorization=auth_record)
+            if before_io is not None: before_io(authorization)
+            with self.storage.snapshot() as snapshot:
+                view = _Reads(snapshot, self.scope_id)
+                auth_record = view.get(authorization); auth = authorization_value(auth_record)
+                row, slot = self._slot(view, value)
+                self._lease(slot, auth["lease"])
+                if slot["authorization"] != authorization or slot["state"] != "authorized": fail("E_DEPENDENCY_STALE")
+                self._guards(view, value)
+                self.budgets.require_committed(view, auth["attention_budget"])
+            destination = self._destination(value["destination"])
+            content = self._content(value)
+        except ContractError as error:
+            # Only this fresh local claim can establish that I/O never began.
+            refusal = self._prepare_refusal(authorization, error.code)
+            recorded = self.execute(refusal, _local_refusal=self._refusal_key)
+            if recorded["status"] != "success": return recorded
+            raise
+        try:
+            observed = transport.send(destination=destination, delivery_key=value["delivery_key"],
+                content=content, authorization=auth_record)
             if not isinstance(observed, TransportResult): raise TypeError("untyped transport result")
         except Exception:
             observed = TransportResult({"status": "delivery_unknown", "receipt_id": None, "at": {"state": "unknown", "reason": "not_reported"},
@@ -623,8 +754,8 @@ class DeliveryService:
             auth = authorization_value(view.get(authorization))
             value = self._intent(view.get(auth["intent"])); self._audit(view, value)
             attempt = _value("delivery-attempt", view.get(self._attempt_ref(authorization))["value"])
+            if attempt["status"] in {"delivered", "failed"}: return self._completion(view, attempt)
             if len(attempt["observations"]) >= 128: fail("E_BUDGET_EXHAUSTED")
-            if attempt["status"] == "delivered": return attempt
             transport = self._transport(self._destination(auth["destination"]))
             if transport.capabilities.value["receipt_lookup"] is None: fail("E_DELIVERY_UNKNOWN")
         # No storage snapshot/read transaction survives transport I/O.

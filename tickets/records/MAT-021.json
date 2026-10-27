@@ -65,7 +65,12 @@
     "Source/permission/baseline changes before authorization refuse sending under the original context; no token renewal.",
     "Restart after an ambiguous external acceptance retains delivery_unknown and conservatively charged capacity.",
     "A late or uncertain-order reconciliation cannot overwrite newer delivered knowledge.",
-    "Missing configured transport refuses before claiming work; exact replay checks current READ authority without redispatch."
+    "Missing configured transport refuses before claiming work; exact replay checks current READ authority without redispatch.",
+    "Queue actor/authority and actual reserved/committed allocation match the immutable intent; early duplicate responses cannot disclose another actor's work.",
+    "An explicit original-context withdrawal atomically retires only never-authorized work, releases unused capacity and fences an old worker; authorized or unknown sends cannot be withdrawn or refunded.",
+    "Known pre-I/O refusal records system-origin definite non-delivery, distinct from actual transport uncertainty; resolved replay returns the real typed completion result.",
+    "Repeated unknown polling cannot exhaust terminal-receipt capacity; contradictory transport status/reason pairs are refused.",
+    "Unusable remote transport clocks retain the exact reported time with unavailable ordering rather than losing an actual success or overwriting newer delivered knowledge."
   ],
   "risks": [
     "A local transaction cannot make arbitrary external transport exactly-once."

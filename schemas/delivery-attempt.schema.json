@@ -8,7 +8,8 @@
     "authorization",
     "status",
     "current",
-    "observations"
+    "observations",
+    "completion_key"
   ],
   "properties": {
     "authorization": {
@@ -39,6 +40,16 @@
       "items": {
         "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
       }
+    },
+    "completion_key": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+        }
+      ]
     }
   }
 }

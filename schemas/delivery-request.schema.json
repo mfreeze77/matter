@@ -167,7 +167,8 @@
       "enum": [
         null,
         "transport",
-        "outcome"
+        "outcome",
+        "refusal"
       ]
     },
     "withheld_reason": {
