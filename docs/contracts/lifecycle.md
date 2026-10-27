@@ -1,6 +1,6 @@
 # Matter lifecycle, attention, and delivery contract
 
-Status: normative target specification. Bounded portions are implemented by MAT-009 [identity correction](../identity-corrections.md), MAT-010 [time and coverage](../time-coverage.md), and MAT-011 [trusted controls](../controls.md). Domain lifecycle, audience attention, scheduling and full delivery remain to be implemented and qualified through MAT-017 through MAT-025. The existing components do not establish those later runtime guarantees.
+Status: normative target specification. Bounded implementations include MAT-009 [identity correction](../identity-corrections.md), MAT-010 [time and coverage](../time-coverage.md), MAT-011 [trusted controls](../controls.md), MAT-017 [lifecycle](../lifecycle.md), MAT-018 [contexts](../contexts.md), and MAT-019 [attention](../attention.md). MAT-020 scheduling and budget integration is tracked in the [current validation receipt](../validation/live-roadmap.md). Full delivery, replay and runtime qualification retain their later canonical tickets; local synthetic checks do not establish those guarantees.
 
 Sources: [matterbrainstormspec](../../matterbrainstormspec), sections 2–5 and 8–9, and [matterjevmesh](../../matterjevmesh), sections 3–7, 9, and 10. Companion contracts: [core](core.md) and [rules](rules.md).
 

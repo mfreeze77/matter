@@ -25,7 +25,7 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-017: Apply evidence-backed lifecycle transitions, resolution, and reopening](MAT-017.md) | core | 3 | P0 | in_progress | in_progress | MAT-007, MAT-009, MAT-010, MAT-011, MAT-013, MAT-015, MAT-016 |
 | [MAT-018: Bind purposes, audiences, and dispositions independently](MAT-018.md) | rules | 3 | P0 | in_progress | in_progress | MAT-005, MAT-011, MAT-013, MAT-015, MAT-016 |
 | [MAT-019: Evaluate attention eligibility against the last delivered baseline](MAT-019.md) | rules | 3 | P0 | in_progress | in_progress | MAT-015, MAT-016, MAT-017, MAT-018 |
-| [MAT-020: Schedule temporal reevaluation with durable resource and attention budgets](MAT-020.md) | core | 3 | P0 | planned | waiting | MAT-003, MAT-010, MAT-011, MAT-014, MAT-016, MAT-019 |
+| [MAT-020: Schedule temporal reevaluation with durable resource and attention budgets](MAT-020.md) | core | 3 | P0 | in_progress | in_progress | MAT-003, MAT-010, MAT-011, MAT-014, MAT-016, MAT-019 |
 | [MAT-021: Deliver through a freshness-checked outbox with independent outcome receipts](MAT-021.md) | core | 3 | P0 | planned | waiting | MAT-003, MAT-011, MAT-016, MAT-019, MAT-020 |
 | [MAT-022: Support bounded evidence-gap investigation without forced human escalation](MAT-022.md) | rules | 4 | P1 | planned | waiting | MAT-010, MAT-011, MAT-012, MAT-014, MAT-016, MAT-020 |
 | [MAT-023: Expose consistent projections and decision explanations](MAT-023.md) | core | 4 | P1 | planned | waiting | MAT-003, MAT-007, MAT-009, MAT-015, MAT-016, MAT-017, MAT-019, MAT-021 |
@@ -34,7 +34,7 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-026: Define the provider-neutral typed executor](MAT-026.md) | jev | 2 | P0 | done | done | MAT-001, MAT-002, MAT-012 |
 | [MAT-027: Implement versioned question specifications and rendering](MAT-027.md) | jev | 2 | P0 | done | done | MAT-026, MAT-007 |
 | [MAT-028: Build bounded source-linked assessment packets](MAT-028.md) | jev | 2 | P0 | done | done | MAT-027, MAT-004, MAT-006, MAT-010 |
-| [MAT-029: Plan independent batches and validated semantic stages](MAT-029.md) | jev | 3 | P0 | planned | waiting | MAT-026, MAT-027, MAT-028, MAT-014, MAT-020 |
+| [MAT-029: Plan independent batches and validated semantic stages](MAT-029.md) | jev | 3 | P0 | in_progress | in_progress | MAT-026, MAT-027, MAT-028, MAT-014, MAT-020 |
 | [MAT-030: Persist judgment receipts and exact execution reuse](MAT-030.md) | jev | 3 | P0 | planned | waiting | MAT-026, MAT-029, MAT-003, MAT-015, MAT-016 |
 | [MAT-031: Enforce qualification certificates at runtime admission](MAT-031.md) | jev | 3 | P0 | planned | waiting | MAT-027, MAT-028, MAT-030, MAT-013 |
 | [MAT-032: Integrate an optional TypeSafe transport adapter](MAT-032.md) | jev | 3 | P1 | planned | waiting | MAT-026, MAT-027, MAT-028, MAT-030, MAT-031 |

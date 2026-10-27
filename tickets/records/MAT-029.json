@@ -4,7 +4,7 @@
   "track": "jev",
   "phase": 3,
   "priority": "P0",
-  "status": "planned",
+  "status": "in_progress",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "semantic/stages",
@@ -74,7 +74,7 @@
     }
   ],
   "sources": [
-    "matterjevmesh §6",
+    "matterjevmesh \u00a76",
     "https://docs.typesafe.ai/primitives",
     "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/system_one_http.py"
   ],

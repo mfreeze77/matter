@@ -45,7 +45,11 @@
     "dispatch",
     "assess",
     "publish_coverage",
-    "register_negative_watch"
+    "register_negative_watch",
+    "schedule_timer",
+    "fire_timer",
+    "reserve_budget",
+    "settle_budget"
   ],
   "success_outcomes": {
     "ingest_observation": [
@@ -140,6 +144,27 @@
     ],
     "register_negative_watch": [
       "registered"
+    ],
+    "schedule_timer": [
+      "scheduled",
+      "cancelled",
+      "unchanged"
+    ],
+    "fire_timer": [
+      "fired",
+      "already_fired",
+      "not_due",
+      "inert"
+    ],
+    "reserve_budget": [
+      "reserved",
+      "budget_limited"
+    ],
+    "settle_budget": [
+      "committed",
+      "released",
+      "expired",
+      "unchanged"
     ]
   },
   "error_codes": [

@@ -4,7 +4,7 @@
   "track": "core",
   "phase": 3,
   "priority": "P0",
-  "status": "planned",
+  "status": "in_progress",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "scheduling_budgets",

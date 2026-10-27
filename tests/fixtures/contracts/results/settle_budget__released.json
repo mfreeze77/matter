@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "operation": "settle_budget",
+  "operation_id": "command-settle_budget",
+  "status": "success",
+  "outcome": "released",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "matter.scheduler",
+    "record_type": "receipt",
+    "id": "firing-one"
+  },
+  "body": {
+    "reservation": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.budgets",
+      "record_type": "matter:projection",
+      "id": "reservation-one",
+      "revision": 1
+    },
+    "reason": "Synthetic allocation settlement.",
+    "remaining": {
+      "calls": 0
+    },
+    "next_eligible_at": {
+      "state": "unknown",
+      "reason": "not_applicable"
+    }
+  }
+}

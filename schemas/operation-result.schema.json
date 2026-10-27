@@ -45,7 +45,11 @@
             "dispatch",
             "assess",
             "publish_coverage",
-            "register_negative_watch"
+            "register_negative_watch",
+            "schedule_timer",
+            "fire_timer",
+            "reserve_budget",
+            "settle_budget"
           ]
         },
         "operation_id": {
@@ -1533,6 +1537,620 @@
               }
             }
           }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "schedule_timer"
+            },
+            "outcome": {
+              "const": "scheduled"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "timer",
+                "next_check_at"
+              ],
+              "properties": {
+                "timer": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "next_check_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "schedule_timer"
+            },
+            "outcome": {
+              "const": "cancelled"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "timer",
+                "next_check_at"
+              ],
+              "properties": {
+                "timer": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "next_check_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "schedule_timer"
+            },
+            "outcome": {
+              "const": "unchanged"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "timer",
+                "next_check_at"
+              ],
+              "properties": {
+                "timer": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "next_check_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "fire_timer"
+            },
+            "outcome": {
+              "const": "fired"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "timer",
+                "firing",
+                "scheduled_at",
+                "actual_at",
+                "coalesced_count",
+                "attention_decision"
+              ],
+              "properties": {
+                "timer": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "firing": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+                },
+                "scheduled_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+                },
+                "actual_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+                },
+                "coalesced_count": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 128
+                },
+                "attention_decision": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "fire_timer"
+            },
+            "outcome": {
+              "const": "already_fired"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "timer",
+                "firing",
+                "scheduled_at",
+                "actual_at",
+                "coalesced_count",
+                "attention_decision"
+              ],
+              "properties": {
+                "timer": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "firing": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+                },
+                "scheduled_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+                },
+                "actual_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+                },
+                "coalesced_count": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 128
+                },
+                "attention_decision": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "fire_timer"
+            },
+            "outcome": {
+              "const": "not_due"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "timer",
+                "reason",
+                "next_check_at"
+              ],
+              "properties": {
+                "timer": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "reason": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+                },
+                "next_check_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "fire_timer"
+            },
+            "outcome": {
+              "const": "inert"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "timer",
+                "reason",
+                "next_check_at"
+              ],
+              "properties": {
+                "timer": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "reason": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+                },
+                "next_check_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "reserve_budget"
+            },
+            "outcome": {
+              "const": "reserved"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reservation",
+                "remaining",
+                "next_eligible_at"
+              ],
+              "properties": {
+                "reservation": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "remaining": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [],
+                  "properties": {
+                    "calls": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "input_bytes": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "output_bytes": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "elapsed_ms": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "candidates": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "retries": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "cost_units": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "deliveries": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "interruption_units": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    }
+                  },
+                  "minProperties": 1
+                },
+                "next_eligible_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "reserve_budget"
+            },
+            "outcome": {
+              "const": "budget_limited"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reason",
+                "remaining",
+                "next_eligible_at"
+              ],
+              "properties": {
+                "reason": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+                },
+                "remaining": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [],
+                  "properties": {
+                    "calls": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "input_bytes": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "output_bytes": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "elapsed_ms": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "candidates": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "retries": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "cost_units": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "deliveries": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "interruption_units": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    }
+                  },
+                  "minProperties": 1
+                },
+                "next_eligible_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "settle_budget"
+            },
+            "outcome": {
+              "const": "committed"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reservation",
+                "reason",
+                "remaining",
+                "next_eligible_at"
+              ],
+              "properties": {
+                "reservation": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "reason": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+                },
+                "remaining": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [],
+                  "properties": {
+                    "calls": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "input_bytes": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "output_bytes": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "elapsed_ms": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "candidates": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "retries": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "cost_units": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "deliveries": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "interruption_units": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    }
+                  },
+                  "minProperties": 1
+                },
+                "next_eligible_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "settle_budget"
+            },
+            "outcome": {
+              "const": "released"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reservation",
+                "reason",
+                "remaining",
+                "next_eligible_at"
+              ],
+              "properties": {
+                "reservation": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "reason": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+                },
+                "remaining": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [],
+                  "properties": {
+                    "calls": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "input_bytes": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "output_bytes": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "elapsed_ms": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "candidates": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "retries": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "cost_units": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "deliveries": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "interruption_units": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    }
+                  },
+                  "minProperties": 1
+                },
+                "next_eligible_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "settle_budget"
+            },
+            "outcome": {
+              "const": "expired"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reservation",
+                "reason",
+                "remaining",
+                "next_eligible_at"
+              ],
+              "properties": {
+                "reservation": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "reason": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+                },
+                "remaining": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [],
+                  "properties": {
+                    "calls": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "input_bytes": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "output_bytes": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "elapsed_ms": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "candidates": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "retries": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "cost_units": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "deliveries": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "interruption_units": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    }
+                  },
+                  "minProperties": 1
+                },
+                "next_eligible_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "settle_budget"
+            },
+            "outcome": {
+              "const": "unchanged"
+            },
+            "body": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reservation",
+                "reason",
+                "remaining",
+                "next_eligible_at"
+              ],
+              "properties": {
+                "reservation": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+                },
+                "reason": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+                },
+                "remaining": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [],
+                  "properties": {
+                    "calls": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "input_bytes": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "output_bytes": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "elapsed_ms": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "candidates": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "retries": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "cost_units": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "deliveries": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    },
+                    "interruption_units": {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+                    }
+                  },
+                  "minProperties": 1
+                },
+                "next_eligible_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+                }
+              }
+            }
+          }
         }
       ]
     },
@@ -1575,7 +2193,11 @@
             "dispatch",
             "assess",
             "publish_coverage",
-            "register_negative_watch"
+            "register_negative_watch",
+            "schedule_timer",
+            "fire_timer",
+            "reserve_budget",
+            "settle_budget"
           ]
         },
         "operation_id": {

@@ -385,7 +385,7 @@ A delivered result names the observed transport milestone; it does not assert co
 
 ## Fixtures, verification, and remaining boundaries
 
-The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares the validity of standalone record, command, result, and intentionally invalid examples. The [inventory](../../tests/fixtures/contracts/inventory.json) lists the supported kinds, operations, outcome pairs, and error codes. The current manifest contains **203 fixtures: 145 valid and 58 intentionally invalid**. All examples are synthetic. Their zero-valued digest placeholders establish shape only and are not evidence that source bytes or referenced schemas exist.
+The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares the validity of standalone record, command, result, and intentionally invalid examples. The [inventory](../../tests/fixtures/contracts/inventory.json) lists the supported kinds, operations, outcome pairs, and error codes. The current manifest contains **220 fixtures: 162 valid and 58 intentionally invalid**. All examples are synthetic. Their zero-valued digest placeholders establish shape only and are not evidence that source bytes or referenced schemas exist.
 
 The examples cover every record kind, every command, every permitted success pair, every semantic error code, and additional unknown-time, failed/unknown/qualified judgment cases. Invalid examples include storage failure disguised as `no_match`, embedded execution failure in a semantic success, empty scope, unknown time with an invented value, failed judgment with a conclusion, absent qualification certificate, unsafe revision, missing dependency pin, malformed source digest, undeclared command fields, incompatible availability/locator declarations, ineligible association members, newline-suffixed digests or scope identifiers, missing reproducibility fields, fabricated digests for unproduced outputs, missing evidence locators, and negative resource ceilings.
 
@@ -444,17 +444,44 @@ MAT-017 adds five exact internal schemas: [profile](../../schemas/lifecycle-prof
 edges, actual evidence correspondence, separate effective/knowledge times and
 registered current validity through the [lifecycle API](../lifecycle.md).
 
-MAT-018 adds seven schemas for [context definitions](../../schemas/context-definition.schema.json),
+MAT-018 adds eight schemas for [context definitions](../../schemas/context-definition.schema.json),
 [mutations](../../schemas/context-mutation.schema.json), [versions](../../schemas/context-version.schema.json),
 [current pointers](../../schemas/context-current.schema.json),
 [disposition definitions](../../schemas/disposition-definition.schema.json),
 [mutations](../../schemas/disposition-mutation.schema.json) and
-[current slots](../../schemas/disposition-current.schema.json).
+[current slots](../../schemas/disposition-current.schema.json), and
+[retained host target proof](../../schemas/context-targets.schema.json).
 They keep purpose/audience/preferences and authenticated dispositions separate
 from source meaning and domain resolution. See [contexts](../contexts.md).
 
-These twelve resources introduce no new core record kind or database migration.
+These thirteen resources introduce no new core record kind or database migration.
 Their focused validation receipts are [MAT-017](../validation/MAT-017.md) and
 [MAT-018](../validation/MAT-018.md); canonical completion is recorded separately
 from source availability. MAT-072's [access boundary](../access.md) uses closed,
 versioned Python value validation without adding a schema or wire operation.
+
+## Attention and durable temporal budgets
+
+MAT-019 adds seven packaged domain contracts: [policy](../../schemas/attention-policy.schema.json),
+[request](../../schemas/attention-request.schema.json), [decision](../../schemas/attention-decision.schema.json),
+[current pointer](../../schemas/attention-current.schema.json), [delivered baseline](../../schemas/attention-baseline.schema.json),
+[host delivery milestone](../../schemas/attention-delivery-milestone.schema.json), and
+[result extension](../../schemas/attention-result.schema.json). The
+[attention API](../attention.md) uses the existing `assess` envelope and preserves
+actual delivery history independently of current eligibility.
+
+MAT-020 adds [timer definition](../../schemas/timer-definition.schema.json),
+[request](../../schemas/timer-request.schema.json), [state](../../schemas/timer-state.schema.json),
+[manifest](../../schemas/timer-manifest.schema.json), and [firing](../../schemas/timer-firing.schema.json)
+contracts. Separate budget resources bind [policy](../../schemas/budget-policy.schema.json),
+[amounts](../../schemas/budget-amounts.schema.json), [requests](../../schemas/budget-request.schema.json),
+[accounts](../../schemas/budget-account.schema.json), and [reservations](../../schemas/budget-reservation.schema.json).
+See [scheduling](../scheduler.md) and [budgets](../budgets.md).
+
+The four additive v1 operations are `schedule_timer`, `fire_timer`,
+`reserve_budget` and `settle_budget`. Timer and budget maintenance is separate
+from trusted control input. Existing operation branches and twelve core record
+kinds are preserved; readers that do not recognize a new operation refuse it.
+The portable inventory now has **28 operations and 58 successful outcome pairs**.
+The package has **80 JSON Schema resources** at this milestone. These shapes
+and their synthetic fixtures establish no external delivery or provider accuracy.

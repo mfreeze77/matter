@@ -1,0 +1,119 @@
+{
+  "schema_version": "1.0",
+  "operation": "schedule_timer",
+  "command_id": "command-schedule_timer",
+  "idempotency_key": "idempotency-schedule_timer",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [
+    {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    }
+  ],
+  "body": {
+    "action": "create",
+    "timer": {
+      "schema": {
+        "namespace": "matter",
+        "id": "timer-definition",
+        "version": "1.0",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "value": {
+        "schema_version": "1.0",
+        "namespace": "example",
+        "id": "timer-one",
+        "semantic_version": "1.0",
+        "condition_id": "condition-one",
+        "generation": 1,
+        "matter": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "matter",
+          "id": "matter-1",
+          "revision": 1
+        },
+        "assessment": {
+          "scope_id": "synthetic:mat002",
+          "namespace": "example",
+          "record_type": "assessment",
+          "id": "assessment-1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "profile": {
+          "namespace": "example",
+          "id": "resolution-edge",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "purpose": {
+          "namespace": "example",
+          "id": "resolution-edge",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "audience": {
+          "namespace": "example",
+          "id": "resolution-edge",
+          "version": "1.0",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "rules": [
+          {
+            "namespace": "example",
+            "id": "resolution-edge",
+            "version": "1.0",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "dependencies": [
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "matter",
+            "id": "matter-1",
+            "revision": 1
+          },
+          {
+            "scope_id": "synthetic:mat002",
+            "namespace": "example",
+            "record_type": "assessment",
+            "id": "assessment-1",
+            "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "checkpoints": [
+          {
+            "id": "deadline",
+            "at": {
+              "state": "known",
+              "value": "2026-10-08T15:00:00Z",
+              "precision": "second"
+            }
+          }
+        ],
+        "expires_at": {
+          "state": "known",
+          "value": "2026-10-11T00:00:00Z",
+          "precision": "second"
+        },
+        "max_clock_skew_ms": 1000
+      }
+    },
+    "previous": null
+  }
+}

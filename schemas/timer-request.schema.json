@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/timer-request.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "token",
+    "captured_at"
+  ],
+  "properties": {
+    "token": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
+    },
+    "captured_at": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+    }
+  }
+}

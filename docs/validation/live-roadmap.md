@@ -64,8 +64,60 @@ Focused local evidence on 2026-10-27:
   2.939 seconds, then five targeted current/profile/source/read-denial regression
   checks passed in 6.257 seconds after the public reader adopted the same gate.
 
-A full local regression run is checking committed `e974bf0` in an isolated
-checkout while MAT-019 implementation proceeds. Its result will be recorded
-when the command finishes. No hosted CI rerun or further live call is required
+The full local regression run on committed `e974bf0` passed **1,051 tests in
+707.244 seconds**, exit 0, in an isolated checkout while MAT-019 implementation
+proceeded. The command used the existing `.venv` with the physical temporary
+path to avoid the known macOS `/var` versus `/private/var` backup-path alias.
+Its log and command receipt are retained as `foundation-full-suite.log` and
+`foundation-full-suite.json` in the external task directory. This run predates
+the independent-review remediations and MAT-019; those changes require their
+own subsequent checks. No hosted CI rerun or further live call is required
 by this run. These checks establish synthetic local behavior, not empirical
 provider accuracy, real evidence egress or a qualified deployed runtime.
+
+The two-pass independent reviews completed without skipped groups or warnings:
+MAT-018 reviewed 10 files, MAT-072 reviewed 8, and MAT-017 reviewed 11. Their
+findings are being reconciled against the actual code. Confirmed fixes include
+context/disposition version and expiry handling, exact declaration namespaces,
+pre-evaluation access coverage, historical access versus work freshness,
+timeless access-aware cache identity, and lifecycle basis independence from
+mere current-assessment replacement. None is represented as completed merely
+because the preceding regression run passed.
+
+## Current authority under advancing host clocks
+
+Timer integration exposed an existing MAT-011 availability defect: current
+control checks required a caller's earlier clock sample to equal a new clock
+read exactly. A microsecond-advancing host clock could therefore refuse valid
+work. The shared guard now always uses freshly sampled host time; an earlier
+hint cannot backdate authority, and a future hint remains refused. No authority
+window, token recapture or new clock service was introduced.
+
+Four targeted behavioral checks passed in **3.278 seconds**
+(`/tmp/matter-current-clock.log`): actual assessment publication/current reading
+with a clock advancing on every read, later source READ denial including replay,
+a past hint against a present stop/denial, a refused future hint, and clock
+regression before a committed governing restriction. The full control suites
+and independent follow-up review remain integration checks.
+
+## Attention and scheduling development milestones
+
+MAT-019 was committed in `9691f11`: 5 pure projection checks and 11 actual SQLite
+integration checks passed, the latter in 255.876 seconds. The integrated access,
+metadata, derived assessment and resolved lifecycle case retained all original
+work contexts and refused publication/replay after a real source READ denial.
+MAT-018's remediation passed all 16 focused checks; MAT-072's remediation passed
+118 focused checks. Their receipts record individual commands and overlap.
+
+MAT-020's development evidence is 9 runtime checks in 76.232 seconds, 77 portable
+contract checks in 4.278 seconds, then 3 final targeted checks in 41.335 seconds.
+These cover actual deadline attention with unchanged semantics, cross-connection
+quota races, restart/catch-up, conservative precharge, expiry/release, independent
+attention limits, direct stop, and access-protected timer replay. Its runtime
+file now has 11 tests; a final combined run is still required. Four additive
+operations preserve the old 24, with 28 operations and 58 success pairs total.
+
+The next implementation milestone is MAT-029 staged semantic execution over
+actual committed resource allocations. A frozen follow-up review is checking
+`880a887..9691f11` in the isolated checkout while this work continues; its result
+has not yet been reported as clean. Hosted CI is not a merge gate.

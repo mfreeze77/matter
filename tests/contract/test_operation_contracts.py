@@ -23,6 +23,10 @@ from matter.contracts import (
 
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "contracts"
 SUCCESS_OUTCOMES = {
+    "schedule_timer": {"scheduled", "cancelled", "unchanged"},
+    "fire_timer": {"fired", "already_fired", "not_due", "inert"},
+    "reserve_budget": {"reserved", "budget_limited"},
+    "settle_budget": {"committed", "released", "expired", "unchanged"},
     "ingest_observation": {"committed", "duplicate"},
     "publish_coverage": {"published"},
     "register_negative_watch": {"registered"},
@@ -49,6 +53,10 @@ SUCCESS_OUTCOMES = {
     "assess": {"assessed", "incomplete"},
 }
 COMMAND_BODY_REQUIRED = {
+    "schedule_timer": ("action", "timer", "previous"),
+    "fire_timer": ("timer", "firing_key", "attention_command"),
+    "reserve_budget": ("budget", "reservation_id", "amounts", "expires_at", "targets"),
+    "settle_budget": ("reservation", "action"),
     "ingest_observation": ("observation",),
     "publish_coverage": (
         "specification", "catalog", "coverage", "as_of", "mode", "members", "source_baselines",

@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "operation": "fire_timer",
+  "operation_id": "command-fire_timer",
+  "status": "success",
+  "outcome": "not_due",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "matter.scheduler",
+    "record_type": "receipt",
+    "id": "firing-one"
+  },
+  "body": {
+    "timer": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.scheduler",
+      "record_type": "matter:projection",
+      "id": "timer-one",
+      "revision": 1
+    },
+    "reason": "Synthetic explicit condition status.",
+    "next_check_at": {
+      "state": "unknown",
+      "reason": "not_applicable"
+    }
+  }
+}

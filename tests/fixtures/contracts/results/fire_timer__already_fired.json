@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "operation": "fire_timer",
+  "operation_id": "command-fire_timer",
+  "status": "success",
+  "outcome": "already_fired",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "matter.scheduler",
+    "record_type": "receipt",
+    "id": "firing-one"
+  },
+  "body": {
+    "timer": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.scheduler",
+      "record_type": "matter:projection",
+      "id": "timer-one",
+      "revision": 1
+    },
+    "firing": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.scheduler",
+      "record_type": "receipt",
+      "id": "firing-one",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "scheduled_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "actual_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    },
+    "coalesced_count": 1,
+    "attention_decision": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.scheduler",
+      "record_type": "receipt",
+      "id": "firing-one",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  }
+}

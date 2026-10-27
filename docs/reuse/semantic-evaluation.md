@@ -64,3 +64,37 @@ These are verified primary preprints and author-reported findings. They were rea
 This plan does not add a graph database, message broker, acoustic model, or separate retrieval platform. It also does not import OIL's fixed policy catalogue, Jev-Mem's memory authority, Jevcal's runtime trust decision, or benchmark scores as Matter qualification. The intended deliverable is a small neutral execution and evaluation boundary over the existing Matter contracts, with optional provider transport and explicit receipts.
 
 Roadmap: MAT-026–035 implement semantic contracts; MAT-036–045 supply the evaluation, comparison, and release evidence. Every ticket starts planned with no execution evidence.
+
+
+## MAT-032 transport decision for the current roadmap
+
+Inspected on 2026-10-27: Oil's arbitrary `ask(state, questions)` and SDK adapter
+at `14772cd10b4fc3d3b54768a131de3acb45b5fde4`, under its Apache-2.0 license;
+and the official Python SDK **0.7.5**, tag/commit
+[`f36e68549ceca3191e5791e5f99ea1baa1a258b5`](https://github.com/typesafe-ai/typesafe-sdk-python/tree/f36e68549ceca3191e5791e5f99ea1baa1a258b5).
+The SDK's [package declaration](https://github.com/typesafe-ai/typesafe-sdk-python/blob/f36e68549ceca3191e5791e5f99ea1baa1a258b5/pyproject.toml)
+uses MIT and adds HTTP, Pydantic, retry and other runtime dependencies.
+Its [response boundary](https://github.com/typesafe-ai/typesafe-sdk-python/blob/f36e68549ceca3191e5791e5f99ea1baa1a258b5/src/typesafe_sdk/_core/response_types.py)
+exposes typed answers, including integer Score map keys, while
+[raw HTTP metadata](https://github.com/typesafe-ai/typesafe-sdk-python/blob/f36e68549ceca3191e5791e5f99ea1baa1a258b5/src/typesafe_sdk/_core/schemas/base.py)
+retains original bytes. Thus the SDK can support lossless validation through
+its raw path; reconstructing decimals from its typed floats cannot.
+
+Decision: implement one optional Matter adapter compatible with Oil's arbitrary
+question HTTP boundary, using Python's standard library and Matter's existing
+strict decimal validator. The existing Oil implementation returns a parsed
+payload and belongs to a separate runtime; importing it would couple Matter to
+that runtime and would still require an original-byte capture seam. The Matter
+adapter will preserve the native wire artifact before normalization and reuse
+one conformance boundary for HTTP and raw-byte-bearing SDK-shaped fixtures.
+It will not construct a second SDK client or depend on Oil. This is an original
+compatible implementation based on inspected API behavior, not copied upstream
+code or a claim that upstream tests ran here.
+
+The adapter will require explicit selection/model, bounded timeout/calls/retries,
+redacted faults, exact requested/resolved models and honest usage/byte evidence.
+Core imports and default tests remain offline. MAT-030 receipts and MAT-031
+admission are prerequisites to implementation closeout; this decision alone does
+not complete MAT-032. The earlier single synthetic live call used Oil's existing
+transport and remains connectivity evidence only. No new live call is authorized
+merely by this decision or assumed necessary to resume the roadmap.

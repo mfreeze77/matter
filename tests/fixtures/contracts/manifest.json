@@ -1219,6 +1219,108 @@
       "schema": "result",
       "valid": false,
       "description": "A duplicate observation cannot claim a new negative-scope arrival change."
+    },
+    {
+      "path": "commands/schedule_timer.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic MAT-020 structural command; runtime admission is separate."
+    },
+    {
+      "path": "results/schedule_timer__scheduled.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-020 explicit success result."
+    },
+    {
+      "path": "results/schedule_timer__cancelled.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-020 explicit success result."
+    },
+    {
+      "path": "results/schedule_timer__unchanged.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-020 explicit success result."
+    },
+    {
+      "path": "commands/fire_timer.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic MAT-020 structural command; runtime admission is separate."
+    },
+    {
+      "path": "results/fire_timer__fired.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-020 explicit success result."
+    },
+    {
+      "path": "results/fire_timer__already_fired.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-020 explicit success result."
+    },
+    {
+      "path": "results/fire_timer__not_due.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-020 explicit success result."
+    },
+    {
+      "path": "results/fire_timer__inert.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-020 explicit success result."
+    },
+    {
+      "path": "commands/reserve_budget.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic MAT-020 structural command; runtime admission is separate."
+    },
+    {
+      "path": "results/reserve_budget__reserved.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-020 explicit success result."
+    },
+    {
+      "path": "results/reserve_budget__budget_limited.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-020 explicit success result."
+    },
+    {
+      "path": "commands/settle_budget.json",
+      "schema": "command",
+      "valid": true,
+      "description": "Synthetic MAT-020 structural command; runtime admission is separate."
+    },
+    {
+      "path": "results/settle_budget__committed.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-020 explicit success result."
+    },
+    {
+      "path": "results/settle_budget__released.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-020 explicit success result."
+    },
+    {
+      "path": "results/settle_budget__expired.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-020 explicit success result."
+    },
+    {
+      "path": "results/settle_budget__unchanged.json",
+      "schema": "result",
+      "valid": true,
+      "description": "Synthetic MAT-020 explicit success result."
     }
   ]
 }
