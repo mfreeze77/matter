@@ -217,8 +217,11 @@ class ControlService:
 
     def _time(self, as_of=None):
         now = _validate_fragment(self._clock(), "known_time")
-        if as_of is not None and compare_times(_validate_fragment(as_of, "known_time"), now) != 0:
-            raise StorageError("E_POLICY_INVALID", "Historical or future time cannot authorize current work; inject a host clock for simulation.")
+        # Callers often sampled this same host clock earlier in their current
+        # operation. Never use that hint to backdate authority, and do not
+        # require two readings of an advancing clock to be identical.
+        if as_of is not None and compare_times(_validate_fragment(as_of, "known_time"), now) > 0:
+            raise StorageError("E_POLICY_INVALID", "Future time cannot authorize current work; inject a host clock for simulation.")
         return now
 
     def _command(self, command):

@@ -295,6 +295,29 @@ class AssessmentCommitTests(RuleTestCase):
                 self.service.read_current(view, pin(stored), self.profile)
             self.assertEqual(error.exception.code, "E_AUTHORITY_REQUIRED")
 
+    def test_advancing_host_clock_allows_publication_without_backdating_authority(self):
+        from datetime import datetime, timedelta, timezone
+        current = datetime.fromisoformat(self.now["value"].replace("Z", "+00:00"))
+        def advancing():
+            nonlocal current
+            current += timedelta(microseconds=1)
+            return {"state": "known", "value": current.astimezone(timezone.utc).isoformat(timespec="microseconds").replace("+00:00", "Z"),
+                "precision": "microsecond"}
+        self.controls._clock = advancing
+        self.service.clock = advancing
+        _, command, stored = self.publish()
+        self.assertEqual(self.service.current(self.subject, profile=self.profile.reference,
+            purpose=self.purpose, audience=self.audience), stored)
+        denial = _in_scope(control_command("advancing-deny", self.authority, targets=[self.source],
+            action="deny", capabilities=["read"], now=self.now), self.storage.scope_id)
+        denial["actor"] = self.actor
+        denial["body"]["control"]["body"]["actor"] = self.actor
+        self.assertEqual(self.controls.apply(self.controls.prepare(denial))["status"], "success")
+        with self.assertRaises(StorageError) as error:
+            self.service.current(self.subject, profile=self.profile.reference, purpose=self.purpose, audience=self.audience)
+        self.assertEqual(error.exception.code, "E_AUTHORITY_REQUIRED")
+        self.assertEqual(self.service.commit(command)["error"]["code"], "E_AUTHORITY_REQUIRED")
+
     def test_competing_publications_have_one_current_and_one_durable_stale_refusal(self):
         first, second = self.prepare(), self.prepare()
         one, two = self.command(first), self.command(second)
