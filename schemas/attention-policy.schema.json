@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/attention-policy.schema.json",
+  "title": "Matter attention-policy v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "namespace",
+    "id",
+    "semantic_version",
+    "description",
+    "profile",
+    "fields",
+    "routine_treatment",
+    "disposition_namespace",
+    "decision",
+    "delivery_producers"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "namespace": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespace"
+    },
+    "id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "semantic_version": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "description": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+    },
+    "profile": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "claim_schema",
+          "predicate",
+          "condition_pointer",
+          "condition",
+          "value_pointer",
+          "roles",
+          "accepted_statuses",
+          "accepted_values"
+        ],
+        "properties": {
+          "name": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+          },
+          "claim_schema": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+          },
+          "predicate": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+          },
+          "condition_pointer": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+          },
+          "condition": {},
+          "value_pointer": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "material",
+                "relevance",
+                "critical",
+                "owned_next_step"
+              ]
+            },
+            "maxItems": 4,
+            "uniqueItems": true
+          },
+          "accepted_statuses": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "supported",
+                "refuted",
+                "mixed",
+                "unknown",
+                "not_applicable"
+              ]
+            },
+            "maxItems": 5,
+            "uniqueItems": true
+          },
+          "accepted_values": {
+            "type": "array",
+            "items": {},
+            "maxItems": 32,
+            "uniqueItems": true
+          }
+        }
+      },
+      "maxItems": 32,
+      "uniqueItems": true
+    },
+    "routine_treatment": {
+      "enum": [
+        "host_hint",
+        "digest",
+        "update"
+      ]
+    },
+    "disposition_namespace": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespace"
+    },
+    "decision": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "field",
+            "audience",
+            "prompt",
+            "options",
+            "why_host_cannot_settle"
+          ],
+          "properties": {
+            "field": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+            },
+            "audience": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+            },
+            "prompt": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+            },
+            "options": {
+              "type": "array",
+              "items": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
+              },
+              "maxItems": 16,
+              "uniqueItems": true
+            },
+            "why_host_cannot_settle": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "delivery_producers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "producer",
+          "outcome"
+        ],
+        "properties": {
+          "producer": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+          },
+          "outcome": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespaced_name"
+          }
+        }
+      },
+      "maxItems": 16,
+      "uniqueItems": true
+    }
+  }
+}

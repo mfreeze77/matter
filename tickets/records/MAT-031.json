@@ -4,7 +4,7 @@
   "track": "jev",
   "phase": 3,
   "priority": "P0",
-  "status": "planned",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "semantic/qualification",
@@ -79,7 +79,11 @@
     "https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/check.py"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "2026-10-27: Actual receipt admission, exact reviewed-method applicability, current-clock expiry, accepted polarity support and transitive revocation passed 14 focused tests. Actual acceptance evidence and limitations: docs/validation/MAT-031.md.",
+      "Integrated dev14 checks: 1,157 tests passed in the isolated installed environment; 39 checkout-tooling tests passed from the repository. Full installed discovery retained 29 checkout-only walkthrough-schema lookup errors; see docs/validation/live-roadmap.md for exact contexts, commands and limits. All 162 packaged Python/SQL/schema files match source, including 88 schemas; no provider SDK was installed.",
+      "Independent two-pass source reviews completed with no skipped groups or warnings; confirmed findings and the final test gap were fixed and verified. Tracked in PR #16 (https://github.com/mfreeze77/matter/pull/16). These are synthetic mechanism/conformance checks, with no new live provider request, empirical certificate issuance or provider qualification."
+    ]
   }
 }

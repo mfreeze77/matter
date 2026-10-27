@@ -70,7 +70,7 @@ MAT-013 adds the [policy profile schema](../../schemas/policy-profile.schema.jso
 for immutable versioned evidence, lifecycle, purpose and audience components.
 The [profile API](../profiles.md) performs exact-reference, graph, scope,
 capability, conflict and budget validation beyond structural schema checks.
-The current package contains **41 JSON Schema resources**. MAT-026's
+At MAT-013 the package contained **41 JSON Schema resources**. MAT-026's
 [typed executor](../semantic-executor.md) and MAT-036's
 [frozen corpus](../evaluation-corpus.md) use their own versioned, closed Python
 validation boundaries without adding a core record or command variant. No
@@ -385,7 +385,7 @@ A delivered result names the observed transport milestone; it does not assert co
 
 ## Fixtures, verification, and remaining boundaries
 
-The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares the validity of standalone record, command, result, and intentionally invalid examples. The [inventory](../../tests/fixtures/contracts/inventory.json) lists the supported kinds, operations, outcome pairs, and error codes. The current manifest contains **203 fixtures: 145 valid and 58 intentionally invalid**. All examples are synthetic. Their zero-valued digest placeholders establish shape only and are not evidence that source bytes or referenced schemas exist.
+The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares the validity of standalone record, command, result, and intentionally invalid examples. The [inventory](../../tests/fixtures/contracts/inventory.json) lists the supported kinds, operations, outcome pairs, and error codes. The current manifest contains **224 fixtures: 166 valid and 58 intentionally invalid**. All examples are synthetic. Their zero-valued digest placeholders establish shape only and are not evidence that source bytes or referenced schemas exist.
 
 The examples cover every record kind, every command, every permitted success pair, every semantic error code, and additional unknown-time, failed/unknown/qualified judgment cases. Invalid examples include storage failure disguised as `no_match`, embedded execution failure in a semantic success, empty scope, unknown time with an invented value, failed judgment with a conclusion, absent qualification certificate, unsafe revision, missing dependency pin, malformed source digest, undeclared command fields, incompatible availability/locator declarations, ineligible association members, newline-suffixed digests or scope identifiers, missing reproducibility fields, fabricated digests for unproduced outputs, missing evidence locators, and negative resource ceilings.
 
@@ -434,3 +434,81 @@ These schemas add no core record kind or database migration. They do not grant
 source authority, provider qualification or permission for external delivery.
 See [assessments](../assessments.md) and [dependencies](../dependencies.md) for
 the corresponding runtime checks and their configured-host boundaries.
+
+## Lifecycle and independent contexts
+
+MAT-017 adds five exact internal schemas: [profile](../../schemas/lifecycle-profile.schema.json),
+[request](../../schemas/lifecycle-request.schema.json), [state](../../schemas/lifecycle-state.schema.json),
+[transition](../../schemas/lifecycle-transition.schema.json) and
+[occurrence slot](../../schemas/lifecycle-event.schema.json). These bind declared
+edges, actual evidence correspondence, separate effective/knowledge times and
+registered current validity through the [lifecycle API](../lifecycle.md).
+
+MAT-018 adds eight schemas for [context definitions](../../schemas/context-definition.schema.json),
+[mutations](../../schemas/context-mutation.schema.json), [versions](../../schemas/context-version.schema.json),
+[current pointers](../../schemas/context-current.schema.json),
+[disposition definitions](../../schemas/disposition-definition.schema.json),
+[mutations](../../schemas/disposition-mutation.schema.json) and
+[current slots](../../schemas/disposition-current.schema.json), and
+[retained host target proof](../../schemas/context-targets.schema.json).
+They keep purpose/audience/preferences and authenticated dispositions separate
+from source meaning and domain resolution. See [contexts](../contexts.md).
+
+These thirteen resources introduce no new core record kind or database migration.
+Their focused validation receipts are [MAT-017](../validation/MAT-017.md) and
+[MAT-018](../validation/MAT-018.md); canonical completion is recorded separately
+from source availability. MAT-072's [access boundary](../access.md) uses closed,
+versioned Python value validation without adding a schema or wire operation.
+
+## Attention and durable temporal budgets
+
+MAT-019 adds seven packaged domain contracts: [policy](../../schemas/attention-policy.schema.json),
+[request](../../schemas/attention-request.schema.json), [decision](../../schemas/attention-decision.schema.json),
+[current pointer](../../schemas/attention-current.schema.json), [delivered baseline](../../schemas/attention-baseline.schema.json),
+[host delivery milestone](../../schemas/attention-delivery-milestone.schema.json), and
+[result extension](../../schemas/attention-result.schema.json). The
+[attention API](../attention.md) uses the existing `assess` envelope and preserves
+actual delivery history independently of current eligibility.
+
+MAT-020 adds [timer definition](../../schemas/timer-definition.schema.json),
+[request](../../schemas/timer-request.schema.json), [state](../../schemas/timer-state.schema.json),
+[manifest](../../schemas/timer-manifest.schema.json), and [firing](../../schemas/timer-firing.schema.json)
+contracts. Separate budget resources bind [policy](../../schemas/budget-policy.schema.json),
+[requests](../../schemas/budget-request.schema.json),
+[accounts](../../schemas/budget-account.schema.json), and [reservations](../../schemas/budget-reservation.schema.json).
+See [scheduling](../scheduler.md) and [budgets](../budgets.md).
+
+The four additive v1 operations are `schedule_timer`, `fire_timer`,
+`reserve_budget` and `settle_budget`. Timer and budget maintenance is separate
+from trusted control input. Existing operation branches and twelve core record
+kinds are preserved; readers that do not recognize a new operation refuse it.
+The portable inventory now has **28 operations and 58 successful outcome pairs**.
+The package has **79 JSON Schema resources** at this milestone. These shapes
+and their synthetic fixtures establish no external delivery or provider accuracy.
+
+
+MAT-030's additive `record_semantic_execution` branch records an actual evaluator
+receipt without requiring a prior assessment or inventing host control input.
+The result body names the semantic execution receipt; the standard top-level
+`receipt` remains the storage operation receipt. The portable inventory with
+this branch is **29 operations and 59 successful outcome pairs**. The
+[canonical ticket](../../tickets/MAT-030.md) tracks its implementation and evidence.
+
+Its three packaged schemas bind the immutable [execution receipt](../../schemas/semantic-execution.schema.json),
+[attempt journal](../../schemas/semantic-execution-attempt.schema.json), and
+[reuse entry](../../schemas/semantic-execution-cache.schema.json). See the
+[receipt API](../semantic-receipts.md) for exact native bytes, separate normalized
+digests, durable dispatch claiming and current reuse guards.
+
+MAT-031 adds `admit_semantic_result`, with explicit recorded qualification status,
+without changing the twelve core record kinds. Its six schemas bind the
+[certificate](../../schemas/semantic-certificate.schema.json),
+[catalog mutation](../../schemas/semantic-certificate-mutation.schema.json),
+[catalog state](../../schemas/semantic-certificate-state.schema.json),
+[evaluation report](../../schemas/semantic-qualification-evaluation.schema.json),
+[original admission context](../../schemas/semantic-qualification-request.schema.json),
+and [admission projection](../../schemas/semantic-qualification-admission.schema.json).
+The current inventory is **30 operations, 60 successful outcome pairs and 88 JSON
+Schema resources**. The [qualification API](../semantic-qualification.md) checks
+actual certificate applicability; these synthetic contracts issue no certificate
+and establish no provider accuracy.

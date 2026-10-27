@@ -207,9 +207,17 @@ class ControlBypassTests(ControlTestCase):
         target = self.matter("time-bypass")
         token = self.token([target])
         self.apply_control("time-stop", targets=[target])
-        self.assert_code("E_POLICY_INVALID", self.controls.capture, actor=ACTOR, authority=entity_ref(self.authority),
+        self.assert_code("E_CANCELLED", self.controls.capture, actor=ACTOR, authority=entity_ref(self.authority),
                          capability="read", targets=[entity_ref(target)], as_of=instant("2026-10-09T12:00:00Z"))
         self.assert_code("E_CANCELLED", self.controls.read, token, entity_ref(target))
+
+    def test_old_time_hint_uses_present_read_denial_and_future_hint_cannot_advance_authority(self):
+        target = self.matter("time-hint-read")
+        self.apply_control("time-hint-deny", targets=[target], action="deny", capabilities=["read"])
+        self.assert_code("E_AUTHORITY_REQUIRED", self.controls.capture, actor=ACTOR, authority=entity_ref(self.authority),
+            capability="read", targets=[entity_ref(target)], as_of=instant("2026-10-09T12:00:00Z"))
+        self.assert_code("E_POLICY_INVALID", self.controls.capture, actor=ACTOR, authority=entity_ref(self.authority),
+            capability="read", targets=[entity_ref(target)], as_of=instant("2026-10-11T12:00:00Z"))
 
     def test_clock_regression_cannot_make_committed_stop_or_denial_inactive(self):
         for action, capability in (("cancel", "write"), ("deny", "read")):

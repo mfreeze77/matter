@@ -1,0 +1,389 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/semantic-qualification-evaluation.schema.json",
+  "title": "Matter semantic-qualification-evaluation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "identity",
+    "regions",
+    "status",
+    "labels",
+    "support",
+    "interval_method",
+    "artifacts",
+    "reason"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resolved_model",
+        "requested_model",
+        "model_resolution",
+        "provider",
+        "transport",
+        "adapter_version",
+        "mode",
+        "question",
+        "criteria_digest",
+        "renderer",
+        "packet_profile",
+        "preparation",
+        "domain",
+        "measure",
+        "precision"
+      ],
+      "properties": {
+        "resolved_model": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+        },
+        "requested_model": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+        },
+        "model_resolution": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+        },
+        "provider": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+        },
+        "transport": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+        },
+        "adapter_version": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+        },
+        "mode": {
+          "enum": [
+            "offline_fixture",
+            "recorded_replay",
+            "provider_shadow"
+          ]
+        },
+        "question": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+        },
+        "criteria_digest": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+        },
+        "renderer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+            },
+            "version": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+            }
+          }
+        },
+        "packet_profile": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+        },
+        "preparation": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+        },
+        "domain": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+        },
+        "measure": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "unit"
+          ],
+          "properties": {
+            "name": {
+              "enum": [
+                "probability",
+                "confidence",
+                "choice_probability",
+                "score"
+              ]
+            },
+            "unit": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+            }
+          }
+        },
+        "precision": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "version",
+            "rounding",
+            "probability_quantum",
+            "score_quantum"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+            },
+            "version": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+            },
+            "rounding": {
+              "const": "nearest"
+            },
+            "probability_quantum": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+            },
+            "score_quantum": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+            }
+          }
+        }
+      }
+    },
+    "regions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "positive",
+        "negative"
+      ],
+      "properties": {
+        "positive": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "choices",
+                "minimum",
+                "maximum"
+              ],
+              "properties": {
+                "choices": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+                  },
+                  "maxItems": 128,
+                  "minItems": 0,
+                  "uniqueItems": true
+                },
+                "minimum": {
+                  "anyOf": [
+                    {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "maximum": {
+                  "anyOf": [
+                    {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "negative": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "choices",
+                "minimum",
+                "maximum"
+              ],
+              "properties": {
+                "choices": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+                  },
+                  "maxItems": 128,
+                  "minItems": 0,
+                  "uniqueItems": true
+                },
+                "minimum": {
+                  "anyOf": [
+                    {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "maximum": {
+                  "anyOf": [
+                    {
+                      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "passed",
+        "failed",
+        "not_run"
+      ]
+    },
+    "labels": {
+      "enum": [
+        "independent",
+        "teacher_only",
+        "mixed",
+        "unknown"
+      ]
+    },
+    "support": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "positive",
+        "negative"
+      ],
+      "properties": {
+        "positive": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "episodes",
+                "minimum_episodes",
+                "accepted",
+                "errors",
+                "target_accuracy",
+                "lower_accuracy_bound",
+                "passed"
+              ],
+              "properties": {
+                "episodes": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Independent eligible episodes in this polarity cohort before applying the decision region."
+                },
+                "minimum_episodes": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Predeclared minimum independent accepted episode decisions for this polarity; must not exceed accepted."
+                },
+                "accepted": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Independent episode decisions accepted in this polarity region, between minimum_episodes and episodes."
+                },
+                "errors": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Incorrect accepted decisions for this polarity, not exceeding accepted."
+                },
+                "target_accuracy": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+                },
+                "lower_accuracy_bound": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+                },
+                "passed": {
+                  "type": "boolean"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "negative": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "episodes",
+                "minimum_episodes",
+                "accepted",
+                "errors",
+                "target_accuracy",
+                "lower_accuracy_bound",
+                "passed"
+              ],
+              "properties": {
+                "episodes": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Independent eligible episodes in this polarity cohort before applying the decision region."
+                },
+                "minimum_episodes": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Predeclared minimum independent accepted episode decisions for this polarity; must not exceed accepted."
+                },
+                "accepted": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Independent episode decisions accepted in this polarity region, between minimum_episodes and episodes."
+                },
+                "errors": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter",
+                  "description": "Incorrect accepted decisions for this polarity, not exceeding accepted."
+                },
+                "target_accuracy": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+                },
+                "lower_accuracy_bound": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+                },
+                "passed": {
+                  "type": "boolean"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "interval_method": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+      },
+      "maxItems": 128,
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "reason": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "operation": "reserve_budget",
+  "operation_id": "command-reserve_budget",
+  "status": "success",
+  "outcome": "reserved",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "matter.scheduler",
+    "record_type": "receipt",
+    "id": "firing-one"
+  },
+  "body": {
+    "reservation": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.budgets",
+      "record_type": "matter:projection",
+      "id": "reservation-one",
+      "revision": 1
+    },
+    "remaining": {
+      "calls": 0
+    },
+    "next_eligible_at": {
+      "state": "unknown",
+      "reason": "not_applicable"
+    }
+  }
+}

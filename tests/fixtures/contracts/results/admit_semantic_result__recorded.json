@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "operation": "admit_semantic_result",
+  "operation_id": "command-admit_semantic_result",
+  "status": "success",
+  "outcome": "recorded",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "matter.storage",
+    "record_type": "receipt",
+    "id": "semantic-operation-receipt"
+  },
+  "body": {
+    "execution": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "semantic-execution-one",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "admission": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.semantic_qualification",
+      "record_type": "matter:projection",
+      "id": "synthetic-admission",
+      "revision": 1
+    },
+    "qualification": "unqualified"
+  }
+}

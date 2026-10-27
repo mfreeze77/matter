@@ -1,9 +1,15 @@
 # Semantic evaluation and JEV
 
 Status: implementation contract. MAT-026 supplies the bounded offline
-[typed executor boundary](semantic-executor.md); MAT-027 through MAT-035 remain
-planned. This document does not claim that a provider adapter, a qualified
-model, or a live attention policy has shipped. The source notes are
+[typed executor boundary](semantic-executor.md). MAT-027 and MAT-028 add
+[versioned questions](semantic-questions.md) and [bounded packets](semantic-packets.md),
+merged in PR #15 at `c755dd9`. MAT-029–031 implement
+[stages](semantic-stages.md), [durable receipts](semantic-receipts.md) and
+[runtime admission](semantic-qualification.md). The
+[MAT-032 transport](semantic-typesafe.md) supplies one optional TypeSafe HTTP path.
+See [actual progress](validation/live-roadmap.md)
+for completed checks and remaining gates. No model has empirical qualification,
+and no deployed live attention policy is claimed. The source notes are
 [matterbrainstormspec](../matterbrainstormspec) and [matterjevmesh](../matterjevmesh).
 [jevinmatter](../jevinmatter) is a procedural-diarization example, not the general
 executor contract.
@@ -22,9 +28,10 @@ The interface accepts a batch of question instances plus an execution context
 and returns a batch execution record. Its inputs are ordinary serializable data;
 importing the core must not import a vendor SDK or read a credential. MAT-026's
 offline seam validates primitive shapes and batch admission; the broader
-question registry, durable execution receipts and qualification admission are
-later tickets. An adapter maps the neutral contract to a specific provider and
-transport.
+question registry and packet preparation are implemented by MAT-027/028.
+MAT-030 persists durable execution receipts, and MAT-031 checks reviewed
+qualification at admission. An optional adapter maps this neutral contract to a
+specific provider and transport.
 
 | Boundary | Required contents |
 |---|---|

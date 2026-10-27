@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/semantic-execution.schema.json",
+  "title": "Matter semantic-execution v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "phase",
+    "logical_request_id",
+    "attempt_id",
+    "retry_of",
+    "source_execution",
+    "request",
+    "result",
+    "neutral_response",
+    "native_response",
+    "normalized_digest",
+    "execution_key",
+    "sources",
+    "control_token",
+    "access_context",
+    "allocation",
+    "parents",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "phase": {
+      "enum": [
+        "started",
+        "completed",
+        "unknown",
+        "reused",
+        "observed"
+      ]
+    },
+    "logical_request_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "attempt_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "retry_of": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+        }
+      ]
+    },
+    "source_execution": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+        }
+      ]
+    },
+    "request": {
+      "type": "object"
+    },
+    "result": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "neutral_response": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/source_content"
+        }
+      ]
+    },
+    "native_response": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/source_content"
+        }
+      ]
+    },
+    "normalized_digest": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "execution_key": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "maxItems": 4096,
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+      }
+    },
+    "control_token": {
+      "type": "object"
+    },
+    "access_context": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "allocation": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+        }
+      ]
+    },
+    "parents": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+      }
+    },
+    "created_at": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+    }
+  }
+}

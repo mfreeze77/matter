@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "operation": "schedule_timer",
+  "operation_id": "command-schedule_timer",
+  "status": "success",
+  "outcome": "cancelled",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "matter.scheduler",
+    "record_type": "receipt",
+    "id": "firing-one"
+  },
+  "body": {
+    "timer": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "matter.scheduler",
+      "record_type": "matter:projection",
+      "id": "timer-one",
+      "revision": 1
+    },
+    "next_check_at": {
+      "state": "unknown",
+      "reason": "not_applicable"
+    }
+  }
+}

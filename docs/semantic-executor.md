@@ -4,8 +4,9 @@ MAT-026 supplies detached provider-neutral interface values and an injected
 offline executor. It does not construct a vendor client, obtain credentials,
 issue qualification, publish assessments, or call a host action. The governing
 [semantic contract](jev.md) and [rule contract](contracts/rules.md) still apply.
-MAT-027 owns the later specification registry and renderer; MAT-030 owns durable
-execution receipts and reuse; MAT-031 owns semantic qualification admission.
+MAT-027 supplies the [specification registry and renderer](semantic-questions.md);
+MAT-030 supplies [durable execution receipts and reuse](semantic-receipts.md);
+MAT-031 supplies [semantic qualification admission](semantic-qualification.md).
 
 ## Questions and batches
 
@@ -27,8 +28,8 @@ Supported primitives have separate criteria and response requirements:
   confidence, and the observed difference from its probability-weighted mean.
 - `proposition_probability`: an object with explicit `true` and `false`
   descriptions. The answer retains the probability of the proposition named in
-  the instructions. The TypeSafe Noul primitive projects to this meaning in a
-  future adapter. There is no confidence or severity field for this primitive.
+  the instructions. The optional TypeSafe adapter projects its Noul primitive
+  to this meaning. There is no confidence or severity field for this primitive.
 
 `Batch` accepts `schema_version: "1.0"`, `id`, `scope_id`, `run_id`, `stage_id`,
 `state`, `packet_digest`, ordered `questions`, and `context`. `state` is frozen
@@ -128,8 +129,11 @@ another packet/model or invent a negative answer. Fixtures accept only offline
 or replay modes. Adapter exceptions yield a fixed fault without exposing their
 message. An injected adapter is trusted host code; this is not a process sandbox
 for untrusted Python. No host action or delivery callback is part of the API.
-Usage and cost remain null with explicit reasons because this interface does
-not measure them. Full durable execution receipts remain MAT-030.
+Without optional instrumentation, usage and cost remain null with explicit
+reasons. `RawExecution` can retain separate original native bytes and a closed
+`ExecutionInstrumentation` value containing observed bytes, times and usage;
+missing measurements stay null. No pricing is inferred. MAT-030 persists these
+artifacts and normalized digests in its durable receipt store.
 
 Run the synthetic conformance suite with:
 

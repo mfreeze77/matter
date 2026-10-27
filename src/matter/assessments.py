@@ -185,7 +185,7 @@ class PreparedAssessment(FrozenValue):
 
 class AssessmentService:
     def __init__(self, storage, *, profiles, rules, bindings, schemas, controls, clock,
-                 qualifications=None, cache=None, conflicts=None):
+                 qualifications=None, cache=None, conflicts=None, access=None):
         if not isinstance(profiles, ProfileRegistry) or not isinstance(controls, ControlService) or not callable(clock):
             _fail()
         if storage.scope_id != controls.scope_id:
@@ -193,6 +193,7 @@ class AssessmentService:
         self.storage, self.scope_id = storage, storage.scope_id
         self.profiles, self.rules, self.bindings, self.schemas = profiles, rules, bindings, schemas
         self.controls, self.clock, self.cache = controls, clock, cache
+        self.access = access
         self.qualifications = qualifications or QualificationRegistry()
         self.conflicts = conflicts or ConflictResolverRegistry()
 
@@ -257,7 +258,7 @@ class AssessmentService:
     def _preparation(self, value):
         data = checked(value, required=("schema_version", "request", "plan", "token", "control_contexts", "captured_at",
             "records", "reads", "absent", "watch_queries", "current_dependencies", "lane", "previous", "prior_assessment", "prior_request", "prior_basis",
-            "cache_inputs", "staged_snapshots", "proof_reads"),
+            "cache_inputs", "staged_snapshots", "proof_reads"), optional=("access_context",),
             code="E_EVIDENCE_INVALID")
         if data["schema_version"] != "1.0" or len(canonical_bytes(data)) > 8388608:
             _fail("The retained assessment preparation exceeds its supported contract.", "E_EVIDENCE_INVALID")
@@ -299,7 +300,7 @@ class AssessmentService:
         return data
 
     def prepare(self, command, *, token, plan, extra_dependencies=(), candidate_sets=(), negative_dependencies=(),
-                control_contexts=(), cache_references=(), cache_queries=()):
+                control_contexts=(), cache_references=(), cache_queries=(), access_context=None):
         request = validate_command(command)
         if request["operation"] != "assess" or request["scope_id"] != self.scope_id or not isinstance(plan, RulePlan):
             _fail()
@@ -326,6 +327,15 @@ class AssessmentService:
                                          purpose=body["purpose"], audience=body.get("audience"))
         with self.storage.snapshot() as snapshot:
             view = _Tracked(snapshot, self.scope_id)
+            admitted_access = None
+            if self.access is not None:
+                if access_context is None or body.get("audience") is None:
+                    _fail("The installed access boundary requires an exact audience context.", "E_AUTHORITY_REQUIRED")
+                admitted_access = self.access.require_current(view, access_context, references=nominated, audience=body["audience"])
+                if admitted_access.value["token"] != token:
+                    _fail("The original access and assessment control contexts differ.", "E_AUTHORITY_REQUIRED")
+            elif access_context is not None:
+                _fail("An access context requires its installed host boundary.", "E_AUTHORITY_REQUIRED")
             self.controls.require_current(view, token, capability="assessment", targets=[entity_ref(body["matter"])], as_of=now)
             for reference in nominated:
                 self._read(view, reference)
@@ -350,7 +360,7 @@ class AssessmentService:
                 cached_input = self.cache.capture(view, self.cache._definition(query["definition"]),
                     records=query["records"], context=query["context"], token=token, as_of=now,
                     qualification_context=query["qualification_context"], citations=query["citations"],
-                    negative_dependencies=query["negative_dependencies"])
+                    negative_dependencies=query["negative_dependencies"], access_context=admitted_access)
                 cache_inputs.append(cached_input.value)
                 lookup_refs.append(cache_ref(self.scope_id, cached_input.key))
                 positive = _unique_refs([*positive, *query["records"].values()])
@@ -392,6 +402,8 @@ class AssessmentService:
                 "prior_assessment": None if prior is None else prior["assessment"], "prior_request": prior_request,
                 "prior_basis": None if prior is None else self._basis(prior["preparation"]),
                 "cache_inputs": cache_inputs, "staged_snapshots": [], "proof_reads": proof_reads}
+            if admitted_access is not None:
+                data["access_context"] = admitted_access.value
             self.controls.require_current(view, token, capability="assessment", targets=self._read_targets(data), as_of=now)
         if len(canonical_bytes(data)) > body["budget"]["max_bytes"]:
             _fail("The captured assessment input exceeds its byte budget.", "E_BUDGET_EXHAUSTED")
@@ -410,6 +422,8 @@ class AssessmentService:
         data, now = prepared.value, self._now()
         with self.storage.snapshot() as snapshot:
             view = _Tracked(snapshot, self.scope_id)
+            if self.access is not None:
+                self.access.require_current(view, data.get("access_context", {}), references=references)
             targets = _read_targets(data["request"], [*data["current_dependencies"]["positive"], *references])
             self.controls.require_current(view, data["token"], capability="assessment", targets=targets, as_of=now)
             for ref in data["current_dependencies"]["positive"]:
@@ -787,6 +801,16 @@ class AssessmentService:
 
     def _guards(self, view, preparation, graph, now):
         body = preparation["request"]["body"]
+        if self.access is not None:
+            if "access_context" not in preparation:
+                _fail("The installed access boundary requires its original context.", "E_AUTHORITY_REQUIRED")
+            access_reads = _unique_refs([*preparation["current_dependencies"]["positive"],
+                *(reference for material in graph["inputs"].values() for reference in material["packet"]["dependencies"]["positive"]),
+                *(item["reference"] for material in graph["inputs"].values()
+                  for item in [*material["packet"]["evidence"], *material["packet"]["omitted"]])])
+            self.access.require_current(view, preparation["access_context"], audience=body.get("audience"), references=access_reads)
+        elif "access_context" in preparation:
+            _fail("The original access boundary is not installed.", "E_AUTHORITY_REQUIRED")
         self.controls._audit(view, preparation["request"], self._read_targets(preparation, graph))
         self.controls.require_current(view, preparation["token"], capability="assessment", targets=self._read_targets(preparation, graph), as_of=now)
         for ref in preparation["current_dependencies"]["positive"]:
@@ -803,6 +827,10 @@ class AssessmentService:
             _fail()
         value = material.value if hasattr(material, "value") else material
         with self.storage.snapshot() as view:
+            if self.access is not None:
+                self.access.require_current(view, prepared.value.get("access_context", {}),
+                    references=_unique_refs([*value["packet"]["dependencies"]["positive"],
+                        *(item["reference"] for item in [*value["packet"]["evidence"], *value["packet"]["omitted"]])]))
             self._input_current(view, value, prepared.value, fragment(as_of, "known_time"))
 
     def _require_fresh_result(self, view, publication, assessment, now, admission):
@@ -901,6 +929,47 @@ class AssessmentService:
             _fail("Current assessment projection has an unknown schema.", "E_EVIDENCE_INVALID")
         return raw["value"]
 
+    def read_current(self, view, reference, profile, *, as_of=None):
+        """Validate one exact assessment using the caller's consistent view.
+
+        Lifecycle, attention and scheduling share the publication guards instead
+        of opening nested snapshots or treating an immutable old result as current.
+        The original publication's authority and access context remain mandatory.
+        """
+        selected = getattr(profile, "reference", profile)
+        self.profiles.resolve(selected)
+        reference = fragment(reference, "pinned_ref")
+        if reference["scope_id"] != self.scope_id:
+            _fail(code="E_SCOPE_FORBIDDEN")
+        stored = validate_record(view.get(entity_ref(reference)))
+        if not matches(stored, reference):
+            _fail("The selected assessment revision is no longer current.", "E_DEPENDENCY_STALE")
+        if stored["record_type"] != "assessment":
+            _fail("The selected record is not an assessment.", "E_EVIDENCE_INVALID")
+        body = stored["body"]
+        if body["profile"] != selected:
+            _fail("The assessment uses another exact policy.", "E_DEPENDENCY_STALE")
+        lane = view.get(assessment_current_ref(self.scope_id, body["matter"],
+            profile=selected, purpose=body["purpose"], audience=body.get("audience")))
+        value = self._current_value(lane)
+        if value["status"] != "current" or value["assessment"] != reference:
+            _fail("The selected assessment is not current.", "E_DEPENDENCY_STALE")
+        preparation, publication = value["preparation"], value["publication"]
+        self.controls._audit(view, preparation["request"], self._read_targets(preparation, publication["graph"]))
+        now = self._now() if as_of is None else fragment(as_of, "known_time")
+        from .dependencies import registration_ref, require_current_dependency
+        try:
+            registration = view.get(registration_ref(lane))
+        except StorageError as error:
+            if error.code != "E_NOT_FOUND":
+                raise
+            registration = None
+        if registration is not None:
+            require_current_dependency(view, pin(registration), as_of=now, controls=self.controls)
+        admission = self._guards(view, preparation, publication["graph"], now)
+        self._require_fresh_result(view, publication, stored, now, admission)
+        return stored, lane
+
     def current(self, matter, *, profile, purpose, audience=None):
         self.profiles.resolve(profile)
         reference = assessment_current_ref(self.scope_id, matter, profile=profile, purpose=purpose, audience=audience)
@@ -912,27 +981,10 @@ class AssessmentService:
                     return None
                 raise
             value = self._current_value(record)
-            self.controls._audit(view, value["preparation"]["request"], self._read_targets(value["preparation"], value["publication"]["graph"]))
-            # MAT-016 registration is optional for an unconfigured legacy host.
-            # Once present, its scoped fence/correction verdict is mandatory.
-            from .dependencies import registration_ref, require_current_dependency
-            try:
-                registration = view.get(registration_ref(reference))
-            except StorageError as error:
-                if error.code != "E_NOT_FOUND":
-                    raise
-                registration = None
-            if registration is not None:
-                require_current_dependency(view, pin(registration), as_of=self._now(), controls=self.controls)
-            if value["status"] != "current":
-                _fail("The assessment lane was invalidated.", "E_DEPENDENCY_STALE")
-            body = value["preparation"]["request"]["body"]
-            if body["profile"] != profile or body["purpose"] != purpose or body.get("audience") != audience:
-                _fail("The lane holds a different exact policy or contextual revision.", "E_DEPENDENCY_STALE")
-            now = self._now()
-            admission = self._guards(view, value["preparation"], value["publication"]["graph"], now)
-            stored = validate_record(view.get(value["assessment"]))
-            self._require_fresh_result(view, value["publication"], stored, now, admission)
+            stored, _ = self.read_current(view, value["assessment"], profile)
+            body = stored["body"]
+            if body["purpose"] != purpose or body.get("audience") != audience:
+                _fail("The lane holds a different exact contextual revision.", "E_DEPENDENCY_STALE")
             return stored
 
     def attempt(self, idempotency_key):
@@ -940,6 +992,11 @@ class AssessmentService:
         with self.storage.snapshot() as view:
             journal = view.command_receipt(idempotency_key)
             publication = self._publication(journal["command"])
+            if self.access is not None:
+                self.access.require_history(view, publication["preparation"].get("access_context", {}),
+                    references=publication["preparation"]["reads"])
+            elif "access_context" in publication["preparation"]:
+                _fail("The original access boundary is not installed.", "E_AUTHORITY_REQUIRED")
             self.controls._audit(view, journal["command"], self._read_targets(publication["preparation"], publication["graph"]))
             return journal
 

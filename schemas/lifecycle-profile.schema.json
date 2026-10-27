@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/lifecycle-profile.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "namespace",
+    "id",
+    "semantic_version",
+    "description",
+    "states",
+    "initial_state",
+    "edges"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "namespace": {
+      "$ref": "#/$defs/namespace"
+    },
+    "id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "semantic_version": {
+      "$ref": "#/$defs/identifier"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "states": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "role"
+        ],
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/namespaced_name"
+          },
+          "role": {
+            "enum": [
+              "open",
+              "resolved",
+              "unknown",
+              "withdrawn"
+            ]
+          }
+        }
+      },
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true
+    },
+    "initial_state": {
+      "$ref": "#/$defs/namespaced_name"
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "semantic_version",
+          "description",
+          "from_states",
+          "to_state",
+          "trigger",
+          "claim_schema",
+          "predicate",
+          "condition_pointer",
+          "signal_pointer",
+          "accepted_signals",
+          "assessment_statuses",
+          "assessment_states",
+          "requires_decision",
+          "allowed_origins",
+          "effective_time",
+          "allow_past_effective"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "semantic_version": {
+            "$ref": "#/$defs/identifier"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "from_states": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/namespaced_name"
+            },
+            "minItems": 1,
+            "maxItems": 32,
+            "uniqueItems": true
+          },
+          "to_state": {
+            "$ref": "#/$defs/namespaced_name"
+          },
+          "trigger": {
+            "enum": [
+              "establish",
+              "resolution",
+              "recurrence",
+              "retraction",
+              "correction"
+            ]
+          },
+          "claim_schema": {
+            "$ref": "#/$defs/component_ref"
+          },
+          "predicate": {
+            "$ref": "#/$defs/namespaced_name"
+          },
+          "condition_pointer": {
+            "type": "string",
+            "pattern": "^/"
+          },
+          "signal_pointer": {
+            "type": "string",
+            "pattern": "^/"
+          },
+          "accepted_signals": {
+            "type": "array",
+            "items": {},
+            "minItems": 1,
+            "maxItems": 32,
+            "uniqueItems": true
+          },
+          "assessment_statuses": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "supported",
+                "refuted",
+                "mixed",
+                "unknown",
+                "not_applicable"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 5,
+            "uniqueItems": true
+          },
+          "assessment_states": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "complete",
+                "incomplete"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 2,
+            "uniqueItems": true
+          },
+          "requires_decision": {
+            "type": "boolean"
+          },
+          "allowed_origins": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "source",
+                "host",
+                "adapter",
+                "evaluator",
+                "derived",
+                "system"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 6,
+            "uniqueItems": true
+          },
+          "effective_time": {
+            "const": "claim_start"
+          },
+          "allow_past_effective": {
+            "type": "boolean"
+          }
+        }
+      },
+      "minItems": 1,
+      "maxItems": 128,
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "component_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "namespace",
+        "id",
+        "version",
+        "digest"
+      ],
+      "properties": {
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "version": {
+          "$ref": "#/$defs/text"
+        },
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^\\u0000-\\u0020\\u007f]+(?![\\s\\S])",
+      "not": {
+        "pattern": "[\\u0000-\\u0020\\u007f]"
+      }
+    },
+    "namespace": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z][A-Za-z0-9._:/-]*(?![\\s\\S])",
+      "not": {
+        "pattern": "[\\u0000-\\u0020\\u007f]"
+      }
+    },
+    "namespaced_name": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]*(?:[.:/][A-Za-z0-9][A-Za-z0-9_.:/-]*)+(?![\\s\\S])",
+      "not": {
+        "pattern": "[\\u0000-\\u0020\\u007f]"
+      }
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}(?![\\s\\S])",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

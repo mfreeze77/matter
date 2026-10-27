@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "operation": "reserve_budget",
+  "operation_id": "command-reserve_budget",
+  "status": "success",
+  "outcome": "budget_limited",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "matter.scheduler",
+    "record_type": "receipt",
+    "id": "firing-one"
+  },
+  "body": {
+    "reason": "Synthetic allocation limit.",
+    "remaining": {
+      "calls": 0
+    },
+    "next_eligible_at": {
+      "state": "known",
+      "value": "2026-10-08T15:00:00Z",
+      "precision": "second"
+    }
+  }
+}

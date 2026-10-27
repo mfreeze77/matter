@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "operation": "reserve_budget",
+  "command_id": "command-reserve_budget",
+  "idempotency_key": "idempotency-reserve_budget",
+  "scope_id": "synthetic:mat002",
+  "actor": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example:host",
+    "id": "actor-1"
+  },
+  "authority": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "authority-1"
+  },
+  "expected_revisions": [
+    {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter",
+      "id": "matter-1",
+      "revision": 1
+    }
+  ],
+  "body": {
+    "budget": {
+      "namespace": "example",
+      "id": "resolution-edge",
+      "version": "1.0",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "reservation_id": "allocation-one",
+    "amounts": {
+      "calls": 1
+    },
+    "expires_at": {
+      "state": "known",
+      "value": "2026-10-11T00:00:00Z",
+      "precision": "second"
+    },
+    "targets": [
+      {
+        "scope_id": "synthetic:mat002",
+        "namespace": "example",
+        "record_type": "matter",
+        "id": "matter-1"
+      }
+    ]
+  }
+}

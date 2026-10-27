@@ -432,7 +432,7 @@ def register_dependency(tx, target, manifest, *, as_of, controls=None, previous=
     ref = _scoped(scope, target)
     if ref["record_type"] not in {"judgment", "assessment", PROJECTION_TYPE}:
         _fail("Only judgments, assessments and host derivatives can be registered.", "E_SCHEMA_INVALID")
-    if ref["record_type"] == PROJECTION_TYPE and ref["namespace"].startswith("matter.") and ref["namespace"] not in {"matter.assessments", "matter.semantic_cache"}:
+    if ref["record_type"] == PROJECTION_TYPE and ref["namespace"].startswith("matter.") and ref["namespace"] not in {"matter.assessments", "matter.semantic_cache", "matter.lifecycle", "matter.attention", "matter.semantic_qualification"}:
         _fail("Unrelated internal state is not a host derivative.", "E_SCOPE_FORBIDDEN")
     _current(tx, scope, ref)
     data = manifest.value

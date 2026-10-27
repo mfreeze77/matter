@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/lifecycle-event.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "transition"
+  ],
+  "properties": {
+    "transition": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+    }
+  }
+}

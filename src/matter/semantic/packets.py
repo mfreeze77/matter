@@ -244,7 +244,8 @@ def _mechanical(selected, occurrence_refs, provenance):
             "provenance_inputs": provenance["groups"], "identifier_matches": matches, "date_comparisons": dates}
 
 
-def prepare_packet(view, profile, *, payloads, scope_id, binding, as_of, evidence=(), occurrences=(), coverage):
+def prepare_packet(view, profile, *, payloads, scope_id, binding, as_of, evidence=(), occurrences=(), coverage,
+                   access=None, access_context=None):
     """Prepare one exact bounded snapshot from explicitly supplied references.
 
     The host opens a consistent authorized read view and admits locator adapter
@@ -257,6 +258,14 @@ def prepare_packet(view, profile, *, payloads, scope_id, binding, as_of, evidenc
     if payloads.scope_id != scope:
         _fail(code="E_SCOPE_FORBIDDEN")
     boundary, supplied_coverage = fragment(as_of, "known_time"), fragment(coverage, "coverage")
+    admitted_access = None
+    if access is not None:
+        if access_context is None:
+            _fail("The installed access boundary requires its original context.", "E_AUTHORITY_REQUIRED")
+        admitted_access = access.require_current(view, access_context)
+        view = access.view(view, admitted_access)
+    elif access_context is not None:
+        _fail("An access context requires its installed host boundary.", "E_AUTHORITY_REQUIRED")
     definition = profile.value
     reads = _Reads(view, scope)
     bound = _binding(reads, binding, boundary)
@@ -278,6 +287,8 @@ def prepare_packet(view, profile, *, payloads, scope_id, binding, as_of, evidenc
     selected, omitted, truncated = [], [], []
     base = {"scope_id": scope, "as_of": boundary, "binding": bound, "profile": profile.reference,
             "preparation": preparation_reference()}
+    if admitted_access is not None:
+        base["access_context"] = admitted_access.reference
 
     def omit(item, reason):
         entry = {"reference": item["reference"], "roles": item["roles"], "mandatory": item["mandatory"], "reason": reason}
@@ -379,4 +390,6 @@ def prepare_packet(view, profile, *, payloads, scope_id, binding, as_of, evidenc
                         "Occurrence inputs are the explicit supplied set, not discovered complete membership."]}
     if len(canonical_bytes(audit)) > 4 * MAX_PACKET_BYTES:
         _fail(code="E_BUDGET_EXHAUSTED")
+    if access is not None:
+        access.require_packet(view._view, admitted_access, state)
     return PreparedPacket(audit, _prepared=True)

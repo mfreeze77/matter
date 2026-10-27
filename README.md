@@ -6,7 +6,7 @@ Matter is a shared foundation for following a continuing subject, preserving its
 
 ## Current status
 
-This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, explicit occurrence grouping, scoped claims and citations, authorized association decisions, typed relationships, reversible identity correction, temporal coverage and negative evidence scopes, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata. MAT-006 separates reports, happenings, and declared provenance groups with atomic membership corrections and covered counts. MAT-007 adds immutable claim corrections, component-scoped evidence relations, exact citation validation, and revisioned acceptance. MAT-008 adds explicit candidate catalogs, exact-key and external proposals, currentness checks, and authorized attachment and rejection decisions. MAT-009 adds typed relationship constraints, complete guarded identity groups, retained evidence/conflicts, protected undo/split, explicit separation release, and atomic registered-dependency invalidation. MAT-010 adds nanosecond-preserving time views, explicit source catalogs and historical initialization, protected complete-scope replacement, and atomic negative watches for previously unknown observation IDs; the command inventory now contains twenty-four variants. MAT-011 adds a trusted control lane with scoped durable fences, static host authority ceilings, transaction-time guards, and explicit post-commit hooks. MAT-012 adds exact provider-neutral rule definitions, bounded deterministic/recorded attempts, and explicit prerequisite admission. MAT-013 adds immutable policy profiles. MAT-014–016 add typed rule graphs, atomic revision-bound assessments, declared semantic caches and registered transitive invalidation. MAT-026–028 add offline typed execution, versioned questions and bounded source-linked packets; MAT-036 adds frozen corpus contracts. Lifecycle, attention, delivery, semantic stage planning, live provider transport and qualification issuance remain in the backlog. The shipped storage backend is SQLite; its neutral port also defines the boundary for additional backends.
+This repository contains the governing design, a dependency-linked implementation backlog, portable core record/command/result schemas, strict canonical encoding, durable SQLite storage, immutable observation intake, persistent matter identity, explicit occurrence grouping, scoped claims and citations, authorized association decisions, typed relationships, reversible identity correction, temporal coverage and negative evidence scopes, validation tools, and three runnable synthetic lifecycle walkthroughs. MAT-002 supplies the executable structural boundary: twelve record kinds, explicit success/failure results, and portable byte/digest fixtures. MAT-003 adds transactional persistence with checked revisions, exact command retries, immutable history, atomic receipts, migrations, and verified backup/restore. MAT-004 adds source-aware observation deduplication, exact payload storage, conflict receipts, explicit corrections, and source history filtered by evidence availability. MAT-005 adds exact scoped subject keys, continuing IDs across runs, and revisioned metadata. MAT-006 separates reports, happenings, and declared provenance groups with atomic membership corrections and covered counts. MAT-007 adds immutable claim corrections, component-scoped evidence relations, exact citation validation, and revisioned acceptance. MAT-008 adds explicit candidate catalogs, exact-key and external proposals, currentness checks, and authorized attachment and rejection decisions. MAT-009 adds typed relationship constraints, complete guarded identity groups, retained evidence/conflicts, protected undo/split, explicit separation release, and atomic registered-dependency invalidation. MAT-010 adds nanosecond-preserving time views, explicit source catalogs and historical initialization, protected complete-scope replacement, and atomic negative watches for previously unknown observation IDs; the command inventory at that milestone contained twenty-four variants. MAT-011 adds a trusted control lane with scoped durable fences, static host authority ceilings, transaction-time guards, and explicit post-commit hooks. MAT-012 adds exact provider-neutral rule definitions, bounded deterministic/recorded attempts, and explicit prerequisite admission. MAT-013 adds immutable policy profiles. MAT-014–016 add typed rule graphs, atomic revision-bound assessments, declared semantic caches and registered transitive invalidation. MAT-026–028 add offline typed execution, versioned questions and bounded source-linked packets; MAT-036 adds frozen corpus contracts. The current roadmap adds lifecycle, independent contexts, source-egress guards, attention, durable timers and budgets, semantic stages, durable receipts and runtime qualification admission; [progress and actual validation](docs/validation/live-roadmap.md) distinguish implementation from completed acceptance. The optional [TypeSafe HTTP adapter](docs/semantic-typesafe.md) supplies one explicitly selected provider path. Full delivery and empirical provider qualification retain later tickets. The shipped storage backend is SQLite; its neutral port also defines the boundary for additional backends.
 
 The walkthroughs are deliberately small: their fixtures already contain host-supplied associations and classifications. They demonstrate selected continuity and delivery rules; they do not infer semantic meaning, execute an agent hook, call JEV, train a speaker model, or establish production correctness.
 
@@ -21,8 +21,8 @@ and qualification outcomes; it grants no action authority.
 See the [rule API](docs/rules.md) for exact prerequisite mapping, historical
 knowledge cuts, current admission gates, certificate allowlists, and cooperative
 elapsed limits. The [MAT-012 validation receipt](docs/validation/MAT-012.md)
-distinguishes interface checks from provider qualification and future assessment
-publication. Run the neutral synthetic example with:
+distinguishes interface checks from provider qualification; assessment
+publication is documented in the [assessment API](docs/assessments.md). Run the neutral synthetic example with:
 
 ```bash
 python examples/rule_evaluation.py
@@ -75,9 +75,14 @@ implementation.
 
 MAT-027 [versioned questions](docs/semantic-questions.md) and MAT-028
 [bounded packets](docs/semantic-packets.md) retain exact meaning, source scope,
-availability, selection and omission evidence. They add no live provider client
-or qualification grant. Synthetic checks, offline replay, live calls and
-provider qualification remain separate evidence categories.
+availability, selection and omission evidence. MAT-029's
+[stage planner](docs/semantic-stages.md) uses committed resource allocations;
+MAT-030's [durable execution receipts](docs/semantic-receipts.md) distinguish
+attempts, unknown outcomes and exact reuse. MAT-031's
+[runtime admission](docs/semantic-qualification.md) checks reviewed certificates,
+separate decision regions and revocation. These mechanisms issue no empirical
+qualification or action authority. Synthetic checks, offline replay, live calls
+and provider qualification remain separate evidence categories.
 
 ## Run the scaffold
 
@@ -221,7 +226,7 @@ whole artifact and returns concrete reasons for invalid or unavailable evidence.
 
 Acceptance revisions preserve original citations and every historical decision.
 Claim corrections and relation updates emit durable dependency-change notices;
-the later assessment invalidation engine remains a separate ticket. See the
+configured MAT-016 observers consume those notices for registered transitive invalidation. See the
 [claims and citation API](docs/claims.md) for receipt, authority, retry, correction,
 and adapter contracts. Run its complete installed-package example with:
 
@@ -250,7 +255,7 @@ Rejections and protected separations persist across new proposals and restarts.
 They can revoke an existing attachment atomically; an explicit release requires
 correction authority and preserves the prior decisions. Exact retry returns its
 historical result without undoing a later rejection. These bounded decisions do
-not implement the general control-epoch or assessment-invalidation engines.
+use the separate [trusted control](docs/controls.md) and [dependency invalidation](docs/dependencies.md) boundaries.
 See the [association API](docs/associations.md) and run the synthetic example:
 
 ```bash
@@ -273,8 +278,8 @@ a fresh merge still has to pass all remaining guards.
 
 Registered assessments and host projections become invalidated in the same
 transaction as identity changes. Their former merged views remain readable
-through exact historical dependencies. The general transitive invalidation and
-delivery engines remain later tickets. See the [identity correction API](docs/identity-corrections.md)
+through exact historical dependencies. MAT-016 supplies general registered
+transitive invalidation; delivery remains later work. See the [identity correction API](docs/identity-corrections.md)
 and run the complete installed-package example:
 
 ```bash
