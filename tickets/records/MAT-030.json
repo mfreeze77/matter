@@ -4,7 +4,7 @@
   "track": "jev",
   "phase": 3,
   "priority": "P0",
-  "status": "planned",
+  "status": "in_progress",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "semantic/receipts",
@@ -82,7 +82,7 @@
     }
   ],
   "sources": [
-    "matterjevmesh §7",
+    "matterjevmesh \u00a77",
     "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/validate.py"
   ],
   "completion": {

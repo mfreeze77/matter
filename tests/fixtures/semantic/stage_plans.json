@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0",
+  "synthetic": true,
+  "invalid": [
+    {"mutation": "missing_parent", "reason": "missing_prerequisite"},
+    {"mutation": "sibling", "reason": "in_batch_sibling_dependency"},
+    {"mutation": "cycle", "reason": "cycle"}
+  ]
+}
