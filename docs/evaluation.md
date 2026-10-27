@@ -1,6 +1,12 @@
 # Evaluation and release evidence
 
-Status: planned evaluation contract, covering MAT-036 through MAT-045. Examples and synthetic fixtures demonstrate contracts; they do not establish provider accuracy, live usefulness, or production readiness. Results must identify which mode actually ran and which gates remain unrun.
+Status: evaluation contract covering MAT-036 through MAT-045. MAT-036 supplies
+the [frozen corpus interface](evaluation-corpus.md) and synthetic episode
+fixtures. The grouped splits, evaluator harness, provider trials, qualification
+and release evidence in MAT-037 through MAT-045 remain planned. Examples and
+synthetic fixtures demonstrate contracts; they do not establish provider
+accuracy, live usefulness, or production readiness. Results must identify which
+mode actually ran and which gates remain unrun.
 
 ## Questions the evaluation must answer
 

@@ -1,0 +1,280 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/policy-profile.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "namespace": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespace"
+    },
+    "profile_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "semantic_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "components": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "evidence": {
+          "$ref": "#/$defs/component"
+        },
+        "lifecycle": {
+          "$ref": "#/$defs/component"
+        },
+        "purpose": {
+          "$ref": "#/$defs/component"
+        },
+        "audience": {
+          "$ref": "#/$defs/component"
+        }
+      }
+    },
+    "required_outputs": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespaced_name"
+      },
+      "maxItems": 128,
+      "uniqueItems": true
+    },
+    "resource_limits": {
+      "$ref": "#/$defs/resource_limits"
+    },
+    "incomplete_evaluation": {
+      "enum": [
+        "retain_unresolved",
+        "withhold_consequences"
+      ]
+    }
+  },
+  "$defs": {
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "semantic_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16384
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16384
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+          },
+          "maxItems": 128,
+          "uniqueItems": true
+        },
+        "parameters": {
+          "type": "object",
+          "maxProperties": 128
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "evidence",
+              "lifecycle",
+              "purpose",
+              "audience"
+            ]
+          },
+          "maxItems": 4,
+          "uniqueItems": true
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespaced_name"
+              },
+              "rule": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "schema": {
+                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+              },
+              "accepted_labels": {
+                "type": "array",
+                "items": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespaced_name"
+                },
+                "maxItems": 64,
+                "uniqueItems": true,
+                "minItems": 1
+              },
+              "accepted_statuses": {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "applicable",
+                    "not_applicable",
+                    "insufficient_evidence",
+                    "ambiguous",
+                    "conflicting"
+                  ]
+                },
+                "maxItems": 5,
+                "uniqueItems": true,
+                "minItems": 1
+              }
+            },
+            "required": [
+              "name",
+              "rule",
+              "schema",
+              "accepted_labels",
+              "accepted_statuses"
+            ]
+          },
+          "maxItems": 128,
+          "uniqueItems": true
+        },
+        "data_scopes": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+          },
+          "maxItems": 128,
+          "uniqueItems": true
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+          },
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "conflict_resolvers": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+          },
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "resource_limits": {
+          "$ref": "#/$defs/resource_limits"
+        },
+        "lifecycle_extensions": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
+          },
+          "maxItems": 32,
+          "uniqueItems": true
+        },
+        "conformance_cases": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 16384
+              },
+              "invariant": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 16384
+              }
+            },
+            "required": [
+              "name",
+              "invariant"
+            ]
+          }
+        }
+      },
+      "required": [
+        "semantic_version",
+        "description",
+        "rules",
+        "parameters",
+        "dependencies",
+        "outputs",
+        "data_scopes",
+        "capabilities",
+        "conflict_resolvers",
+        "resource_limits",
+        "lifecycle_extensions",
+        "conformance_cases"
+      ]
+    },
+    "resource_limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_calls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "max_input_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 134217728
+        },
+        "max_output_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 33554432
+        },
+        "max_evidence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "max_elapsed_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 7680000
+        }
+      },
+      "required": [
+        "max_calls",
+        "max_input_bytes",
+        "max_output_bytes",
+        "max_evidence",
+        "max_elapsed_ms"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "namespace",
+    "profile_id",
+    "semantic_version",
+    "description",
+    "components",
+    "required_outputs",
+    "resource_limits",
+    "incomplete_evaluation"
+  ]
+}

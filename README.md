@@ -28,6 +28,32 @@ publication. Run the neutral synthetic example with:
 python examples/rule_evaluation.py
 ```
 
+## Use the next foundations
+
+MAT-013 adds [versioned policy profiles](docs/profiles.md), exact historical
+rule references, component fingerprints and static validation. Profiles are
+declarations: rule-graph execution, assessment publication and transitive
+invalidation remain MAT-014, MAT-015 and MAT-016.
+
+MAT-026 adds the [provider-neutral typed executor](docs/semantic-executor.md)
+with offline injection, distinct Choice/Score/proposition-probability meanings,
+exact numeric preservation and whole-batch validation. It does not construct a
+vendor client, issue qualifications or authorize host actions.
+
+MAT-036 adds [frozen episode corpora](docs/evaluation-corpus.md) with source
+hashes, availability cuts, occurrence lineage and independent label provenance.
+Tracked examples are synthetic; real corpora remain external. Dataset splits,
+provider evaluation and integrated release qualification remain future tickets.
+
+The [combined validation receipt](docs/validation/ready-foundations.md) records
+this batch's executed checks and limits. The next core dependency sequence is
+MAT-014 → MAT-015 → MAT-016; semantic question specifications and evaluation
+splits follow their own explicit prerequisites.
+
+```bash
+python examples/ready_foundations.py tests/fixtures/evaluation/episodes.jsonl
+```
+
 ## Run the scaffold
 
 Use Python 3.11 or newer from the repository checkout:

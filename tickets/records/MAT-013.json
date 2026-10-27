@@ -4,7 +4,7 @@
   "track": "rules",
   "phase": 2,
   "priority": "P0",
-  "status": "planned",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "profiles",
@@ -50,7 +50,9 @@
   "artifacts": [
     "src/matter/profiles.py",
     "schemas/policy-profile.schema.json",
-    "tests/unit/test_profile_validation.py"
+    "tests/unit/test_profile_validation.py",
+    "docs/profiles.md",
+    "docs/validation/MAT-013.md"
   ],
   "tests": [
     "Two profiles can assess one matter concurrently.",
@@ -77,7 +79,13 @@
     "matterjevmesh"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "2026-10-27: Immutable exact profiles/history, component semantic fingerprints, host admission ceilings, static graph/schema/outcome/budget validation, descriptive compatibility and detached supersession notices; 24 focused tests passed. Graph execution and assessment publication remain later tickets.",
+      "2026-10-27: final combined unittest discovery passed all 826 tests in 344.831 seconds on Python 3.12.14 with canonical macOS TMPDIR. Initial /var versus /private/var backup-path assertion failure and its environment-only resolution are recorded in docs/validation/ready-foundations.md; no storage source or old test changed.",
+      "2026-10-27: generated-file and repository validation passed (80 tickets, 104 requirements, 41 schemas, three walkthroughs); all walkthroughs and JavaScript 26 canonical/eight source vectors passed. All 393 final runtime/schema/test/example/workflow inputs remained unchanged.",
+      "2026-10-27: final dev12 wheel matched 92 source/schema/migration resources; all ten installed examples passed outside the checkout. Initial two-pass independent review covered 19 files and identified three confirmed low-severity issues; all were fixed, and two-pass remediation review of three changed Python files returned zero findings/warnings. Source review, synthetic checks, provider evaluation and live usefulness remain distinct.",
+      "See docs/validation/MAT-013.md and docs/validation/ready-foundations.md for actual commands, final hashes, review exclusions, storage accounting and qualification limits. Local acceptance does not assert submitted-head CI success, merge or deployment."
+    ]
   }
 }

@@ -39,4 +39,8 @@ Validation rejects malformed records, duplicate IDs and acceptance IDs, missing 
 
 ## Scope of this delivery
 
-MAT-001 records the scaffold milestone. MAT-002 records the executable structural and canonical-encoding contracts with their own validation evidence. The remaining records describe future implementation, integration, research, and qualification. Domain learning stays with DIAT; civic authority stays with its reviewed host; Oil controls and delivery stay under Oil's host boundary.
+The canonical records and generated index identify completed and active milestones.
+MAT-001 records the scaffold; subsequent tickets have separate implementation
+and validation evidence. A ticket's planned artifacts or requirements do not
+establish its completion. Domain learning stays with DIAT; civic authority stays
+with its reviewed host; Oil controls and delivery stay under Oil's host boundary.
