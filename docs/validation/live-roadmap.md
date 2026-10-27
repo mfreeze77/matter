@@ -77,7 +77,7 @@ provider accuracy, real evidence egress or a qualified deployed runtime.
 
 The two-pass independent reviews completed without skipped groups or warnings:
 MAT-018 reviewed 10 files, MAT-072 reviewed 8, and MAT-017 reviewed 11. Their
-findings are being reconciled against the actual code. Confirmed fixes include
+confirmed findings were reconciled in the committed foundation fixes. These include
 context/disposition version and expiry handling, exact declaration namespaces,
 pre-evaluation access coverage, historical access versus work freshness,
 timeless access-aware cache identity, and lifecycle basis independence from
@@ -97,8 +97,9 @@ Four targeted behavioral checks passed in **3.278 seconds**
 (`/tmp/matter-current-clock.log`): actual assessment publication/current reading
 with a clock advancing on every read, later source READ denial including replay,
 a past hint against a present stop/denial, a refused future hint, and clock
-regression before a committed governing restriction. The full control suites
-and independent follow-up review remain integration checks.
+regression before a committed governing restriction. The 32 existing control integration checks subsequently passed in 18.200 seconds
+(`/tmp/matter-current-control-regression.log`). The advancing-clock fix was also
+included in the later 1,132-test snapshot below.
 
 ## Attention and scheduling development milestones
 
@@ -113,14 +114,16 @@ MAT-020's development evidence is 9 runtime checks in 76.232 seconds, 77 portabl
 contract checks in 4.278 seconds, then 3 final targeted checks in 41.335 seconds.
 These cover actual deadline attention with unchanged semantics, cross-connection
 quota races, restart/catch-up, conservative precharge, expiry/release, independent
-attention limits, direct stop, and access-protected timer replay. Its runtime
-file now has 11 tests; a final combined run is still required. Four additive
+attention limits, direct stop, and access-protected timer replay. Later review fixes added scoped replay and orphaned-timer checks; the final
+boundary-drift delta and combined snapshot are recorded below. Four additive
 operations preserve the old 24, with 28 operations and 58 success pairs total.
 
-The next implementation milestone is MAT-029 staged semantic execution over
-actual committed resource allocations. A frozen follow-up review is checking
-`880a887..9691f11` in the isolated checkout while this work continues; its result
-has not yet been reported as clean. Hosted CI is not a merge gate.
+MAT-029 staged semantic execution was committed in `02e4c13`, with review
+remediation in `8aa71b6`. Its 19 focused checks passed in 35.210 seconds. The
+completed two-pass attention, scheduling and stage reviews had no skipped groups
+or warnings; confirmed findings were fixed in `c137031`, `d934647` and
+`8aa71b6`. The subsequent remediation review found one timer/access-boundary
+drift case, fixed in `c9a0e76`. Hosted CI is not a merge gate.
 
 
 The frozen committed `d934647` snapshot passed **1,132 tests in 1,335.361
@@ -130,3 +133,22 @@ It includes the lifecycle, access, attention, timer and stage review fixes,
 and predates MAT-030/031/032. The last timer boundary-drift delta subsequently
 passed its two targeted checks in 28.405 seconds; later semantic additions still
 require their combined regression and package checks.
+
+## Durable semantic execution and admission milestone
+
+`6a978cc` integrates MAT-030 and MAT-031 over the existing storage, controls,
+budgets and dependency registration. MAT-030 passed 27 behavioral checks in
+54.337 seconds, including actual durable pre-I/O claiming, protected dispatch,
+transitive parent-source access and stage reuse with zero new calls. MAT-031
+passed 12 checks in 54.006 seconds, including failed held-out rejection, exact
+identity matching, separate abstention and actual assessment invalidation after
+certificate revocation. The shared portable contracts passed 106 checks in
+6.871 seconds: 12 core kinds, 30 operations, 60 success pairs, 224 synthetic
+vectors and 88 schemas. Their [receipt](MAT-030.md) and
+[admission](MAT-031.md) validation records give the exact commands and limits.
+
+Independent two-pass source review is running on frozen `d934647..6a978cc`;
+MAT-032 adapter development uses injected transports only. Final combined
+regression, package checks and findings reconciliation remain pending. No new
+live call or real/private evidence was sent, and no empirical certificate was
+issued.
