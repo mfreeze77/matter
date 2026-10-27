@@ -134,6 +134,9 @@ a truly unchanged semantic basis remains refused.
 Declared cache temporal classes are compared separately: crossing a clock
 boundary produces `temporal_transition`, preserving the distinction from an
 evidence correction when the selected sources have not changed.
+Only inputs with matching exact definitions and non-temporal projections in
+both assessments participate in that comparison. Adding or removing a cache
+input is a projection change, without inventing a clock transition.
 
 `attempt(idempotency_key)` returns the durable original command, typed result and
 actual operation receipt under current read authority. Failed commands retain

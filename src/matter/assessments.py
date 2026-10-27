@@ -234,7 +234,9 @@ class AssessmentService:
             "cache_projections": _sorted({"definition": item["definition"],
                 "projected": {key: value for key, value in item["projected"].items() if key != "temporal_class"}}
                                           for item in preparation["cache_inputs"]),
-            "cache_temporal_classes": _sorted({"definition": item["definition"],
+            "cache_temporal_classes": _sorted({"projection": canonical_digest({"definition": item["definition"],
+                "projected": {key: value for key, value in item["projected"].items() if key != "temporal_class"}},
+                "matter.assessment-cache-projection-basis.v1"),
                 "temporal_class": item["projected"]["temporal_class"]} for item in preparation["cache_inputs"]),
             # Merely selecting a new target with no control history is an
             # input change, not a new host disposition. Nonempty generations,
@@ -648,9 +650,13 @@ class AssessmentService:
         for field, cause in (("plan", "policy_change"), ("control_context", "disposition_change"),
             ("negative_registrations", "coverage_change"), ("candidate_sets", "association_correction"),
             ("extra_dependencies", "evidence_correction"), ("staged", "evidence_correction"),
-            ("cache_projections", "evidence_correction"), ("cache_temporal_classes", "temporal_transition")):
+            ("cache_projections", "evidence_correction")):
             if prior[field] != current[field] and cause not in causes:
                 causes.append(cause)
+        before_classes = {item["projection"]: item["temporal_class"] for item in prior["cache_temporal_classes"]}
+        after_classes = {item["projection"]: item["temporal_class"] for item in current["cache_temporal_classes"]}
+        if any(before_classes[key] != after_classes[key] for key in before_classes.keys() & after_classes.keys()):
+            causes.append("temporal_transition")
         if not causes:
             if before["assessed_as_of"] != after["assessed_as_of"]:
                 causes.append("temporal_transition")

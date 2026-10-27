@@ -407,6 +407,25 @@ class AssessmentCommitTests(RuleTestCase):
         self.assertEqual(self.storage.get(pin(prior)), prior)
         self.assertEqual(self.storage.get(pin(original_cache)), original_cache)
 
+    def test_same_lane_added_cache_query_at_same_cut_is_not_temporal_transition(self):
+        _, _, prior = self.publish()
+        definition, cache = self.cache_fixture()
+        self.service.cache = cache
+        calls = []
+        prepared = self.prepare()
+        cached = self.cache_compute(prepared, definition, cache, calls)
+        command = self.command(prepared, cache_entries=[cached])
+        self.assertEqual(command["body"]["assessment"]["body"]["causes"], ["evidence_correction"])
+        result = self.service.commit(command)
+        self.assertEqual(result["status"], "success", result)
+        current = self.service.current(self.subject, profile=self.profile.reference, purpose=self.purpose, audience=self.audience)
+        self.assertEqual(current["body"]["causes"], ["evidence_correction"])
+        self.assertEqual(current["body"]["assessed_as_of"], prior["body"]["assessed_as_of"])
+        self.assertEqual(current["body"]["evidence_selection"], prior["body"]["evidence_selection"])
+        self.assertEqual(current["body"]["prior_assessment"], pin(prior))
+        self.assertEqual(self.storage.get(pin(prior)), prior)
+        self.assertEqual(len(calls), 1)
+
     def test_cached_unknown_stays_unknown_and_does_not_invent_a_source_attempt(self):
         recorded = self.recorded(identity="unknown-cache-model")
         rule = self.rule(recorded)
