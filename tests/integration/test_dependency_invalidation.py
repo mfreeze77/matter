@@ -358,6 +358,20 @@ class DependencyCoverageTests(GraphFixture, CoverageTestCase):
             self.fresh(second_reg)
             self.assertEqual(len(self.storage.watchers(time_watch(self.storage.scope_id))), 2)
 
+    def test_due_unswept_cohort_does_not_refuse_its_replacement_host_registration(self):
+        unknown = {"state": "unknown", "reason": "not_applicable"}
+        with patch("matter.dependencies.MAX_LIVE_TEMPORAL", 2):
+            old = [self.host(f"due-host-{index}", time_conditions=[{
+                "condition": component("due-host"), "next_check_at": T3, "expires_at": unknown}])[0] for index in range(2)]
+            self.graph_now = deepcopy(T3)
+            target, registration = self.host("first-write-after-due", time_conditions=[{
+                "condition": component("future-host"), "next_check_at": T4, "expires_at": unknown}])
+            self.fresh(registration)
+            self.assertEqual(self.state(target)["status"], "current")
+            for prior in old:
+                self.assertEqual(self.state(prior)["status"], "invalidated")
+            self.assertEqual(len(self.storage.watchers(time_watch(self.storage.scope_id))), 1)
+
 
 class DependencyOccurrenceTests(GraphFixture, OccurrenceTestCase):
     def setUp(self):
@@ -536,6 +550,50 @@ class DependencyAssessmentTests(GraphFixture, unittest.TestCase):
         self.assertFalse(any(key.startswith("dependency-time-prefix-") for key in invalidated["watch_keys"]))
         self.assertEqual(self.storage.get(pin(original)), original)
 
+    def test_due_full_cohort_admits_actual_multi_registration_publication_without_prior_write(self):
+        from matter.planner import RulePlan
+        from matter.profiles import ProfileRegistry
+        from matter.rules import RuleRegistry
+        from rule_helpers import LATE
+        fixture = self.fixture
+        unknown = {"state": "unknown", "reason": "not_applicable"}
+        future = {**LATE, "value": "2026-10-12T12:00:00Z"}
+        condition = {"condition": component("replacement-publication"), "next_check_at": future, "expires_at": unknown}
+        fixture.rule_instance = fixture.rule(fixture.binding_instance, change=lambda definition: definition.update(temporal_dependencies=[condition]))
+        fixture.rules = RuleRegistry([fixture.rule_instance])
+        fixture.profile = fixture.make_profile(fixture.rule_instance)
+        fixture.profiles = ProfileRegistry([fixture.profile])
+        fixture.plan = RulePlan(fixture.profile, rules=fixture.rules, schemas=fixture.schemas,
+                               nodes={"evidence": fixture.rule_instance.reference})
+        fixture.service = fixture.make_service()
+        hook = self.hook
+        capacity_limits = []
+        class SmallDefaultSystemView:
+            def __init__(self, transaction):
+                self.transaction = transaction
+            def __getattr__(self, name):
+                return getattr(self.transaction, name)
+            def watchers(self, key, *, limit=2):
+                if key.startswith("dependency-time-"):
+                    capacity_limits.append(limit)
+                return self.transaction.watchers(key, limit=limit)
+        def limited_hook(transaction, changes):
+            return hook(SmallDefaultSystemView(transaction), changes)
+        with patch("matter.dependencies.MAX_LIVE_TEMPORAL", 2), patch("matter.invalidation.MAX_LIVE_TEMPORAL", 2):
+            old = [self.host(f"due-publication-{index}", time_conditions=[{
+                "condition": component("due-publication"), "next_check_at": LATE, "expires_at": unknown}])[0] for index in range(2)]
+            self.graph_now = deepcopy(LATE)
+            fixture.now = deepcopy(LATE)
+            with patch.object(self.storage, "_transaction_hook", limited_hook):
+                _, _, assessment = fixture.publish()
+            judgment = self.storage.get(assessment["body"]["judgments"][0])
+            self.fresh(self.storage.get(registration_ref(judgment)))
+            self.fresh(self.storage.get(registration_ref(assessment)))
+            for prior in old:
+                self.assertEqual(self.state(prior)["status"], "invalidated")
+            self.assertIn(4, capacity_limits)
+            self.assertEqual(len(self.storage.watchers(time_watch(self.storage.scope_id))), 2)
+
 
     def test_read_access_loss_invalidates_source_required_derivative_and_descendant(self):
         fixture = self.fixture
@@ -654,8 +712,18 @@ class DependencyAssessmentTests(GraphFixture, unittest.TestCase):
                 return tx.success("created", {"matter": pin(subject)})
             self.assertEqual(raw.execute(command, seed)["status"], "success")
             old = raw.get(address)
-        with patch("matter.invalidation.MAX_DEPENDENCIES", 1):
-            denied = self.deny_read("deny-with-malformed-fence")
+        # Ordinary source intake needs only the verified scope-fence pin for
+        # due-cohort routing. Its damaged derivative payload must not block it.
+        fixture.ingestor = ObservationIngestor(self.storage, fixture.payloads)
+        arrived = fixture.observe("intake-with-malformed-fence")
+        self.assertEqual(self.storage.get(pin(arrived)), arrived)
+        self.assertEqual(self.storage.get(address), old)
+        with self.storage.snapshot() as view:
+            with self.assertRaises(StorageError):
+                capture_dependencies(view, scope_id=self.storage.scope_id, as_of=self.graph_now)
+        # No capacity failure is forced: a real control explicitly detects and
+        # repairs the malformed declaration through its bounded fallback.
+        denied = self.deny_read("deny-with-malformed-fence")
         self.assertEqual(denied["status"], "success", denied)
         repaired = self.storage.get(address)
         self.assertEqual(repaired["value"]["value"]["epoch"], old["revision"] + 1)

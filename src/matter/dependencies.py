@@ -451,10 +451,12 @@ def register_dependency(tx, target, manifest, *, as_of, controls=None, previous=
         _fail("A previous registration token cannot name an absent target.", "E_DEPENDENCY_STALE")
     if data["time_conditions"]:
         # Existing ports expose exact watch cohorts. The maintained invariant
-        # bounds this capacity-only cohort to 512 live rows; invalidation removes
-        # its membership. Count under the write lock before admitting a new row.
-        # System-port default retrieval also bounds this cohort before loading.
-        live = tx.watchers(time_watch(scope, data["scope_fence"]))
+        # bounds future membership to 512. Due rows are already stale and may
+        # await this transaction's hook sweep; do not charge them to admission.
+        # During auto-publication the bounded system view permits old-due plus
+        # new-future rows to coexist until the hook flushes invalidations.
+        live = [record for record in tx.watchers(time_watch(scope, data["scope_fence"]))
+                if compare_times(as_of, temporal_deadline(read_registration(tx, pin(record))["value"]["value"]["manifest"]["time_conditions"])) < 0]
         if len(live) >= MAX_LIVE_TEMPORAL and not any(entity_ref(record) == address for record in live):
             _fail("The live temporal cohort is full; only this registration is refused.", "E_BUDGET_EXHAUSTED")
     # Follow reverse target registrations to reject cycles before publication.

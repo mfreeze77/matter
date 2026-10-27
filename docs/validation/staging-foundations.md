@@ -216,3 +216,13 @@ expansion, PostgreSQL implementation or live provider work is part of closeout.
 
 Final combined regression, wheel verification and remediation review results
 will follow. Earlier passing runs are retained as preliminary evidence only.
+
+The next combined source run passed 1005 tests in 420.880 seconds and repeated
+the isolated 110-resource wheel check successfully. Its closeout review found
+two further timer boundaries: already-due rows charged to live admission, and
+ordinary intake parsing a damaged derivative fence. Both were reproduced and
+fixed without a storage API change. Future-only admission handles bounded
+due-plus-future rows; ordinary sweep uses the verified fence pin while operator
+controls explicitly repair malformed metadata. The expanded 36-case invalidation
+suite passed in 30.438 seconds. Final verification below applies to this last
+repair, not merely to the preceding 1005-case source set.

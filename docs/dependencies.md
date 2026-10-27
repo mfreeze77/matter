@@ -174,9 +174,14 @@ removes temporal membership while retaining object/query/control watches for
 further recomputation fences. Historical judgments therefore do not accumulate
 in a global time scan. No background scheduler is introduced.
 
-A scope generation admits at most 512 live timed registrations. Admission is
-checked atomically; exceeding this cap refuses only the new registration, and
-ordinary intake can continue. Cohort proof rows enter the checked read set, not
+A scope generation admits at most 512 future current timed registrations.
+Admission excludes already-due rows at the actual check time, so the publication
+that sweeps expired work can also replace it without requiring an unrelated
+write first. During a multi-registration publication, the system view permits
+a bounded 1024-row transient cohort (512 old due plus 512 new future rows) until
+the hook flushes invalidations; future admission remains capped at 512.
+Exceeding this cap refuses only the new registration, and ordinary intake can
+continue. Cohort proof rows enter the checked read set, not
 semantic dependency edges. Temporal keys also bind the captured scope fence,
 so registrations from a prior fallback generation do not consume renewed
 capacity. This explicit capacity and 78 watch keys per timed registration are
@@ -198,6 +203,10 @@ without blocking the admitted control. Its old revision remains historical.
 Freshness compares exact fence pins/absence, so it cannot accept an older guard
 merely because malformed epoch data was discarded. Raw database integrity
 failures remain storage errors; this is not a corruption bypass.
+Ordinary intake routes its due sweep using only the verified fence pin and does
+not parse cached derivative metadata. Capture and freshness still validate that
+metadata strictly. An actual operator control explicitly checks and repairs an
+invalid fence declaration through the bounded fallback.
 
 After the host explicitly restores required permissions, a recomputation can
 capture a new original token, the current scope fence and exact old registration
