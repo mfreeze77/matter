@@ -1,0 +1,20 @@
+# Intent-Oil local state. Volatile, and the ledger's hash chain cannot be merged
+# across branches -- two people appending produce divergent chains. Provenance is
+# local; RULES.md is the shared artifact and is committed.
+ledger/
+telemetry/
+projections/
+review_queue/
+review_results/
+*.lock
+*.tmp
+
+# Per-checkout settings, merged over config.yaml. The committed config has to be
+# the one that works for anyone who clones; anything needing a local API key or
+# a machine-specific path goes here instead.
+config.local.yaml
+enforcement/
+
+# baseline.json is deliberately NOT ignored. A hidden baseline is
+# indistinguishable from no rule; accepting a violation should be a line
+# somebody reviews in a diff.

@@ -1,0 +1,16 @@
+schema_version: intent-oil.project.v1
+project_id: matter
+detected:
+  project_id: matter
+  languages:
+  - python
+  test_runners: []
+  ci_systems:
+  - github-actions
+  agent_hosts:
+  - codex
+  has_git: true
+  existing_oil: true
+mission: ''
+non_negotiables: []
+anti_goals: []

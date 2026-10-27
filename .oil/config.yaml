@@ -1,0 +1,22 @@
+schema_version: intent-oil.config.v2
+project_id: matter
+scope_id: project:matter
+state_dir: .oil
+decision:
+  backend: deterministic
+  model: jev-latest
+  material_threshold: 0.4
+  contradiction_threshold: 0.86
+  durable_intent_threshold: 0.94
+  auto_accept_user_intent: true
+review:
+  backend: ocr
+  executable: ocr
+  auto_enqueue: true
+  default_effort: low
+  timeout_seconds: 3600
+retrieval:
+  max_items: 8
+  max_chars: 9000
+  include_candidates: false
+  per_turn_standing_floor: 5

@@ -1,0 +1,23 @@
+{
+  "schema_version": "oildrop.scaffold.v2",
+  "managed": {
+    ".oil/.gitignore": {
+      "sha256": "4955b4e95d5939bcd5bdb561df64d6df4e92155f151e6a3c07d81c7abd0240e0"
+    },
+    ".oil/config.yaml": {
+      "sha256": "86e92f6c5dc76c55cc012d206ae82ffefa7b4cc8b6b04abb2d21d1a8a2f78458"
+    },
+    ".oil/project.yaml": {
+      "sha256": "8302eeaf7b7765af7f88b65dd20810d073d5131fd1fa842cc235a9a5993f7f59"
+    },
+    ".oil/policy/review.yaml": {
+      "sha256": "9610a2fb69decfbf0e99b922e3ee60a7628e716c06b416b95fe282dfe4a592ec"
+    },
+    ".oil/intent/README.md": {
+      "sha256": "915e4a0f327fa16f2277a2ac3ffc97c03906992e7a6cf7589d59bf1a4594d50c"
+    },
+    ".oil/review/README.md": {
+      "sha256": "37c26fb3386baf71807c0c55b9f023327e0ba960d084ed8c977fa38c7660db02"
+    }
+  }
+}

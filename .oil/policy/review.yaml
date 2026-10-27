@@ -1,0 +1,15 @@
+schema_version: intent-oil.review-policy.v1
+high_risk_globs:
+- '**/auth/**'
+- '**/security/**'
+- '**/permissions/**'
+- '**/crypto/**'
+- '**/migrations/**'
+medium_risk_globs:
+- '**/api/**'
+- '**/schema/**'
+- '**/db/**'
+- '**/config/**'
+- '**/*.sql'
+notes: Project-owned policy. Add repo-specific paths here; Intent-Oil core has no
+  project-specific rules.
