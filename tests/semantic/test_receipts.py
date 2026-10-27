@@ -433,6 +433,19 @@ class DurableExecutionTests(unittest.TestCase):
         access.current_read = self.f.storage.snapshot
         request = self.service.request(batch, packet=packet, rendered_questions=material.rendered_questions,
             token=self.stage.token, model_binding=self.binding, access_context=context)
+        from matter.semantic.cache import attempt_ref
+        before_allocation = self.f.storage.get(self.stage.reservation)
+        with self.assertRaises(ContractError) as missing:
+            self.service.run(request, executor=self.stage.spy, token=self.stage.token, logical_request_id="protected",
+                attempt_id="protected-first", allocation=self.stage.reservation, access_context=context)
+        self.assertEqual(missing.exception.code, "E_AUTHORITY_REQUIRED")
+        with self.assertRaises(StorageError) as absent:
+            self.f.storage.get(attempt_ref(self.f.storage.scope_id, "protected", "protected-first"))
+        self.assertEqual(absent.exception.code, "E_NOT_FOUND")
+        with self.f.storage.snapshot() as view:
+            self.assertEqual(view.watchers(self.service._watch(self.stage.reservation)), [])
+        self.assertEqual(self.f.storage.get(self.stage.reservation), before_allocation)
+        self.assertEqual(len(self.stage.calls), 0)
         def guarded(**args):
             from matter.assessments import FrozenAssessmentView
             from matter.budgets import _Reads
@@ -447,7 +460,7 @@ class DurableExecutionTests(unittest.TestCase):
             attempt_id="protected-first", allocation=self.stage.reservation, access_context=context, dispatch=guarded)
         self.assertEqual(first["status"], "completed", first)
         second = self.service.run(request, executor=self.stage.spy, token=self.stage.token, logical_request_id="protected",
-            attempt_id="protected-second", allocation=self.stage.reservation, access_context=context, dispatch=guarded)
+            attempt_id="protected-second", allocation=self.stage.reservation, access_context=context)
         self.assertEqual(second["status"], "reused", second)
         self.assertEqual(len(self.stage.calls), 1)
 
@@ -657,3 +670,87 @@ class DurableExecutionTests(unittest.TestCase):
         self.assertFalse(historical["dispatched"])
         self.assertEqual(self.run_attempt("original")["execution"], first["execution"])
         self.assertEqual(len(self.stage.calls), 1)
+
+    def test_same_attempt_id_in_distinct_logical_requests_has_distinct_reuse_commands(self):
+        first = self.run_attempt("source")
+        records = []
+        for logical in ("B", "C"):
+            outcome = self.service.run(self.request, executor=self.stage.spy, token=self.stage.token,
+                logical_request_id=logical, attempt_id="1", allocation=self.stage.reservation)
+            self.assertEqual(outcome["status"], "reused", outcome)
+            records.append(outcome["execution"])
+            metadata = self.service.read(outcome["execution"])["body"]["details"]["value"]
+            self.assertEqual(metadata["logical_request_id"], logical)
+            self.assertEqual(metadata["source_execution"], first["execution"])
+            again = self.service.run(self.request, executor=self.stage.spy, token=self.stage.token,
+                logical_request_id=logical, attempt_id="1", allocation=self.stage.reservation)
+            self.assertEqual(again["execution"], outcome["execution"])
+        self.assertNotEqual(*records)
+        self.assertEqual(len(self.stage.calls), 1)
+
+    def test_provider_shadow_missing_dispatcher_creates_no_claim_then_allows_guarded_attempt_and_cache(self):
+        from matter.semantic.contracts import Capabilities
+        from matter.semantic.cache import attempt_ref
+        request = deepcopy(self.request); request["batch"]["context"]["mode"] = "provider_shadow"
+        original_allocation = self.f.storage.get(self.stage.reservation)
+        with self.assertRaises(ContractError) as missing:
+            self.service.run(request, executor=self.stage.spy, token=self.stage.token, logical_request_id="shadow",
+                attempt_id="1", allocation=self.stage.reservation)
+        self.assertEqual(missing.exception.code, "E_AUTHORITY_REQUIRED")
+        with self.assertRaises(StorageError) as absent:
+            self.f.storage.get(attempt_ref(self.f.storage.scope_id, "shadow", "1"))
+        self.assertEqual(absent.exception.code, "E_NOT_FOUND")
+        with self.f.storage.snapshot() as view:
+            self.assertEqual(view.watchers(self.service._watch(self.stage.reservation)), [])
+        self.assertEqual(self.f.storage.get(self.stage.reservation), original_allocation)
+        self.assertEqual(len(self.stage.calls), 0)
+        outer = self
+        class ShadowFixture:
+            capabilities = Capabilities({**outer.stage.spy.capabilities.value, "modes": ["provider_shadow"]})
+            def execute(inner, batch): return outer.stage.spy.execute(batch)
+        def guarded(**args):
+            return execute_batch(args["executor"], args["batch"], clock=args["clock"], precision=args["precision"])
+        first = self.service.run(request, executor=ShadowFixture(), token=self.stage.token, logical_request_id="shadow",
+            attempt_id="1", allocation=self.stage.reservation, dispatch=guarded)
+        self.assertEqual(first["status"], "completed", first)
+        # Existing history and a new cache read do no I/O and need no dispatcher.
+        historical = self.service.run(request, executor=ShadowFixture(), token=self.stage.token, logical_request_id="shadow",
+            attempt_id="1", allocation=self.stage.reservation)
+        self.assertEqual(historical["execution"], first["execution"])
+        reused = self.service.run(request, executor=ShadowFixture(), token=self.stage.token, logical_request_id="other-shadow",
+            attempt_id="1", allocation=self.stage.reservation)
+        self.assertEqual(reused["status"], "reused", reused)
+        self.assertEqual(len(self.stage.calls), 1)
+
+    def test_invalid_durable_journal_caps_and_phase_refuse_before_budget_dispatch(self):
+        from matter.semantic.cache import attempt_ref
+        from integration.helpers import create_command
+        first = self.run_attempt("source")
+        address = attempt_ref(self.f.storage.scope_id, "logical", "source")
+        original = self.f.storage.get(address)
+        valid = deepcopy(original["value"])
+        mutations = [({"calls": -5, "elapsed_ms": -100000}, "completed"), ({"calls": "1"}, "completed"),
+            ({"calls": True}, "completed"), ({"unrecognized": 0}, "completed"),
+            ({key: value for key, value in valid["value"]["caps"].items() if key != "calls"}, "started"),
+            ({}, "started"), (valid["value"]["caps"], "not-a-phase")]
+        def privileged_fixture_write(payload, suffix):
+            # Deliberately bypass the private schema constructor to simulate a
+            # malformed imported journal through the real generic storage port.
+            current = self.f.storage.get(address)
+            command = create_command("journal-" + suffix, "journal-subject-" + suffix, scope_id=self.f.storage.scope_id,
+                expected_revisions=[pin(current)])
+            def handler(tx):
+                tx.put_projection(address, payload, watch_keys=current["watch_keys"])
+                subject = tx.insert(tx.command["body"]["matter"])
+                return tx.success("created", {"matter": pin(subject)})
+            self.assertEqual(self.f.storage.execute(command, handler)["status"], "success")
+        for index, (caps, phase) in enumerate(mutations):
+            with self.subTest(index=index):
+                malformed = deepcopy(valid); malformed["value"].update(caps=caps, phase=phase)
+                privileged_fixture_write(malformed, "bad-" + str(index))
+                with self.assertRaises(ContractError) as refused:
+                    self.run_attempt("not-dispatched-" + str(index), reuse=False)
+                self.assertEqual(refused.exception.code, "E_SCHEMA_INVALID")
+                self.assertEqual(len(self.stage.calls), 1)
+                privileged_fixture_write(valid, "restore-" + str(index))
+        self.assertTrue(self.service.replay(first["execution"]).primitive_valid)

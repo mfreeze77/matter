@@ -21,7 +21,13 @@
       "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
     },
     "phase": {
-      "type": "string"
+      "enum": [
+        "started",
+        "completed",
+        "unknown",
+        "reused",
+        "observed"
+      ]
     },
     "execution": {
       "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
@@ -40,7 +46,53 @@
       ]
     },
     "caps": {
-      "type": "object"
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "calls": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+        },
+        "input_bytes": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+        },
+        "output_bytes": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+        },
+        "retries": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+        },
+        "elapsed_ms": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/counter"
+        }
+      }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "phase": {
+            "enum": [
+              "started",
+              "completed",
+              "unknown"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "caps": {
+            "required": [
+              "calls",
+              "input_bytes",
+              "output_bytes",
+              "retries",
+              "elapsed_ms"
+            ]
+          }
+        }
+      }
+    }
+  ]
 }

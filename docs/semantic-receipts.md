@@ -156,3 +156,12 @@ returning historical data; work-lineage changes conflict with idempotency.
 Unchanged original context can still inspect authorized historical evidence after
 cancellation, without dispatch or fresh qualification. A requested retry satisfied
 by cache preserves `retry_of` alongside `source_execution` in its reuse observation.
+
+Reuse command identities include both logical request and physical attempt IDs,
+so separate logical requests can each use attempt `1`. A guarded dispatcher is
+required before claiming new protected/provider-shadow I/O; a missing dispatcher
+creates no started observation or cap reservation. Authorized exact history and
+cache reads remain available without a dispatcher because they perform no I/O.
+The attempt journal admits only its five nonnegative integer counter keys and
+known phases; started/completed/unknown phases require all five counters, while
+observed/reused records may carry an empty cap object.

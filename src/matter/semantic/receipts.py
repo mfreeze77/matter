@@ -603,13 +603,17 @@ class ExecutionReceiptStore:
             value["result"] = material["result"]
             value["neutral_response"], value["native_response"] = material["neutral_response"], material["native_response"]
             value["normalized_digest"] = material["normalized_digest"]
-            command = self.prepare(value, command_id="reuse-" + attempt_id, idempotency_key="reuse-" + canonical_digest(address, "matter.semantic.command.v1"), qualify=qualify, _retain_refusal=True)
+            identity = canonical_digest(address, "matter.semantic.command.v1")
+            command = self.prepare(value, command_id="reuse-" + identity, idempotency_key="reuse-" + identity, qualify=qualify, _retain_refusal=True)
             classified = []
             recorded = self.commit(command, qualify=qualify, _classification=classified)
             if recorded["status"] != "success":
                 return {"status": "refused", "operation": recorded, "dispatched": False, "reused": False}
             return {"status": "reused", "execution": recorded["body"]["execution"], "result": self.replay(pin(original)),
                 "dispatched": False, "reused": True, "original_execution": pin(original), "qualification": classified[-1] if classified else cached["qualification"]}
+        batch = Batch(request["batch"])
+        if dispatch is None and ("access_context" in batch.value["state"] or batch.value["context"]["mode"] == "provider_shadow"):
+            _fail("E_AUTHORITY_REQUIRED")
         request = self._clip_request(request, allocation)
         value = self._metadata(request, token=token, logical_request_id=logical_request_id, attempt_id=attempt_id,
             phase="started", access_context=access_context, allocation=allocation, parents=parents, retry_of=retry_of)
@@ -623,9 +627,6 @@ class ExecutionReceiptStore:
         batch, profile = Batch(request["batch"]), _precision(request["precision"])
         with self.storage.snapshot() as view:
             self._current(view, value, dispatch=True)
-        protected = "access_context" in batch.value["state"] or batch.value["context"]["mode"] == "provider_shadow"
-        if protected and dispatch is None:
-            _fail("E_AUTHORITY_REQUIRED")
         try:
             result = (execute_batch(executor, batch, clock=self.clock, precision=profile) if dispatch is None else
                 dispatch(batch=batch, stage_input={"packet": request["packet"], "rendered_questions": request["rendered"]},
