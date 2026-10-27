@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/attention-baseline.schema.json",
+  "title": "Matter attention-baseline v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "delivered"
+  ],
+  "properties": {
+    "delivered": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "scope_id",
+            "policy",
+            "matter",
+            "purpose",
+            "audience",
+            "assessment",
+            "material_contract",
+            "material",
+            "material_digest",
+            "decision",
+            "delivery_receipt",
+            "delivered_at"
+          ],
+          "properties": {
+            "schema_version": {
+              "const": "1.0"
+            },
+            "scope_id": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+            },
+            "policy": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+            },
+            "matter": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_ref"
+            },
+            "purpose": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+            },
+            "audience": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+            },
+            "assessment": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/assessment_dependency"
+            },
+            "material_contract": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+            },
+            "material": {
+              "type": "object"
+            },
+            "material_digest": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+            },
+            "decision": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+            },
+            "delivery_receipt": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+            },
+            "delivered_at": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}
