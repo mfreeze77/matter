@@ -126,7 +126,7 @@ or warnings; confirmed findings were fixed in `c137031`, `d934647` and
 drift case, fixed in `c9a0e76`. Hosted CI is not a merge gate.
 
 
-The frozen committed `d934647` snapshot passed **1,132 tests in 1,335.361
+The detached-code `d934647` snapshot passed **1,132 tests in 1,335.361
 seconds**, exit 0, with physical `TMPDIR`. Logs and the command receipt are
 `attention-scheduling-stages-full.log` and `.json` in the external task directory.
 It includes the lifecycle, access, attention, timer and stage review fixes,
@@ -147,8 +147,59 @@ certificate revocation. The shared portable contracts passed 106 checks in
 vectors and 88 schemas. Their [receipt](MAT-030.md) and
 [admission](MAT-031.md) validation records give the exact commands and limits.
 
-Independent two-pass source review is running on frozen `d934647..6a978cc`;
-MAT-032 adapter development uses injected transports only. Final combined
-regression, package checks and findings reconciliation remain pending. No new
+At this milestone, two-pass source review of `d934647..6a978cc` and the
+injected-only MAT-032 adapter were still in progress. Their subsequent gates
+are recorded below. No new
 live call or real/private evidence was sent, and no empirical certificate was
 issued.
+
+## Integrated adapter and final gates
+
+`ba59098` integrates MAT-032's one optional stdlib HTTP adapter. Its 16 focused
+checks passed in 68.842 seconds, including actual SQLite execution, budgets,
+access and admission services with synthetic injected responses. Offline replay
+of the earlier live response preserved all 120 native bytes and their digest,
+resolved `jev-1.14.0`, and remained unqualified. It made zero new live requests.
+See the [adapter validation receipt](MAT-032.md). The new Matter adapter has not
+itself been tested against the live endpoint.
+
+Read-only integration review found and fixed certificate backdating and too-small
+accepted polarity support in `f313444`, followed by 14 passing admission checks
+in 61.268 seconds. Attempt recovery now requires its original consumer/context
+and actual lineage (`856096d`): 30 receipt checks passed in 59.496 seconds.
+`6a27cff` additionally rejects float/integer lookalikes in recovery allocation
+pins; its two affected checks passed in 5.391 seconds.
+
+The two-pass `d934647..6a978cc` review completed: all 28 selected files reviewed,
+four findings, no warnings or skipped groups. Three receipt/journal findings
+were verified and fixed in `60b0e75`: logical request ID collisions on reuse, missing guarded dispatch
+checked after claiming work, and under-specified attempt counters. The polarity
+finding was rejected after source/contract review: a host edge can deliberately
+consume reviewed negative evidence, its exact predicate still applies, abstention
+is excluded, and qualification grants no affirmative conclusion or action power.
+The contract declares no implicit positive-only intent. The adapter/remediation
+range has its own two-pass review in flight.
+
+A wheel at `6a27cff` built successfully and was installed in a fresh environment
+with constrained runtime dependencies and no provider SDK. Its 232 selected
+portable, semantic and timer checks passed in 419.746 seconds. A subsequent
+`60b0e75` wheel includes the receipt/journal review fixes. All 162 packaged Python/SQL/schema
+files match their sources byte for byte, including 88 schemas; all 73 imported
+Matter modules resolve inside that installed environment. The initial byte-proof
+script omitted the existing `schemas/__init__.py` package mapping; correcting
+the verifier made the exact comparison pass without a source change. The final full suite now uses the `60b0e75` wheel in that fresh environment and
+an exact Git archive of matching repository assets, with no editable import
+mapping. Both code and schema import paths were verified inside the fresh
+environment before dispatch. The earlier `ba59098` attempt was deliberately
+stopped after 536.546 seconds because editable package mapping resolved
+`matter._schemas` from the active root. Its aborted log/receipt remain external
+as `roadmap-editable-aborted.*`; it is not a passing gate. The earlier 1,051/1,132
+counts are observed development results with detached code and editable schema
+resources, not fully isolated release snapshots. The corrected installed full
+suite supersedes them for the final gate. Final regression and two-pass
+remediation review remain pending.
+
+The receipt remediation passed 33 focused checks in 78.406 seconds and 91
+portable checks in 6.647 seconds. Its final three-file two-pass review covers
+`ba59098..60b0e75`. The local task footprint is approximately 49 MiB, below the
+1-GiB task budget and with more than 50 GiB free reserve.
