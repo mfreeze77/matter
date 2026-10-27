@@ -137,3 +137,19 @@ The [MAT-020 receipt](validation/MAT-020.md) records real SQLite races,
 expiry/release, precharge, separate accounts, guarded envelopes and direct stop
 tests. These are synthetic mechanism checks, not provider pricing, measured
 live costs or verified transport delivery.
+
+## Stage a transition inside a host transaction
+
+`BudgetService.stage(tx, prepared_command)` applies one existing reserve/settle
+transition within a host operation and returns `{outcome, body}`. The enclosing
+operation owns the actual storage receipt. Original actor/authority and prepared
+read pins remain checked; a new outer read set cannot renew the inner preparation.
+The outer transaction must declare all preexisting reads and stage at most one
+transition per budget account, preserving one write per identity. A queue can
+hold capacity; dispatch authorization can later commit that actual hold atomically.
+A later host failure rolls back both budget and other operation writes.
+
+The host must install a replay guard that checks present READ authority for the
+original allocation/source targets before returning a prior outer result. Staging
+is trusted local machinery and supplies no network call or independent caller
+policy. Existing `execute` retains its own replay guard and wire result behavior.

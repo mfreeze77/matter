@@ -218,63 +218,87 @@ class BudgetService:
         command.setdefault("extensions", {})[REQUEST_EXTENSION] = domain("budget-request", request)
         return validate_command(command)
 
-    def execute(self, command):
+    def stage(self, tx, command):
+        """Stage one prepared budget command in its host transaction.
+
+        Returns outcome/body; the enclosing operation owns the actual receipt.
+        The outer transaction must declare all preexisting budget reads.
+        Stage at most one transition per account in one command, preserving
+        the storage port's one-write-per-identity rule.
+        """
         command = self._command(command)
         wrapped = command.get("extensions", {}).get(REQUEST_EXTENSION)
         if type(wrapped) is not dict or wrapped != domain("budget-request", wrapped.get("value")):
             _fail()
         request = wrapped["value"]
-        def handler(tx):
-            now = fragment(self.clock(), "known_time")
-            if compare_times(now, request["captured_at"]) == -1:
+        if tx.command["scope_id"] != self.scope_id:
+            _fail("E_SCOPE_FORBIDDEN")
+        if tx.command["actor"] != command["actor"] or tx.command["authority"] != command["authority"]:
+            _fail("E_AUTHORITY_REQUIRED")
+        for reference in command["expected_revisions"]:
+            if pin(tx.get(entity_ref(reference))) != reference:
                 _fail("E_DEPENDENCY_STALE")
-            view = _Reads(tx, self.scope_id)
-            definition, address, account, holders, row, allocation = self._inspect(view, command, request, now)
-            remaining, next_at = self._available(definition, account, holders, now)
-            if command["operation"] == "reserve_budget":
-                body = command["body"]
-                target = reservation_ref(address, body["reservation_id"])
-                if _lookup(view, target) is not None:
-                    _fail("E_IDEMPOTENCY_CONFLICT")
-                if (contains(definition.value["window"], now) is not True or compare_times(now, body["expires_at"]) != -1 or
-                        any(amount > remaining[key] for key, amount in body["amounts"].items())):
-                    return tx.success("budget_limited", {"reason": "Shared allocation capacity or its declared time window is unavailable.",
-                        "remaining": remaining, "next_eligible_at": next_at})
-                if len(holders) >= 512 and all(compare_times(now, _value(item, "budget-reservation")["expires_at"]) == -1 for item in holders):
-                    _fail("E_BUDGET_EXHAUSTED")
-                # Expire only unused holds, in this same writer transaction.
-                for old in holders:
-                    value = _value(old, "budget-reservation")
-                    if compare_times(now, value["expires_at"]) >= 0:
-                        for key, amount in value["amounts"].items():
-                            account["held"][key] -= amount
-                        value.update(status="expired", settled_at=now)
-                        tx.put_projection(entity_ref(old), domain("budget-reservation", value))
-                for key, amount in body["amounts"].items():
-                    account["held"][key] += amount
-                    remaining[key] -= amount
-                value = {"schema_version": "1.0", "budget": definition.reference, "account": address,
-                    "reservation_id": body["reservation_id"], "amounts": body["amounts"], "targets": body["targets"],
-                    "token": request["token"], "created_at": now, "expires_at": body["expires_at"], "status": "held", "settled_at": None}
-                stored = tx.put_projection(target, domain("budget-reservation", value), watch_keys=(_watch(address),))
-                tx.put_projection(address, domain("budget-account", account))
-                return tx.success("reserved", {"reservation": pin(stored), "remaining": remaining,
-                    "next_eligible_at": body["expires_at"] if next_at["state"] == "unknown" or compare_times(body["expires_at"], next_at) < 0 else next_at})
-            if allocation["status"] != "held":
-                return tx.success("unchanged", {"reservation": pin(row), "reason": "Finalized allocations cannot be released or renewed.",
+        def stage_result(outcome, body):
+            return {"outcome": outcome, "body": body}
+        now = fragment(self.clock(), "known_time")
+        if compare_times(now, request["captured_at"]) == -1:
+            _fail("E_DEPENDENCY_STALE")
+        view = _Reads(tx, self.scope_id)
+        definition, address, account, holders, row, allocation = self._inspect(view, command, request, now)
+        remaining, next_at = self._available(definition, account, holders, now)
+        if command["operation"] == "reserve_budget":
+            body = command["body"]
+            target = reservation_ref(address, body["reservation_id"])
+            if _lookup(view, target) is not None:
+                _fail("E_IDEMPOTENCY_CONFLICT")
+            if (contains(definition.value["window"], now) is not True or compare_times(now, body["expires_at"]) != -1 or
+                    any(amount > remaining[key] for key, amount in body["amounts"].items())):
+                return stage_result("budget_limited", {"reason": "Shared allocation capacity or its declared time window is unavailable.",
                     "remaining": remaining, "next_eligible_at": next_at})
-            expired = compare_times(now, allocation["expires_at"]) >= 0
-            status = "expired" if expired else "committed" if command["body"]["action"] == "commit" else "released"
-            for key, amount in allocation["amounts"].items():
-                account["held"][key] -= amount
-                if status == "committed":
-                    account["charged"][key] += amount
-            allocation.update(status=status, settled_at=now)
-            stored = tx.put_projection(entity_ref(row), domain("budget-reservation", allocation))
+            if len(holders) >= 512 and all(compare_times(now, _value(item, "budget-reservation")["expires_at"]) == -1 for item in holders):
+                _fail("E_BUDGET_EXHAUSTED")
+            # Expire only unused holds, in this same writer transaction.
+            for old in holders:
+                value = _value(old, "budget-reservation")
+                if compare_times(now, value["expires_at"]) >= 0:
+                    for key, amount in value["amounts"].items():
+                        account["held"][key] -= amount
+                    value.update(status="expired", settled_at=now)
+                    tx.put_projection(entity_ref(old), domain("budget-reservation", value))
+            for key, amount in body["amounts"].items():
+                account["held"][key] += amount
+                remaining[key] -= amount
+            value = {"schema_version": "1.0", "budget": definition.reference, "account": address,
+                "reservation_id": body["reservation_id"], "amounts": body["amounts"], "targets": body["targets"],
+                "token": request["token"], "created_at": now, "expires_at": body["expires_at"], "status": "held", "settled_at": None}
+            stored = tx.put_projection(target, domain("budget-reservation", value), watch_keys=(_watch(address),))
             tx.put_projection(address, domain("budget-account", account))
-            remaining, next_at = self._available(definition, account, [item for item in holders if entity_ref(item) != entity_ref(row)], now)
-            return tx.success(status, {"reservation": pin(stored), "reason": "Conservative allocation " + status + ".",
+            return stage_result("reserved", {"reservation": pin(stored), "remaining": remaining,
+                "next_eligible_at": body["expires_at"] if next_at["state"] == "unknown" or compare_times(body["expires_at"], next_at) < 0 else next_at})
+        if allocation["status"] != "held":
+            return stage_result("unchanged", {"reservation": pin(row), "reason": "Finalized allocations cannot be released or renewed.",
                 "remaining": remaining, "next_eligible_at": next_at})
+        expired = compare_times(now, allocation["expires_at"]) >= 0
+        status = "expired" if expired else "committed" if command["body"]["action"] == "commit" else "released"
+        for key, amount in allocation["amounts"].items():
+            account["held"][key] -= amount
+            if status == "committed":
+                account["charged"][key] += amount
+        allocation.update(status=status, settled_at=now)
+        stored = tx.put_projection(entity_ref(row), domain("budget-reservation", allocation))
+        tx.put_projection(address, domain("budget-account", account))
+        remaining, next_at = self._available(definition, account, [item for item in holders if entity_ref(item) != entity_ref(row)], now)
+        return stage_result(status, {"reservation": pin(stored), "reason": "Conservative allocation " + status + ".",
+            "remaining": remaining, "next_eligible_at": next_at})
+
+    def execute(self, command):
+        command = self._command(command)
+        wrapped = command.get("extensions", {}).get(REQUEST_EXTENSION)
+        if type(wrapped) is not dict or wrapped != domain("budget-request", wrapped.get("value")):
+            _fail()
+        def handler(tx):
+            result = self.stage(tx, command)
+            return tx.success(result["outcome"], result["body"])
         def audit(view):
             targets = command_targets(command)
             if command["operation"] == "settle_budget":

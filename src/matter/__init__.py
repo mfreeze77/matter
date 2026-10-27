@@ -30,8 +30,9 @@ and freshness gates live in ``matter.dependencies`` and ``matter.invalidation``.
 Profile-backed lifecycle transitions live in ``matter.lifecycle``; independent
 context and disposition state lives in ``matter.contexts`` and
 ``matter.dispositions``. Host-declared source/audience/provider guards live in
-``matter.access``. Delivery, provider qualification issuance and downstream
-usefulness retain separate validation milestones.
+``matter.access``. The neutral injected delivery port and durable outbox live in
+``matter.outbox`` and ``matter.delivery``. Provider qualification issuance,
+native channel adapters and downstream usefulness retain separate milestones.
 """
 
-__version__ = "0.1.0.dev14"
+__version__ = "0.1.0.dev15"

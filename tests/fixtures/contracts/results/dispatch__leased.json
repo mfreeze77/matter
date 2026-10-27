@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "operation": "dispatch",
+  "operation_id": "operation-dispatch",
+  "status": "success",
+  "outcome": "leased",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "intent": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "delivery-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "lease_token": "synthetic-lease-token",
+    "fence": 1,
+    "expires_at": {
+      "state": "known",
+      "value": "2026-10-27T21:00:00Z",
+      "precision": "second"
+    }
+  }
+}

@@ -352,3 +352,14 @@ input and fresh host guards where needed; resolving an arbitrary result for the
 same rule is insufficient. Results remain uncommitted attempts. Any later
 storage/publication adapter must preserve original input/control artifacts and
 perform its atomic currentness and authority checks before publication.
+
+## MAT-021 dispatch stages
+
+MAT-021 adds explicit `leased`, `authorized` and `recorded` successful outcomes
+to the existing `dispatch` operation. Earlier `delivered` and `withheld` bodies
+remain valid. An older closed-schema reader will reject the new stage outcomes;
+there is no automatic negotiation or claim of compatibility with that reader.
+Hosts must deploy the updated result contract before exchanging these stages.
+The wire envelope remains `1.0`; no record kind, command variant, storage
+migration or historical journal is changed. Broader client compatibility
+qualification remains MAT-074.

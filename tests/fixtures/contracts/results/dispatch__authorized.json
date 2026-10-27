@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "operation": "dispatch",
+  "operation_id": "operation-dispatch",
+  "status": "success",
+  "outcome": "authorized",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "example",
+    "record_type": "receipt",
+    "id": "operation-receipt-1"
+  },
+  "body": {
+    "authorization": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "delivery-1",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "attention_budget": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "matter:projection",
+      "id": "delivery-1",
+      "revision": 1
+    }
+  }
+}

@@ -150,6 +150,16 @@ observed real network transport. The host adapter remains responsible for its
 actual milestone evidence. MAT-021 owns transport/outbox concurrency and the
 irreversible send boundary.
 
+The MAT-021 outbox uses `stage_observed_delivery` inside its observation
+transaction. This host-only seam binds the actual immutable authorization and
+committed budget allocation to the reserved storage receipt's command/result
+digests. It records an observed send even if its work was subsequently cancelled;
+it does not recapture authority or publish the old assessment as current.
+A timestamped late milestone cannot replace newer delivered knowledge. Without
+transport ordering, advancement requires the original baseline to be unchanged.
+Public history and exact replay still enforce present READ/source access.
+See the [delivery validation receipt](validation/MAT-021.md) for executed checks.
+
 ## Authority, access and atomic timer integration
 
 The original authenticated actor, authority, complete public target set,

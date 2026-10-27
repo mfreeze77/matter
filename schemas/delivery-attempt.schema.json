@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/delivery-attempt.schema.json",
+  "title": "Matter delivery attempt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "authorization",
+    "status",
+    "current",
+    "observations",
+    "completion_key"
+  ],
+  "properties": {
+    "authorization": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+    },
+    "status": {
+      "enum": [
+        "authorized",
+        "delivered",
+        "failed",
+        "delivery_unknown",
+        "withheld"
+      ]
+    },
+    "current": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+        }
+      ]
+    },
+    "observations": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+      }
+    },
+    "completion_key": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+        }
+      ]
+    }
+  }
+}

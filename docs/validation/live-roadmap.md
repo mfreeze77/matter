@@ -177,8 +177,8 @@ checked after claiming work, and under-specified attempt counters. The polarity
 finding was rejected after source/contract review: a host edge can deliberately
 consume reviewed negative evidence, its exact predicate still applies, abstention
 is excluded, and qualification grants no affirmative conclusion or action power.
-The contract declares no implicit positive-only intent. The adapter/remediation
-range has its own two-pass review in flight.
+The contract declares no implicit positive-only intent. The completed adapter/remediation two-pass review is recorded in the final
+closeout below.
 
 A wheel at `6a27cff` built successfully and was installed in a fresh environment
 with constrained runtime dependencies and no provider SDK. Its 232 selected
@@ -196,8 +196,7 @@ stopped after 536.546 seconds because editable package mapping resolved
 as `roadmap-editable-aborted.*`; it is not a passing gate. The earlier 1,051/1,132
 counts are observed development results with detached code and editable schema
 resources, not fully isolated release snapshots. The corrected installed full
-suite supersedes them for the final gate. Final regression and two-pass
-remediation review remain pending.
+suite supersedes them for the final gate. Completed final regression and two-pass remediation results are recorded below.
 
 The receipt remediation passed 33 focused checks in 78.406 seconds and 91
 portable checks in 6.647 seconds. Its final three-file two-pass review covers
@@ -255,3 +254,36 @@ MAT-039/040 empirical evaluation/qualification, PostgreSQL, MAT-046 and DIAT rem
 deferred. Full delivery/outbox and other later backlog work are not completed by
 this segment. Real/private evidence was not sent; future egress requires installed
 MAT-072 policy and current original host authority. Credentials remain outside Git.
+
+
+## MAT-021 delivery milestone
+
+MAT-021 is implemented and validated; integration is tracked in
+[PR #17](https://github.com/mfreeze77/matter/pull/17). The canonical backlog now
+contains **30 done and 50 planned**, with none in progress or blocked. Of the
+remaining tickets, **28 belong to Matter** and 22 track other repositories.
+
+The [delivery guide](../delivery.md) covers immutable intents, exact caller and
+attention-allocation binding, finite leases/fences, original-context withdrawal
+of never-authorized work, one injected send, lookup-only reconciliation and
+independent observed outcomes. Unknown sends block equivalent redispatch; an
+actual milestone alone advances delivered knowledge. No native channel adapter,
+resend scheduler, civic profile or downstream integration was introduced.
+
+The [MAT-021 receipt](MAT-021.md) records **1,237 passing tests in 2,787.687s** on
+frozen base `dcf1a79`, with unchanged runtime/schema/test manifests. Final bounded
+outcome delta `1590446` passed **2 checkout and 2 installed targeted checks**;
+those checks are separate from the base full run. Eight corrected-base installed
+checks also passed. All **174** runtime/SQL/schema files match the final wheel and
+integrated source, including **98 schemas**; all 74 submodules import from the
+installed environment with no provider SDK. The final three-file independent
+review completed in two passes with zero findings or warnings. Earlier findings,
+failed development probes and the interrupted first full attempt remain recorded.
+
+The installed walkthrough default schema lookup was rechecked on the final wheel
+and still fails; the prior 29 installed-full errors remain a packaging gap.
+Checkout passes do not resolve it. No new live JEV call, real notification,
+private evidence or empirical qualification occurred. StateCivics profiles and
+receiving integration, MAT-039/040 evaluation, PostgreSQL and cross-repository work
+remain outside this completed slice. MAT-022 and the MAT-023 → 024 → 025 chain
+retain their canonical scope and prerequisites.

@@ -124,7 +124,10 @@
     ],
     "dispatch": [
       "delivered",
-      "withheld"
+      "withheld",
+      "leased",
+      "authorized",
+      "recorded"
     ],
     "assess": [
       "assessed",

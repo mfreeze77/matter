@@ -51,7 +51,7 @@ SUCCESS_OUTCOMES = {
     "invalidate_dependents": {"affected", "no_op"},
     "request_transition": {"applied", "already_applied", "held_for_evidence", "held_for_conflict"},
     "prepare_delivery": {"ready", "withheld"},
-    "dispatch": {"delivered", "withheld"},
+    "dispatch": {"delivered", "withheld", "leased", "authorized", "recorded"},
     "assess": {"assessed", "incomplete"},
 }
 COMMAND_BODY_REQUIRED = {
