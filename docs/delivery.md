@@ -85,7 +85,10 @@ retract it. The original token is retained, never renewed by recapture.
 
 An authorization is durable before I/O. If the fresh owning process observes a
 known local guard, lease or content failure before calling the transport, it
-records a **system-origin definite no-send** fact and raises the local error. A
+records a **system-origin definite no-send** fact and raises the local error
+after that fact commits. If recording fails, the recording failure is surfaced
+and the attempt remains unresolved with its allocation charged. A local error
+alone does not prove that no authorization exists or grant a refund. A
 serialized generic observation cannot claim this private local proof. The
 committed allocation remains charged; later eligible work can proceed as a new
 intent. This is distinct from a process disappearing without an observation.
@@ -163,7 +166,11 @@ Delivery alone creates no consumption, action, repair or usefulness claim.
 `prepare_outcome(authorization, evidence, ...)` appends an independently stored
 host receipt whose stage is `consumed`, `acted_on`, `outcome_verified` or `useful`.
 The receipt must come from the original configured transport producer and explicitly
-cite the authorization. Such outcomes require a delivered attempt, retain their
+cite the authorization. Each appended outcome binds exactly one genuine source;
+its reported time and receipt ID must canonically match that source. Its exact
+source-reported time is retained. A producer
+clock outside the authorization/host-observation interval gives the appended
+outcome unavailable ordering; it does not discard the fact or reorder delivery. Such outcomes require a delivered attempt, retain their
 own evidence and do not change transport status or the delivered baseline.
 `history(authorization)` checks current disclosure rights before returning immutable
 observations. Trusted raw database handles remain privileged; this API is not a

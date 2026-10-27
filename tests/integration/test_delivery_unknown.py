@@ -171,6 +171,64 @@ class DeliveryUnknown(DeliveryFixture):
         self.assertEqual([r["body"]["stage"] for r in history["observations"]], ["delivered", "consumed", "acted_on", "outcome_verified", "useful"])
         self.assertEqual(len(self.transport.calls), 1)
 
+    def test_independent_outcomes_preserve_behind_and_ahead_producer_clocks_without_ordering_delivery(self):
+        from integration.helpers import create_command, record_input, domain_value
+        from matter.outbox import OBSERVATION_EXTENSION, REQUEST_EXTENSION
+        from matter.storage import entity_ref
+        from rule_helpers import EARLY
+        _, _, prepared = self.authorize(identity="outcome-clocks")
+        result = self.service.send(prepared)
+        self.assertEqual(result.get("outcome"), "delivered", result)
+        auth = self.f.storage.command_receipt("auth-outcome-clocks")["result"]["body"]["authorization"]
+        baseline = self.a.baseline()
+        delivery = self.f.storage.get(self.service._attempt_ref(auth))["value"]["value"]["current"]
+        for label, stage, reported_at in (("behind", "consumed", EARLY), ("ahead", "useful", add_milliseconds(self.f.now, 5000))):
+            with self.subTest(clock=label):
+                bootstrap = create_command("outcome-clock-" + label, "outcome-clock-host-" + label, scope_id=self.f.storage.scope_id)
+                evidence = record_input("receipt", "clock-" + label, scope_id=self.f.storage.scope_id)
+                evidence["namespace"] = "synthetic:outcomes"
+                evidence["provenance"].update(origin="host", producer=self.transport.capabilities.value["producer"],
+                    recorded_at=deepcopy(reported_at), parents=[auth])
+                evidence["body"].update(stage=stage, operation_id=bootstrap["command_id"], recorded_at=deepcopy(reported_at),
+                    outcome="synthetic:" + stage, evidence=[auth], details=domain_value({"declared_observation": stage}))
+                def insert(tx):
+                    matter = tx.insert(tx.command["body"]["matter"]); tx.insert(evidence)
+                    return tx.success("created", {"matter": pin(matter)})
+                self.assertEqual(self.f.storage.execute(bootstrap, insert)["status"], "success")
+                source = self.f.storage.get(entity_ref(evidence))
+                for mutation in ("reported_at", "receipt_id", "extra_source"):
+                    with self.subTest(clock=label, mutation=mutation):
+                        key = "tamper-clock-" + label + "-" + mutation
+                        changed = self.service.prepare_outcome(auth, pin(source), command_id=key, idempotency_key=key)
+                        request = changed["extensions"][REQUEST_EXTENSION]["value"]
+                        if mutation == "extra_source": request["evidence"].append(pin(source))
+                        else:
+                            request["observation"]["value"][mutation] = deepcopy(self.f.now) if mutation == "reported_at" else "rewritten-receipt"
+                        before = self.f.storage.get(self.service._attempt_ref(auth))
+                        refused = self.service.execute(changed)
+                        self.assertEqual(refused["status"], "failure", refused)
+                        self.assertEqual(refused["error"]["code"], "E_EVIDENCE_INVALID")
+                        self.assertEqual(self.f.storage.get(self.service._attempt_ref(auth)), before)
+                        self.assertEqual(self.a.baseline(), baseline)
+                command = self.service.prepare_outcome(auth, pin(source), command_id="record-clock-" + label,
+                    idempotency_key="record-clock-" + label)
+                recorded = self.service.execute(command)
+                self.assertEqual(recorded.get("outcome"), "recorded", recorded)
+                fact = self.f.storage.get(recorded["body"]["delivery_receipt"])
+                observation = fact["extensions"][OBSERVATION_EXTENSION]["value"]
+                self.assertEqual(observation["reported_at"], reported_at)
+                self.assertEqual(observation["ordering"], "unavailable")
+                self.assertEqual(observation["observed_at"], self.f.now)
+                self.assertIn(pin(source), fact["body"]["evidence"])
+                self.assertIn(pin(source), fact["provenance"]["parents"])
+                self.assertEqual(self.f.storage.get(pin(source)), source)
+                self.assertEqual(self.a.baseline(), baseline)
+                current = self.f.storage.get(self.service._attempt_ref(auth))["value"]["value"]
+                self.assertEqual(current["status"], "delivered")
+                self.assertEqual(current["current"], delivery)
+                self.assertEqual(len(self.transport.calls), 1)
+                self.assertEqual(self.transport.lookups, [])
+
     def test_lease_expiry_after_authorization_is_definite_system_no_send(self):
         from matter.outbox import ENGINE
         from matter.storage import entity_ref

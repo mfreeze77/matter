@@ -213,8 +213,7 @@ class DispatchRaces(DeliveryFixture):
         from copy import deepcopy
         from control_helpers import control_command
         from integration.helpers import _in_scope
-        from matter.contracts import ContractError
-        from matter.outbox import REQUEST_EXTENSION, RESULT_EXTENSION
+        from matter.outbox import RESULT_EXTENSION
         from matter.storage import entity_ref
         intent, _, old_authorization = self.authorize(identity="withdraw-old")
         original_token = deepcopy(self.token)

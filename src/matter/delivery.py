@@ -605,12 +605,13 @@ class DeliveryService:
         elif producer != auth["producer"]: fail("E_AUTHORITY_REQUIRED")
         if request["observation_kind"] == "outcome":
             if status not in {"consumed", "acted_on", "outcome_verified", "useful"}: fail()
-            if attempt["status"] != "delivered" or not request["evidence"]: fail()
-            for reference in request["evidence"]:
-                source = validate_record(tx.get(reference))
-                if (source["record_type"] != "receipt" or source["provenance"]["origin"] != "host" or
-                        source["provenance"]["producer"] != producer or source["body"]["stage"] != status or
-                        pin(auth_record) not in source["body"]["evidence"]): fail("E_AUTHORITY_REQUIRED")
+            if attempt["status"] != "delivered" or len(request["evidence"]) != 1: fail()
+            source = validate_record(tx.get(request["evidence"][0]))
+            if (source["record_type"] != "receipt" or source["provenance"]["origin"] != "host" or
+                    source["provenance"]["producer"] != producer or source["body"]["stage"] != status or
+                    pin(auth_record) not in source["body"]["evidence"]): fail("E_AUTHORITY_REQUIRED")
+            if (not _same(observation["reported_at"], source["body"]["recorded_at"]) or
+                    not _same(observation["receipt_id"], source["id"])): fail()
         elif request["observation_kind"] not in {"transport", "refusal"} or status not in {"delivered", "failed", "delivery_unknown"}: fail()
         if request["observation_kind"] == "transport":
             TransportResult({"status": "not_found" if status == "delivery_unknown" and observation["reason"] == "transport:not_found" else status,
@@ -784,11 +785,11 @@ class DeliveryService:
             token = _value("control-token", value["token"])
             proof = view.command_receipt(auth["authorization_key"])
             observed_at = fragment(self.clock(), "known_time")
-            if compare_times(record["body"]["recorded_at"], observed_at) > 0: fail()
         observation = {"schema_version": "1.0", "authorization": authorization, "intent": auth["intent"],
             "destination": auth["destination"], "transport": auth["transport"], "delivery_key": auth["delivery_key"], "status": status,
             "receipt_id": record["id"], "reported_at": record["body"]["recorded_at"], "observed_at": observed_at,
-            "ordering": "transport_time", "reason": "delivery:independent_outcome",
+            "ordering": "transport_time" if compare_times(auth["authorized_at"], record["body"]["recorded_at"]) <= 0 and
+                compare_times(record["body"]["recorded_at"], observed_at) <= 0 else "unavailable", "reason": "delivery:independent_outcome",
             "eligibility_at_observation": self._eligibility_observation(value)}
         command, _ = self._maintenance_for_fact(auth, value, token, command_id, idempotency_key)
         request = command["extensions"][REQUEST_EXTENSION]["value"]
