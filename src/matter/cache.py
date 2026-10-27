@@ -226,7 +226,7 @@ class SemanticCache:
                      "temporal_class": interval, "negative_registrations": _refs(negative),
                      "qualification_context": qcontext, "citations": exact_citations}
         if admitted_access is not None:
-            projected["access_context"] = admitted_access.reference
+            projected["access_context"] = admitted_access.eligibility_reference
         value = {"schema_version": "1.0", "scope_id": self.controls.scope_id, "definition": definition.reference,
             "projected": projected, "records": pins, "context": context, "token": deepcopy(token),
             "as_of": now, "negative_dependencies": negative, "qualification_context": qcontext, "citations": exact_citations}

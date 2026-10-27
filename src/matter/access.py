@@ -15,6 +15,7 @@ from .storage import PROJECTION_TYPE, StorageError, entity_ref, pin
 
 
 MAX_SOURCES = 256
+MAX_REFERENCE_OCCURRENCES = 65536
 
 
 def _fail(reason="forbidden", code="E_AUTHORITY_REQUIRED"):
@@ -34,12 +35,16 @@ def _public(ref):
 
 def _pins(values):
     result = {}
-    for raw in bounded(list(values), MAX_SOURCES):
+    for index, raw in enumerate(values):
+        if index >= MAX_REFERENCE_OCCURRENCES:
+            _fail("reference_budget", "E_BUDGET_EXHAUSTED")
         ref = fragment(raw, "pinned_ref")
         identity = _key(entity_ref(ref))
         if identity in result and result[identity] != ref:
             _fail("unavailable", "E_EVIDENCE_UNAVAILABLE")
         result[identity] = ref
+        if len(result) > MAX_SOURCES:
+            _fail("source_budget", "E_BUDGET_EXHAUSTED")
     return sorted(result.values(), key=_key)
 
 
@@ -110,6 +115,13 @@ class AccessContext(FrozenValue):
         return descriptor("matter", "access-context", "1.0", self.value, "matter.access-context.v1")
 
     @property
+    def eligibility_reference(self):
+        data = self.value
+        return descriptor("matter", "access-eligibility", "1.0",
+            {key: data[key] for key in ("policy", "audience", "provider", "dependencies")},
+            "matter.access-eligibility.v1")
+
+    @property
     def status(self):
         return "permitted" if self.value["references"] else "permitted_empty"
 
@@ -124,7 +136,7 @@ class AccessService:
         self.policy, self.controls, self.scope_id = policy, controls, controls.scope_id
         self.current_read = current_read
 
-    def _closure(self, view, references, audience, provider, token):
+    def _closure(self, view, references, audience, provider, token, *, historical=False):
         definition = self.policy.value
         if audience not in definition["audiences"] or (provider is not None and provider not in [item["reference"] for item in definition["providers"]]):
             _fail()
@@ -147,7 +159,7 @@ class AccessService:
             # Verify READ before retrieving a possibly protected body.
             self.controls._audit(view, {"actor": token["actor"], "authority": entity_ref(token["authority"])}, [entity_ref(ref)])
             try:
-                record = view.get(entity_ref(ref))
+                record = view.get(ref if historical else entity_ref(ref))
             except StorageError as error:
                 if error.code == "E_NOT_FOUND":
                     if grant is None:
@@ -155,9 +167,12 @@ class AccessService:
                     _fail("unavailable", "E_EVIDENCE_UNAVAILABLE")
                 raise
             if pin(record) != ref:
-                _fail("unavailable", "E_EVIDENCE_UNAVAILABLE")
-            parents = [item for item in record["provenance"]["parents"] if _public(item)]
-            derived = record["provenance"]["origin"] in {"derived", "evaluator"} or record["record_type"] in {"judgment", "assessment"}
+                _fail("stale_source_context", "E_DEPENDENCY_STALE")
+            # Host metadata projections have no source provenance. They need
+            # their own exact grant and cannot implicitly inherit a source ACL.
+            provenance = record.get("provenance", {})
+            parents = [item for item in provenance.get("parents", []) if _public(item)]
+            derived = provenance.get("origin") in {"derived", "evaluator"} or record["record_type"] in {"judgment", "assessment"}
             if grant is None and not (derived and parents):
                 _fail()
             active.add(key)
@@ -180,6 +195,12 @@ class AccessService:
             targets = [entity_ref(ref) for ref in dependencies]
             self.controls.require_current(view, token, capability=token["capability"], targets=targets or token["targets"])
         except StorageError as error:
+            if error.code == "E_REVISION_CONFLICT":
+                _fail("stale_control_context", "E_DEPENDENCY_STALE")
+            reasons = {"E_DEPENDENCY_STALE": "stale_control_context", "E_CANCELLED": "cancelled",
+                       "E_BUDGET_EXHAUSTED": "budget_exhausted", "E_STORAGE_UNAVAILABLE": "unavailable"}
+            if error.code in reasons:
+                _fail(reasons[error.code], error.code)
             _fail("unavailable" if error.code in {"E_NOT_FOUND", "E_STORAGE_UNAVAILABLE"} else "forbidden",
                   "E_EVIDENCE_UNAVAILABLE" if error.code in {"E_NOT_FOUND", "E_STORAGE_UNAVAILABLE"} else "E_AUTHORITY_REQUIRED")
         return AccessContext({"schema_version": "1.0", "scope_id": self.scope_id, "policy": self.policy.reference,
@@ -216,6 +237,37 @@ class AccessService:
             if current.value != data:
                 _fail()
         return context
+
+    def require_history(self, view, context, *, references=()):
+        """Present READ/grants on original snapshots, without renewing old work.
+
+        History remains inspectable after benign source/control revisions. This
+        never authorizes dispatch, cache reuse or current assessment admission.
+        """
+        try:
+            admitted = context if isinstance(context, AccessContext) else AccessContext(context)
+        except (ContractError, TypeError, ValueError):
+            _fail()
+        data = admitted.value
+        if data["scope_id"] != self.scope_id:
+            _fail("scope_forbidden", "E_SCOPE_FORBIDDEN")
+        refs = _pins(references)
+        if any(ref["scope_id"] != self.scope_id for ref in refs):
+            _fail("scope_forbidden", "E_SCOPE_FORBIDDEN")
+        if any(ref not in data["dependencies"] for ref in refs if _public(ref)):
+            _fail()
+        try:
+            dependencies = self._closure(view, data["references"], data["audience"], data["provider"],
+                data["token"], historical=True)
+        except StorageError as error:
+            if error.code in {"E_STORAGE_UNAVAILABLE", "E_DEPENDENCY_STALE", "E_BUDGET_EXHAUSTED"}:
+                _fail("history_unavailable", error.code)
+            if error.code == "E_NOT_FOUND":
+                _fail("unavailable", "E_EVIDENCE_UNAVAILABLE")
+            _fail()
+        if dependencies != data["dependencies"]:
+            _fail()
+        return admitted
 
     def view(self, view, context):
         self.require_current(view, context)
@@ -299,7 +351,13 @@ class AccessService:
     @staticmethod
     def public_failure(error):
         """Fixed public coverage/error outcome with no denied audit references."""
-        unavailable = getattr(error, "code", None) == "E_EVIDENCE_UNAVAILABLE"
+        code = getattr(error, "code", None)
+        distinct = {"E_DEPENDENCY_STALE": {"status": "stale", "reason": "context_changed"},
+                    "E_CANCELLED": {"status": "cancelled", "reason": "host_cancelled"},
+                    "E_BUDGET_EXHAUSTED": {"status": "budget_exhausted", "reason": "resource_limit"}}
+        if code in distinct:
+            return deepcopy(distinct[code])
+        unavailable = code in {"E_EVIDENCE_UNAVAILABLE", "E_STORAGE_UNAVAILABLE"}
         return {"status": "unavailable" if unavailable else "forbidden",
                 "reason": "source_unavailable" if unavailable else "access_forbidden"}
 

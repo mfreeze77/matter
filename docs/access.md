@@ -32,6 +32,10 @@ as an additional gate. Missing parents, cycles, excessive closure, changed
 snapshots and inaccessible sources fail closed. Receipt/control/internal
 projection bookkeeping retains the existing control exclusions and does not
 become source authority.
+Public host metadata projections without source provenance require their own
+exact grant; they cannot implicitly inherit a source ACL. Source closure limits
+count unique exact pins, with a separate bound on reference occurrences, so
+repeated dependencies across a large rule graph do not consume extra sources.
 
 `AccessService(policy=..., controls=existing_control_service,
 current_read=None)` uses the original control token:
@@ -57,6 +61,10 @@ credential. The host must use currently configured policy: a different policy
 reference refuses an old context. External grant changes must update that
 configuration and reach the existing control path for in-flight work. A
 long-lived obsolete host configuration cannot discover a change by itself.
+`.eligibility_reference` separately identifies policy, audience, provider and
+the exact admitted closure without token capture time. Cache projections use
+that eligibility identity; their existing control-generation key still binds
+the original token's actor, authority and fences separately.
 
 ## Current checks and integration
 
@@ -83,9 +91,11 @@ Install the same access boundary at each protected port:
   currentness, atomic publication, current consumption, historical attempt reads
   and staged prerequisites recheck it. A serialized foreign-source rule attempt
   cannot acquire eligibility through a model answer.
+  The pre-evaluation gate checks each actual rule input's dependencies, evidence
+  and omission references, rather than only the assessment's initial selection.
 - `SemanticCache(..., access=access)` requires a context at `capture`.
   Assessment cache queries forward their original context. The identity enters
-  the projected cache key; the callback receives its opaque reference, not token
+  the projected cache key; the callback receives its opaque eligibility reference, not token
   or grant material. Capture, hits, computation results and transaction staging
   check current source access. A more restrictive audience cannot relabel an
   old result into permission. Old raw attempts remain immutable private history.
@@ -102,6 +112,15 @@ Once an access boundary is installed, missing contexts fail closed. An
 access-bound assessment/cache cannot be read by removing its installed boundary.
 Legacy synthetic hosts without access configuration retain their earlier APIs;
 that compatibility does not imply permission to process real private evidence.
+
+Historical `attempt()` and `input_artifact()` reads use
+`require_history(view, original_context, references=original_read_manifest)`.
+It checks present READ authority and current host grants for the original exact
+source snapshots, audience and provider. It does not require those snapshots to
+remain current or an old work token's fences to be unchanged. Benign revisions
+and cancellation therefore do not hide durable attempts; a present READ or
+sharing revocation still blocks their disclosure. This history gate grants no
+dispatch, current-assessment or cache-reuse authority.
 
 ## Provider and explanation output
 
@@ -135,6 +154,12 @@ Cross-scope references use `E_SCOPE_FORBIDDEN`; missing or revoked access uses
 `E_EVIDENCE_UNAVAILABLE`. No failure includes denied source IDs, locators,
 quotations, provider exceptions or partial source manifests. This module emits
 no content logs.
+Control staleness remains `E_DEPENDENCY_STALE` with public `stale/context_changed`;
+explicit cancellation remains `E_CANCELLED` with `cancelled/host_cancelled`;
+resource exhaustion remains `E_BUDGET_EXHAUSTED` with
+`budget_exhausted/resource_limit`. These fixed outcomes do not misreport an
+ordinary stale attempt as a forbidden read. A changed source revision is stale;
+an admitted source whose snapshot is unavailable remains unavailable.
 
 These are trusted host ports, not a Python sandbox or universal protection for
 raw storage, payload handles, arbitrary source strings or legacy APIs. The host

@@ -804,8 +804,10 @@ class AssessmentService:
         if self.access is not None:
             if "access_context" not in preparation:
                 _fail("The installed access boundary requires its original context.", "E_AUTHORITY_REQUIRED")
-            access_reads = [*preparation["current_dependencies"]["positive"],
-                *(reference for material in graph["inputs"].values() for reference in material["packet"]["dependencies"]["positive"])]
+            access_reads = _unique_refs([*preparation["current_dependencies"]["positive"],
+                *(reference for material in graph["inputs"].values() for reference in material["packet"]["dependencies"]["positive"]),
+                *(item["reference"] for material in graph["inputs"].values()
+                  for item in [*material["packet"]["evidence"], *material["packet"]["omitted"]])])
             self.access.require_current(view, preparation["access_context"], audience=body.get("audience"), references=access_reads)
         elif "access_context" in preparation:
             _fail("The original access boundary is not installed.", "E_AUTHORITY_REQUIRED")
@@ -826,7 +828,9 @@ class AssessmentService:
         value = material.value if hasattr(material, "value") else material
         with self.storage.snapshot() as view:
             if self.access is not None:
-                self.access.require_current(view, prepared.value.get("access_context", {}))
+                self.access.require_current(view, prepared.value.get("access_context", {}),
+                    references=_unique_refs([*value["packet"]["dependencies"]["positive"],
+                        *(item["reference"] for item in [*value["packet"]["evidence"], *value["packet"]["omitted"]])]))
             self._input_current(view, value, prepared.value, fragment(as_of, "known_time"))
 
     def _require_fresh_result(self, view, publication, assessment, now, admission):
@@ -989,7 +993,8 @@ class AssessmentService:
             journal = view.command_receipt(idempotency_key)
             publication = self._publication(journal["command"])
             if self.access is not None:
-                self.access.require_current(view, publication["preparation"].get("access_context", {}))
+                self.access.require_history(view, publication["preparation"].get("access_context", {}),
+                    references=publication["preparation"]["reads"])
             elif "access_context" in publication["preparation"]:
                 _fail("The original access boundary is not installed.", "E_AUTHORITY_REQUIRED")
             self.controls._audit(view, journal["command"], self._read_targets(publication["preparation"], publication["graph"]))

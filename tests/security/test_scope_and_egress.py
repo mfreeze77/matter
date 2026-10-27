@@ -8,12 +8,13 @@ import logging
 import unittest
 
 from matter.access import AccessContext, AccessService, HostAccessPolicy
-from matter.canonical import canonical_bytes
+from matter.canonical import canonical_bytes, source_digest
 from matter.contracts import ContractError
 from matter.semantic import Batch, Capabilities, RawExecution
 from matter.semantic.packets import PacketProfile, prepare_packet
 from matter.semantic.questions import QuestionSpecification
 from matter.semantic.rendering import render_question
+from matter.executor import GraphExecutor
 from matter.storage import SQLiteStore, entity_ref, pin
 
 from control_helpers import control_command
@@ -52,10 +53,10 @@ class ScopeAndEgressTests(unittest.TestCase):
                        {"reference": self.other_provider, "provider": "other", "transport": "fixture"}], grants=grants)
         return AccessService(policy=policy, controls=self.core.controls, current_read=self.live_reader.snapshot)
 
-    def context(self, *, access=None, audience=None, provider="default", references=None):
+    def context(self, *, access=None, audience=None, provider="default", references=None, token_references=None):
         references = [pin(self.core.subject), pin(self.core.source)] if references is None else references
         token = self.core.controls.capture(actor=self.core.actor, authority=entity_ref(self.core.authority),
-            capability="assessment", targets=[entity_ref(ref) for ref in references])
+            capability="assessment", targets=[entity_ref(ref) for ref in (references if token_references is None else token_references)])
         with self.core.storage.snapshot() as view:
             return (access or self.access).capture(view, token=token, audience=audience or self.audience,
                 provider=self.provider if provider == "default" else provider, references=references)
@@ -231,12 +232,14 @@ class ScopeAndEgressTests(unittest.TestCase):
         child = self.core.storage.get(result["body"]["observation"])
         self.access = self.make_access(source_providers=[], extra=[{"reference": pin(child),
             "audiences": [self.audience], "providers": [self.provider]}])
-        refs = [pin(self.core.source), pin(child)]
+        refs = [pin(child)]
+        token_refs = [pin(child), pin(self.core.source)]
         with self.assertRaises(ContractError) as error:
-            self.context(references=refs)
+            self.context(references=refs, token_references=token_refs)
         self.assertNotIn(MARKER, str(error.exception))
-        local = self.context(references=refs, provider=None)
-        self.assertEqual(local.value["dependencies"], sorted(refs, key=canonical_bytes))
+        local = self.context(references=refs, token_references=token_refs, provider=None)
+        self.assertEqual(local.value["references"], refs)
+        self.assertEqual(local.value["dependencies"], sorted(token_refs, key=canonical_bytes))
 
     def test_authorized_empty_forbidden_and_unavailable_are_distinct_and_safe(self):
         empty = self.context(references=[], provider=None)
@@ -302,18 +305,144 @@ class ScopeAndEgressTests(unittest.TestCase):
             self.assertNotIn("UNADMITTED", str(error.exception))
         self.assertEqual(calls, [])
 
-    def test_otherwise_valid_rule_attempt_cannot_publish_a_foreign_source_reference(self):
-        from matter.assessments import PUBLICATION_EXTENSION
+    def test_actual_ineligible_node_input_is_refused_before_any_evaluation(self):
+        denied = self.core.observe("ineligible-in-scope", payload=b"SYNTHETIC denied source body.\n")
+        # Generic READ/assessment ceilings cover this source; only the specific
+        # audience/provider access context excludes it. No wire bytes are edited.
+        context = self.context(token_references=[pin(self.core.subject), pin(self.core.source), pin(denied)])
+        prepared = self.prepare_assessment(context)
+        self.core.controls.check(context.value["token"])
+        with self.core.storage.snapshot() as view:
+            material = self.core.packet(self.core.rule_instance, view=view, subject=pin(self.core.subject),
+                control_token=context.value["token"], evidence=[self.core.evidence(denied)], as_of=self.core.now)
+        self.assertIn(pin(denied), material.value["packet"]["dependencies"]["positive"])
+        with self.assertRaises(ContractError) as error:
+            self.core.service.check_current(prepared, material, as_of=self.core.now)
+        self.assertEqual(error.exception.code, "E_AUTHORITY_REQUIRED")
+        runner = self.core.runner([self.core.rule_instance], [self.core.binding_instance], clock=lambda: self.core.now)
+        graph = GraphExecutor(runner, clock=lambda: self.core.now).execute(self.core.plan,
+            prepare=lambda name, upstream: material, run_id="untampered-ineligible", max_workers=1,
+            check_current=lambda value, as_of: self.core.service.check_current(prepared, value, as_of=as_of),
+            check_control=self.core.controls.check)
+        events = graph.value["nodes"]["evidence"]["attempt_receipt"]["body"]["details"]["value"]["events"]
+        self.assertIn({"stage": "pre_gate", "status": "failed", "code": "E_AUTHORITY_REQUIRED"}, events)
+        self.assertEqual(graph.value["resource_reservations"]["actual_invocations"], 0)
+        self.assertEqual(self.core.calls, [])
+
+    def test_duplicate_dependency_occurrences_do_not_spend_unique_source_budget(self):
+        context = self.context()
+        with self.core.storage.snapshot() as view:
+            checked = self.access.require_current(view, context, references=[pin(self.core.source)] * 1024)
+        self.assertEqual(checked.reference, context.reference)
+        conflicting = pin(self.core.source)
+        conflicting["digest"] = "f" * 64
+        with self.core.storage.snapshot() as view:
+            with self.assertRaises(ContractError):
+                self.access.require_current(view, context, references=[pin(self.core.source), conflicting])
+
+    def test_actual_host_context_projection_requires_its_own_exact_grant(self):
+        from matter.contexts import ContextDefinition, ContextService, context_ref
+        definition = ContextDefinition({"schema_version": "1.0", "namespace": "example:contexts", "id": "access-audience",
+            "semantic_version": "1.0", "kind": "audience", "description": "Synthetic audience metadata.",
+            "applies_to": [entity_ref(self.core.subject)], "effective_from": self.core.now,
+            "effective_until": {"state": "unknown", "reason": "not_applicable"},
+            "content": {"audience_id": "synthetic-audience", "audience_kind": "human", "purposes": [],
+                        "responsibilities": [], "preferences": []}})
+        service = ContextService(self.core.storage, controls=self.core.controls)
+        result = service.commit(service.prepare(definition, command_id="access-context-metadata", idempotency_key="access-context-metadata",
+            actor=self.core.actor, authority=entity_ref(self.core.authority)))
+        self.assertEqual(result["status"], "success", result)
+        metadata = self.core.storage.get(context_ref(self.core.storage.scope_id, definition))
+        self.assertNotIn("provenance", metadata)
+        granted = self.make_access(extra=[{"reference": pin(metadata), "audiences": [self.audience], "providers": [self.provider]}])
+        admitted = self.context(access=granted, references=[pin(metadata)])
+        self.assertEqual(admitted.value["dependencies"], [pin(metadata)])
+        with self.assertRaises(ContractError) as error:
+            self.context(references=[pin(metadata)])
+        self.assertEqual(error.exception.code, "E_AUTHORITY_REQUIRED")
+
+    def test_stale_and_cancelled_controls_keep_safe_distinct_public_outcomes(self):
         context = self.context()
         prepared = self.prepare_assessment(context)
         command = self.core.command(prepared)
-        material = command["extensions"][PUBLICATION_EXTENSION]["value"]["graph"]["inputs"]["evidence"]
-        material["packet"]["evidence"][0]["reference"]["scope_id"] = "foreign-scope"
+        for identity, action, expected, status in (("benign-correction", "invalidate", "E_DEPENDENCY_STALE", "stale"),
+                                                    ("explicit-cancel", "cancel", "E_CANCELLED", "cancelled")):
+            control = _in_scope(control_command(identity, self.core.authority, targets=[self.core.source], action=action,
+                now=self.core.now), self.core.storage.scope_id)
+            control["actor"] = self.core.actor
+            control["body"]["control"]["body"]["actor"] = self.core.actor
+            self.assertEqual(self.core.controls.apply(self.core.controls.prepare(control))["status"], "success")
+            with self.core.storage.snapshot() as view:
+                with self.assertRaises(ContractError) as error:
+                    self.access.require_current(view, context)
+            self.assertEqual(error.exception.code, expected)
+            self.assertEqual(self.access.public_failure(error.exception)["status"], status)
+            self.assertNotIn(MARKER, str(error.exception))
+            if action == "invalidate":
+                result = self.core.service.commit(command)
+                self.assertEqual(result["error"]["code"], "E_DEPENDENCY_STALE", result)
+                self.assertEqual(self.core.service.attempt(command["idempotency_key"])["result"], result)
+
+    def test_success_history_survives_benign_revision_but_not_present_grant_revocation(self):
+        context = self.context()
+        prepared = self.prepare_assessment(context)
+        command = self.core.command(prepared)
+        result = self.core.service.commit(command)
+        self.assertEqual(result["status"], "success", result)
+        assessment = self.core.storage.get(result["body"]["assessment"])
+        original_subject = pin(self.core.subject)
+        self.core.rename_subject()
+        self.assertEqual(self.core.service.attempt(command["idempotency_key"])["result"], result)
+        self.assertEqual(source_digest(self.core.service.input_artifact(command["idempotency_key"])),
+            assessment["body"]["input_artifact"]["digest"])
+        # Current host grants, not the old policy digest, govern historical READ.
+        old_grant = {"reference": original_subject, "audiences": [self.audience], "providers": [self.provider]}
+        self.access.policy = self.make_access(extra=[old_grant]).policy
+        self.assertEqual(self.core.service.attempt(command["idempotency_key"])["result"], result)
+        self.access.policy = self.make_access(source_audiences=[], extra=[old_grant]).policy
         with self.assertRaises(ContractError) as error:
-            self.core.service.commit(command)
-        self.assertNotIn(MARKER, str(error.exception))
-        self.assertIsNone(self.core.service.current(self.core.subject, profile=self.core.profile.reference,
-            purpose=self.core.purpose, audience=self.audience))
+            self.core.service.attempt(command["idempotency_key"])
+        self.assertEqual(error.exception.code, "E_AUTHORITY_REQUIRED")
+
+    def test_failed_stale_attempt_and_artifact_remain_readable_until_read_revocation(self):
+        context = self.context()
+        prepared = self.prepare_assessment(context)
+        command = self.core.command(prepared)
+        original_bytes = canonical_bytes({"preparation": prepared.value,
+            "inputs": command["extensions"]["matter:assessment_publication"]["value"]["graph"]["inputs"]})
+        self.core.rename_subject()
+        result = self.core.service.commit(command)
+        self.assertEqual(result["error"]["code"], "E_DEPENDENCY_STALE", result)
+        self.assertEqual(self.core.service.attempt(command["idempotency_key"])["result"], result)
+        self.assertEqual(self.core.service.input_artifact(command["idempotency_key"]), original_bytes)
+        self.revoke()
+        with self.assertRaises(ContractError) as error:
+            self.core.service.attempt(command["idempotency_key"])
+        self.assertEqual(error.exception.code, "E_AUTHORITY_REQUIRED")
+
+    def test_fresh_access_capture_time_does_not_defeat_timeless_cache_reuse(self):
+        first_context = self.context()
+        definition, cache = self.core.cache_fixture()
+        cache.access = self.access
+        self.core.service.cache = cache
+        calls = []
+        first = self.prepare_assessment(first_context, definition=definition)
+        original = self.core.cache_compute(first, definition, cache, calls)
+        self.assertEqual(self.core.service.commit(self.core.command(first, cache_entries=[original]))["status"], "success")
+        self.core.now = {**self.core.now, "value": "2026-10-10T12:10:00Z"}
+        fresh_context = self.context()
+        self.assertNotEqual(first_context.reference, fresh_context.reference)
+        self.assertEqual(first_context.eligibility_reference, fresh_context.eligibility_reference)
+        second = self.prepare_assessment(fresh_context, definition=definition)
+        self.assertEqual(first.cache_inputs[0].key, second.cache_inputs[0].key)
+        hit = self.core.cache_compute(second, definition, cache, calls)
+        self.assertTrue(hit.cache_hit)
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(hit.entry["source_attempt_id"], original.entry["source_attempt_id"])
+        self.revoke()
+        with self.assertRaises(ContractError):
+            self.core.cache_compute(second, definition, cache, calls)
+        self.assertEqual(len(calls), 1)
 
     def test_response_is_not_returned_if_access_is_revoked_during_injected_execution(self):
         context = self.context()
