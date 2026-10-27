@@ -1,0 +1,305 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/semantic-certificate-mutation.schema.json",
+  "title": "Matter semantic-certificate-mutation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "definition",
+    "previous",
+    "revoked",
+    "reason"
+  ],
+  "properties": {
+    "definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "namespace",
+        "id",
+        "semantic_version",
+        "description",
+        "identity",
+        "regions",
+        "evaluation",
+        "valid_from",
+        "valid_until"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "namespace": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespace"
+        },
+        "id": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+        },
+        "semantic_version": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+        },
+        "description": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+        },
+        "identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "resolved_model",
+            "requested_model",
+            "model_resolution",
+            "provider",
+            "transport",
+            "adapter_version",
+            "mode",
+            "question",
+            "criteria_digest",
+            "renderer",
+            "packet_profile",
+            "preparation",
+            "domain",
+            "measure",
+            "precision"
+          ],
+          "properties": {
+            "resolved_model": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+            },
+            "requested_model": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+            },
+            "model_resolution": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+            },
+            "provider": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+            },
+            "transport": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+            },
+            "adapter_version": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+            },
+            "mode": {
+              "enum": [
+                "offline_fixture",
+                "recorded_replay",
+                "provider_shadow"
+              ]
+            },
+            "question": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+            },
+            "criteria_digest": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+            },
+            "renderer": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "version"
+              ],
+              "properties": {
+                "id": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+                },
+                "version": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+                }
+              }
+            },
+            "packet_profile": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+            },
+            "preparation": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+            },
+            "domain": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+            },
+            "measure": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "unit"
+              ],
+              "properties": {
+                "name": {
+                  "enum": [
+                    "probability",
+                    "confidence",
+                    "choice_probability",
+                    "score"
+                  ]
+                },
+                "unit": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+                }
+              }
+            },
+            "precision": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "version",
+                "rounding",
+                "probability_quantum",
+                "score_quantum"
+              ],
+              "properties": {
+                "id": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+                },
+                "version": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+                },
+                "rounding": {
+                  "const": "nearest"
+                },
+                "probability_quantum": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+                },
+                "score_quantum": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+                }
+              }
+            }
+          }
+        },
+        "regions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "positive",
+            "negative"
+          ],
+          "properties": {
+            "positive": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "choices",
+                    "minimum",
+                    "maximum"
+                  ],
+                  "properties": {
+                    "choices": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+                      },
+                      "maxItems": 128,
+                      "minItems": 0,
+                      "uniqueItems": true
+                    },
+                    "minimum": {
+                      "anyOf": [
+                        {
+                          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maximum": {
+                      "anyOf": [
+                        {
+                          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "negative": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "choices",
+                    "minimum",
+                    "maximum"
+                  ],
+                  "properties": {
+                    "choices": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+                      },
+                      "maxItems": 128,
+                      "minItems": 0,
+                      "uniqueItems": true
+                    },
+                    "minimum": {
+                      "anyOf": [
+                        {
+                          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maximum": {
+                      "anyOf": [
+                        {
+                          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "evaluation": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+        },
+        "valid_from": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+        },
+        "valid_until": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+        }
+      }
+    },
+    "previous": {
+      "anyOf": [
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "revoked": {
+      "type": "boolean"
+    },
+    "reason": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+    }
+  }
+}

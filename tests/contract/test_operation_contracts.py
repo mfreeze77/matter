@@ -23,6 +23,8 @@ from matter.contracts import (
 
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "contracts"
 SUCCESS_OUTCOMES = {
+    "admit_semantic_result": {"recorded"},
+    "record_semantic_execution": {"recorded"},
     "schedule_timer": {"scheduled", "cancelled", "unchanged"},
     "fire_timer": {"fired", "already_fired", "not_due", "inert"},
     "reserve_budget": {"reserved", "budget_limited"},
@@ -53,6 +55,8 @@ SUCCESS_OUTCOMES = {
     "assess": {"assessed", "incomplete"},
 }
 COMMAND_BODY_REQUIRED = {
+    "admit_semantic_result": ("execution", "question_id", "certificate", "domain"),
+    "record_semantic_execution": ("receipt",),
     "schedule_timer": ("action", "timer", "previous"),
     "fire_timer": ("timer", "firing_key", "attention_command"),
     "reserve_budget": ("budget", "reservation_id", "amounts", "expires_at", "targets"),

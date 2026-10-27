@@ -385,7 +385,7 @@ A delivered result names the observed transport milestone; it does not assert co
 
 ## Fixtures, verification, and remaining boundaries
 
-The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares the validity of standalone record, command, result, and intentionally invalid examples. The [inventory](../../tests/fixtures/contracts/inventory.json) lists the supported kinds, operations, outcome pairs, and error codes. The current manifest contains **220 fixtures: 162 valid and 58 intentionally invalid**. All examples are synthetic. Their zero-valued digest placeholders establish shape only and are not evidence that source bytes or referenced schemas exist.
+The [fixture manifest](../../tests/fixtures/contracts/manifest.json) declares the validity of standalone record, command, result, and intentionally invalid examples. The [inventory](../../tests/fixtures/contracts/inventory.json) lists the supported kinds, operations, outcome pairs, and error codes. The current manifest contains **224 fixtures: 166 valid and 58 intentionally invalid**. All examples are synthetic. Their zero-valued digest placeholders establish shape only and are not evidence that source bytes or referenced schemas exist.
 
 The examples cover every record kind, every command, every permitted success pair, every semantic error code, and additional unknown-time, failed/unknown/qualified judgment cases. Invalid examples include storage failure disguised as `no_match`, embedded execution failure in a semantic success, empty scope, unknown time with an invented value, failed judgment with a conclusion, absent qualification certificate, unsafe revision, missing dependency pin, malformed source digest, undeclared command fields, incompatible availability/locator declarations, ineligible association members, newline-suffixed digests or scope identifiers, missing reproducibility fields, fabricated digests for unproduced outputs, missing evidence locators, and negative resource ceilings.
 
@@ -486,3 +486,29 @@ The portable inventory now has **28 operations and 58 successful outcome pairs**
 The package has **79 JSON Schema resources** at this milestone. These shapes
 and their synthetic fixtures establish no external delivery or provider accuracy.
 
+
+MAT-030's additive `record_semantic_execution` branch records an actual evaluator
+receipt without requiring a prior assessment or inventing host control input.
+The result body names the semantic execution receipt; the standard top-level
+`receipt` remains the storage operation receipt. The portable inventory with
+this branch is **29 operations and 59 successful outcome pairs**. The
+[canonical ticket](../../tickets/MAT-030.md) tracks its implementation and evidence.
+
+Its three packaged schemas bind the immutable [execution receipt](../../schemas/semantic-execution.schema.json),
+[attempt journal](../../schemas/semantic-execution-attempt.schema.json), and
+[reuse entry](../../schemas/semantic-execution-cache.schema.json). See the
+[receipt API](../semantic-receipts.md) for exact native bytes, separate normalized
+digests, durable dispatch claiming and current reuse guards.
+
+MAT-031 adds `admit_semantic_result`, with explicit recorded qualification status,
+without changing the twelve core record kinds. Its six schemas bind the
+[certificate](../../schemas/semantic-certificate.schema.json),
+[catalog mutation](../../schemas/semantic-certificate-mutation.schema.json),
+[catalog state](../../schemas/semantic-certificate-state.schema.json),
+[evaluation report](../../schemas/semantic-qualification-evaluation.schema.json),
+[original admission context](../../schemas/semantic-qualification-request.schema.json),
+and [admission projection](../../schemas/semantic-qualification-admission.schema.json).
+The current inventory is **30 operations, 60 successful outcome pairs and 88 JSON
+Schema resources**. The [qualification API](../semantic-qualification.md) checks
+actual certificate applicability; these synthetic contracts issue no certificate
+and establish no provider accuracy.

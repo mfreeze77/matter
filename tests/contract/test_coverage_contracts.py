@@ -309,7 +309,7 @@ class CoverageContractTests(unittest.TestCase):
 
     def test_fixture_inventory_adds_two_operations_without_core_kinds_or_error_codes(self):
         inventory = fixture("inventory.json")
-        self.assertEqual((12, 28, 58, 19), (len(inventory["record_kinds"]), len(inventory["operations"]),
+        self.assertEqual((12, 30, 60, 19), (len(inventory["record_kinds"]), len(inventory["operations"]),
             sum(len(values) for values in inventory["success_outcomes"].values()), len(inventory["error_codes"])))
         self.assertEqual(set(SUCCESS_OUTCOMES), set(inventory["operations"]))
         self.assertEqual(ERROR_CODES, set(inventory["error_codes"]))

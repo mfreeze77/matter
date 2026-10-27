@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/semantic-qualification-admission.schema.json",
+  "title": "Matter semantic-qualification-admission v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scope_id",
+    "execution",
+    "question_id",
+    "certificate",
+    "certificate_state",
+    "domain",
+    "measure",
+    "status",
+    "method_qualification",
+    "reason",
+    "decision",
+    "measure_value",
+    "at",
+    "dependencies",
+    "host_authority_granted",
+    "raw_result_modified",
+    "request"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "scope_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "execution": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+    },
+    "question_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "certificate": {
+      "anyOf": [
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "certificate_state": {
+      "anyOf": [
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "domain": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    },
+    "measure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "unit"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "probability",
+            "confidence",
+            "choice_probability",
+            "score"
+          ]
+        },
+        "unit": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "qualified",
+        "unqualified",
+        "unknown",
+        "mismatched",
+        "expired",
+        "revoked",
+        "abstained"
+      ]
+    },
+    "method_qualification": {
+      "enum": [
+        "qualified",
+        "unqualified",
+        "unknown",
+        "mismatched",
+        "expired",
+        "revoked"
+      ]
+    },
+    "reason": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "decision": {
+      "enum": [
+        "positive",
+        "negative",
+        "abstained",
+        null
+      ]
+    },
+    "measure_value": {
+      "anyOf": [
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/decimal_string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "at": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+      },
+      "maxItems": 4096,
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "host_authority_granted": {
+      "const": false
+    },
+    "raw_result_modified": {
+      "const": false
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "token",
+        "measure",
+        "previous",
+        "previous_registration",
+        "access_context",
+        "captured_at"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "token": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
+        },
+        "measure": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "unit"
+          ],
+          "properties": {
+            "name": {
+              "enum": [
+                "probability",
+                "confidence",
+                "choice_probability",
+                "score"
+              ]
+            },
+            "unit": {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/text"
+            }
+          }
+        },
+        "previous": {
+          "anyOf": [
+            {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "previous_registration": {
+          "anyOf": [
+            {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/domain_value"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "access_context": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "captured_at": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+        }
+      }
+    }
+  }
+}

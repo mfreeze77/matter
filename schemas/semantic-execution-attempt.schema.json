@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/semantic-execution-attempt.schema.json",
+  "title": "Matter semantic-execution-attempt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "logical_request_id",
+    "attempt_id",
+    "phase",
+    "execution",
+    "request_digest",
+    "allocation",
+    "caps"
+  ],
+  "properties": {
+    "logical_request_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "attempt_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "phase": {
+      "type": "string"
+    },
+    "execution": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/receipt_dependency"
+    },
+    "request_digest": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+    },
+    "allocation": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+        }
+      ]
+    },
+    "caps": {
+      "type": "object"
+    }
+  }
+}

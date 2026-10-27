@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import base64
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation, localcontext
 import json
 import re
@@ -431,14 +431,107 @@ def normalize_response(batch, raw, *, precision=None):
                    diagnostics=diagnostics, faults=faults)
 
 
+class ExecutionInstrumentation(_Frozen):
+    """Immutable observations, with explicit null reasons and no header fields."""
+    __slots__ = ()
+
+    def __init__(self, value):
+        try:
+            canonical_bytes(value)
+        except (ValueError, TypeError, RecursionError):
+            _fail("Canonical execution instrumentation is required.")
+        names = ("logical_request_id", "attempt_id", "started", "completed", "request_bytes", "response_bytes", "usage", "unavailable")
+        _shape(value, (), names)
+        data = {name: value.get(name) for name in names if name != "unavailable"}
+        for name in ("logical_request_id", "attempt_id"):
+            if data[name] is not None:
+                _text(data[name])
+        for name in ("started", "completed"):
+            if data[name] is not None:
+                known_time_key(data[name])
+        if data["started"] is not None and data["completed"] is not None and known_time_key(data["completed"]) < known_time_key(data["started"]):
+            _fail("Execution instrumentation reverses time.")
+        for name in ("request_bytes", "response_bytes"):
+            if data[name] is not None:
+                _integer(data[name], 0, 2**53 - 1)
+        if data["usage"] is not None:
+            _shape(data["usage"], ("input_tokens", "output_tokens", "total_tokens"), ("unavailable",))
+            usage = {name: data["usage"][name] for name in ("input_tokens", "output_tokens", "total_tokens")}
+            for amount in usage.values():
+                if amount is not None:
+                    _integer(amount, 0, 2**53 - 1)
+            unavailable = {name: "not_reported" for name, amount in usage.items() if amount is None}
+            if "unavailable" in data["usage"] and data["usage"]["unavailable"] != unavailable:
+                _fail("Usage availability must match the observed counters.")
+            data["usage"] = {**usage, "unavailable": unavailable}
+        supplied = value.get("unavailable", {})
+        if type(supplied) is not dict or any(name not in data for name in supplied):
+            _fail()
+        reasons = {"not_observed", "not_reported", "not_supplied", "not_exposed_by_transport", "not_applicable"}
+        absent = {}
+        for name, observed in data.items():
+            if observed is None:
+                reason = supplied.get(name, "not_reported" if name == "usage" else "not_observed")
+                if reason not in reasons:
+                    _fail()
+                absent[name] = reason
+            elif name in supplied:
+                _fail("An observed measurement cannot also be unavailable.")
+        self._freeze({**data, "unavailable": absent})
+
+
+class ExecutionFault(Exception):
+    """Recognized safe attempt failure; arbitrary exception text is never retained."""
+    __slots__ = ("_code", "_native_response", "_instrumentation")
+    CODES = frozenset({"timeout", "rate_limited", "cancelled", "transport_error", "provider_error", "unavailable", "response_budget",
+                       "precision_unavailable", "model_unresolved"})
+
+    def __init__(self, code, *, native_response=None, instrumentation=None):
+        if code not in self.CODES:
+            _fail()
+        _execution_extensions(native_response, instrumentation)
+        super().__init__("A declared semantic execution fault occurred.")
+        object.__setattr__(self, "_code", code)
+        object.__setattr__(self, "_native_response", native_response)
+        object.__setattr__(self, "_instrumentation", instrumentation)
+
+    def __setattr__(self, name, value):
+        if name in {"__traceback__", "__context__", "__cause__", "__suppress_context__", "__notes__"}:
+            BaseException.__setattr__(self, name, value)
+            return
+        raise AttributeError("ExecutionFault is immutable.")
+
+    @property
+    def code(self):
+        return self._code
+
+    @property
+    def native_response(self):
+        return self._native_response
+
+    @property
+    def instrumentation(self):
+        return self._instrumentation
+
+
+def _execution_extensions(native, instrumentation):
+    if native is not None and (type(native) is not bytes or len(native) > MAX_WIRE_BYTES):
+        _fail("Original native response bytes exceed the supported bound.")
+    if instrumentation is not None and not isinstance(instrumentation, ExecutionInstrumentation):
+        _fail("Validated immutable instrumentation is required.")
+
+
 @dataclass(frozen=True, slots=True)
 class RawExecution:
-    """Only the original neutral wire bytes cross back from an adapter."""
+    """Original neutral wire bytes plus optional independently preserved native evidence."""
     raw_response: bytes
+    native_response: bytes | None = field(default=None, kw_only=True)
+    instrumentation: ExecutionInstrumentation | None = field(default=None, kw_only=True)
 
     def __post_init__(self):
         if type(self.raw_response) is not bytes:
             _fail("An adapter must return original neutral wire bytes.")
+        _execution_extensions(self.native_response, self.instrumentation)
 
 
 class Executor(Protocol):
@@ -502,6 +595,7 @@ def execute_batch(executor, batch, *, clock, precision=None):
     if start_key >= deadline:
         return _result(batch, profile, status="timed_out", started=started, completed=started,
                        faults=[{"code": "deadline_before_dispatch", "path": []}])
+    native, instrumentation = None, None
     try:
         execution = executor.execute(batch)
         if not isinstance(execution, RawExecution):
@@ -511,6 +605,11 @@ def execute_batch(executor, batch, *, clock, precision=None):
             result = _result(batch, profile, status="budget_exhausted", faults=[{"code": "response_byte_limit", "path": []}])
         else:
             result = normalize_response(batch, execution.raw_response, precision=profile)
+        native, instrumentation = execution.native_response, execution.instrumentation
+    except ExecutionFault as error:
+        status = "timed_out" if error.code == "timeout" else "cancelled" if error.code == "cancelled" else "budget_exhausted" if error.code == "response_budget" else "failed"
+        result = _result(batch, profile, status=status, exact=error.code != "precision_unavailable", faults=[{"code": error.code, "path": []}])
+        native, instrumentation = error.native_response, error.instrumentation
     except Exception:
         # Errors do not echo arbitrary adapter exceptions, which may carry data
         # or secrets, and cannot turn into a fabricated negative answer.
@@ -518,6 +617,20 @@ def execute_batch(executor, batch, *, clock, precision=None):
     completed = clock()
     end_key = known_time_key(completed)
     value = result.value
+    if native is not None:
+        maximum = min(context["max_response_bytes"], caps["max_response_bytes"])
+        if len(native) > maximum:
+            value["execution_status"] = "budget_exhausted"
+            value["admission"]["primitive_status"] = "invalid"
+            value["faults"].append({"code": "native_response_budget", "path": []})
+            value["native_response"] = {"state": "unavailable", "reason": "response_budget", "observed_bytes": len(native)}
+        else:
+            value["native_response"] = {"state": "available", "sha256": source_digest(native),
+                "byte_length": len(native), "base64": base64.b64encode(native).decode("ascii")}
+    if instrumentation is not None:
+        value["instrumentation"] = instrumentation.value
+        if instrumentation.value["usage"] is not None:
+            value["usage"] = {"value": instrumentation.value["usage"], "reason": None}
     value["timing"] = {"called": True, "started": started, "completed": completed}
     if end_key < start_key or end_key >= deadline:
         value["execution_status"] = "failed" if end_key < start_key else "timed_out"

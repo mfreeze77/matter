@@ -1,0 +1,8 @@
+{
+  "synthetic_only": true,
+  "review_reason": "Trusted-host admitted synthetic held-out report; no measured provider accuracy or issued certificate.",
+  "support": {"episodes": 100, "minimum_episodes": 10, "accepted": 95, "errors": 0, "target_accuracy": "0.9", "lower_accuracy_bound": "0.95", "passed": true},
+  "regions": {"positive": {"choices": [], "minimum": "0.9", "maximum": null}, "negative": {"choices": [], "minimum": null, "maximum": "0.2"}},
+  "failed_case": {"status": "failed", "probability": "0.999999999999999999", "expected_reason": "held_out_failed"},
+  "abstention_case": {"probability": "0.5", "expected_reason": "undecided_region"}
+}

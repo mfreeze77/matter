@@ -34,6 +34,7 @@ DEFAULT_OPERATION_CAPABILITIES = {
     "release_identity_separations": "correction", "commit_assessment": "assessment",
     "invalidate_dependents": "assessment", "request_transition": "transition",
     "assess": "assessment", "publish_coverage": "write", "register_negative_watch": "assessment",
+    "record_semantic_execution": "assessment", "admit_semantic_result": "assessment",
 }
 
 

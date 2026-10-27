@@ -4,7 +4,7 @@
   "track": "jev",
   "phase": 3,
   "priority": "P0",
-  "status": "planned",
+  "status": "in_progress",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "semantic/qualification",
@@ -74,7 +74,7 @@
     }
   ],
   "sources": [
-    "matterjevmesh §8",
+    "matterjevmesh \u00a78",
     "https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/runtime.py",
     "https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/check.py"
   ],

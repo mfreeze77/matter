@@ -49,7 +49,9 @@
     "schedule_timer",
     "fire_timer",
     "reserve_budget",
-    "settle_budget"
+    "settle_budget",
+    "record_semantic_execution",
+    "admit_semantic_result"
   ],
   "success_outcomes": {
     "ingest_observation": [
@@ -165,6 +167,12 @@
       "released",
       "expired",
       "unchanged"
+    ],
+    "record_semantic_execution": [
+      "recorded"
+    ],
+    "admit_semantic_result": [
+      "recorded"
     ]
   },
   "error_codes": [

@@ -36,8 +36,8 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-028: Build bounded source-linked assessment packets](MAT-028.md) | jev | 2 | P0 | done | done | MAT-027, MAT-004, MAT-006, MAT-010 |
 | [MAT-029: Plan independent batches and validated semantic stages](MAT-029.md) | jev | 3 | P0 | in_progress | in_progress | MAT-026, MAT-027, MAT-028, MAT-014, MAT-020 |
 | [MAT-030: Persist judgment receipts and exact execution reuse](MAT-030.md) | jev | 3 | P0 | in_progress | in_progress | MAT-026, MAT-029, MAT-003, MAT-015, MAT-016 |
-| [MAT-031: Enforce qualification certificates at runtime admission](MAT-031.md) | jev | 3 | P0 | planned | waiting | MAT-027, MAT-028, MAT-030, MAT-013 |
-| [MAT-032: Integrate an optional TypeSafe transport adapter](MAT-032.md) | jev | 3 | P1 | planned | waiting | MAT-026, MAT-027, MAT-028, MAT-030, MAT-031 |
+| [MAT-031: Enforce qualification certificates at runtime admission](MAT-031.md) | jev | 3 | P0 | in_progress | in_progress | MAT-027, MAT-028, MAT-030, MAT-013 |
+| [MAT-032: Integrate an optional TypeSafe transport adapter](MAT-032.md) | jev | 3 | P1 | in_progress | in_progress | MAT-026, MAT-027, MAT-028, MAT-030, MAT-031 |
 | [MAT-033: Add shadow association and claim-evidence question families](MAT-033.md) | jev | 3 | P1 | planned | waiting | MAT-027, MAT-028, MAT-029, MAT-031, MAT-007, MAT-008 |
 | [MAT-034: Add shadow change, recovery and audience-contribution families](MAT-034.md) | jev | 3 | P1 | planned | waiting | MAT-027, MAT-028, MAT-029, MAT-031, MAT-017, MAT-018, MAT-019, MAT-021 |
 | [MAT-035: Add bounded investigation judgments and stopping outcomes](MAT-035.md) | jev | 4 | P1 | planned | waiting | MAT-028, MAT-029, MAT-031, MAT-033, MAT-034, MAT-022, MAT-040 |

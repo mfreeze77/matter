@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "operation": "record_semantic_execution",
+  "operation_id": "command-record_semantic_execution",
+  "status": "success",
+  "outcome": "recorded",
+  "receipt": {
+    "scope_id": "synthetic:mat002",
+    "namespace": "matter.storage",
+    "record_type": "receipt",
+    "id": "semantic-operation-receipt"
+  },
+  "body": {
+    "execution": {
+      "scope_id": "synthetic:mat002",
+      "namespace": "example",
+      "record_type": "receipt",
+      "id": "semantic-execution-one",
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  }
+}
