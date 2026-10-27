@@ -46,13 +46,18 @@ run = stages.execute(
 )
 ```
 
-The callback receives `(stage, parents, remaining=...)`. Only admitted parent
+The callback receives `(stage, parents, remaining=..., deadline=...)`. Only admitted parent
 answers and their exact trace references are provided. It returns a
 `StageInput(packet=PreparedPacket(...), rendered_questions=[...], context=...,
 transform=exact_ref, parents=[...], candidate_count=...)` or a host-owned
 `concurrent.futures.Future` that resolves to one. The executor waits for that
 future cooperatively while checking cancellation, allocation validity and time.
-It does not start a fetch itself.
+It does not start a fetch itself. Remaining elapsed capacity and the absolute
+deadline are refreshed before each preparation; a failed gate requests cancellation
+of an unfinished future. A completed future exception is inspected once.
+Compatible members are admitted separately, so one expired prerequisite does not
+block unrelated members. Every attempted dispatch retains its exact request and
+unique batch index, with a null result when no valid result was observed.
 
 Parent references, exact specifications, question inventory, packet digest,
 scope, declared candidate cap and transform identity must match. Each binding

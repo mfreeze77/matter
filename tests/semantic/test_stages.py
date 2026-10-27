@@ -7,10 +7,10 @@ from pathlib import Path
 from threading import Event
 import unittest
 
-from matter.budgets import BudgetDefinition, BudgetService, REQUEST_EXTENSION, budget_ref
+from matter.budgets import BudgetDefinition, BudgetService, budget_ref
 from matter.canonical import canonical_bytes
 from matter.contracts import ContractError
-from matter.semantic import Capabilities, RawExecution
+from matter.semantic import Batch, Capabilities, RawExecution, execute_batch
 from matter.semantic.packets import PacketProfile, prepare_packet
 from matter.semantic.questions import QuestionRegistry, QuestionSpecification
 from matter.semantic.rendering import render_question
@@ -43,7 +43,8 @@ class StageTests(unittest.TestCase):
                 for question in batch.value["questions"]:
                     value = {"id": question["id"], "primitive": question["primitive"]}
                     if question["primitive"] == "choice":
-                        value.update(choice=outer.choice, probabilities={outer.candidate["id"]: "0.9", "insufficient": "0.1"}, confidence="0.5")
+                        value.update(choice=outer.choice, probabilities={outer.candidate["id"]: "0.9" if outer.choice == outer.candidate["id"] else "0.1",
+                            "insufficient": "0.9" if outer.choice == "insufficient" else "0.1"}, confidence="0.5")
                     else:
                         value["probability"] = "0.1234567890123456789"
                     answers.append(value)
@@ -94,8 +95,8 @@ class StageTests(unittest.TestCase):
                         "max_elapsed_ms": 10000, "max_evidence": 16}
         self.runner = StageExecutor(questions=self.questions, budgets=self.budgets, executor=self.spy, clock=lambda: self.f.now)
 
-    def packet(self, *, candidate=False, wrong_binding=False, access=None, access_context=None):
-        record = self.candidate if candidate else self.f.source
+    def packet(self, *, candidate=False, wrong_binding=False, access=None, access_context=None, record=None):
+        record = record or (self.candidate if candidate else self.f.source)
         profile = PacketProfile({"namespace": "synthetic", "id": "stage-packet", "version": "1.0", "required_roles": [],
             "allowed_origins": ["source"], "locator_adapters": [self.f.adapter.reference], "max_sources": 16,
             "max_source_bytes": 65536, "max_packet_bytes": 65536})
@@ -181,7 +182,7 @@ class StageTests(unittest.TestCase):
             if case["mutation"] == "missing_parent":
                 raw["stages"][1]["requires"][0]["stage"] = "absent"
             elif case["mutation"] == "sibling":
-                raw["stages"][1]["requires"][0].update(stage="details", question="recovery", accepted={"minimum": "0", "maximum": "1"})
+                raw["stages"][1]["packet_key"] = raw["stages"][0]["packet_key"]
             else:
                 raw["stages"][0]["requires"] = [{"stage": "details", "question": "recovery", "accepted": {"minimum": "0", "maximum": "1"},
                                                  "require_qualified": True, "bindings": []}]
@@ -200,6 +201,10 @@ class StageTests(unittest.TestCase):
                 return self.material(stage, parents)
             run = self.execute(self.dependent(), build, qualify=self.qualified if qualified else None)
             self.assertEqual(run.value["stages"]["details"]["status"], "blocked")
+            self.assertEqual(run.value["stages"]["select"]["status"], "completed")
+            self.assertEqual(run.value["stages"]["details"]["reason"],
+                "prerequisite_outcome_not_admitted" if qualified else "qualification_unknown")
+            self.assertEqual(run.value["batches"][0]["result"]["admission"]["primitive_status"], "valid")
             self.assertEqual(prepared, ["select"])
         self.assertEqual(len(self.calls), 2)
 
@@ -344,6 +349,97 @@ class StageTests(unittest.TestCase):
         self.assertEqual(run.value["status"], "completed", run.value)
         self.assertEqual(len(self.calls), 1)
         self.assertEqual(run.value["inputs"]["one"]["rendered_questions"][0]["manifest"]["access_context"], context.reference)
+
+    def test_prepare_receives_decreased_time_and_pending_fetch_is_cancelled_on_stop(self):
+        self.reserve()
+        elapsed, stop, observed = [0.0], Event(), []
+        future = Future()
+        self.runner.monotonic = lambda: elapsed[0]
+        original = self.spy.execute
+        def execute(batch):
+            result = original(batch)
+            elapsed[0] = 3.0
+            self.f.now = {**self.f.now, "value": "2026-10-10T12:00:03Z"}
+            return result
+        self.spy.execute = execute
+        def prepare(stage, parents, *, remaining, deadline):
+            observed.append((stage["id"], remaining["max_elapsed_ms"], deadline))
+            if parents:
+                stop.set()
+                return future
+            return self.material(stage, parents)
+        run = self.execute(self.dependent(), prepare, qualify=self.qualified, cancelled=stop.is_set)
+        self.assertEqual([item[1] for item in observed], [10000, 7000])
+        self.assertEqual(observed[0][2], observed[1][2])
+        self.assertTrue(future.cancelled())
+        self.assertEqual(run.value["stages"]["details"]["error_code"], "E_CANCELLED")
+        self.assertEqual(len(self.calls), 1)
+
+    def test_completed_fetch_timeout_does_not_poll_or_block_independent_work(self):
+        self.reserve()
+        future = Future()
+        future.set_exception(TimeoutError("SYNTHETIC-PRIVATE-FETCH-ERROR"))
+        self.runner.monotonic = lambda: 0.0
+        plan = self.plan([self.stage("a_fetch", ["support"]), self.stage("z_independent", ["recovery"])])
+        def prepare(stage, parents, **_):
+            return future if stage["id"] == "a_fetch" else self.material(stage, parents)
+        run = self.execute(plan, prepare)
+        self.assertEqual(run.value["stages"]["a_fetch"]["error_code"], "E_POLICY_INVALID")
+        self.assertEqual(run.value["stages"]["z_independent"]["status"], "completed")
+        self.assertEqual(len(self.calls), 1)
+        self.assertNotIn("PRIVATE-FETCH", canonical_bytes(run.value).decode())
+
+    def test_one_expired_member_does_not_abort_compatible_independent_member(self):
+        shared = self.f.observe("shared-details", payload=b"SYNTHETIC common fetched detail.\n")
+        self.targets.append(entity_ref(shared))
+        self.token = self.f.controls.capture(actor=self.f.actor, authority=entity_ref(self.f.authority),
+            capability="assessment", targets=self.targets)
+        self.reserve()
+        edge_a = self.edge(stage="a_select")
+        edge_a["bindings"] = []
+        edge_x = {"stage": "x_support", "question": "support", "accepted": {"minimum": "0", "maximum": "1"},
+                  "require_qualified": True, "bindings": []}
+        plan = self.plan([self.stage("a_select", ["selection"]), self.stage("x_support", ["support"]),
+            self.stage("b_recovery", ["recovery"], requires=[edge_a], packet_key="shared"),
+            self.stage("c_contradiction", ["contradiction"], requires=[edge_x], packet_key="shared")])
+        expired = Event()
+        def prepare(stage, parents, **_):
+            if stage["id"] == "c_contradiction":
+                expired.set()
+            packet = self.packet(record=shared) if parents else self.packet(candidate=stage["id"] == "x_support")
+            return self.material(stage, parents, packet=packet)
+        def qualify(**kwargs):
+            return {"status": "expired", "certificate": None} if expired.is_set() and kwargs["question"]["id"] == "selection" else self.qualified()
+        run = self.execute(plan, prepare, qualify=qualify)
+        self.assertEqual(run.value["stages"]["b_recovery"]["error_code"], "E_DEPENDENCY_STALE")
+        self.assertEqual(run.value["stages"]["c_contradiction"]["status"], "completed", run.value)
+        self.assertEqual(len(self.calls), 3)
+        self.assertEqual([item["id"] for item in self.calls[-1]["questions"]], ["contradiction"])
+
+    def test_unknown_or_mismatched_dispatch_retains_unique_request_before_next_batch(self):
+        for mismatch in (False, True):
+            self.reserve()
+            seen = []
+            def dispatch(batch, **kwargs):
+                seen.append(batch.value["id"])
+                if len(seen) == 1:
+                    if not mismatch:
+                        raise RuntimeError("SYNTHETIC PRIVATE")
+                    other = batch.value
+                    other["id"] = "different-request"
+                    return execute_batch(self.spy, Batch(other), clock=kwargs["clock"])
+                return execute_batch(self.spy, batch, clock=kwargs["clock"])
+            self.runner.dispatch = dispatch
+            plan = self.plan([self.stage("a_first", ["support"]), self.stage("z_second", ["recovery"])])
+            run = self.execute(plan, lambda stage, parents, **_: self.material(stage, parents,
+                packet=self.packet(candidate=stage["id"] == "z_second")))
+            self.assertEqual(seen, ["stage-test:batch:0", "stage-test:batch:1"])
+            self.assertEqual(len(run.value["batches"]), 2)
+            self.assertIsNone(run.value["batches"][0]["result"])
+            self.assertEqual(run.value["batches"][0]["batch"]["id"], seen[0])
+            self.assertEqual(run.value["stages"]["a_first"]["batch_index"], 0)
+            self.assertEqual(run.value["stages"]["z_second"]["batch_index"], 1)
+            self.assertIsNotNone(run.value["batches"][1]["result"])
 
 
 if __name__ == "__main__":

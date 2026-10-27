@@ -4,7 +4,7 @@ No source fetch, provider client, durable retry or qualification issuance is
 implemented here. Hosts supply exact packet transforms and original context.
 """
 
-from concurrent.futures import Future, TimeoutError as FutureTimeout
+from concurrent.futures import Future, wait
 from copy import deepcopy
 from datetime import datetime, timedelta
 import math
@@ -197,11 +197,18 @@ class StageExecutor:
                 if answer:
                     _fail("cancelled", "E_CANCELLED")
             elapsed = max(0, math.ceil((self.monotonic() - tick) * 1000))
+            remaining["max_elapsed_ms"] = max(0, envelope.remaining_budget["max_elapsed_ms"] - elapsed)
             if elapsed >= envelope.remaining_budget["max_elapsed_ms"] or compare_times(now, started) == -1:
                 _fail("elapsed_limit", "E_BUDGET_EXHAUSTED")
             with self.budgets.storage.snapshot() as view:
                 self.budgets.require_committed(view, reservation, as_of=now)
             return now
+
+        def deadline_for(now):
+            main, nanos = known_time_key(now)
+            value = datetime.fromisoformat(main + "+00:00") + timedelta(milliseconds=int(nanos) // 1000000 + remaining["max_elapsed_ms"])
+            clipped = {"state": "known", "value": value.isoformat(timespec="milliseconds").replace("+00:00", "Z"), "precision": "millisecond"}
+            return envelope.value["deadline"] if compare_times(envelope.value["deadline"], clipped) == -1 else clipped
 
         def trace(name, status, reason, **extra):
             value = {"stage": name, "status": status, "reason": reason, "parents": [], **extra}
@@ -275,6 +282,7 @@ class StageExecutor:
             for name in ready:
                 pending.remove(name)
                 stage, parents = stages[name], []
+                host_future = None
                 try:
                     gate()
                     for edge in stage["requires"]:
@@ -290,17 +298,16 @@ class StageExecutor:
                         _fail("candidate_limit", "E_BUDGET_EXHAUSTED")
                     candidates_left -= stage["max_candidates"]
                     spent["reserved_candidates"] += stage["max_candidates"]
-                    prepared = prepare(deepcopy(stage), deepcopy(parents), remaining=deepcopy(remaining))
+                    now = gate()
+                    prepared = prepare(deepcopy(stage), deepcopy(parents), remaining=deepcopy(remaining), deadline=deadline_for(now))
                     if isinstance(prepared, Future):
-                        while True:
+                        host_future = prepared
+                        while not host_future.done():
                             gate()
-                            if prepared.cancelled():
-                                _fail("host_future_cancelled", "E_CANCELLED")
-                            try:
-                                prepared = prepared.result(timeout=0.05)
-                                break
-                            except FutureTimeout:
-                                continue
+                            wait((host_future,), timeout=0.05)
+                        if host_future.cancelled():
+                            _fail("host_future_cancelled", "E_CANCELLED")
+                        prepared = host_future.result()
                     gate()
                     if not isinstance(prepared, StageInput):
                         _fail("stage_input_required")
@@ -332,30 +339,44 @@ class StageExecutor:
                     key = canonical_digest({"packet": prepared.packet.digest, "context": value["context"]}, "matter.semantic-batch-group.v1")
                     groups.setdefault(key, []).append((name, prepared, ignored))
                 except Exception as error:
+                    if host_future is not None and not host_future.done():
+                        try:
+                            host_future.cancel()
+                        except Exception:
+                            pass
                     code = error.code if isinstance(error, ContractError) else "E_POLICY_INVALID"
                     trace(name, "cancelled" if code == "E_CANCELLED" else "blocked",
                           error.reason if isinstance(error, StageError) else "stage_preparation_or_gate_failed", error_code=code,
                           parents=[item["receipt"] for item in parents])
             for group in groups.values():
-                names = [item[0] for item in group]
-                index = None
-                try:
-                    gate()
-                    for name in names:
+                admitted = []
+                for member in group:
+                    name = member[0]
+                    try:
+                        gate()
                         for edge in stages[name]["requires"]:
                             if accepted(edge, name, "dispatch")[1] is not None:
                                 _fail("prerequisite_changed", "E_DEPENDENCY_STALE")
                         input_gate(inputs[name])
+                        admitted.append(member)
+                    except Exception as error:
+                        code = error.code if isinstance(error, ContractError) else "E_POLICY_INVALID"
+                        trace(name, "cancelled" if code == "E_CANCELLED" else "blocked",
+                            error.reason if isinstance(error, StageError) else "member_admission_failed", error_code=code,
+                            parents=[receipts[edge["stage"]]["reference"] for edge in stages[name]["requires"]])
+                group = admitted
+                if not group:
+                    continue
+                names = [item[0] for item in group]
+                index = None
+                try:
+                    gate()
                     first = group[0][1]
                     context = first.value["context"]
-                    elapsed_left = max(0, envelope.remaining_budget["max_elapsed_ms"] - math.ceil((self.monotonic() - tick) * 1000))
                     now = gate()
-                    main, nanos = known_time_key(now)
-                    deadline = datetime.fromisoformat(main + "+00:00") + timedelta(milliseconds=int(nanos) // 1000000 + elapsed_left)
-                    clipped = {"state": "known", "value": deadline.isoformat(timespec="milliseconds").replace("+00:00", "Z"), "precision": "millisecond"}
-                    for limit in (envelope.value["deadline"], clipped):
-                        if compare_times(limit, context["deadline"]) == -1:
-                            context["deadline"] = limit
+                    clipped = deadline_for(now)
+                    if compare_times(clipped, context["deadline"]) == -1:
+                        context["deadline"] = clipped
                     caps = {"max_calls": 1, "max_input_bytes": context["max_request_bytes"], "max_output_bytes": context["max_response_bytes"]}
                     if any(caps[key] > remaining[key] for key in caps):
                         _fail("remaining_allocation_exhausted", "E_BUDGET_EXHAUSTED")
@@ -364,6 +385,8 @@ class StageExecutor:
                         "scope_id": self.budgets.scope_id, "run_id": run_id, "stage_id": "+".join(names),
                         "state": first.packet.state, "packet_digest": first.packet.digest,
                         "questions": [item.question.value for item in rendered], "context": context})
+                    index = len(batches)
+                    batches.append({"batch": batch.value, "result": None})
                     for key, amount in caps.items():
                         remaining[key] -= amount
                     spent["reserved_calls"] += 1
@@ -379,8 +402,7 @@ class StageExecutor:
                         result = self.dispatch(batch, rendered_questions=rendered, clock=self.clock, precision=profile)
                     if not isinstance(result, BatchResult) or result.value["batch_digest"] != batch.digest:
                         _fail("wrong_batch_result")
-                    index = len(batches)
-                    batches.append({"batch": batch.value, "result": result.value})
+                    batches[index]["result"] = result.value
                     spent["unobserved_dispatches"] -= 1
                     spent["known_invocations"] += int(result.value["timing"]["called"])
                     gate()
