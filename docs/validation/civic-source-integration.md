@@ -123,7 +123,7 @@ its human-reviewed-label and independent-support requirements are unchanged.
 ## Verification and remaining work
 
 - `python -m unittest discover -s tests/integration -p test_civic_exports.py -v`:
-  7 passed, including restart/replay, two reports of one occurrence, separate later
+  10 passed at final adapter code, including restart/replay, two reports of one occurrence, separate later
   appearances, jurisdiction collisions, malformed rows and changed derivations.
 - `python -m unittest discover -s tests/semantic -p test_civic_attention.py -v`:
   4 passed; source/audience separation, unknown versus neutral, no legal authority.
@@ -137,7 +137,35 @@ its human-reviewed-label and independent-support requirements are unchanged.
   subnetted`. Its owned cleanup completed. No other network was deleted. The live
   run did exercise actual PostgreSQL through the existing rehearsal network;
   that does not replace the blocked complete regression selection.
-- Full Matter suite and two-pass reviews: receipts will be appended at closeout.
+- Full `unittest discover -s tests -v` was attempted at the earlier `eae62d6`
+  snapshot, then deliberately interrupted after 435 completed checks with no
+  recorded failures. It has **no full-suite verdict**. The final adapter delta
+  passed all 10 focused checks, and all four source-question checks passed.
+- Two-pass Matter reviews: initial adapter review, expanded eight-file review,
+  five-file checkpoint delta and final two-file refusal delta. Confirmed findings
+  fixed; final delta has zero findings, zero warnings. Receipts under ignored
+  `data/validation/civic-source-integration-20261028/`.
+- State review covered 11 original files, seven guard-delta files and three final
+  files, two rounds each, zero coverage warnings. All confirmed functional
+  findings fixed. Two final low comments concern future constant synchronization
+  and adding a civic preflight unit assertion; current model/timeout match the
+  interpreter, and the actual civic zero-call preflight verified packet custody.
+  They are not reported as a clean zero-finding State review.
+- Final State archive check at `720637332`: 43 passed, exit 0, with closeout SDK
+  wheel `5ffc85bc3982197553ca6f114e281e87ae3908b824412173e652e6fa0c177230`.
+  Default image without SDK: 10 passed/3 expected skips. One intermediate
+  43-passing run returned gate exit 78 after HEAD moved during verification;
+  the stable archive rerun supersedes it. The generic gate message claimed an
+  env refusal, but tests had executed; no entrypoint guard was bypassed.
+- Post-review real-source import/replay (`import-final/receipt.json`) verified
+  one subject, three claims, one occurrence, eight retained native identity
+  proposals and a source-linked durable checkpoint; zero provider calls.
+  Final fully-refused/empty-package handling is covered by the focused checks.
+- Later launcher preflight at `~/ks-rehearsal/matter-live-20261028T224653Z-9680/`
+  made zero calls, copied/hashed the exact external input and mounted the copy
+  read-only. Existing run-budget query returned 1/32; preflight consumed no slot.
+  The original live packet was retrospectively copied only after matching its
+  recorded preflight digest; this is not described as a pre-run custody copy.
 - Retained audit: five valid native responses/exact numeric values; source-only
   request contains no audience comparison; one shared factual projection;
   retries/cutoff checks passed; 41 bounded files scanned, no credential echoes.
@@ -156,5 +184,5 @@ held-out success. DIAT is not required for this work.
 Original installed walkthrough-schema failure was fixed earlier in PR #21;
 MAT-077's broader distribution work remains separate. No infrastructure,
 PostgreSQL backend, DIAT or alert-writing expansion was introduced. Storage was
-56 GiB free before image reuse, 54 GiB after; reserve 50 GiB/task cap 10 GiB.
+56 GiB free before image reuse, 53 GiB at closeout; reserve 50 GiB/task cap 10 GiB.
 The live artifact root is about 11 MiB. Both repositories have one worktree.
