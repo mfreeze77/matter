@@ -44,6 +44,15 @@ actually executed; its authored structured facts do not establish semantic extra
 
 ## Reuse the existing replay
 
+Owner correction, October 27: this integration must run in the existing local
+rehearsal **without a login**. KS-841's rehearsal already runs without sign-in
+and excludes copied accounts/sessions. The older KS-698 native-admin console
+requirements below describe the inspected implementation, not a requirement to
+add authentication to rehearsal. Reuse its replay/runtime mechanisms through
+rehearsal access; retain synthetic run isolation, cutoff fences and capture-only
+delivery. Acceptance must exercise the scenario controls without credentials or
+a login redirect. That browser check has not run yet.
+
 Read-only inspection of StateCivics at `d28663cc0` found (the inspected replay
 runtime, manifest, router, config and console files are unchanged from
 `1f7011fd8`):
@@ -55,9 +64,9 @@ runtime, manifest, router, config and console files are unchanged from
   currently selects only `hb2560` and `hearing829` scenario directories.
 - `core/config.py` defines `historical_replay_enabled` (default false),
   `historical_replay_instance_file` and `historical_replay_scenario_root`.
-  The root must be an explicit absolute path. The instance marker, active admin
-  authority, source access and isolated stores remain required; setting a flag
-  alone does not establish a safe running instance.
+  The root must be an explicit absolute path. The older admin route additionally
+  requires native-admin authority and its dedicated instance identity; setting a
+  flag alone does not make that route usable in the no-login rehearsal.
 - Catalog/runtime responses explicitly report `model_mode: unavailable`.
   The initial retained scenarios prove the factual detection path. They do not
   supply the new Matter assessment integration or these local-record scenarios.

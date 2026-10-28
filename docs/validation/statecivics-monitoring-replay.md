@@ -110,12 +110,16 @@ API and alert-delivery test modules. No alternate checkout was created.
 
 - These are deterministic structured-source checks, not recorded executor tests,
   new live JEV calls, independent civic labels or provider qualification.
-- The ordinary KS-841 dress rehearsal runs without sign-in in development mode.
-  A native interactive KS-698 instance needs its existing dedicated database,
-  marker, source root and genuine native admin/session admission. Those guards
-  were not weakened. The PostgreSQL proof uses a controlled authority callback;
-  route admission tests control native transport seams. Neither is a new native
-  browser acceptance result.
+- Owner correction after this checkpoint: replay must run in the existing
+  KS-841 rehearsal **without a login**. Its README and Compose configuration
+  confirm sign-in is already disabled and copied accounts/sessions are excluded.
+  The older KS-698 admin route requires a native session and a different database
+  identity; that is an integration mismatch to fix, not a login prerequisite for
+  the user. Rehearsal must reuse the replay mechanisms with synthetic run
+  isolation and capture-only delivery. No-login browser acceptance remains
+  untested. The PostgreSQL proof uses a controlled authority callback; route
+  admission tests control native transport seams. Neither proves rehearsal
+  browser access.
 - The LLM writer, real/private evidence and external alert delivery remain out
   of this slice. MAT-046/047/048/049/050 and their canonical prerequisites remain
   separate; this host fixture binding does not complete them.
@@ -130,9 +134,9 @@ Initial independent review covered nine code files in two rounds, with 15
 findings and no skipped groups/warnings. Confirmed findings were addressed,
 including optional-SDK admission, immutable capture history, pending digest
 selection, meaningful cutoff probes, default gate compatibility, and Mac shell
-array handling. Final source review remains in progress at this checkpoint.
-Findings already confirmed in the final review
-remain unresolved while checkout ownership is pending:
+array handling. Final source review subsequently completed: 14 files, four
+groups, two rounds, eight findings, no skipped groups or warnings. The findings
+below remain unresolved while checkout ownership is pending:
 
 - The shared replay banner still describes retained history and the legacy
   detector during the synthetic Matter mode; its mode-specific disclosure must
@@ -149,6 +153,12 @@ remain unresolved while checkout ownership is pending:
 - The controller records JUnit identity but does not require or hash its emitted
   `matter-timeline.json`. That trace's existence/counts were inspected separately;
   controller-bound artifact identity remains an open receipt gap.
+- In an SDK-free image, the bad-context admission test can pass on the unrelated
+  missing-SDK refusal. It needs a direct assertion of the intended context
+  validation error. The 199-test run above used the SDK image; this finding does
+  not invalidate that run, but weakens the ordinary-image regression check.
+
+Final review result is retained locally at `/tmp/ks1105-review-final.json`.
 
 The separate Matter JSON review covered both changed JSON files in two rounds:
 zero findings or warnings. Its applicable rule checks key spelling; it is not
