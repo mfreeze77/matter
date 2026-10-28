@@ -223,6 +223,13 @@ insufficient support with no independent labels. Synthetic software tests of a
 passing report are explicitly fixtures; MAT-040 empirical qualification remains
 blocked on independently reviewed held-out episodes and approved targets.
 
+The [MAT-040 label/target handoff](qualification/MAT-040-label-target-handoff.md)
+now supplies source-cited teacher drafts, a separate blank human worksheet,
+metadata-only fresh-cohort recruitment candidates, and a concrete unapproved
+capture-only target proposal. Existing exposed cases remain development data
+after human review. Target approval, genuine independent review and a fresh
+cohort are separate prerequisites; no qualification follows from preparation.
+
 ## Controlled question sensitivity
 
 MAT-041's `prepare_sensitivity` renders the entire frozen packet before returning

@@ -8,6 +8,12 @@ and sufficient actual support. The narrow installed walkthrough-schema failure
 is resolved; broader MAT-077 remains planned. No receiving deployment or real
 alerts were enabled.
 
+The subsequent [label/target handoff](../qualification/MAT-040-label-target-handoff.md)
+prepares 120 explicitly teacher-origin drafts, retains a separate blank human
+worksheet, and proposes specific capture-only pilot gates. It preserves all
+prior exposures and requests actual reviewer/cohort identity and operator target
+approval. It does not turn these exploratory calls into held-out results.
+
 Executed evidence: 24 additional actual public-evidence JEV calls; 1,348 tests
 on the frozen installed wheel; 46 focused tests on the final wheel; 41 selected
 core checks producing a v2 report; and 39 repository/hardening checks. Final
