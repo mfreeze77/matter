@@ -32,7 +32,9 @@ retained native/neutral bytes and passed primitive validation. No production or
 external alert was sent. Source facts, identity, material fields and cadence
 remain authored synthetic inputs; JEV supplied relevance/novelty interpretations
 of released prose and audience purpose. This is a hybrid integration experiment,
-not full civic extraction, provider qualification or MAT-049 completion.
+not full civic extraction, provider qualification or MAT-049 completion. The
+observed capture baseline legitimately contains the host-authored facts actually
+conveyed earlier; this is not a prose-only reading test.
 
 Observed decisions: 29 quiet, nine updates, six digests, four corrections. Every
 immediate command retry produced the same snapshot without extra calls/captures.
@@ -75,8 +77,11 @@ passed at `08cd03dca`, including interpreter revocation rollback and retaining
 history while withholding an older pending digest after unknown latest meaning.
 PostgreSQL source/harness stability and owned-resource cleanup passed. JUnit SHA
 `a045714ddd5dd25a29d4b86a50af49d3e2276e335d8bccab47d5a85e25975a16`.
-Full commands, earlier failures, review findings and retained evidence are in
-StateCivics `docs/evidence/ks1118-live-matter-replay.md` and ticket KS-1118.
+Later at `9917c37bc`, 41 focused Docker cases passed, and a zero-call launcher
+preflight verified pinned scenario custody, the protected-.env entrypoint and
+read-only source/marker/provenance mounts. Those later safeguards were not
+retroactively attributed to the earlier 45-call source pin. Full commands,
+earlier failures, review findings and retained evidence are in StateCivics `docs/evidence/ks1118-live-matter-replay.md` and ticket KS-1118.
 No installed walkthrough-schema requalification, real/private-evidence run or
 production acceptance is claimed. MAT-040's human-reviewed held-out references
 and independent-support requirements remain separate; they did not block this run.
