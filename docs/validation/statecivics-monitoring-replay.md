@@ -14,6 +14,13 @@ walked in Chrome using the shared replay console. Its original native-admin
 route remains separate. The KS-1106 work at `ca7b9a3aa` was merged into the task
 branch, retaining both ticket rows and the other session's ignored evidence.
 
+Local StateCivics `main` now contains this integration at `c2325ba89`, with a
+clean checkout. It also preserves `795aa1d2c`'s newer owner decision: KS-574 is
+superseded; workstation hearing/provider work belongs to crawler CR-148, while
+StateCivics retains receiver/import/publication work under KS-1104. No KS-574
+implementation was started here. Runtime/source bytes are unchanged from the
+walked `5af45f817` checkpoint. This is a local merge, not a hosted push.
+
 The final browser run (`941f5cec-6238-4447-8270-1515eab1343a`) completed all
 12 releases: **48 decisions, 19 in-app captures and 40 factual activity
 associations**, matching the independent expected trace. A separate HTTP read
@@ -189,6 +196,6 @@ The separate Matter JSON review covered both changed JSON files in two rounds:
 zero findings or warnings. Its applicable rule checks key spelling; it is not
 behavioral integration evidence.
 
-Storage: 69 GiB free initially, 64 GiB at the last check, above the 50 GiB reserve.
+Storage: 69 GiB free initially, 63 GiB at the last check, above the 50 GiB reserve.
 The retained private traces/logs are small; no real corpus or production copy was
 made. Test PostgreSQL used bounded tmpfs and cleaned up its owned resources.
