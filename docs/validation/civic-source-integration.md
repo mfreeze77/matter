@@ -41,7 +41,7 @@ No source assertion is accepted legal state. See `docs/civic-import-map.md`.
 ## Executed connected run
 
 StateCivics source: `bf92f745232bfb2e1b0b2168e03e695c85802433`, branch
-`feat/civic-real-packet-monitoring`, KS-1119. Matter adapter/source questions at
+`feat/civic-real-packet-monitoring`, now KS-1121 (originally unmerged KS-1119). Matter adapter/source questions at
 `eae62d6`, installed wheel SHA
 `724cdc92f2020dcc0c885dee23a3f66db8d93d898b73f2bd38a2015868b75e5e`.
 The existing test image was reused with only that wheel replaced:
@@ -187,13 +187,24 @@ PostgreSQL backend, DIAT or alert-writing expansion was introduced. Storage was
 56 GiB free before image reuse, 53 GiB at closeout; reserve 50 GiB/task cap 10 GiB.
 The live artifact root is about 11 MiB. Both repositories have one worktree.
 
-### Concurrent ticket allocation discovered at closeout
+### Owner-approved allocation and main integration — 2026-10-28
 
-Read-only closeout found StateCivics branch `ks1119-ks1120` with an unrelated
-KS-1119 ticket (commit `52b5920cd`). Our civic ticket is
-`tickets/KS-1119-civic-public-source-monitoring.md` on
-`feat/civic-real-packet-monitoring`. Both branches and their unique work are
-preserved; no transcript/DIAT code was changed. StateCivics' stable-ID rule means
-allocation must be reconciled before integration. Owner input requested for moving
-our newly introduced, unmerged civic ticket to KS-1121; no renumbering performed
-without that input. This is a branch-integration blocker, not a live-test failure.
+The owner confirmed the other session keeps KS-1119/1120 and authorized fixing
+this session's collision and main ordering. StateCivics' current civic ticket is
+**KS-1121**, `tickets/KS-1121-civic-public-source-monitoring.md` on
+`feat/civic-real-packet-monitoring`; evidence doc
+`docs/evidence/ks1121-civic-public-monitoring.md`. Its original unmerged ticket was
+KS-1119. Historical commits and retained run-scope identifiers stay unchanged,
+with the alias documented; there are no new provider trials from renumbering.
+
+KS-1118 is now merged and pushed to StateCivics main at
+`bf0fa18a60017693162b4ab9769e96cfb16f7d67`; local/remote main were verified equal.
+The main-integration candidate passed 74 focused Docker checks, including the
+existing canonical ticket metadata/contiguity test. Implementation files are
+byte-identical to the previously reviewed KS-1118 closeout; only the ticket index
+resolution preserves current main entries plus KS-1118. No deployment or new
+live call was made. This unblocks the other session's KS-1119/1120 integration.
+
+KS-1121 follows those intervening tickets before its main merge. The other
+session's branch and ticket identities are preserved; its implementation is not
+merged as incidental numbering work. No transcript/DIAT implementation changes.
