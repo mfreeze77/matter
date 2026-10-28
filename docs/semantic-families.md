@@ -35,12 +35,16 @@ packet's existing dependency audit. Assessment views select propositions,
 status, causes, evidence and gaps; omitted publication/manifest fields are named
 explicitly. Nothing is silently truncated, and the original packet is unchanged.
 
-All references in the resulting model-visible view are exact, available at the
+All references in the resulting model-visible view are exact, committed at the
 cut and included in the dependency audit, including references nested in claim,
 assessment and context bodies. The shared packet reader performs those checks;
 control `public_targets` bookkeeping is omitted from the semantic view. Original
 definitions and records remain available through their immutable pins. This
 allows the comparison to use the actual receipt/access scanners and dispatcher.
+Knowing an attribution identity does not expose an unavailable source's content;
+source availability and incomplete coverage remain separate. The transform reads
+only its added comparison fields and memoizes repeated references; it does not
+re-walk the original packet's quadratic mechanical comparisons.
 
 A missing optional snapshot is `not_supplied`, not proof of absence. A queued
 receipt remains queued; supplying it cannot advance delivered knowledge. Hosts

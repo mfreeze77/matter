@@ -111,9 +111,8 @@ def prepare_comparison(view, packet, *, cause, after, condition, purpose, audien
                 {'preference' if name == 'preferences' else 'responsibility'},
                 comparison['after']['record']['body']['matter']))
     value = packet.value
-    value["state"]["comparison"] = comparison
+    value["state"]["comparison"] = _pin_references(reads, comparison, state['as_of'])
     value["state"]["preparation"] = comparison_preparation_reference(state["preparation"])
-    value['state'] = _pin_references(reads, value['state'], state['as_of'])
     dependencies = {canonical_bytes(ref): ref for ref in value["dependencies"]}
     dependencies.update(reads.pins)
     value["dependencies"] = [dependencies[key] for key in sorted(dependencies)]

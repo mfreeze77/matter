@@ -18,6 +18,7 @@ from security import test_scope_and_egress as access_fixtures
 from matter.semantic.receipts import ExecutionReceiptStore
 from rule_helpers import component
 from integration.helpers import domain_value
+from observation_helpers import observation_command
 import claim_helpers
 from occurrence_helpers import declared, group_key
 
@@ -166,6 +167,23 @@ class EvidenceFamiliesTests(unittest.TestCase):
         with f.core.storage.snapshot() as view:
             options['access_view'] = view
             with self.assertRaises(ContractError): ShadowResult(batch, result, specifications=specs, **options)
+
+    def test_unknown_attribution_keeps_known_claim_and_explicit_incomplete_coverage(self):
+        f = claim_helpers.ClaimTestCase('runTest'); f.setUp(); self.addCleanup(f.doCleanups)
+        payload=b'SYNTHETIC-UNAVAILABLE-ATTRIBUTION-CONTENT\n'
+        command=observation_command('observe-unknown-attribution','unknown-attribution',payload=payload,
+            scope_id=f.storage.scope_id,event_id='unknown-attribution',
+            available_at={'state':'unknown','reason':'not_reported'})
+        ingested=f.ingestor.ingest(f.ingestor.prepare(command),payload=payload)
+        self.assertEqual(ingested['status'],'success',ingested)
+        f.source=f.storage.get(ingested['body']['observation'])
+        claim,_,_ = f.append('known-claim-about-unknown-source')
+        packet = h.packet(f.storage,f.payloads,f.adapter,{'kind':'claim','claim':pin(claim)},[f.source])
+        self.assertEqual(packet.state['coverage']['status'],'incomplete')
+        self.assertEqual(packet.state['evidence'],[])
+        self.assertEqual(packet.source_manifest['excluded'][0]['reason'],'unknown_availability')
+        self.assertIn(pin(f.source),packet.value['dependencies'])
+        self.assertNotIn('SYNTHETIC-UNAVAILABLE-ATTRIBUTION-CONTENT',str(packet.state))
 
 
 if __name__=='__main__': unittest.main()

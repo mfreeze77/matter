@@ -22,6 +22,8 @@ from matter.semantic.receipts import ExecutionReceiptStore, _public_refs, _targe
 from matter.semantic.rendering import RenderedQuestion
 from matter.semantic.families.evidence import claim_evidence_questions
 from matter.storage import SQLiteStore
+from matter.matters import MatterService
+from matter_helpers import identity_policy, metadata_command
 from claim_helpers import claim_command
 from semantic import family_helpers as h
 from semantic import test_stages as stage_fixtures
@@ -323,6 +325,23 @@ class AttentionFamiliesTests(unittest.TestCase):
         self.assertEqual(result['status'],'completed',result)
         self.assertTrue(result['result'].primitive_valid,result['result'].value)
         self.assertFalse(protected_service.replay(result['execution']).value['admission']['consequential_use'])
+
+    def test_original_cut_survives_later_matter_metadata_revision(self):
+        assessment, claim, source, _ = self.a.assess('historical-subject')
+        with self.f.storage.snapshot() as view:
+            cut = view.receipt_for(pin(assessment))['provenance']['recorded_at']
+        original = self.packet(claim,[source],boundary=cut)
+        comparison = self.compare(original,claim,assessment)
+        matters = MatterService(self.f.storage,identity_policy=identity_policy())
+        command = metadata_command('after-cut-metadata',self.f.subject,{'title':'Later synthetic wording'})
+        changed = matters.update_metadata(matters.prepare(command))
+        self.assertEqual(changed['status'],'success',changed)
+        later = self.f.storage.get(entity_ref(self.f.subject))
+        self.assertNotEqual(pin(later),pin(self.f.subject))
+        rebuilt = self.packet(claim,[source],boundary=cut)
+        self.assertEqual(rebuilt.value,original.value)
+        self.assertEqual(self.compare(rebuilt,claim,assessment).value,comparison.value)
+        self.assertNotIn(pin(later),rebuilt.value['dependencies'])
 
 
 if __name__ == '__main__': unittest.main()
