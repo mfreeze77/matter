@@ -290,6 +290,9 @@ retain their canonical scope and prerequisites.
 
 ## MAT-033/034 shadow question families
 
+Implementation and synthetic acceptance are complete in
+[PR #19](https://github.com/mfreeze77/matter/pull/19).
+
 The [family guide](../semantic-families.md) and
 [validation receipt](MAT-033-034.md) track 15 versioned association, independent
 claim/evidence, explicit change-cause, matching recovery and audience-contribution
