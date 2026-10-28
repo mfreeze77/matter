@@ -17,6 +17,49 @@ qualification or production deployment.
 
 ## Connected live JEV capture experiment — October 28, 2026
 
+### Final guarded run — 21:02 UTC
+
+After the launcher guard review passed, the same bounded workload was rerun through
+the final source/scenario/entrypoint/read-only-mount guards. StateCivics source
+`58b9ff8ede5a2df2c516bd3bc7146fc557586569`: **45 actual live calls, 48 decisions,
+12 releases, 15 in-app captures**, no external/production alerts. All 45 native
+responses valid; 29 quiet, ten updates, five digests and four corrections. All
+retries, duplicate/scope/gap silence, future-evidence and packet/credential audits
+passed. Actual duration 27.764 seconds. This is the final connected receipt;
+the initial 16-capture run below remains separately retained.
+
+**90 new live calls total**: 45 initial plus 45 after meaningful launcher hardening;
+zero in the failed stdin launch and zero-call preflight. Combined reported usage
+430,729 input tokens, calculated charge $0.018090618 at the verified published
+rate. These repeated cases are not independent qualification groups.
+
+Quality remains limited. Six illustrative treatments were withheld (s02 IT/finance,
+s03 finance, s05 IT/advocacy, s06 finance), and two s09 expected corrections became
+digests because earlier messages were not captured. On identical semantic state
+and questions, s05 advocacy relevance shifted from 0.8 to 0.78 across runs, crossing
+the exploratory routing boundary and changing its delivery history. Forty-three
+of 45 packets/question sets matched across runs; probability variation is retained.
+This demonstrates a threshold-sensitivity problem to investigate, not a calibrated
+robustness/accuracy result. Source facts and observed prior capture material remain
+host-authored; full civic adaptation and MAT-040 are not complete.
+
+Final root:
+`/Users/mfrieson/ks-rehearsal/matter-live-20261028T210200Z-84592/responses/run/`.
+Run `db69ec35-719f-467c-aeb9-74e1ea0d53df`.
+
+- Final SHA-256: `58143541d5c112f383c963d85f8b93c0454a985b80995eb5a6d39c9e58169122`.
+- Trace SHA-256: `d66b34118a2589e8f57fdfe7e1ae234d2466c771fd6ed6baf952b040a2b73deb`.
+- Summary SHA-256: `270f1d62000df9e9ccdc2a4925b98bddacb994e81abf21ae40de7558377561be`.
+- Audit/comparison SHA-256: `31555a1dd9c4eac64863de150cf6c4c759965f86d80e68ec75ea4d2d9874a132`.
+
+Software/review evidence: 41 focused Docker cases, 32 exact PostgreSQL cases,
+seven-file/two-round host review with findings addressed or explicitly reconciled,
+then three-file/two-group/two-round guard review with zero findings/warnings.
+MAT-049 stays planned. No installed walkthrough requalification or production
+readiness claim. Host ticket KS-1118 closes the bounded connected experiment.
+
+### Initial connected run — 20:41 UTC
+
 The connected path has now executed, separately from the historical deterministic
 19-capture trace below. StateCivics KS-1118 at `08cd03dca730c61b14e4a154bb13d744be36ba7d`
 used Matter `823d4e7`'s installed wheel and the same scenario/custody/no-login
