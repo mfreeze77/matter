@@ -144,6 +144,12 @@ def _run_prepared(*,config,prepared,identity,preflight,credential,output,resume,
                     stop_reason='resolved_model_differs_from_price_binding';break
                 if prior_tokens is not None and prior_tokens>config['price_basis']['max_input_tokens_per_call']:
                     stop_reason='observed_usage_exceeds_reserved_bound';break
+            elif artifacts.exists(name+'-refused.json'):
+                row=artifacts.read(name+'-refused.json')
+                if row['started_digest']!=canonical_digest(started,'matter.provider-start.v1'):_fail('response_start_mismatch')
+                observations.append(row)
+                if row['transport_attempt_observed']:unknown+=1
+                else:non_dispatched+=1
             else:
                 observations.append({'index':index,'job_id':job['id'],'trial':trial,'status':'outcome_unknown',
                     'observation_kind':'incomplete_attempt','reason':'started_without_terminal_receipt'})
@@ -165,8 +171,19 @@ def _run_prepared(*,config,prepared,identity,preflight,credential,output,resume,
             result=execute_batch(executor,batch,clock=clock)
         else:
             case=guards[job['id']]
-            result=case.access.dispatch(case.view,case.context,batch,executor,
-                rendered_questions=case.rendered_questions,clock=clock)
+            try:
+                result=case.access.dispatch(case.view,case.context,batch,executor,
+                    rendered_questions=case.rendered_questions,clock=clock)
+            except ContractError:
+                dispatched=executor.calls_made>before
+                if dispatched:fresh+=1;unknown+=1
+                else:non_dispatched+=1
+                refusal={'index':index,'trial':trial,'status':'outcome_unknown' if dispatched else 'access_refused',
+                    'observation_kind':'incomplete_attempt' if dispatched else 'not_dispatched',
+                    'reason':'access_refused','transport_attempt_observed':dispatched,
+                    'started_digest':canonical_digest(started,'matter.provider-start.v1')}
+                artifacts.write(name+'-refused.json',refusal);observations.append(refusal)
+                stop_reason='access_refused';break
         dispatched=executor.calls_made>before
         if dispatched:fresh+=1
         else:non_dispatched+=1
@@ -190,9 +207,59 @@ def _run_prepared(*,config,prepared,identity,preflight,credential,output,resume,
         'scheduled':len(schedule),'fresh_attempts':fresh,'cached_replays':cached,'incomplete_attempts':unknown,'non_dispatched':non_dispatched,'not_attempted':len(schedule)-len(observations),
         'reserved_cost_usd':str(reserved),'billing_cost':'not_observed','stop_reason':stop_reason,'observations':observations,
         'qualification':'unknown','host_mutations':0,'real_deliveries':0,'consequential_use':False}
+    if guards is not None:
+        report['observed_transport_attempts']=sum(row.get('transport_attempt_observed') is True for row in observations)
+        if stop_reason=='access_refused':
+            # A later revocation withholds earlier response bodies as well.
+            report['observations']=[{key:row[key] for key in ('index','trial','status','observation_kind','transport_attempt_observed') if key in row}
+                for row in observations]
     artifact=artifacts.write('report-'+str(time.monotonic_ns())+'.json',report)
     return {**report,'artifact':artifact}
 
+
+
+def _guarded_refused_resume(*,config,identity,output,reason):
+    """Private, source-free ledger accounting only; no results or new dispatch.
+
+    Revocation cannot erase evidence that a request may already have left the
+    host. This reports counts under the original manifest without renewing its
+    token or reading/releasing source bodies through an unguarded semantic port.
+    """
+    artifacts=ArtifactDirectory(output,resume=True)
+    if artifacts.read('manifest.json')['identity']!=identity:_fail('resume_configuration_mismatch')
+    schedule=[(job,trial) for job in identity['jobs'] for trial in range(config['trials_per_case'])]
+    observations=[];reserved=Decimal('0');unknown=0;non_dispatched=0;completed=0;observed=0
+    for index,(job,trial) in enumerate(schedule):
+        name=str(index)
+        if not artifacts.exists(name+'-started.json'):continue
+        started=artifacts.read(name+'-started.json')
+        if started['index']!=index or started['job_id']!=job['id'] or started['trial']!=trial:_fail('attempt_identity_mismatch')
+        reserved+=Decimal(started['reserved_cost_usd'])
+        if artifacts.exists(name+'-result.json'):
+            row=artifacts.read(name+'-result.json')
+            if row['started_digest']!=canonical_digest(started,'matter.provider-start.v1'):_fail('response_start_mismatch')
+            sent=row['transport_attempt_observed'];completed+=1
+            if not sent:non_dispatched+=1
+            status='response_withheld';kind='recorded_attempt_withheld'
+        elif artifacts.exists(name+'-refused.json'):
+            row=artifacts.read(name+'-refused.json')
+            if row['started_digest']!=canonical_digest(started,'matter.provider-start.v1'):_fail('response_start_mismatch')
+            sent=row['transport_attempt_observed']
+            if sent:unknown+=1
+            else:non_dispatched+=1
+            status=row['status'];kind=row['observation_kind']
+        else:
+            sent=None;unknown+=1;status='outcome_unknown';kind='incomplete_attempt'
+        observed+=sent is True
+        observations.append({'index':index,'trial':trial,'status':status,'observation_kind':kind,'transport_attempt_observed':sent})
+    report={'schema_version':'1.0','mode':'provider_shadow','purpose':'access_refused_accounting_only','status':'incomplete',
+        'reason':reason,'scheduled':len(schedule),'fresh_attempts':0,'cached_replays':0,
+        'recorded_terminal_attempts':completed,'observed_transport_attempts':observed,'incomplete_attempts':unknown,
+        'non_dispatched':non_dispatched,'not_attempted':len(schedule)-len(observations),'reserved_cost_usd':str(reserved),
+        'billing_cost':'not_observed','stop_reason':'access_refused','observations':observations,
+        'qualification':'unknown','host_mutations':0,'real_deliveries':0,'consequential_use':False}
+    artifact=artifacts.write('report-access-refused-'+str(time.monotonic_ns())+'.json',report)
+    return {**report,'artifact':artifact}
 
 @dataclass(frozen=True)
 class GuardedProviderCase:
@@ -212,8 +279,9 @@ def run_guarded_diagnostic(*,config,cases,credential,output,provenance,live=Fals
     This is deliberately separate from paired offline/provider evaluation: no
     fabricated OfflineReport, label accuracy, admission or qualification claim.
     All protected work requires actual detached inputs and fresh host reads.
-    An access failure after a durable start leaves an incomplete attempt; resume
-    never automatically resends it, including when a response was withheld.
+    An access failure after a durable start records definite non-dispatch or an
+    unknown outcome after observed I/O. A revoked resume reports ledger counts
+    only, with no response bodies, renewed token or automatically resent work.
     """
     from ..access import AccessService,AccessContext
     from ..assessments import FrozenAssessmentView
@@ -247,10 +315,6 @@ def run_guarded_diagnostic(*,config,cases,credential,output,provenance,live=Fals
                 [q.question.value for q in case.rendered_questions]!=batch.value['questions'] or
                 any(q.manifest.get('access_context')!=context.reference for q in case.rendered_questions)):
                 return unrun('guarded_packet_mismatch')
-            selected=next((p for p in case.access.policy.value['providers'] if p['reference']==context.value['provider']),None)
-            if selected is None or selected['provider']!='typesafe' or selected['transport']!='http':return unrun('provider_access_mismatch')
-            try:case.access.require_packet(case.view,context,batch.value['state'],_fresh=True)
-            except ContractError:return unrun('access_or_packet_refused')
             if len(batch.canonical)>config['max_request_bytes']:return unrun('provider_request_unsupported_or_oversize')
             try:adapter._request(batch)
             except ExecutionFault:return unrun('provider_request_unsupported_or_oversize')
@@ -262,6 +326,17 @@ def run_guarded_diagnostic(*,config,cases,credential,output,provenance,live=Fals
         # Reject noncanonical or oversized private audit declarations before writes.
         if len(canonical_bytes(identity))>1048576:return unrun('guarded_manifest_limit')
         if credential.encode() in canonical_bytes(identity):return unrun('credential_echo_withheld')
+        for case in guards.values():
+            selected=next((p for p in case.access.policy.value['providers'] if p['reference']==case.context.value['provider']),None)
+            reason=None
+            if selected is None or selected['provider']!='typesafe' or selected['transport']!='http':reason='provider_access_mismatch'
+            else:
+                try:case.access.require_packet(case.view,case.context,case.batch.value['state'],_fresh=True)
+                except ContractError:reason='access_or_packet_refused'
+            if reason is not None:
+                if resume and live is True:
+                    return _guarded_refused_resume(config=config,identity=identity,output=output,reason=reason)
+                return unrun(reason)
     except (ValueError,TypeError,KeyError,ArithmeticError):return unrun('invalid_provider_configuration')
     if live is not True:return {**limits,'status':'not_run','reason':'live_mode_not_selected'}
     return _run_prepared(config=config,prepared=prepared,identity=identity,preflight=limits,credential=credential,

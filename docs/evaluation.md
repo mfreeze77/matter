@@ -172,3 +172,11 @@ the execution bounded. A missing terminal record remains outcome-unknown on
 resume; it is never automatically reissued. Cached responses are labeled replay,
 and repeated calls share their episode/provenance independence unit. Neither
 successful calls nor a completed shadow runner qualify any question family.
+
+Guarded dispatch refusals preserve the whole attempted prefix and reservations.
+Known pre-I/O refusal is definite non-dispatch; a response withheld after observed
+I/O is an incomplete outcome, even though the request is counted as observed.
+A revoked resume returns source-free ledger accounting only, including earlier
+attempts; it releases no response bodies or source/job identifiers and cannot
+renew controls or dispatch. Previously completed responses in that prefix are
+also withheld from the refusal report.

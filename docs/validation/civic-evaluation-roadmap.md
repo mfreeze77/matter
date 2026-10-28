@@ -306,9 +306,10 @@ The added `run_guarded_diagnostic` reuses the provider runner's existing executi
 budgets, durable starts/results and resume accounting. It requires real access
 service/context bindings and exactly the guarded rendered questions. It is an
 **exploratory** entry point, not a fabricated passed `OfflineReport` or a bypass
-of the paired runner's offline/held-out contracts. A revocation after start or
-while a call is in flight prevents result release; the retained start remains
-outcome-unknown and is never silently resent. Qualification, corpus/split and
+of the paired runner's offline/held-out contracts. A revocation prevents result release; known pre-I/O refusal is definite
+non-dispatch, while an observed request with a withheld response has an unknown
+outcome. Original reservations and markers survive report-only revoked resume;
+no attempt is silently resent. Qualification, corpus/split and
 paired-arm fields remain unknown/null where not applicable.
 
 ### Twelve actual public-source calls, with limitations retained
@@ -458,3 +459,60 @@ resume returned a misleading zero-attempt preflight. This is a remaining
 failure-path correction at this checkpoint, not a defect observed in the twenty
 successful calls. Closeout requires explicit refusal/unknown accounting and a
 source-free report-only resume that cannot make new calls or release responses.
+
+The accounting correction now writes a fixed refusal marker and an aggregate
+report instead of escaping after a guarded dispatch failure. Known pre-I/O
+refusal counts as definite non-dispatch. Observed I/O followed by a withheld
+response counts as a fresh observed request **and** an incomplete outcome (these
+two measures overlap; they are not extra independent attempts). Reservations
+remain charged conservatively. A subsequent revoked resume reports only
+source-free ledger counts under the exact original manifest: no response bodies,
+source/job identifiers, renewed token, cached-result release or new HTTP call.
+Previously completed results in the same prefix are also withheld from that
+aggregate response. A start interrupted before its refusal/result record remains
+unknown rather than being reported as zero historical attempts.
+
+Twenty provider/guarded checks passed in 17.459s after this correction
+(`accounting-focused.log`), including multi-case prefix reconciliation, pre-I/O
+refusal, in-flight revocation and interrupted-start recovery. These are injected
+HTTP mechanism checks, not additional live calls. The final regression, wheel
+and independent correction review follow below.
+
+## Live-testing closeout
+
+The correction received a two-pass review of both changed Python files:
+`accounting-review.json` records two reviewed files, no warnings and one low
+report-label issue. It was confirmed and fixed by forwarding the specific
+`provider_access_mismatch` reason into report-only resume, with that behavior
+added to the existing provider-binding regression. This final small forwarding
+fix was tested after the review; no extra independent review of that final
+reporting-only edit is claimed. No known review findings remain unaddressed.
+
+Final-source checkout: **59 tests passed in 16.039s**
+(`closeout-checkout.log`). Final-source installed provider/guarded/access suite:
+**37 tests passed in 37.150s** (`closeout-installed.log`). Final wheel SHA-256:
+`c5f05abfee4d90985aedcb0cf92775ae2b65f77cdd16323a3397d3b0c66200c1`;
+provider source SHA-256:
+`12c73fa64db01e416a02e3f2abf4516e092c6962f0d14214c7df21773721f6bc`.
+All 189 checkout/wheel/installed runtime/schema files match
+(`closeout-installed-byte-match.json`). Earlier wheel hashes and test counts in
+this receipt are historical checkpoints. No full discovery was repeated on this
+delta. Canonical rendering/validation and diff checks pass; ticket statuses stay
+38 done, 41 planned, one blocked. MAT-039/MAT-072 record the actual live evidence;
+MAT-040 explicitly retains its independent-label/support blocker.
+
+The actual credential audit checked 50 provider-artifact JSON files and 116
+encoded request/response bodies, finding no credential; authentication headers
+were never retained (`credential-audit.json`). Real evidence/results remain in
+the external private directory. At the measured storage checkpoint the task
+artifacts used about 9 MiB in the checkout and 10 MiB externally, with about
+60 GiB free, above the 50 GiB reserve. Review logs and later small closeout files
+are additional bounded artifacts; no bulk media work, new environment, cleanup
+or branch deletion occurred.
+
+There is **no remaining access/configuration blocker to exploratory live JEV
+calls** in this completed slice. Provider qualification needs independent held-out
+labels, adequate episode/polarity support and defensible results; real-client
+monitoring/delivery usefulness needs the receiving integration and its own
+acceptance. Neither follows from these twenty calls. The installed walkthrough
+schema failure remains open independently.
