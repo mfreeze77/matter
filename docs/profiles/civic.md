@@ -46,3 +46,9 @@ capture sinks when supplying these profiles. This ticket neither replaces that
 stack nor changes its receiver registry. Crawler MAT-047 still owns the actual
 jurisdiction/authority export; MAT-048/049 own source adaptation and audience use.
 Unsupported real-world procedural rules remain explicit missing/unknown inputs.
+
+StateCivics uses Matter as its contextual monitoring and alert membrane. The
+[monitoring profile and synthetic scenarios](statecivics-monitoring.md) describe
+purpose/audience inputs and the existing no-login rehearsal evidence. StateCivics'
+existing civic matter records/pages are a separate implementation; a shared name
+does not imply a shared code path.
