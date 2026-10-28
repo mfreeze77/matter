@@ -120,8 +120,8 @@ MAT-039's focused **5 provider-shaped tests passed in 0.200s**
 OfflineReport schema fixture to isolate preflight/recovery; these are not live
 provider trials or evidence that a new corpus passed offline. Missing/unselected
 credentials, changed questions, insufficient cost, interruption, cached resume,
-timeout, model mismatch and capture-only spies are covered. The only actual live
-JEV calls in this task remain the six interpretation calls recorded above.
+timeout, model mismatch and capture-only spies are covered. At that checkpoint the only actual live
+JEV calls were the six interpretation calls recorded above.
 
 The current official model reference was checked again: Jev 1.14's published
 input price is USD 0.042 per million tokens and output is free
@@ -203,7 +203,7 @@ The additional f192e20 negative policy test passed separately (1 test, 52.047s);
 it was added after discovery and is not part of the 1305-test count. Runtime
 files remain byte-identical to c0de7ad.
 
-## Canonical closeout
+## Canonical closeout before live completion
 
 MAT-046, MAT-023, MAT-024, MAT-037, MAT-038 and MAT-039 are complete for their
 recorded implementation/conformance scope. MAT-039 completion means the optional
@@ -238,3 +238,223 @@ JSON files, zero findings and zero coverage warnings**
 41 planned and 1 blocked (MAT-040); 20 Matter-owned items and the unchanged
 22 cross-repository roadmap items remain open. This closeout does not turn the
 optional provider runner into a completed held-out provider study.
+
+## Actual provider runner and public-evidence live completion — 2026-10-28
+
+This checkpoint supersedes the earlier **no-call** runner preflight. Twenty new
+HTTP attempts actually reached JEV in this pass: eight on the retained synthetic
+schedule and two six-call exploratory runs on one real public document. The six
+synthetic interpretation calls from the earlier checkpoint are additional, older
+calls. None of these exposed/tuning cases constitutes MAT-040 qualification.
+
+### Retained synthetic schedule: eight live calls
+
+Executed `.venv/bin/python data/validation/live-completion-20261028/run_synthetic.py`
+using the existing `run_provider(..., live=True)` and its default real TypeSafe
+HTTP transport, not an injected response. Inputs are the retained
+`roadmap-retained-offline/inputs.json` and actual passed `report.json`; their
+frozen packets/questions and offline digest are unchanged. The explicit model
+was `jev-1.14.0`, maximum eight calls, zero retries, one worker, 30 seconds per
+call, 360 seconds wall time, 64 KiB request/response bounds and USD 0.03 maximum
+reservation. The credential came from ignored `.env:TYPESAFE_API_KEY`; its value
+was neither printed nor stored.
+
+All eight attempts completed, were primitive-valid and resolved `jev-1.14.0`:
+zero cached replays, incomplete attempts, non-dispatched rows or unscheduled
+retries. Artifacts: ignored `data/validation/live-completion-20261028/synthetic/`,
+including starts, exact neutral batches, native/neutral response bytes and
+`report-908193908689125.json` (SHA-256
+`28be698b77c60d8a4fa4203859732722b082d214fa246e9bdabf0d5537afc98a`).
+Observed input usage was 4,347 tokens, giving an input-price estimate of
+USD 0.000182574; the conservative reservation was USD 0.022020096. Billing was
+not observed. Names such as `timeout`, `malformed` and `partial` identify the
+**offline fixture cases**, not live faults: all eight actual responses completed.
+This proves the new runner can dispatch and reconcile its matched workload; it
+is not a provider-accuracy experiment.
+
+### Selected real evidence and existing access boundary
+
+Reused the saved extraction from the latest Shawnee dropoff ZIP
+`Statecivicsai/docs/local-crawler-captures/ks_county_wyandotte/ks_county_shawnee-seed-20261022-r2q.zip`,
+SHA-256 `5936d0a01f06faf63f37736955b24ac72d0c674eb38cfeb4c27982b265f86b3b`.
+The selected source is the public three-page FY23 SS4A grant close-out amendment
+packet, attachment 9267, associated with the May 14 commission agenda. The
+[official attachment](https://shawneecoks.api.civicclerk.com/v1/Meetings/GetAttachmentFile(fileId=9267))
+returned HTTP 200 without credentials; its 1,271,491 bytes matched the crawler's
+PDF SHA-256 `ef4c88ba21f430aca5c7f69a435aedc933ad398ef41b27424addf3ee69fd7042`.
+The saved 5,446-byte machine extraction matched SHA-256
+`db37eed59fa863964139334645d32ccb55b026f7f54af342f66a0280434f1a7f`.
+No new OCR, crawler run, stack, deployment or bulk archive extraction was needed.
+The crawler's redistribution field is unknown; this authorized public-source
+provider diagnostic does not assert a general redistribution license.
+
+Real source bytes, provenance, SQLite host records, requests and responses stay
+**outside the repository** under
+`/Users/mfrieson/.local/share/matter-validation/live-20261028/` (private directory).
+`provenance.json` retains the selected row, custody receipt, ZIP/public-fetch
+hashes, extraction origin and permission basis. The original PDF is an actual
+source observation; the saved text is an actual derived observation with that
+PDF as its provenance parent. The explicit `HostAccessPolicy` grants both exact
+pins to two experimental audience versions and the selected TypeSafe provider.
+The existing original `ControlService` assessment token covers both targets.
+Preparation and rendering use MAT-072; actual dispatch uses
+`AccessService.dispatch`, with detached views and independent short current
+SQLite reads before and after I/O. No database read transaction spans HTTP.
+A model answer cannot expand those grants.
+
+The added `run_guarded_diagnostic` reuses the provider runner's existing execution,
+budgets, durable starts/results and resume accounting. It requires real access
+service/context bindings and exactly the guarded rendered questions. It is an
+**exploratory** entry point, not a fabricated passed `OfflineReport` or a bypass
+of the paired runner's offline/held-out contracts. A revocation after start or
+while a call is in flight prevents result release; the retained start remains
+outcome-unknown and is never silently resent. Qualification, corpus/split and
+paired-arm fields remain unknown/null where not applicable.
+
+### Twelve actual public-source calls, with limitations retained
+
+Both runs used `.venv/bin/python examples/guarded_evidence_diagnostic.py --evidence
+/Users/mfrieson/.local/share/matter-validation/live-20261028 --env .env --model
+jev-1.14.0 --run-id <run-id> --live`. Each allowed at most six calls, zero retries,
+one worker, 30 seconds per call, 300 seconds wall time, 64 KiB request/response
+bounds and USD 0.02 maximum reservation. No other live runs were made in this
+pass. Official model price basis was checked on 2026-10-28 at
+[TypeSafe's model reference](https://docs.typesafe.ai/models): USD 0.042 per
+million input tokens, output free. These estimates are not invoices.
+
+Each run covered proposal, exact duplicate and analyst interpretation correction
+for **grant oversight** versus **school technology procurement**. The correction
+changes an experimental prior reading of the memo as a new grant opportunity;
+it does not invent a government correction, a new source revision, a historical
+client action or actual audience delivery. Comparison histories are explicitly
+experimental capture contexts. Both document/event dates and the October 18
+extraction time remain provenance; actual diagnostic availability is current
+October 28 ingestion. An earlier cut really refused the source with
+`E_EVIDENCE_UNAVAILABLE`. Actual redelivery returned `duplicate` and the same
+source pin, rather than manufacturing corroboration.
+
+The first run, `public-live`, included an authored summary in its current-input
+comparison. Its six real calls are retained, not discarded: all completed and
+were primitive-valid; input usage 128,685 tokens, estimated USD 0.005404770,
+reservation USD 0.016515072. Report `report-909077422621833.json` has SHA-256
+`3edfc226b5e74e8dd7de85bdf678250094a5d63dd1fcf6967784be957708bf72`.
+Grant-oversight correction novelty was 0.45 despite relevance 0.96.
+
+That summary could prime interpretation. One final bounded run,
+`public-source-only-live`, removed the authored current interpretation and did
+not tell the model the prior analyst reading was wrong. The source bytes,
+question definitions and explicit experimental audience/history still supplied
+the evidence and comparison task. All six calls completed, were primitive-valid
+and resolved `jev-1.14.0`: no cache replay, incomplete attempts, non-dispatch or
+retry. Input usage was 129,069 tokens; estimated input cost USD 0.005420898,
+reservation USD 0.016515072; billing remains unknown.
+
+Observed scores on that final run (descriptions are diagnostic, not accuracy):
+
+- Proposal support: 0.96–0.97; proof of execution by both parties: 0.02–0.05.
+  The proposed terms and signature fields were not upgraded to proven execution.
+- First proposal objective contribution: grant oversight 0.81, school procurement
+  0.03. Initial novelty was 0.76 versus 0.38.
+- Exact duplicate novelty: 0.06 and 0.04; objective contribution 0.20 and 0.04.
+  Those scores are consistent with expected silence, alongside actual intake
+  deduplication. No qualified attention/outbox decision was published.
+- Analyst correction: grant oversight objective 0.96, novelty 0.77; school
+  procurement objective 0.35, novelty 0.58. Relevance and novelty remain separate.
+  The difference from the first run illustrates prompt/context sensitivity; it
+  does not prove a correction detection rate or justify fitting thresholds.
+
+All twenty new calls were capture-only: no accepted assessments/judgments,
+certificates, StateCivics client actions or real deliveries. Source ingestion
+and isolated host bootstrap records are deliberate setup, not admitted model
+conclusions. Expectations were agent-authored and frozen before each run; there
+are no independently reviewed held-out labels or defensible accuracy estimates.
+Actual real evidence and actual provider interpretation have now been exercised;
+a production monitoring/usefulness trial and MAT-040 qualification remain open.
+The installed walkthrough-schema failure is still a separate unresolved
+packaging gap, unaffected by these calls or checkout checks.
+
+The final real-data report is
+`public-source-only-live/report-909278195010666.json`, SHA-256
+`4875f57b595d8b432b5ca70554c0f015ffb6fe1b4492843c9868a51ff65ac5b4`.
+The external `executed-source-hashes.json` records the six source files at the
+final live checkpoint; later review corrections are separately tested below.
+Each run also retains `wire-reconstruction.json`: exact deterministic adapter
+rendering of the recorded pre-call batch, with its byte length reconciled to
+actual transport instrumentation. That supplement is a reconstruction, not an
+independent network tap. Native response bytes were captured by the adapter;
+authentication headers were never retained.
+
+The first two-pass independent review selected/reviewed three Python files and
+reported five comments (four distinct issues): require literal `live=True`,
+execute/check host setup even under `python -O`, bind the example's verified
+price to a fixed model/date, and distinguish configuration errors from access
+refusals. All were confirmed and corrected. Its three warnings concerned
+unpositioned comments, not omitted review groups. The actual calls used literal
+True, ordinary Python and the verified `jev-1.14.0` price; these fixes do not turn
+those calls into an untested different-model run or require paid repetition.
+The optimized-Python example preflight subsequently prepared the actual public
+packet and passed its checks with zero calls. No fake fresh price check is
+stamped onto future runs: the example now fixes the price record to
+`jev-1.14.0`, checked at `2026-10-28T13:59:12Z`, and refuses other models before
+setup. Original live receipts retain their original configuration bytes.
+
+Validation uses the existing `.venv`; the ambient `python` does not have Matter
+installed, and an initial security discovery without `PYTHONPATH=tests` could
+not import checkout helpers. Corrected invocations are recorded, not treated as
+product regressions. The pre-review provider/guarded suite passed 16 checks in
+10.534s; the existing MAT-072 suite passed 17 checks in 22.927s. Interim new-test
+failures were corrected before the final run. Final checks/review follow below.
+
+The two atomic source questions are explicitly named diagnostic specifications
+(proposal support and proven execution); the objective/novelty questions reuse
+MAT-034's existing templates. This is not a qualification of every MAT-033/034
+head. Duplicate packets were deliberately submitted to measure model behavior
+after actual intake deduplication; this does not claim a production duplicate
+would automatically trigger another provider call. One source, its derivation,
+two audiences and repeated runs remain one connected provenance unit.
+
+Final checkout validation ran
+`PYTHONPATH=tests .venv/bin/python -m unittest evaluation.test_provider_runner
+evaluation.test_guarded_provider test_repository test_hardening -v`:
+**57 passed in 13.505s** (`live-completion-20261028/final-regression-verified.log`).
+This includes eight new guarded tests, ten existing provider-runner tests and
+39 repository/hardening checks. The 17 existing access checks passed separately.
+`matter render --check`, `matter validate` (80 tickets, 104 requirements,
+101 schemas, three walkthroughs) and `git diff --check` passed. The actual-key
+scan found no credential in the eleven changed/nonignored files; `.env` remains
+ignored and untracked.
+
+Built with existing dependencies and no dependency/network installation:
+`.venv/bin/python -m pip wheel . --no-deps --no-build-isolation --wheel-dir
+ data/validation/live-completion-20261028/wheels`. Wheel SHA-256:
+`ce170d23f79129d6031d90538da7e9ac6e3430e0934da2de47ca3c5e0d48eca1`.
+All **189 Python/SQL/schema files** match checkout, wheel and installed bytes
+(`installed-byte-match.json`). With the installed target first on `PYTHONPATH`,
+**35 provider/guarded/access checks passed in 36.053s**
+(`installed-focused.log`); the imported provider path was verified to be inside
+that target. These installed checks do not replace a full installed test run.
+The default installed `Walkthrough` was explicitly retried and still raises
+`FileNotFoundError` at its checkout-style schema path; exact path/exception are
+recorded in `installed-walkthrough-gap.json`. No fix or green installed-full-suite
+claim is included. The earlier 1,305-test discovery predates this delta; it was
+not rerun or relabeled as validation of this new source.
+
+Across the twenty actual new calls, input usage totals **262,101 tokens**;
+the published input-price estimate totals **USD 0.011008242**, conservative
+reservations total USD 0.055050240 (sum of configured run maxima USD 0.07).
+Actual billing remains unknown. No unreviewed labels were promoted, thresholds
+fitted, certificates issued, real sinks attached or downstream systems changed.
+
+A recorded resume using the **final** runner read all eight original live
+synthetic results with a transport spy that refuses dispatch: zero fresh calls,
+eight cached replays, completed accounting (`recorded-resume.json`). This checks
+compatibility with receipts written before the shared-loop change; it is not
+another live-provider trial and adds no cost or independent support.
+
+The second two-pass review covered six selected Python/JSON files with no
+warnings and one confirmed finding: an access failure after a durable start
+withheld the result but escaped before the aggregate report, while a revoked
+resume returned a misleading zero-attempt preflight. This is a remaining
+failure-path correction at this checkpoint, not a defect observed in the twenty
+successful calls. Closeout requires explicit refusal/unknown accounting and a
+source-free report-only resume that cannot make new calls or release responses.

@@ -83,6 +83,8 @@
   ],
   "completion": {
     "state": "not_run",
-    "evidence": []
+    "evidence": [
+      "2026-10-28: Eight actual matched synthetic runner calls and twelve actual public-evidence exploratory calls now recorded in docs/validation/civic-evaluation-roadmap.md. These exposed, agent-authored contexts/expectations do not supply independent untouched held-out labels, sufficient episode/polarity support or fitted/admitted qualification records. This missing qualification evidence does not block exploratory live testing, which actually ran. No threshold or certificate has been issued."
+    ]
   }
 }

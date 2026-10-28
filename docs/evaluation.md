@@ -154,9 +154,15 @@ remain the evidence for actual source-currentness/certificate refusal.
 schedule, explicit TypeSafe model/scope/credential source, destination, call/time
 and conservative cost limits. It reuses the existing adapter. Execution context
 metadata changes for the live attempt; frozen state and rendered questions do
-not. Current support accepts synthetic corpus artifacts only. Real/private packets
-require the existing MAT-072 access/egress dispatcher rather than this direct
-synthetic diagnostic lane. No credential value is written to the run manifest.
+not. This paired lane accepts synthetic corpus artifacts only. For exploratory
+public/cleared evidence, `run_guarded_diagnostic` shares its bounded execution
+and artifact accounting while requiring exact `GuardedProviderCase` bindings
+to the existing MAT-072 access service, original context, detached view and
+guarded rendered questions. It dispatches through `AccessService.dispatch`,
+including fresh pre/post-I/O checks; it cannot use a permission boolean callback.
+It does not fabricate offline, paired-arm or held-out evidence. The example
+`examples/guarded_evidence_diagnostic.py` keeps real corpus bytes/results in an
+explicit external directory; no real delivery or qualification is enabled. No credential value is written to the run manifest.
 
 Provider artifacts retain starts before dispatch, native/neutral result bytes,
 requested/resolved model, usage, faults, per-attempt cost reservations and unknown
