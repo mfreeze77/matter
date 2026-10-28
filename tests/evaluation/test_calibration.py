@@ -160,3 +160,19 @@ class CalibrationTests(unittest.TestCase):
             with self.assertRaises(ContractError):certificate_from_review(view,report,**{**kwargs,'reviewers':[component('not-admitted')]})
             failed=deepcopy(report);failed['evaluation']['status']='failed'
             with self.assertRaises(ContractError):certificate_from_review(view,failed,**kwargs)
+
+    def test_ratio_gates_do_not_round_policy_limits_into_a_pass(self):
+        from matter.evaluation.calibration import _metrics
+        plan={'confidence':'0.95','minimum_episodes':{'positive':1,'negative':1},'target_accuracy':{'positive':'0.01','negative':'0.01'},
+            'minimum_coverage':'0.50000000000000000000000000001','maximum_failure_fraction':'1'}
+        regions={'positive':{'minimum':'0.8','maximum':'1','choices':[]},'negative':None}
+        rows=[{'reference':'positive','status':'valid','group':['first'],'value':'0.99','choice':None},
+              {'reference':'positive','status':'valid','group':['second'],'value':'0.5','choice':None}]
+        measured=_metrics(plan,rows,regions)
+        self.assertEqual(measured['counts']['independent_accepted_groups'],1)
+        self.assertEqual(measured['counts']['independent_eligible_groups'],2)
+        self.assertFalse(measured['coverage_passed']);self.assertFalse(measured['passed'])
+        plan.update(minimum_coverage='0',maximum_failure_fraction='0.49999999999999999999999999999')
+        rows[1].update(status='failed',value=None);measured=_metrics(plan,rows,regions)
+        self.assertEqual(measured['counts']['independent_failed_groups'],1)
+        self.assertFalse(measured['failure_limit_passed']);self.assertFalse(measured['passed'])

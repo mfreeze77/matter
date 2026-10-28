@@ -7,6 +7,7 @@ No network, file fetch, label inference or provider construction occurs here.
 from copy import deepcopy
 from decimal import Decimal, localcontext, ROUND_FLOOR
 from math import comb
+from fractions import Fraction
 
 from .._rule_values import FrozenValue, checked, descriptor, domain, fragment
 from ..canonical import canonical_bytes, canonical_digest
@@ -207,8 +208,8 @@ def _metrics(plan,rows,regions):
     accepted_groups={tuple(r['group']) for r,d in decisions if d is not None}
     failed_groups={tuple(r['group']) for r in rows if r['reference'] is not None and r['status'] in counts['failures']}
     counts['independent_eligible_groups']=len(eligible_groups);counts['independent_accepted_groups']=len(accepted_groups);counts['independent_failed_groups']=len(failed_groups)
-    coverage_ok=bool(eligible_groups) and Decimal(len(accepted_groups))>=_number(plan['minimum_coverage'])*len(eligible_groups)
-    failures_ok=bool(eligible_groups) and Decimal(len(failed_groups))<=_number(plan['maximum_failure_fraction'])*len(eligible_groups)
+    coverage_ok=bool(eligible_groups) and Fraction(len(accepted_groups),len(eligible_groups))>=Fraction(_number(plan['minimum_coverage']))
+    failures_ok=bool(eligible_groups) and Fraction(len(failed_groups),len(eligible_groups))<=Fraction(_number(plan['maximum_failure_fraction']))
     counts['reference_classes']={p:{'cases':sum(r['reference']==p for r in rows),'errors':sum(r['reference']==p and d is not None and d!=p for r,d in decisions),
         'accepted':sum(r['reference']==p and d is not None for r,d in decisions)} for p in POLARITIES}
     return {'support':support,'counts':counts,'coverage_passed':coverage_ok,'failure_limit_passed':failures_ok,
