@@ -211,3 +211,36 @@ pack about 6 MiB, well within the storage cap. Archive inspection found no
 credential/media/corpus paths. The value-level credential audit scanned 944
 public/retained files (including decoded raw-response fields), about 8.3 MB,
 with zero credential matches. No secret values were printed.
+
+The revised core matrix passed **41 tests in 408.948s**, with CORE-01–24 and
+AC-1–4 passed and all five declared provider/domain/backend/power-loss gates
+`not_run`. Actual report:
+`data/validation/civic-followthrough-20261028/core-qualification-stable/report.json`.
+The 197 engine/schema files still match that report's frozen imported runtime.
+Later source changes strengthen an unselected access-refusal test and diagnostic
+preflight only; selected investigation assertions and shared fixture helpers
+remain AST-identical (`core-final-compatibility.json`). This equivalence check is
+not represented as another execution of the matrix.
+
+Four full-scope two-pass subscription reviews were used as implementation grew.
+Every selected file was reviewed; the reported warnings concern findings that
+could not be pinned to lines while files were untracked, not omitted rule groups.
+Confirmed fixes include evidence-history bounds, reader exceptions during
+cancellation/expiry, terminal-stop replay, finish-commit races, retention of
+valid evidence during unrelated control races, fixed-point small statistical
+bounds, platform-independent test paths and fixture-error reporting. The
+access-refusal assertion now uses a valid committed allocation and checks the
+specific authority error. Invalid external plans are refused before credentials
+or per-run stores are opened, and plan provenance hashes the bytes actually used.
+
+The last review also claimed a non-observation return would strand a read with
+a `KeyError`. Source tracing showed the observation-only mutation schema rejects
+that pin before body-field access; SQLite separately enforces referenced record
+kind. A direct public-API regression confirms `source_unavailable`, not a
+stranded read. This finding was not relayed as a confirmed production defect.
+
+A no-call legacy preflight using the larger public SS4A packet returned
+`provider_request_unsupported_or_oversize`, with zero attempts. It is not a live
+success. The synthetic small-input legacy check separately validates all six
+native requests within the existing 64 KiB limits, without dispatch. The actual
+24-call generic-plan experiment above is unaffected by this bounded refusal.

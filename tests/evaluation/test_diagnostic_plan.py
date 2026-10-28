@@ -1,4 +1,4 @@
-"""Synthetic plan isolation checks; no HTTP or actual credentials."""
+"""Synthetic plan isolation and preflight checks; no HTTP or actual credentials."""
 from argparse import Namespace
 from contextlib import redirect_stdout
 import importlib.util

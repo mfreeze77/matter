@@ -3,7 +3,8 @@
 External input: provenance.json, source.pdf and saved source.md. No corpus bytes
 are checked in. This is a small isolated host over the existing store, intake,
 packet renderer, access dispatcher and provider runner; not StateCivics delivery,
-held-out evaluation, an extraction benchmark or qualification.
+held-out evaluation, an extraction benchmark or qualification. External plan
+syntax is checked before reading credentials or creating per-run artifacts.
 """
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone

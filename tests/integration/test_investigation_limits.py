@@ -304,3 +304,10 @@ class InvestigationTests(unittest.TestCase):
         self.assertEqual(len(calls),1);self.assertEqual(result['failed_finish']['status'],'failure')
         self.assertEqual(result['finish']['status'],'success');self.assertTrue(self.inspect()['satisfied'])
         self.assertEqual(self.inspect()['observations'],[pin(self.source)])
+
+    def test_non_observation_return_stops_unavailable_before_source_field_access(self):
+        gap=self.nominate();allocation=self.allocation('wrong-record-kind')
+        result=self.run_read(gap,allocation,reader=lambda c:[pin(self.f.subject)])
+        self.assertEqual(result['finish']['status'],'success')
+        state=self.inspect();self.assertEqual(state['phase'],'stopped')
+        self.assertEqual(state['stop_reason'],'source_unavailable');self.assertFalse(state['satisfied'])
