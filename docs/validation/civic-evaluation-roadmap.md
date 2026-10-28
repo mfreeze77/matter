@@ -1,5 +1,15 @@
 # Civic and provider evaluation roadmap
 
+Current connected checkpoint (October 28): StateCivics KS-1118 now exercises the
+existing no-login rehearsal route → actual JEV → Matter attention → existing
+capture sink. The final guarded run made 45 live `jev-1.14.0` calls, 48 decisions
+and 15 in-app captures, with no production alerts. Initial plus post-hardening
+runs made 90 actual calls in total; repeated cases are not independent support.
+Eight illustrative treatment differences and threshold variation remain visible.
+See the [connected receipts and quality limits](statecivics-monitoring-replay.md).
+Those later results do not retroactively make the historical diagnostics below
+connected runtime evidence, nor do they qualify MAT-040.
+
 Baseline: PR #19 merged at `232a75478251972deb8354d08eb0304debc65deb`.
 The reviewed 177 runtime/SQL/schema files still match the tested wheel manifest;
 the final four-file two-pass review has no findings or coverage warnings. GitHub

@@ -14,6 +14,121 @@ StateCivics implementation: local branch `feat/matter-monitoring-replay`, tested
 commit `f412e3415`. This is bounded mechanism evidence, not civic/provider
 qualification or production deployment.
 
+
+## Connected live JEV capture experiment — October 28, 2026
+
+### Final guarded run — 21:02 UTC
+
+After the launcher guard review passed, the same bounded workload was rerun through
+the final source/scenario/entrypoint/read-only-mount guards. StateCivics source
+`58b9ff8ede5a2df2c516bd3bc7146fc557586569`: **45 actual live calls, 48 decisions,
+12 releases, 15 in-app captures**, no external/production alerts. All 45 native
+responses valid; 29 quiet, ten updates, five digests and four corrections. All
+retries, duplicate/scope/gap silence, future-evidence and packet/credential audits
+passed. Actual duration 27.764 seconds. This is the final connected receipt;
+the initial 16-capture run below remains separately retained.
+
+**90 new live calls total**: 45 initial plus 45 after meaningful launcher hardening;
+zero in the failed stdin launch and zero-call preflight. Combined reported usage
+430,729 input tokens, calculated charge $0.018090618 at the verified published
+rate. These repeated cases are not independent qualification groups.
+
+Quality remains limited. Six illustrative treatments were withheld (s02 IT/finance,
+s03 finance, s05 IT/advocacy, s06 finance), and two s09 expected corrections became
+digests because earlier messages were not captured. On identical semantic state
+and questions, s05 advocacy relevance shifted from 0.8 to 0.78 across runs, crossing
+the exploratory routing boundary and changing its delivery history. Forty-three
+of 45 packets/question sets matched across runs; probability variation is retained.
+This demonstrates a threshold-sensitivity problem to investigate, not a calibrated
+robustness/accuracy result. Source facts and observed prior capture material remain
+host-authored; full civic adaptation and MAT-040 are not complete.
+
+Final root:
+`/Users/mfrieson/ks-rehearsal/matter-live-20261028T210200Z-84592/responses/run/`.
+Run `db69ec35-719f-467c-aeb9-74e1ea0d53df`.
+
+- Final SHA-256: `58143541d5c112f383c963d85f8b93c0454a985b80995eb5a6d39c9e58169122`.
+- Trace SHA-256: `d66b34118a2589e8f57fdfe7e1ae234d2466c771fd6ed6baf952b040a2b73deb`.
+- Summary SHA-256: `270f1d62000df9e9ccdc2a4925b98bddacb994e81abf21ae40de7558377561be`.
+- Audit/comparison SHA-256: `31555a1dd9c4eac64863de150cf6c4c759965f86d80e68ec75ea4d2d9874a132`.
+
+Software/review evidence: 41 focused Docker cases, 32 exact PostgreSQL cases,
+seven-file/two-round host review with findings addressed or explicitly reconciled,
+then three-file/two-group/two-round guard review with zero findings/warnings.
+MAT-049 stays planned. No installed walkthrough requalification or production
+readiness claim. Host ticket KS-1118 closes the bounded connected experiment.
+
+### Initial connected run — 20:41 UTC
+
+The connected path has now executed, separately from the historical deterministic
+19-capture trace below. StateCivics KS-1118 at `08cd03dca730c61b14e4a154bb13d744be36ba7d`
+used Matter `823d4e7`'s installed wheel and the same scenario/custody/no-login
+router/runtime, existing rehearsal PostgreSQL and existing in-app capture sink.
+A single temporary, portless Compose backend used its own operator marker and
+committed source archive, preserving the active shared rehearsal packet. This
+was actual route execution over in-process ASGI, **not a new browser/TCP proof**.
+
+**45 actual HTTPS calls to `jev-1.14.0` → 48 decisions across 12 releases → 16
+in-app captures**. Three unchanged audience lanes at the context-only checkpoint
+were quiet without calling JEV. All 45 responses resolved to the explicit model,
+retained native/neutral bytes and passed primitive validation. No production or
+external alert was sent. Source facts, identity, material fields and cadence
+remain authored synthetic inputs; JEV supplied relevance/novelty interpretations
+of released prose and audience purpose. This is a hybrid integration experiment,
+not full civic extraction, provider qualification or MAT-049 completion. The
+observed capture baseline legitimately contains the host-authored facts actually
+conveyed earlier; this is not a prose-only reading test.
+
+Observed decisions: 29 quiet, nine updates, six digests, four corrections. Every
+immediate command retry produced the same snapshot without extra calls/captures.
+The duplicate release produced four quiet decisions. Keyword-only, foreign-scope
+and incomplete-evidence releases stayed quiet. Future correction evidence returned
+404 before release and 200 after; all 45 packets passed a timestamp/prefix,
+audience-context and oracle-key audit. Only observed captures formed baselines.
+
+Quality findings matter: six illustrative expected treatments were withheld in
+the experimental abstention band; s06 advocacy had relevance 0.8/novelty 0.77 and
+finance relevance 0.53. Two later expected corrections consequently became digests
+because their earlier messages had never been captured. Twenty-two calls had at
+least one undecided head; that includes clear negative relevance with uncertain
+novelty, and is not 22 transport/schema failures. These differences are retained,
+not hidden behind the software checks. The illustrative expectations are neither
+independent human labels nor a defensible accuracy estimate.
+
+Limits: 48 calls maximum, no retries, 20-second request timeout, 1,200-second wall
+allowance, 32,768 request/response bytes, $0.10 conservative cost ceiling. Actual
+runtime 19.746 seconds; reported input usage 215,237 tokens, calculated charge
+$0.009039954 using the October 28 verified [published rate](https://docs.typesafe.ai/models).
+The strict existing credential loader read the ignored .env; no value or header
+was recorded. Plaintext and decoded-response credential scans passed.
+
+Retained artifacts (external, synthetic):
+`/Users/mfrieson/ks-rehearsal/matter-live-20261028T204108Z-78641/responses/`.
+These include 45 started typed batches, 45 native/neutral responses, interpretations,
+12 checkpoints, final, comparison and audit. Typed batches and the pinned adapter
+reconstruct the native request projection; raw HTTP headers/bodies are not claimed.
+Run ID `b45a1836-2057-4314-8c5b-5809c1aea556`.
+
+- Final SHA-256: `511ac9cf52cd58dd7fde212eadabff587c864ddcf95ad09e8202f48693d1adfb`.
+- Trace SHA-256: `6af3a4afa49295933514a4d493222746787bb9a01986ac66b734679204d0b092`.
+- Summary SHA-256: `36f822e4b1938153e488d05e09ec8fe4442ddacba1b4ebd9792ee7ca2730399d`.
+- Independent packet/credential audit SHA-256:
+  `7258e59e2587010d3af23dbeec9d54e46599c692012e86a3ddc0b63f610aa937`.
+
+Fresh software checks: 40 focused Docker cases and 32 exact real PostgreSQL cases
+passed at `08cd03dca`, including interpreter revocation rollback and retaining
+history while withholding an older pending digest after unknown latest meaning.
+PostgreSQL source/harness stability and owned-resource cleanup passed. JUnit SHA
+`a045714ddd5dd25a29d4b86a50af49d3e2276e335d8bccab47d5a85e25975a16`.
+Later at `9917c37bc`, 41 focused Docker cases passed, and a zero-call launcher
+preflight verified pinned scenario custody, the protected-.env entrypoint and
+read-only source/marker/provenance mounts. Those later safeguards were not
+retroactively attributed to the earlier 45-call source pin. Full commands,
+earlier failures, review findings and retained evidence are in StateCivics `docs/evidence/ks1118-live-matter-replay.md` and ticket KS-1118.
+No installed walkthrough-schema requalification, real/private-evidence run or
+production acceptance is claimed. MAT-040's human-reviewed held-out references
+and independent-support requirements remain separate; they did not block this run.
+
 ## No-login rehearsal closeout (October 28 UTC)
 
 The existing KS-841 stack now serves `http://localhost:8080/rehearsal/replay`
