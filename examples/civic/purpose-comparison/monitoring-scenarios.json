@@ -1,0 +1,384 @@
+{
+  "scenario_id": "synthetic:statecivics-monitoring:1",
+  "format": "planning_example_not_runtime_manifest",
+  "provenance": "All organizations, policies, positions, sources, dates and expected decisions below are invented. The Google-like profile describes no actual company policy.",
+  "execution_status": "not_run",
+  "label_provenance": "Agent-authored illustrative expectations; not independent evaluation labels or provider qualification.",
+  "oracle_boundary": "Keep expected decisions outside evaluator-visible packets. Release source and context inputs only at their available_at cutoff; never send the entire scenario to a model.",
+  "delivery_boundary": "quiet means no optional intelligent interruption. Preserve authorized factual monitoring events, explicit follows and their review state. All proposed alert delivery goes to the existing replay sink.",
+  "clients": [
+    {
+      "id": "cloud-company",
+      "name": "Synthetic cloud company (Google-like example)",
+      "kind": "company"
+    },
+    {
+      "id": "privacy-coalition",
+      "name": "Synthetic Student Privacy Coalition",
+      "kind": "special_interest"
+    },
+    {
+      "id": "school-district",
+      "name": "Synthetic Cedar School District",
+      "kind": "school_district"
+    }
+  ],
+  "contexts": [
+    {
+      "id": "cloud-affairs",
+      "client_id": "cloud-company",
+      "revision": "v1",
+      "available_at": "2026-11-01T08:00:00Z",
+      "territory": [
+        "synthetic:kansas"
+      ],
+      "purpose": "Monitor school cloud-service policy and eligible procurement opportunities.",
+      "approved_positions": [
+        {
+          "provision": "open interoperability",
+          "position": "proponent"
+        },
+        {
+          "provision": "mandatory facial recognition",
+          "position": "neutral"
+        }
+      ],
+      "policy": "Digest applicable drafts; update on an actionable comment deadline or eligible solicitation. Topic overlap alone is quiet. Neutral stance does not mean commercially irrelevant."
+    },
+    {
+      "id": "privacy-advocacy",
+      "client_id": "privacy-coalition",
+      "revision": "v1",
+      "available_at": "2026-11-01T08:00:00Z",
+      "territory": [
+        "synthetic:kansas"
+      ],
+      "purpose": "Monitor student biometric collection and opportunities to influence it.",
+      "approved_positions": [
+        {
+          "provision": "explicit student-data consent",
+          "position": "proponent"
+        },
+        {
+          "provision": "mandatory facial recognition",
+          "position": "opponent"
+        }
+      ],
+      "policy": "Update on a newly proposed biometric requirement or actionable hearing. Preserve mixed positions on separate provisions. Procurement without biometric consequences is quiet."
+    },
+    {
+      "id": "district-it",
+      "client_id": "school-district",
+      "revision": "v1",
+      "available_at": "2026-11-01T08:00:00Z",
+      "territory": [
+        "synthetic:kansas",
+        "synthetic:cedar-district"
+      ],
+      "purpose": "Prepare district IT procurement and assess possible operational requirements.",
+      "approved_positions": [],
+      "position_when_unspecified": "unknown",
+      "policy": "Digest pending requirements; update on an actionable hearing or changed specification. A next step already owned is quiet unless its obligations materially change. Do not infer a district position from its institutional role."
+    },
+    {
+      "id": "district-finance",
+      "client_id": "school-district",
+      "revision": "v1",
+      "available_at": "2026-11-01T08:00:00Z",
+      "territory": [
+        "synthetic:kansas",
+        "synthetic:cedar-district"
+      ],
+      "purpose": "Prepare the next budget review; monitor funding commitments and credible cost exposure.",
+      "approved_positions": [],
+      "position_when_unspecified": "unknown",
+      "policy": "Digest scoped potential costs. Update on a supported funding commitment or an assigned review deadline. A proposal, recommendation or RFP alone proves no appropriation."
+    }
+  ],
+  "subjects": [
+    {
+      "id": "policy-26",
+      "kind": "proposed_school_digital_services_policy",
+      "scope": "synthetic:kansas"
+    },
+    {
+      "id": "rfp-26",
+      "kind": "district_cloud_procurement",
+      "scope": "synthetic:cedar-district"
+    }
+  ],
+  "steps": [
+    {
+      "id": "s01",
+      "available_at": "2026-11-01T09:00:00Z",
+      "subject_id": "policy-26",
+      "input_kind": "source",
+      "source_id": "agenda:1",
+      "occurred_at": "2026-11-01T08:30:00Z",
+      "text": "An agenda lists a routine presentation about Google Workspace and school technology. It states no policy proposal, position, purchase, vote or deadline.",
+      "source_positions": [],
+      "expected": {
+        "cloud-affairs": "quiet",
+        "privacy-advocacy": "quiet",
+        "district-it": "quiet",
+        "district-finance": "quiet"
+      },
+      "assertions": [
+        "A keyword hit alone creates no intelligent alert.",
+        "No speaker or organization becomes a proponent from a mention."
+      ]
+    },
+    {
+      "id": "s02",
+      "available_at": "2026-11-02T09:00:00Z",
+      "subject_id": "policy-26",
+      "input_kind": "source",
+      "source_id": "draft:1",
+      "occurred_at": "2026-11-02T08:00:00Z",
+      "text": "A draft proposes open cloud interoperability, explicit consent for student-data collection, and mandatory facial recognition. It states no enacted rule, funding commitment or implementation date. Its sponsor says they support the draft.",
+      "source_positions": [
+        {
+          "actor": "synthetic:draft-sponsor",
+          "target": "draft:1",
+          "position": "proponent",
+          "basis": "explicit source statement"
+        }
+      ],
+      "expected": {
+        "cloud-affairs": "digest",
+        "privacy-advocacy": "update",
+        "district-it": "digest",
+        "district-finance": "digest"
+      },
+      "assertions": [
+        "All audiences share the same source facts and draft status.",
+        "The coalition can support consent and oppose biometrics simultaneously.",
+        "Approved client preferences and the sponsor's source position remain separate.",
+        "A neutral biometric position does not erase the company's interoperability interest."
+      ]
+    },
+    {
+      "id": "s03",
+      "available_at": "2026-11-03T09:00:00Z",
+      "subject_id": "policy-26",
+      "input_kind": "source",
+      "source_id": "hearing-notice:1",
+      "occurred_at": "2026-11-03T08:00:00Z",
+      "text": "The official notice schedules a hearing on draft:1 for November 6 and closes written comments November 5 at 17:00 UTC.",
+      "expected": {
+        "cloud-affairs": "update",
+        "privacy-advocacy": "update",
+        "district-it": "update",
+        "district-finance": "digest"
+      },
+      "assertions": [
+        "Relevant audiences receive the exact actionable deadline and proposal status.",
+        "Budget monitoring does not acquire an advocacy task automatically."
+      ]
+    },
+    {
+      "id": "s04",
+      "available_at": "2026-11-03T10:00:00Z",
+      "subject_id": "policy-26",
+      "input_kind": "source",
+      "source_id": "hearing-notice-reprint:1",
+      "same_occurrence_as": "hearing-notice:1",
+      "text": "A newsletter repeats the same hearing and comment deadline without new facts.",
+      "expected": {
+        "cloud-affairs": "quiet",
+        "privacy-advocacy": "quiet",
+        "district-it": "quiet",
+        "district-finance": "quiet"
+      },
+      "assertions": [
+        "No new occurrence or independent corroboration from the reprint.",
+        "No repeat update when an equivalent one is pending or delivered."
+      ]
+    },
+    {
+      "id": "s05",
+      "available_at": "2026-11-06T18:00:00Z",
+      "subject_id": "policy-26",
+      "input_kind": "source",
+      "source_id": "committee-minutes:1",
+      "occurred_at": "2026-11-06T15:00:00Z",
+      "text": "Minutes state that an advisory committee recommended the draft. No final adopting act or appropriation is supplied.",
+      "expected": {
+        "cloud-affairs": "digest",
+        "privacy-advocacy": "digest",
+        "district-it": "digest",
+        "district-finance": "quiet"
+      },
+      "assertions": [
+        "A recommendation never becomes adoption or funding.",
+        "No universal proponent label is assigned to every committee member from a collective result."
+      ]
+    },
+    {
+      "id": "s06",
+      "available_at": "2026-11-07T09:00:00Z",
+      "subject_id": "rfp-26",
+      "input_kind": "source",
+      "source_id": "solicitation:1",
+      "occurred_at": "2026-11-07T08:00:00Z",
+      "text": "The district publishes a cloud-services solicitation open to eligible providers, including facial recognition, closing November 12 at 17:00 UTC. Funding authority is not included. The district IT team's recorded work item already owns the publication and initial response review.",
+      "context_facts": {
+        "district-it": {
+          "next_step_owned": true,
+          "basis": "synthetic host work item it-1"
+        }
+      },
+      "expected": {
+        "cloud-affairs": "update",
+        "privacy-advocacy": "update",
+        "district-it": "quiet",
+        "district-finance": "digest"
+      },
+      "assertions": [
+        "The policy and procurement retain separate identities despite shared vocabulary.",
+        "The district is the buyer; it is not treated as a vendor opportunity audience.",
+        "Owned work suppresses redundant interruption without marking the matter resolved.",
+        "An RFP proves neither enacted policy nor an approved allocation."
+      ]
+    },
+    {
+      "id": "s07",
+      "available_at": "2026-11-08T09:00:00Z",
+      "subject_id": "rfp-26",
+      "input_kind": "source",
+      "source_id": "solicitation:2",
+      "supersedes": "solicitation:1",
+      "occurred_at": "2026-11-08T08:00:00Z",
+      "text": "A published correction removes facial recognition and extends closing to November 20 at 17:00 UTC.",
+      "delivery_checkpoint": "Before advancing here, the eventual replay must establish observed sink delivery of s06 updates for cloud-affairs and privacy-advocacy; digest baselines remain unchanged unless separately observed.",
+      "expected": {
+        "cloud-affairs": "correction",
+        "privacy-advocacy": "correction",
+        "district-it": "update",
+        "district-finance": "digest"
+      },
+      "assertions": [
+        "Previously informed audiences receive the correction even though the biometric risk decreased.",
+        "Queued drafts referring to the old specification or deadline are invalidated.",
+        "A material specification change reaches the IT owner despite their existing work item.",
+        "Earlier as-of views retain the earlier known source."
+      ]
+    },
+    {
+      "id": "s08",
+      "available_at": "2026-11-08T10:00:00Z",
+      "subject_id": "rfp-26",
+      "input_kind": "context_change",
+      "context_revision": {
+        "context_id": "district-finance",
+        "from": "v1",
+        "to": "v2",
+        "purpose": "Complete the assigned November 9 funding review for rfp-26.",
+        "next_step_owned": false
+      },
+      "text": "The host assigns a funding-review responsibility and deadline; the evidence is unchanged.",
+      "expected": {
+        "cloud-affairs": "quiet",
+        "privacy-advocacy": "quiet",
+        "district-it": "quiet",
+        "district-finance": "update"
+      },
+      "assertions": [
+        "Explain the newly assigned responsibility rather than inventing a new external event.",
+        "Reassess affected context only; unchanged client contexts receive no duplicate update.",
+        "Funding authority remains unknown."
+      ]
+    },
+    {
+      "id": "s09",
+      "available_at": "2026-11-09T09:00:00Z",
+      "subject_id": "policy-26",
+      "input_kind": "source",
+      "source_id": "committee-minutes:2",
+      "supersedes": "committee-minutes:1",
+      "occurred_at": "2026-11-06T15:00:00Z",
+      "text": "Corrected minutes retract the reported recommendation and state that the item was deferred. No later final act is available.",
+      "delivery_checkpoint": "Establish observed s05 digest delivery for cloud-affairs, privacy-advocacy and district-it before advancing; district-finance received no recommendation claim.",
+      "expected": {
+        "cloud-affairs": "correction",
+        "privacy-advocacy": "correction",
+        "district-it": "correction",
+        "district-finance": "quiet"
+      },
+      "assertions": [
+        "Availability is November 9; November 6 assessments cannot see the correction.",
+        "Retraction does not establish rejection of the proposal.",
+        "Only audiences that received the withdrawn proposition need a delivered-claim correction."
+      ]
+    },
+    {
+      "id": "s10",
+      "available_at": "2026-11-10T09:00:00Z",
+      "subject_id": "rfp-26",
+      "input_kind": "source",
+      "source_id": "other-place-rfp:1",
+      "scope": "synthetic:other-state",
+      "native_identifier": "rfp-26",
+      "text": "An unrelated school district outside all four territories uses the same RFP number and mentions Google cloud services.",
+      "expected": {
+        "cloud-affairs": "quiet",
+        "privacy-advocacy": "quiet",
+        "district-it": "quiet",
+        "district-finance": "quiet"
+      },
+      "assertions": [
+        "Treat subject_id as the nominated candidate only; refuse association outside scope.",
+        "Do not merge equal identifiers across jurisdictions or create an in-territory opportunity."
+      ]
+    },
+    {
+      "id": "s11",
+      "available_at": "2026-11-11T09:00:00Z",
+      "subject_id": "rfp-26",
+      "input_kind": "unavailable_evidence",
+      "source_id": "funding-record:unavailable",
+      "text": "The requested funding record is unavailable. In separate proposed variants, JEV times out or the optional LLM writer fails.",
+      "expected": {
+        "cloud-affairs": "quiet",
+        "privacy-advocacy": "quiet",
+        "district-it": "quiet",
+        "district-finance": "quiet"
+      },
+      "assertions": [
+        "Retain an unresolved funding gap and distinct retrieval, evaluator and writer failure statuses.",
+        "Do not assert that no appropriation exists or erase the known November 20 solicitation deadline.",
+        "Existing factual monitoring and already-supported deadline alerts survive optional-model failure.",
+        "No empty writer response is recorded as a delivered custom alert."
+      ]
+    },
+    {
+      "id": "s12",
+      "available_at": "2026-11-12T09:00:00Z",
+      "subject_id": "rfp-26",
+      "input_kind": "source",
+      "source_id": "cancellation:1",
+      "occurred_at": "2026-11-12T08:00:00Z",
+      "text": "The issuer cancels rfp-26 before its closing date. The separate policy proposal remains deferred.",
+      "delivery_checkpoint": "Establish observed delivery of s07 corrections and s08 finance update before advancing.",
+      "expected": {
+        "cloud-affairs": "correction",
+        "privacy-advocacy": "quiet",
+        "district-it": "update",
+        "district-finance": "update"
+      },
+      "assertions": [
+        "Withdraw the company's previously delivered opportunity and obsolete pending deadline reminders.",
+        "Cancellation of procurement does not resolve or cancel the separate policy proposal.",
+        "An unknown transport outcome retains its intent and is reconciled without blind resend."
+      ]
+    }
+  ],
+  "proposed_cross_cutting_checks": [
+    "Revoke client/source access after selection and before writing or sink delivery: withhold all newly unauthorized text.",
+    "Keep final JEV and LLM modes explicit: these expectations are not recorded executor responses and no live call has run.",
+    "Run an approaching-deadline clock checkpoint once without new source bytes; idle ticks do not repeatedly call a model or flood reminders.",
+    "Keep client context out of shared factual assessments and cross-client caches.",
+    "LLM may propose a bounded deeper read through existing authorized tools; newly obtained evidence must be recorded and reassessed before it supports an alert.",
+    "Generated wording cannot change the admitted facts, source position, client position, deadline, urgency or permitted destination."
+  ]
+}

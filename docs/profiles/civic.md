@@ -4,6 +4,12 @@ Status: governing design and planned work. This file defines the civic profile f
 
 ## Purpose and ownership
 
+The StateCivics integration target is contextual monitoring and intelligent
+alerts, as clarified by the owner on October 27. See the
+[monitoring handoff and synthetic client scenarios](statecivics-monitoring.md).
+StateCivics' existing civic matter records are separate from this Matter system;
+the shared name does not choose a receiving page or imply an installed bridge.
+
 Matter follows continuing subjects, links observed evidence to claims, records assessments under a versioned purpose, and decides whether an audience has a meaningful update. The civic profile supplies civic identifiers, source stages, body relationships, authority references, and lifecycle predicates. The neutral core does not know Kansas law, parliamentary rules, procurement stages, or which board can approve a particular act.
 
 The local crawler owns jurisdiction-specific definitions, extraction conventions, body aliases, source acquisition and proposed authority tiers/overrides. A receiving application's reviewed authority record remains the authority for consequential state. A crawler parser's label such as `action: final` is evidence about how a source was parsed; it is not proof of a body's legal power. Matter preserves both the raw label and its interpretation status.
