@@ -2,7 +2,7 @@
 
 Status: MAT-036 supplies frozen corpora. MAT-037 grouped splits/paired arms,
 MAT-038 offline execution and MAT-039 optional provider-shadow execution are
-implemented on the active roadmap branch; validation/review closeout is recorded
+merged in PR #20; validation/review closeout is recorded
 in [the current receipt](validation/civic-evaluation-roadmap.md). Qualification
 and later release evidence remain separate. Synthetic labels do not establish
 provider accuracy, live usefulness or production readiness.
@@ -180,3 +180,45 @@ A revoked resume returns source-free ledger accounting only, including earlier
 attempts; it releases no response bodies or source/job identifiers and cannot
 renew controls or dispatch. Previously completed responses in that prefix are
 also withheld from the refusal report.
+
+## Calibration implementation and empirical boundary
+
+MAT-040's `CalibrationPlan` freezes an exact method identity, corpus/split,
+positive and negative outcomes, candidate regions, targets, independent support,
+confidence, coverage and provider-failure limits before fitting. No release
+numbers are supplied as universal defaults. `partition_corpus(..., 'tuning')`
+strips other partitions' episodes and labels before `fit_thresholds` receives
+anything. Fitting retains every tried configuration and returns `insufficient`
+when no predeclared candidate passes. `TrialObservation` binds typed batch/result
+and rendered-question identities; missing, failed, mismatched or unavailable
+trials remain in the measured denominators.
+
+`evaluate_thresholds` consumes only an unexposed qualification partition. It
+reports per-class errors, accepted coverage, abstention, failures, and support
+collapsed by connected episode/source provenance. Its conservative one-sided
+Clopper–Pearson lower bound follows binomial-test inversion in
+[NIST TN 2119, section 4.1](https://nvlpubs.nist.gov/nistpubs/TechnicalNotes/NIST.TN.2119.pdf).
+A group is correct only when all its accepted cases are correct. Bonferroni
+adjusts enabled decision polarities. This is a bound on group-level correctness,
+not a per-message accuracy interval; representative independent groups remain
+an empirical assumption. Exact Decimal arithmetic uses 80-digit inversion and
+rounds the lower bound downward. Numerical conformance is tested against the
+published 17/20 example. No external statistical package or Jevcal code is copied.
+
+The report returns `next_split` with exposure history. The host must retain that
+immutable history before another experiment; reusing an old snapshot cannot
+establish untouched held-out status. The code does not invent label provenance,
+representative sampling or operator approval of targets.
+
+`certificate_from_review` constructs an existing MAT-031 certificate candidate
+only after a passing independent-label report has an exact admitted host-origin
+evaluation review receipt and retained artifact pins. It neither writes a review
+receipt nor installs the candidate. Installation, applicability and revocation
+continue through the existing qualification service. Failed or insufficient
+measurements cannot be turned into a certificate by the fitter.
+
+The new [public-source pack and checks](validation/civic-followthrough.md) are
+exploratory and exposed. Their 120 recorded question observations return
+insufficient support with no independent labels. Synthetic software tests of a
+passing report are explicitly fixtures; MAT-040 empirical qualification remains
+blocked on independently reviewed held-out episodes and approved targets.

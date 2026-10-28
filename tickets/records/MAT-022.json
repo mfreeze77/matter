@@ -4,7 +4,7 @@
   "track": "rules",
   "phase": 4,
   "priority": "P1",
-  "status": "planned",
+  "status": "in_progress",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "investigation",
@@ -79,6 +79,8 @@
   ],
   "completion": {
     "state": "not_run",
-    "evidence": []
+    "evidence": [
+      "2026-10-28: Bounded protocol implemented over existing controls, resource reservations and observation/payload ports. Focused review regressions passed 17 integration tests in 48.222s plus prior work-key checks; independent review and installed full regression closeout remain in progress. See docs/validation/civic-followthrough.md. No retrieval connector, provider escalation or human question is supplied."
+    ]
   }
 }

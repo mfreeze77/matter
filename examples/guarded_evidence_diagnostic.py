@@ -16,7 +16,7 @@ import re
 from matter.access import AccessService, HostAccessPolicy
 from matter.assessments import FrozenAssessmentView
 from matter.authority import AuthorityPolicy
-from matter.canonical import canonical_bytes, canonical_digest, source_digest
+from matter.canonical import canonical_bytes, canonical_digest, source_digest, loads
 from matter.citations import Utf8LineLocatorAdapter
 from matter.controls import ControlService
 from matter.evaluation.provider import GuardedProviderCase, run_guarded_diagnostic
@@ -66,6 +66,23 @@ def specifications():
     return heads+[s for s in contribution_questions() if s.value['family'] in ('attention.objective','attention.novelty')]
 
 
+def experiment_plan(raw):
+    from matter.semantic.contracts import MAX_QUESTIONS
+    if type(raw)is not dict or set(raw)!={'id','audiences','cases','specifications'}:raise ValueError('invalid_experiment_plan')
+    if type(raw['audiences'])is not dict or len(raw['audiences'])!=2 or type(raw['cases'])is not list or len(raw['cases'])!=3:raise ValueError('bounded_plan_requires_two_audiences_and_three_cases')
+    if any(type(k)is not str or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}',k) or type(v)is not dict or type(v.get('purpose'))is not str or not v['purpose'] for k,v in raw['audiences'].items()):raise ValueError('invalid_audience_declaration')
+    if type(raw['specifications'])is not list or not 1<=len(raw['specifications'])<=MAX_QUESTIONS:raise ValueError('bounded_specifications_required')
+    specs=[QuestionSpecification(v) for v in raw['specifications']]
+    if len({s.value['family'] for s in specs})!=len(specs):raise ValueError('duplicate_question_family')
+    for case in raw['cases']:
+        if type(case)is not dict or set(case)!={'id','cause','prior_capture','expectations'}:raise ValueError('invalid_experiment_case')
+        if type(case['id'])is not str or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}',case['id']):raise ValueError('invalid_case_identity')
+        if any(type(case[k])is not str or not case[k] for k in ('cause','prior_capture')):raise ValueError('invalid_case_history')
+        if type(case['expectations'])is not dict or set(case['expectations'])!=set(raw['audiences']):raise ValueError('missing_audience_expectations')
+    if len({c['id'] for c in raw['cases']})!=3:raise ValueError('duplicate_case_identity')
+    return specs
+
+
 def run(args):
     if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}',args.run_id):raise ValueError('invalid_run_id')
     if args.model!=PRICE_BASIS['model']:raise ValueError('model_has_no_verified_price_basis')
@@ -77,8 +94,12 @@ def run(args):
     if source_digest(pdf)!=provenance['public_fetch_sha256'] or source_digest(text)!=provenance['row']['text']['sha256']:
         raise ValueError('source_hash_mismatch')
     if provenance['public_fetch_status']!=200 or not provenance['permission_basis']:raise ValueError('public_permission_required')
+    plan_path=getattr(args,'plan',None)
+    plan_bytes=None if plan_path is None else plan_path.read_bytes()
+    plan=None if plan_bytes is None else loads(plan_bytes)
+    specs=specifications() if plan is None else experiment_plan(plan)
     secret=credential(args.env)
-    scope='exploratory:public-civic-20261028';at=now()
+    scope='exploratory:public-civic-'+source_digest(provenance['custody']['citation_url'].encode())[:16];at=now()
     producer=component('public-crawler-reuse',{'provenance_digest':source_digest((root/'provenance.json').read_bytes())})
     actor={'scope_id':scope,'namespace':'matter.diagnostic','id':'authorized-operator'}
     authority={'scope_id':scope,'namespace':'matter.diagnostic','record_type':'receipt','id':'host-grant'}
@@ -130,6 +151,7 @@ def run(args):
                 'responsibility':'Public grant oversight; a proposed close-out is relevant even before final execution.'},
             'school-procurement':{'purpose':'Find currently open school-district classroom technology procurements to bid on.',
                 'responsibility':'School technology vendor; a completed county roadway safety planning grant is outside this objective.'}}
+        if plan is not None:audiences=plan['audiences']
         refs={name:component(name,value) for name,value in audiences.items()};provider=component('typesafe',{'model':args.model,'transport':'http'})
         access=AccessService(policy=HostAccessPolicy(scope_id=scope,audiences=list(refs.values()),
             providers=[{'reference':provider,'provider':'typesafe','transport':'http'}],
@@ -142,8 +164,9 @@ def run(args):
             'quotation':None,'validation':adapter.validate(source,source['body']['content']['locator'],checked_at=at)}
         cases=[];checks={'duplicate_outcome':duplicate_result['outcome'],'duplicate_pin_unchanged':True,'availability':at,
             'correction_kind':'Experimental analyst interpretation correction; no fabricated publication or source revision.'}
-        specs=specifications()
-        for kind in ('proposal','duplicate','correction'):
+        selected_cases=[{'id':kind} for kind in ('proposal','duplicate','correction')] if plan is None else plan['cases']
+        for case in selected_cases:
+            kind=case['id']
             for audience_name,audience in audiences.items():
                 token=controls.capture(actor=actor,authority=authority,capability='assessment',targets=[entity_ref(original),entity_ref(source)])
                 with store.snapshot() as view:
@@ -168,7 +191,7 @@ def run(args):
                     state=packet.state
                     prior={'proposal':'No earlier applicable capture is supplied; this is the first experimental observation.',
                         'duplicate':'The same audience/purpose experimental capture already conveyed this exact memo, its close-out request and lack of proof of both signatures.',
-                        'correction':'The experimental prior analyst capture described this as a NEW open grant award. Compare that prior interpretation with the source itself; any correction must be source-supported.'}[kind]
+                        'correction':'The experimental prior analyst capture described this as a NEW open grant award. Compare that prior interpretation with the source itself; any correction must be source-supported.'}.get(kind,'No prior capture is supplied.') if plan is None else case['prior_capture']
                     state['diagnostic']={'kind':kind,'source_origin':'Saved machine extraction of the hash-verified public attachment; OCR errors remain possible.',
                         'coverage_limit':'One public attachment, not complete meeting minutes, signed final agreement or historical client context.',
                         'correction_kind':checks['correction_kind']}
@@ -176,6 +199,14 @@ def run(args):
                         'audience':audience,'purpose':audience['purpose'],'current_input':'Read the selected source bytes to determine their meaning; no current interpretation is supplied here.',
                         'last_observed_delivery':{'kind':'explicit_experimental_capture_context','real_audience_delivery':False,'meaning':prior},
                         'uncertainty':'No current procurement, actual client action or completed execution is established.'}
+                    if plan is not None:
+                        state['comparison']['cause']=case['cause']
+                        state['diagnostic']={'source_origin':'Hash-verified saved public-source extraction; extraction errors remain possible.',
+                            'coverage_limit':'Explicit supplied documents only; missing facts remain unresolved.',
+                            'correction_kind':checks['correction_kind']}
+                        state['comparison']['last_observed_delivery']={'kind':'explicit_experimental_capture_context',
+                            'real_audience_delivery':False,'meaning':prior}
+                        state['comparison']['uncertainty']='Preserve missing evidence and authority. This experiment grants no permission to act.'
                     rendered=tuple(render_question(s,state,kind+'-'+audience_name+':'+s.value['family'],source_manifest=packet.source_manifest,
                         access=access,access_context=context,access_view=view) for s in specs)
                     # Reuse the existing detached read format, capturing only actual
@@ -187,10 +218,10 @@ def run(args):
                     'context':{'provider':'typesafe','transport':'http','requested_model':args.model,'adapter_version':ADAPTER_VERSION,
                         'mode':'provider_shadow','deadline':now(),'max_request_bytes':65536,'max_response_bytes':65536}})
                 cases.append(GuardedProviderCase(batch.value['id'],batch,access,context,detached,rendered,
-                    {'proposal':'high','executed':'low','objective':'high' if audience_name=='grant-oversight' else 'low',
+                    (case['expectations'][audience_name] if plan is not None else {'proposal':'high','executed':'low','objective':'high' if audience_name=='grant-oversight' else 'low',
                      'novelty':'low' if kind=='duplicate' else ('high' if audience_name=='grant-oversight' else 'uncertain'),
                      'expected_silence':kind=='duplicate' or audience_name=='school-procurement',
-                     'labels':'Authored exploratory expectations, not independent ground truth.'}))
+                     'labels':'Authored exploratory expectations, not independent ground truth.'})))
         (root/(args.run_id+'-source-checks.json')).write_bytes(canonical_bytes(checks)+b'\n')
         config={'mode':'provider_shadow','provider':'typesafe','model':args.model,'scope_id':scope,'credential_source':'.env:TYPESAFE_API_KEY',
             'max_calls':6,'timeout_seconds':30,'wall_seconds':300,'max_cost_usd':'0.02',
@@ -198,7 +229,7 @@ def run(args):
             'trials_per_case':1,'max_request_bytes':65536,'max_response_bytes':65536}
         report=run_guarded_diagnostic(config=config,cases=cases,credential=secret,output=root/args.run_id,
             provenance={'external_provenance_sha256':source_digest((root/'provenance.json').read_bytes()),'source_checks':checks,
-                'audiences':audiences,'delivery_sink':'isolated_private_artifacts','no_independent_labels':True},live=args.live)
+                'plan_digest':None if plan is None else source_digest(plan_bytes),'audiences':audiences,'delivery_sink':'isolated_private_artifacts','no_independent_labels':True},live=args.live)
         print(json.dumps({k:v for k,v in report.items() if k!='observations'}),flush=True)
         if args.live and report['status']!='completed':raise RuntimeError('live_diagnostic_incomplete')
 
@@ -207,4 +238,5 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--evidence',type=Path,required=True);parser.add_argument('--env',type=Path,required=True)
     parser.add_argument('--model',required=True);parser.add_argument('--run-id',required=True)
+    parser.add_argument('--plan',type=Path,help='External bounded source-grounded experiment plan; no expected outcomes enter model state.')
     parser.add_argument('--live',action='store_true');run(parser.parse_args())

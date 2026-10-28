@@ -93,6 +93,11 @@ and cannot publish assessments, resolve conditions or notify anyone.
 
 ## Deliver an eligible update
 
+MAT-022's [bounded investigation port](docs/investigation.md) nominates exact
+host-approved reads against committed shared reservations. It retains mandatory
+counterevidence, stops honestly, and suppresses retries of unchanged gaps without
+automatically asking a human. It supplies no retrieval connector.
+
 MAT-021's [delivery service](docs/delivery.md) queues an immutable intent, leases
 it to one worker and atomically checks freshness, destination authority and the
 attention budget before authorizing one injected send. Equivalent pending or
@@ -106,6 +111,12 @@ must install applicable source-backed civic profiles and reviewed authority,
 and complete receiving integration; this milestone does not qualify that application.
 
 ## Inspect and replay recorded decisions
+
+The [latest follow-through receipt](docs/validation/civic-followthrough.md)
+records additional actual public-evidence JEV calls, calibration mechanics and
+installed-package validation. Live interpretation findings remain exploratory;
+MAT-040 empirical qualification needs independent held-out evidence and approved
+targets even when software conformance passes.
 
 MAT-023's [queries and explanations](docs/queries.md) compose current READ rights,
 identity redirects, original assessment policy, quiet reasons and actual delivery

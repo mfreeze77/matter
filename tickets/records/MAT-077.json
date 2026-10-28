@@ -76,6 +76,8 @@
   ],
   "completion": {
     "state": "not_run",
-    "evidence": []
+    "evidence": [
+      "2026-10-28: Narrow installed walkthrough-schema repair uses bundled importlib.resources instead of a checkout-relative path. Checkout regression passes; actual built-wheel full regression outside the checkout is in progress. This does not close the broader distribution/CI/provenance ticket or its unmet MAT-025/MAT-074 prerequisites. See docs/validation/civic-followthrough.md."
+    ]
   }
 }

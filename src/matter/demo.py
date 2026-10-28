@@ -9,19 +9,20 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from copy import deepcopy
 import hashlib
-from pathlib import Path
+import json
+from importlib.resources import files
 from typing import Any
 
 from jsonschema import Draft202012Validator, FormatChecker
 from jsonschema.exceptions import SchemaError
 
-from .jsonio import canonical, read
+from .jsonio import canonical
 
 
 def _schema(value: dict[str, Any] | None = None) -> dict[str, Any]:
-    """Use checkout contracts; the CLI passes its selected checkout explicitly."""
-    schema = value if value is not None else read(
-        Path(__file__).resolve().parents[2] / "schemas/walkthrough.schema.json"
+    """Use the bundled SDK contract; explicit CLI checkout overrides remain valid."""
+    schema = value if value is not None else json.loads(
+        files("matter._schemas").joinpath("walkthrough.schema.json").read_text(encoding="utf-8")
     )
     try:
         Draft202012Validator.check_schema(schema)

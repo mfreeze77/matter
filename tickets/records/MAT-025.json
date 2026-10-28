@@ -4,7 +4,7 @@
   "track": "core",
   "phase": 5,
   "priority": "P0",
-  "status": "planned",
+  "status": "in_progress",
   "type": "qualification",
   "owner_repo": "mfreeze77/matter",
   "component": "core_qualification",
@@ -98,8 +98,10 @@
     }
   ],
   "artifacts": [
-    "tests/qualification/test_core_episodes.py",
-    "tests/qualification/test_core_faults.py",
+    "examples/core_qualification.py",
+    "tests/fixtures/conformance/core-qualification.json",
+    "tests/qualification/test_core_report.py",
+    "tests/qualification/test_chronological_replay.py",
     "docs/qualification/core-release.md",
     "schemas/qualification-report.schema.json"
   ],
@@ -132,6 +134,8 @@
   ],
   "completion": {
     "state": "not_run",
-    "evidence": []
+    "evidence": [
+      "2026-10-28: Reuses existing actual SQLite/replay/lifecycle/attention/outbox/control/fault assertions instead of adding a second engine or rehearsal stack. The superseded first 40-check plan (current plan: 41 checks) maps CORE-01\u201324 and AC-1\u20134, preserves per-check results and source inventories, and explicitly leaves provider/domain/usefulness gates unrun. Execution and independent review closeout remain in progress; see docs/qualification/core-release.md and docs/validation/civic-followthrough.md."
+    ]
   }
 }
