@@ -244,3 +244,24 @@ A no-call legacy preflight using the larger public SS4A packet returned
 success. The synthetic small-input legacy check separately validates all six
 native requests within the existing 64 KiB limits, without dispatch. The actual
 24-call generic-plan experiment above is unaffected by this bounded refusal.
+
+Final source deltas passed **4 installed-runtime tests in 20.362s**: the
+non-observation refusal proof, generic-plan isolation/digest stability, malformed
+plan refusal plus small-input legacy native rendering, and the strengthened
+access test. Disabling `AccessService.require_current` in that synthetic access
+fixture produced the expected assertion failure (1 failure, 0 errors, zero
+provider calls), proving the assertion is sensitive to the guard. It was a
+controlled mutation, not a failed production/provider run.
+
+Both latest ZIP hashes and all four retained live-report hashes were rechecked
+and matched; 81 external JSON artifact hashes were retained. The tested local
+environment is Python 3.12.14 and SQLite 3.53.1. Other Python versions, backends
+and production receiver acceptance are not inferred from this local evidence.
+
+MAT-022 and bounded MAT-025 acceptance are now recorded done in canonical JSON.
+MAT-040 remains blocked on actual independent held-out review, approved targets
+and sufficient support; no empirical qualification or runtime certificate was
+issued. MAT-077 remains planned despite the verified narrow schema repair.
+The final three-file delta review completed two passes with zero findings and
+zero warnings. The full installed regression is still running at this checkpoint;
+its exact final result will be appended before integration closeout.

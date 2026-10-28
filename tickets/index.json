@@ -14,8 +14,7 @@
   },
   "counts_by_status": {
     "blocked": 1,
-    "done": 38,
-    "in_progress": 2,
+    "done": 40,
     "planned": 39
   },
   "tickets": [
@@ -427,7 +426,7 @@
       "track": "rules",
       "phase": 4,
       "priority": "P1",
-      "status": "in_progress",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-010",
@@ -440,7 +439,7 @@
       "requirements": [
         "CORE-21"
       ],
-      "readiness": "in_progress",
+      "readiness": "done",
       "path": "records/MAT-022.json"
     },
     {
@@ -499,7 +498,7 @@
       "track": "core",
       "phase": 5,
       "priority": "P0",
-      "status": "in_progress",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-002",
@@ -552,7 +551,7 @@
         "CORE-22",
         "CORE-23"
       ],
-      "readiness": "in_progress",
+      "readiness": "done",
       "path": "records/MAT-025.json"
     },
     {
@@ -1612,7 +1611,7 @@
         "OIL-08",
         "OIL-13"
       ],
-      "readiness": "waiting",
+      "readiness": "ready",
       "path": "records/MAT-066.json"
     },
     {

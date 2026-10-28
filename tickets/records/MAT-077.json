@@ -77,7 +77,7 @@
   "completion": {
     "state": "not_run",
     "evidence": [
-      "2026-10-28: Narrow installed walkthrough-schema repair uses bundled importlib.resources instead of a checkout-relative path. Checkout regression passes; actual built-wheel full regression outside the checkout is in progress. This does not close the broader distribution/CI/provenance ticket or its unmet MAT-025/MAT-074 prerequisites. See docs/validation/civic-followthrough.md."
+      "2026-10-28: Narrow installed walkthrough-schema failure is fixed using bundled importlib.resources. All three walkthroughs ran from the actual installed wheel under isolated Python outside the checkout, with no schema directory; 197 package runtime/SQL/schema files match source, and private/credential/media paths are absent from the wheel. The full installed run and final review limits are in docs/validation/civic-followthrough.md. This does not close broader distribution/CI/provenance acceptance, supported-version checks or the MAT-074 prerequisite; MAT-077 remains planned."
     ]
   }
 }

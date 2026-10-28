@@ -118,6 +118,11 @@ installed-package validation. Live interpretation findings remain exploratory;
 MAT-040 empirical qualification needs independent held-out evidence and approved
 targets even when software conformance passes.
 
+MAT-025's [neutral-core release matrix](docs/qualification/core-release.md)
+records 41 executed synthetic checks across all core requirements, including
+two declared profiles and actual fault/control/delivery boundaries. It leaves
+provider accuracy and production receiving acceptance explicitly unrun.
+
 MAT-023's [queries and explanations](docs/queries.md) compose current READ rights,
 identity redirects, original assessment policy, quiet reasons and actual delivery
 outcomes in one snapshot. Missing source bytes remain unavailable. Historical

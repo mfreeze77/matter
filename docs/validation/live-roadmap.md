@@ -316,3 +316,12 @@ existing dependency machinery and belongs in MAT-046's integration contract.
 The installed walkthrough-schema lookup still fails separately. No new live
 provider call, qualification, real alert, native delivery adapter or receiving
 application change is part of these shadow families.
+
+## Installed-schema follow-through, 2026-10-28
+
+The separate walkthrough default-schema failure reported above is now repaired
+and directly verified with the built wheel under isolated Python outside the
+checkout, without a schema directory. See the [follow-through receipt](civic-followthrough.md)
+for the exact package inventory, checks and remaining broader MAT-077 scope.
+Earlier failure receipts remain historical evidence; checkout passes were not
+used as a substitute for this installed verification.
