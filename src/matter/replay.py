@@ -8,9 +8,9 @@ not. Sequential results establish neither provider accuracy nor race safety.
 from copy import deepcopy
 from ._rule_values import FrozenValue,domain
 from .canonical import canonical_bytes,canonical_digest
-from .contracts import ContractError
+from .contracts import ContractError,validate_command
 from .evaluation.corpus import FrozenCorpus,MAX_CORPUS_BYTES
-from .time import compare_times
+from .time import compare_times,knowledge_eligible
 
 
 def _fail(reason,code='E_EVIDENCE_INVALID'):raise ContractError(code,reason)
@@ -23,6 +23,13 @@ class ReplayManifest(FrozenValue):
         value=domain('replay-manifest',value)['value']
         if value['scope_id']!=corpus.value['scope_id'] or value['corpus_digest']!=corpus.sha256:_fail('corpus_mismatch')
         if not set(value['episode_ids'])<={e['id'] for e in corpus.value['episodes']}:_fail('unknown_replay_episode')
+        control_ids=set()
+        for control in value['controls']:
+            command=validate_command(control['command'])
+            if command['scope_id']!=value['scope_id'] or command['operation']!='record_control':_fail('invalid_replay_control')
+            if command['command_id'] in control_ids:_fail('duplicate_replay_control')
+            control_ids.add(command['command_id'])
+            if command['body']['control']['provenance']['recorded_at']!=control['recorded_at']:_fail('control_recording_cut_mismatch')
         ids=set();previous=None
         known={(e['id'],o['id']) for e in corpus.value['episodes'] if e['id'] in value['episode_ids'] for o in e['observations']}
         for step in value['steps']:
@@ -68,7 +75,7 @@ def run_replay(manifest,*,corpus,driver):
             source=item['observation']['source']
             admitted.append({**item,'source':deepcopy(sources[(item['episode_id'],source['id'],source['revision'])])})
         request={k:deepcopy(step[k]) for k in ('id','as_of','operation','input','recorded_judgments')}
-        request.update(profiles=value['profiles'],controls=value['controls'],inputs=admitted)
+        request.update(profiles=value['profiles'],controls=[c['command'] for c in value['controls'] if knowledge_eligible(c['recorded_at'],step['as_of']) is True],inputs=admitted)
         output=driver.run_step(request)
         canonical_bytes(output)
         required={'conclusions','receipts','quiet_reasons','transitions','delivery_count','sources_used'}

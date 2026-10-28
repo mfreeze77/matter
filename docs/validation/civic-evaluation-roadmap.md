@@ -135,3 +135,36 @@ synthetic/exposed examples; no independently adjudicated untouched held-out
 qualification corpus or sufficient polarity/episode support has been established.
 No thresholds/certificates are fitted or issued from these cases. The installed
 walkthrough-schema lookup remains a separate packaging validation gap.
+
+## Runner review corrections and installed boundary
+
+The third two-pass review covered 20 files with no warnings and six findings.
+Corrections preserve model/usage safety stops on resume, require A/B × corpus
+episode coverage and a kind-B candidate, preflight the existing adapter's actual
+wire shape/byte bound, separate non-dispatched rows from observed transport
+attempts, and atomically publish private artifact files. The offline callback
+checks exact candidate-row routing while keeping unqualified results shadow-only.
+Ten provider-shaped tests passed in 0.445s (`/tmp/mat039-final-focused.log`),
+including an interrupted result publication after an observed transport attempt.
+No actual live call was made by those tests.
+
+The complete second review also identified an authority-history availability
+problem. Civic resolution now scans newest-first only since the oldest selected
+review, skips older unrelated global history, and permits recovery by a fresh
+host review when the bounded tail is too old. Sixteen civic tests passed in
+60.925s, including 257 real unrelated scope-wide controls and successful recovery
+(`/tmp/mat046-history-bound.log`). Recorded host controls now have explicit cut
+bindings; their future contents are withheld from earlier replay requests.
+The targeted control check passed (`/tmp/mat024-controls.log`).
+
+The a7052be installed wheel imported 86 modules and loaded all three new schemas.
+Its SHA-256 was `4363652e51513166385c383f99222b56356555e9b30393aa914458969250c532`.
+The installed walkthrough default still raises FileNotFoundError; this is a
+confirmed separate packaging gap, not a green installed full suite. This wheel
+precedes the final review deltas and is not the final source-byte claim.
+Existing actual source-currentness/missing-certificate/conflicting-head service
+checks passed 3 tests in 7.242s (`/tmp/matter-existing-admission-guards.log`).
+
+Final source freeze, full checkout discovery and review closeout follow below.
+New evaluation/qualification test directories are packages so ordinary discovery
+includes them. No additional provider trial or empirical qualification is implied.

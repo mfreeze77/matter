@@ -49,7 +49,20 @@
       "type": "array",
       "maxItems": 4096,
       "items": {
-        "type": "object"
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "recorded_at",
+          "command"
+        ],
+        "properties": {
+          "recorded_at": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+          },
+          "command": {
+            "type": "object"
+          }
+        }
       }
     },
     "steps": {

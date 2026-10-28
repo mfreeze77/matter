@@ -30,7 +30,7 @@ def _active(value,at):
     return compare_times(at,value['start'])>=0 and (value['end']['state']=='unknown' or compare_times(at,value['end'])<0)
 
 
-def _reviews(view,scope,sources,remember):
+def _reviews(view,scope,sources,remember,minimum_epoch):
     """Per-assertion history from existing registered source-control fences.
 
     A source can support many assertions. Generic fence dispositions overwrite
@@ -42,12 +42,16 @@ def _reviews(view,scope,sources,remember):
     for target in [None,*sources]:
         head=_fence(view,scope,target)
         if head is None:continue
-        if head['revision']>256:_fail('review_history_limit','E_BUDGET_EXHAUSTED')
+        if head['value']['value']['epoch']<minimum_epoch:continue
         address=control_fence_ref(scope,target)
-        for revision in range(1,head['revision']+1):
+        scanned=0
+        for revision in range(head['revision'],0,-1):
             fence=view.get({**address,'revision':revision});remember(pin(fence))
             checked=domain('control-fence',fence['value']['value'])
             if fence['value']!=checked or checked['value']['target']!=target:_fail('review_fence_invalid')
+            if checked['value']['epoch']<minimum_epoch:break
+            scanned+=1
+            if scanned>256:_fail('review_history_scan_limit_re_review_required','E_BUDGET_EXHAUSTED')
             reference=checked['value']['last_control'];key=canonical_bytes(reference)
             if key in seen:continue
             seen.add(key);count+=1
@@ -176,7 +180,8 @@ class CivicRegistry:
                 available &= (source['body']['content']['availability']['status']=='available' and
                     knowledge_eligible(source['body']['available_at'],as_of) is True)
             source_available[canonical_bytes(ref)]=bool(available)
-        review_history,superseded=_reviews(view,scope,sorted({canonical_bytes(entity_ref(s['reference'])):entity_ref(s['reference']) for _,a,_ in selected for s in a['sources']}.values(),key=canonical_bytes)+[entity_ref(a['attestation']) for _,a,_ in selected if a['attestation']],remember)
+        reviewed=[_control(view,a['attestation']) for _,a,_ in candidates if a['disposition']=='reviewed_host']
+        review_history,superseded=([],set()) if not reviewed else _reviews(view,scope,sorted({canonical_bytes(entity_ref(s['reference'])):entity_ref(s['reference']) for _,a,_ in selected for s in a['sources']}.values(),key=canonical_bytes)+[entity_ref(a['attestation']) for _,a,_ in selected if a['attestation']],remember,min(r['body']['control_epoch'] for r in reviewed))
         outcomes=[]
         for profile,assertion,ref in candidates:
             reason=assertion['disposition'];verified=False;available=source_available[canonical_bytes(ref)]

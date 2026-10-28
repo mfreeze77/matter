@@ -20,10 +20,11 @@ observation hashes and availability. A reviewed assertion needs an actual regist
 host control with a `civic-review` payload bound to that assertion, common profile,
 scope and review time. The granting control must target exactly its source records. Currentness is
 checked per assertion through bounded registered source-fence history (256
-revisions per source, 4096 distinct controls maximum). Unrelated reviews cannot
+revisions newer than the oldest selected review per fence, 4096 distinct controls maximum). Unrelated reviews cannot
 displace one another. Later matching withdrawals on overlapping or scope-wide
-targets remain effective after unrelated dispositions. Exceeding the scan bound
-refuses the result; it does not reuse an old grant. A
+targets remain effective after unrelated dispositions. Older unrelated scope-wide history is skipped. Exceeding the scan bound
+refuses the result with `review_history_scan_limit_re_review_required`; a fresh
+host review recovers the boundary without deleting history or reusing an old grant. A
 parser `final` tag, supported source or copied host-looking JSON cannot substitute
 for a registered current host review. Withdrawn, superseded, future or disputed
 review cannot enable the host-proposal gate. The caller owns access/egress and

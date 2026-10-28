@@ -65,6 +65,17 @@ class OfflineHarnessTests(unittest.TestCase):
             driver=core.CoreReplayDriver()
             try:
                 self.assertNotIn('matches_expected_status',str(observations))
+                if arm.value['kind']=='A':self.assertEqual(observations,[])
+                else:
+                    self.assertEqual({o['job_id'] for o in observations},set(SCENARIOS))
+                    self.assertTrue(all(o['episode_id']==episode_id for o in observations))
+                    if recordings_override is None and not silent:
+                        self.assertEqual({o['job_id']:o['status'] for o in observations},SCENARIOS)
+                    expected=[j for j in jobs if j['episode_id']==episode_id]
+                    self.assertEqual(len(observations),len(expected))
+                    for o in observations:
+                        self.assertIn(o['status'],('successful','abstained','failed','stale'))
+                        self.assertNotIn('expected_status',o)
                 manifest=loads((ROOT/'conformance/late-cancellation.json').read_bytes())
                 manifest['corpus_digest']=corpus.sha256
                 # The principal arms see the same complete chronological core

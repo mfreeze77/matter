@@ -46,6 +46,13 @@ class OfflineReport(FrozenValue):
         if type(value['scheduled']) is not int or sum(value['counts'].values())!=value['scheduled'] or len(value['attempts'])!=value['scheduled']:_fail('scheduled_denominator_mismatch')
         if any(a.get('status') not in TERMINAL for a in value['attempts']):_fail('invalid_terminal_outcome')
         if {s:sum(a['status']==s for a in value['attempts']) for s in TERMINAL}!=value['counts']:_fail('terminal_counts_mismatch')
+        if type(value['episodes']) is not list or not value['episodes'] or len(value['episodes'])>512:_fail('offline_episode_coverage_required')
+        keys=[]
+        for episode in value['episodes']:
+            checked(episode,required={'arm','episode_id','replay'})
+            if episode['arm'] not in ('A','B') or type(episode['replay'].get('passed')) is not bool:_fail('invalid_episode_report')
+            keys.append((episode['arm'],episode['episode_id']))
+        if len(keys)!=len(set(keys)) or {k[0] for k in keys}!={'A','B'}:_fail('offline_episode_coverage_required')
         if value['passed'] is not (all(a['matches_expected_status'] for a in value['attempts']) and all(e['replay']['passed'] for e in value['episodes'])):_fail('offline_pass_mismatch')
         self._freeze(value)
     @property

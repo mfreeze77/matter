@@ -218,3 +218,17 @@ class CivicProfilesTests(unittest.TestCase):
         with self.assertRaises(ContractError) as caught:self.profile(value)
         self.assertEqual((caught.exception.code,caught.exception.detail),
             ('E_AUTHORITY_REQUIRED','reviewed_assertion_requires_sources_and_attestation'))
+
+    def test_fresh_review_recovers_after_large_unrelated_scope_wide_history(self):
+        old=self.profile(self.review(self.value()))
+        for index in range(257):
+            command=_in_scope(control_command('global-unrelated-'+str(index),self.f.authority,targets=[],
+                action='invalidate',kind='decision',now=self.f.now),self.f.storage.scope_id)
+            command['actor']=self.f.actor;command['body']['control']['body']['actor']=self.f.actor
+            self.assertEqual(self.f.controls.apply(self.f.controls.prepare(command))['status'],'success')
+        with self.assertRaises(ContractError) as caught:self.resolve([old])
+        self.assertEqual(caught.exception.detail,'review_history_scan_limit_re_review_required')
+        # A new assertion-bound host review recovers; append-only scope history
+        # need not be deleted, compacted or copied into another control service.
+        renewed=self.profile(self.review(self.value('renewed')))
+        self.assertTrue(self.resolve([renewed])['eligible_for_host_proposal'])

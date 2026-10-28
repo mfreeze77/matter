@@ -26,7 +26,7 @@ class ProviderRunnerTests(unittest.TestCase):
             'arms':[self.a.digest,self.b.digest],'fixture_digest':'a'*64,
             'scheduled_manifest_digest':canonical_digest(self.jobs,'matter.offline-schedule.v1'),'scheduled':len(attempts),
             'counts':{s:sum(a['status']==s for a in attempts) for s in ('successful','abstained','failed','stale')},
-            'attempts':attempts,'episodes':[],'passed':True,
+            'attempts':attempts,'episodes':[{'arm':a,'episode_id':e['id'],'replay':{'passed':True}} for a in ('A','B') for e in self.corpus.value['episodes']],'passed':True,
             'gates':{'provider_accuracy':'not_run','live_delivery':'not_run','qualification':'not_run'},'consequential_use':False})
         self.config={'mode':'provider_shadow','provider':'typesafe','model':'jev-1.14.0','scope_id':self.corpus.value['scope_id'],
             'credential_source':'synthetic-injected-test','max_calls':8,'timeout_seconds':2,'wall_seconds':120,'max_cost_usd':'0.03',
@@ -38,12 +38,12 @@ class ProviderRunnerTests(unittest.TestCase):
     def arguments(self):
         return dict(config=self.config,corpus=self.corpus,split=self.split,candidate=self.b,jobs=self.jobs,
             offline=self.offline,credential=KEY,output=self.destination)
-    def transport(self,*,model=None,timeout=False):
+    def transport(self,*,model=None,timeout=False,tokens=12):
         def http(**kwargs):
             request=json.loads(kwargs['body']);self.requests.append(request)
             if timeout:raise TimeoutError('A synthetic timeout.')
             answers={k:{'type':'noul','noul':1} for k in request['questions']}
-            return HTTPResponse(200,json.dumps({'model':model or self.config['model'],'answers':answers,'usage':{'input_tokens':12,'output_tokens':2}}).encode())
+            return HTTPResponse(200,json.dumps({'model':model or self.config['model'],'answers':answers,'usage':{'input_tokens':tokens,'output_tokens':2}}).encode())
         return http
 
     def test_preflight_missing_unselected_and_changed_inputs_never_dispatch(self):
@@ -90,6 +90,10 @@ class ProviderRunnerTests(unittest.TestCase):
         self.assertEqual(report['fresh_attempts'],1);self.assertEqual(report['status'],'incomplete')
         self.assertEqual(report['observations'][0]['result']['resolved_model'],'another-resolved-model')
         self.assertEqual(report['stop_reason'],'resolved_model_differs_from_price_binding')
+        before=len(self.requests)
+        again=run_provider(**self.arguments(),live=True,resume=True,http=self.transport(),clock=lambda:core.NOW)
+        self.assertEqual(len(self.requests),before);self.assertEqual(again['fresh_attempts'],0)
+        self.assertEqual(again['status'],'incomplete');self.assertEqual(again['stop_reason'],'resolved_model_differs_from_price_binding')
 
     def test_declared_cost_and_scope_are_checked_before_any_request(self):
         args=self.arguments();args['config']={**self.config,'max_cost_usd':'0.00001'}
@@ -97,3 +101,56 @@ class ProviderRunnerTests(unittest.TestCase):
         args=self.arguments();args['config']={**self.config,'scope_id':'foreign'}
         self.assertEqual(run_provider(**args,live=True,http=self.transport())['reason'],'scope_mismatch')
         self.assertFalse(self.requests)
+
+    def test_empty_or_incomplete_offline_episode_coverage_is_refused(self):
+        from matter.contracts import ContractError
+        empty=self.offline.value;empty['episodes']=[]
+        with self.assertRaises(ContractError):OfflineReport(empty)
+        # Nonempty A/B entries still cannot stand in for the declared corpus.
+        wrong=self.offline.value
+        for row in wrong['episodes']:row['episode_id']='different-episode'
+        args=self.arguments();args['offline']=OfflineReport(wrong)
+        result=run_provider(**args,live=True,http=self.transport())
+        self.assertEqual(result['reason'],'offline_episode_coverage_incomplete');self.assertEqual(self.requests,[])
+
+    def test_unsupported_or_oversize_provider_configuration_has_zero_requests(self):
+        args=self.arguments();args['config']={**self.config,'max_request_bytes':100}
+        self.assertEqual(run_provider(**args,live=True,http=self.transport())['reason'],'provider_request_unsupported_or_oversize')
+        args=self.arguments();args['candidate']=self.a
+        self.assertEqual(run_provider(**args,live=True,http=self.transport())['reason'],'offline_inputs_mismatch')
+        self.assertEqual(self.requests,[]);self.assertFalse(self.destination.exists())
+
+    def test_expired_before_dispatch_is_not_counted_as_fresh_or_completed(self):
+        from datetime import datetime,timedelta,timezone
+        late={**core.NOW,'value':(datetime.fromisoformat(core.NOW['value'].replace('Z','+00:00'))+timedelta(seconds=3)).isoformat().replace('+00:00','Z')}
+        samples=iter([core.NOW,core.NOW,late])
+        def clock():return next(samples,late)
+        report=run_provider(**self.arguments(),live=True,http=self.transport(),clock=clock)
+        self.assertEqual(report['fresh_attempts'],7);self.assertEqual(len(self.requests),7)
+        self.assertEqual(report['non_dispatched'],1);self.assertEqual(report['status'],'incomplete')
+        self.assertEqual(report['observations'][0]['observation_kind'],'not_dispatched')
+        before=len(self.requests)
+        resumed=run_provider(**self.arguments(),live=True,resume=True,http=self.transport(),clock=lambda:late)
+        self.assertEqual(len(self.requests),before);self.assertEqual(resumed['non_dispatched'],1)
+        self.assertEqual(resumed['status'],'incomplete')
+
+    def test_interrupted_result_publication_keeps_start_and_never_reissues(self):
+        import os
+        link=os.link
+        def interrupt(source,destination):
+            if Path(destination).name=='0-result.json':raise KeyboardInterrupt()
+            return link(source,destination)
+        with patch('matter.evaluation.artifacts.os.link',side_effect=interrupt):
+            with self.assertRaises(KeyboardInterrupt):run_provider(**self.arguments(),live=True,http=self.transport(),clock=lambda:core.NOW)
+        self.assertEqual(len(self.requests),1);self.assertTrue((self.destination/'0-started.json').exists())
+        self.assertFalse((self.destination/'0-result.json').exists())
+        report=run_provider(**self.arguments(),live=True,resume=True,http=self.transport(),clock=lambda:core.NOW)
+        self.assertEqual(report['incomplete_attempts'],1);self.assertEqual(report['fresh_attempts'],7)
+        self.assertEqual(len(self.requests),8)
+
+    def test_usage_bound_failure_is_sticky_across_resume(self):
+        report=run_provider(**self.arguments(),live=True,http=self.transport(tokens=65537),clock=lambda:core.NOW)
+        self.assertEqual(report['fresh_attempts'],1);self.assertEqual(report['stop_reason'],'observed_usage_exceeds_reserved_bound')
+        again=run_provider(**self.arguments(),live=True,resume=True,http=self.transport(),clock=lambda:core.NOW)
+        self.assertEqual(len(self.requests),1);self.assertEqual(again['status'],'incomplete')
+        self.assertEqual(again['stop_reason'],'observed_usage_exceeds_reserved_bound')

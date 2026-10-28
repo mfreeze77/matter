@@ -1,12 +1,10 @@
 """Synthetic portable recipes driving existing Matter services, not toy rules."""
 from copy import deepcopy
-from pathlib import Path
 from matter.canonical import source_digest
-from matter.evaluation.corpus import FrozenCorpus
 from matter.queries import QueryService
 from matter.storage import entity_ref,pin
 from integration import test_audience_attention as fixtures
-from rule_helpers import NOW,EARLY,LATE,component
+from rule_helpers import NOW,EARLY,LATE,component  # exported shared fixture clocks
 
 
 class CoreReplayDriver:
@@ -20,11 +18,6 @@ class CoreReplayDriver:
             from unit.test_attention_deltas import policy_value
             value=self.h.episode.definition.value
             value['namespace']='synthetic:'+domain;value['id']='alternate-lifecycle'
-            def rename(x):
-                if type(x) is str:return x.replace('example:','synthetic:'+domain+':')
-                if type(x) is list:return [rename(i) for i in x]
-                if type(x) is dict:return {k:rename(v) if k in ('name','from_states','to_state','initial_state','states','edges') else v for k,v in x.items()}
-                return x
             # State and edge labels are opaque declarations; core contracts and
             # operations remain identical across the two synthetic domains.
             for state in value['states']:state['name']=state['name'].replace('example:','synthetic:'+domain+':')

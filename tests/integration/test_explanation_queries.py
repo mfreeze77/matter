@@ -63,6 +63,8 @@ class ExplanationQueriesTests(unittest.TestCase):
         cursor=first['next_cursor'];self.assertIsNotNone(cursor)
         second=self.project(assessment,limit=1,cursor=cursor)
         self.assertNotEqual(first['records'],second['records'])
+        with self.assertRaises(ContractError) as caught:self.project(assessment,limit=1,cursor=cursor,include_payload=True)
+        self.assertEqual(caught.exception.detail,'stale_or_foreign_cursor')
         other,*_=self.a.assess('other')
         with self.assertRaises(ContractError):self.project(other,limit=1,cursor=cursor)
         with self.assertRaises(ContractError):self.project(assessment,limit=1,cursor=cursor)

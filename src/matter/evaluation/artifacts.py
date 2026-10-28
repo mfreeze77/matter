@@ -1,5 +1,6 @@
 """Private, immutable external evaluation artifacts, separate from core records."""
 import os
+import tempfile
 from pathlib import Path
 from ..canonical import canonical_bytes,loads,source_digest
 from ..contracts import ContractError
@@ -17,9 +18,15 @@ class ArtifactDirectory:
         return self.path/name
     def write(self,name,value):
         data=canonical_bytes(value)+b'\n';path=self._path(name)
-        descriptor=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
-        with os.fdopen(descriptor,'wb') as stream:
-            stream.write(data);stream.flush();os.fsync(stream.fileno())
+        descriptor,temporary=tempfile.mkstemp(prefix='.pending-',dir=self.path)
+        try:
+            with os.fdopen(descriptor,'wb') as stream:
+                stream.write(data);stream.flush();os.fsync(stream.fileno())
+            # Atomic append-only publication: a killed writer can leave a private
+            # pending file, but cannot expose torn bytes under a final name.
+            os.link(temporary,path)
+        finally:
+            os.unlink(temporary)
         if os.name!='nt':
             directory=os.open(self.path,os.O_RDONLY)
             try:os.fsync(directory)

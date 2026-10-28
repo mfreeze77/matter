@@ -86,3 +86,18 @@ class ChronologicalReplayTests(unittest.TestCase):
         self_test=self
         output=run_replay(manifest,corpus=FrozenCorpus(helpers.corpus_value()),driver=Recorded())
         self.assertEqual(output['gates']['qualification'],'not_run')
+
+    def test_future_host_control_does_not_enter_earlier_driver_request(self):
+        from integration.helpers import fixture,_in_scope
+        value=self.manifest();value['steps']=value['steps'][:1]
+        command=_in_scope(fixture('commands/record_control.json'),value['scope_id'])
+        command['body']['control']['provenance']['recorded_at']=helpers.LATE
+        value['controls']=[{'recorded_at':helpers.LATE,'command':command}]
+        class Spy:
+            reference=helpers.CoreReplayDriver.reference;mode='deterministic';capture_only=True
+            def run_step(self,step):
+                self_test.assertEqual(step['controls'],[])
+                return value['steps'][0]['expected']
+        self_test=self;corpus=FrozenCorpus(helpers.corpus_value())
+        result=run_replay(ReplayManifest(value,corpus=corpus),corpus=corpus,driver=Spy())
+        self.assertTrue(result['passed'])
