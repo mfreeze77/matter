@@ -95,3 +95,43 @@ sitting example changes capacity within one recording, and refusal/mutation
 tests are sharper. The fixes and new roadmap modules require independent review
 before ticket closeout. Full regression and installed validation remain separate
 unrun checks for this batch.
+
+## Review boundary corrections and evaluator ports
+
+The second two-pass review covered 22 files, with no coverage warnings. Its
+confirmed corrections now retain generic control supersession as well as civic
+withdrawals, restrict explanations to the selected assessment and paginate their
+record detail, refuse future metadata cuts, bind recorded judgments to time/source
+requirements, measure real outbox records in replay, and retain all previous
+tuning assignments across split revisions. The review regression passed **36
+tests in 207.091s**, log `/tmp/matter-review-regression.log`. A new source snapshot
+and independent review cover these deltas plus the evaluator ports.
+
+MAT-038's final focused run passed **2 tests in 204.921s** (`/tmp/mat038-focused-final.log`).
+It runs actual fresh-store core episodes for A/B twice, plus missing-wire and
+all-silent variants, and exact fixture response faults. Eight scheduled synthetic
+decisions reconcile to 1 successful fixture admission, 3 abstained, 3 failed and
+1 stale fixture decision. The admission callback is explicitly synthetic; it does
+not turn raw results into actual qualified core judgments. Actual source-change
+and missing-certificate guards remain separate existing service checks.
+
+MAT-039's focused **5 provider-shaped tests passed in 0.200s**
+(`/tmp/mat039-focused.log`). They use injected HTTP responses and a synthetic
+OfflineReport schema fixture to isolate preflight/recovery; these are not live
+provider trials or evidence that a new corpus passed offline. Missing/unselected
+credentials, changed questions, insufficient cost, interruption, cached resume,
+timeout, model mismatch and capture-only spies are covered. The only actual live
+JEV calls in this task remain the six interpretation calls recorded above.
+
+The current official model reference was checked again: Jev 1.14's published
+input price is USD 0.042 per million tokens and output is free
+(https://docs.typesafe.ai/models, checked 2026-10-28). The provider runner requires
+an explicit dated price basis and conservative full-context reservations; native
+billing remains unobserved. This does not retroactively change the first
+diagnostic's recorded unknown billing/cost field.
+
+MAT-040 has not run. Available checked-in and diagnostic cases are authored
+synthetic/exposed examples; no independently adjudicated untouched held-out
+qualification corpus or sufficient polarity/episode support has been established.
+No thresholds/certificates are fitted or issued from these cases. The installed
+walkthrough-schema lookup remains a separate packaging validation gap.

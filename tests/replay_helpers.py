@@ -69,9 +69,12 @@ class CoreReplayDriver:
         assessment,claim,decision,value=self.last
         projection=self.queries.project(entity_ref(self.f.subject),actor=self.f.actor,authority=entity_ref(self.f.authority),
             assessment=pin(assessment),attention=pin(decision))
+        import sqlite3
+        with sqlite3.connect(self.f.database) as connection:
+            delivery_count=connection.execute("SELECT count(*) FROM versions WHERE namespace='matter.delivery' OR json_extract(content, '$.body.stage')='delivered'").fetchone()[0]
         return {'conclusions':[p['status'] for p in projection['explanation']['propositions']],
             'receipts':deepcopy(self.receipts),'quiet_reasons':value['reasons'] if value['treatment']=='quiet' else [],
-            'transitions':list(self.transitions),'delivery_count':0,
+            'transitions':list(self.transitions),'delivery_count':delivery_count,
             'sources_used':[{'episode_id':v['episode_id'],'observation_id':k} for k,v in sorted(self.events.items())]}
 
 

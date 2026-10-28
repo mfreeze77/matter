@@ -43,8 +43,8 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-035: Add bounded investigation judgments and stopping outcomes](MAT-035.md) | jev | 4 | P1 | planned | waiting | MAT-028, MAT-029, MAT-031, MAT-033, MAT-034, MAT-022, MAT-040 |
 | [MAT-036: Freeze episode corpora and independent label provenance](MAT-036.md) | evaluation | 2 | P0 | done | done | MAT-001, MAT-004, MAT-006, MAT-010 |
 | [MAT-037: Create grouped splits and comparable baseline manifests](MAT-037.md) | evaluation | 4 | P0 | in_progress | in_progress | MAT-036, MAT-024 |
-| [MAT-038: Build the deterministic offline evaluation harness](MAT-038.md) | evaluation | 4 | P0 | planned | waiting | MAT-026, MAT-029, MAT-030, MAT-031, MAT-036, MAT-037 |
-| [MAT-039: Run optional real-provider shadow replay with exact receipts](MAT-039.md) | evaluation | 4 | P1 | planned | waiting | MAT-032, MAT-033, MAT-034, MAT-036, MAT-037, MAT-038 |
+| [MAT-038: Build the deterministic offline evaluation harness](MAT-038.md) | evaluation | 4 | P0 | in_progress | in_progress | MAT-026, MAT-029, MAT-030, MAT-031, MAT-036, MAT-037 |
+| [MAT-039: Run optional real-provider shadow replay with exact receipts](MAT-039.md) | evaluation | 4 | P1 | in_progress | in_progress | MAT-032, MAT-033, MAT-034, MAT-036, MAT-037, MAT-038 |
 | [MAT-040: Fit thresholds and issue support-aware qualification records](MAT-040.md) | evaluation | 4 | P0 | planned | waiting | MAT-031, MAT-037, MAT-039 |
 | [MAT-041: Evaluate label, order, changed-question and coherence sensitivity](MAT-041.md) | evaluation | 4 | P1 | planned | waiting | MAT-027, MAT-037, MAT-039 |
 | [MAT-042: Compare matter outcomes and audit justified silence](MAT-042.md) | evaluation | 4 | P0 | planned | waiting | MAT-033, MAT-034, MAT-039, MAT-040, MAT-041, MAT-019, MAT-021 |

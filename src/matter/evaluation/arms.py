@@ -2,7 +2,6 @@
 from .._rule_values import FrozenValue,checked,fragment
 from ..canonical import canonical_bytes,canonical_digest
 from ..contracts import ContractError
-from ..time import knowledge_eligible
 from .corpus import FrozenCorpus,_text
 
 

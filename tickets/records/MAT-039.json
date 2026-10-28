@@ -4,7 +4,7 @@
   "track": "evaluation",
   "phase": 4,
   "priority": "P1",
-  "status": "planned",
+  "status": "in_progress",
   "type": "integration",
   "owner_repo": "mfreeze77/matter",
   "component": "evaluation/provider",
@@ -76,8 +76,8 @@
     }
   ],
   "sources": [
-    "matterjevmesh §§7–8,10",
-    "docs/jev.md — Execution and receipts",
+    "matterjevmesh \u00a7\u00a77\u20138,10",
+    "docs/jev.md \u2014 Execution and receipts",
     "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/system_one_http.py"
   ],
   "completion": {

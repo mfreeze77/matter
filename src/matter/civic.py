@@ -23,9 +23,7 @@ def _within(selector,parent):
 
 
 def _period(value):
-    if value['end']['state']=='unknown':
-        if value['end']['reason']!='not_applicable':_fail('unknown_effective_end','E_POLICY_INVALID')
-    elif compare_times(value['start'],value['end'])>=0:_fail('invalid_effective_period','E_POLICY_INVALID')
+    if value['end']['state']=='known' and compare_times(value['start'],value['end'])>=0:_fail('invalid_effective_period','E_POLICY_INVALID')
 
 
 def _active(value,at):
@@ -40,7 +38,7 @@ def _reviews(view,scope,sources,remember):
     This bounded scan also sees withdrawals on overlapping or scope-wide targets.
     It is metadata lookup, never a replacement control lane or review registry.
     """
-    reviews={};seen=set();count=0
+    reviews={};seen=set();superseded=set();count=0
     for target in [None,*sources]:
         head=_fence(view,scope,target)
         if head is None:continue
@@ -55,6 +53,7 @@ def _reviews(view,scope,sources,remember):
             seen.add(key);count+=1
             if count>4096:_fail('review_history_limit','E_BUDGET_EXHAUSTED')
             record=_control(view,reference);remember(pin(record))
+            superseded.update(canonical_bytes(x) for x in record.get('supersedes',[]))
             effect=record['body']['effect']['value'];payload=effect.get('payload')
             if payload is None or payload.get('schema',{}).get('id')!='civic-review':continue
             value=domain('civic-review',payload.get('value'))
@@ -62,11 +61,15 @@ def _reviews(view,scope,sources,remember):
                 _fail('host_review_binding_mismatch','E_AUTHORITY_REQUIRED')
             if value['value']['scope_id']!=scope:_fail('foreign_review','E_SCOPE_FORBIDDEN')
             reviews[key]=record
-    return list(reviews.values())
+    return list(reviews.values()),superseded
 
 
 class CivicProfile(FrozenValue):
     def __init__(self,value,*,profile):
+        if type(value) is dict and type(value.get('assertions')) is list:
+            for item in value['assertions']:
+                if type(item) is dict and item.get('disposition')=='reviewed_host' and (item.get('attestation') is None or item.get('sources')==[]):
+                    _fail('reviewed_assertion_requires_sources_and_attestation','E_AUTHORITY_REQUIRED')
         value=domain('civic-profile',value)['value']
         if not isinstance(profile,ProfileDefinition) or value['common_profile']!=profile.reference:
             _fail('common_profile_mismatch','E_POLICY_INVALID')
@@ -173,7 +176,7 @@ class CivicRegistry:
                 available &= (source['body']['content']['availability']['status']=='available' and
                     knowledge_eligible(source['body']['available_at'],as_of) is True)
             source_available[canonical_bytes(ref)]=bool(available)
-        review_history=_reviews(view,scope,sorted({canonical_bytes(entity_ref(s['reference'])):entity_ref(s['reference']) for _,a,_ in selected for s in a['sources']}.values(),key=canonical_bytes),remember)
+        review_history,superseded=_reviews(view,scope,sorted({canonical_bytes(entity_ref(s['reference'])):entity_ref(s['reference']) for _,a,_ in selected for s in a['sources']}.values(),key=canonical_bytes)+[entity_ref(a['attestation']) for _,a,_ in selected if a['attestation']],remember)
         outcomes=[]
         for profile,assertion,ref in candidates:
             reason=assertion['disposition'];verified=False;available=source_available[canonical_bytes(ref)]
@@ -191,7 +194,8 @@ class CivicRegistry:
                     _fail('host_review_binding_mismatch','E_AUTHORITY_REQUIRED')
                 matching=[r for r in review_history if r['body']['effect']['value']['payload']['value']['assertion']==ref]
                 latest=max(matching,key=lambda r:r['body']['control_epoch']) if matching else None
-                current=latest is not None and pin(latest)==review_ref and _control_active(latest,controls._time())
+                current=(latest is not None and pin(latest)==review_ref and canonical_bytes(review_ref) not in superseded
+                    and _control_active(latest,controls._time()))
                 known=all(knowledge_eligible(t,as_of) is True for t in (review['provenance']['recorded_at'],proof['provenance']['recorded_at'],checked['value']['reviewed_at']))
                 verified=bool(current and known and available)
                 if not verified:reason='review_not_current_or_available'

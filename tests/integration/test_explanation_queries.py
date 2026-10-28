@@ -130,3 +130,21 @@ class ExplanationQueriesTests(unittest.TestCase):
         self.assertEqual(len(during['identity_members']),2)
         self.assertFalse(project()['redirected'])
         with self.assertRaises(ContractError):project(limit=1,cursor=result['next_cursor'])
+
+    def test_explanation_excludes_other_assessments_and_refuses_future_cut(self):
+        first,_,source,_=self.a.assess('selected');_,decision,*_=self.a.evaluate(first)
+        second,_,other,_=self.a.assess('unrelated',status='unknown')
+        # Another source's missing bytes must not break the selected explanation.
+        for path in self.f.payloads._directory.rglob('*'):
+            if path.is_file() and path.read_bytes()==b'Synthetic episode unrelated.\n':path.unlink()
+        result=self.project(first,decision,include_payload=True)
+        refs=[s['reference'] for s in result['explanation']['sources']]
+        self.assertIn(pin(source),refs);self.assertNotIn(pin(other),refs)
+        self.assertEqual(result['explanation']['reconstruction'],'available')
+        self.assertNotIn('retained_material_unavailable',result['incomplete_reasons'])
+        page=self.project(first,decision,include_payload=True,limit=1)
+        self.assertLessEqual(len(page['explanation']['sources']),1)
+        self.assertFalse(page['explanation']['records_complete'])
+        with self.assertRaises(ContractError) as caught:
+            self.project(first,as_of={'state':'known','value':'2099-01-01T00:00:00Z','precision':'second'})
+        self.assertEqual(caught.exception.detail,'future_query_cut')

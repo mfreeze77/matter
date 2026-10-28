@@ -15,7 +15,7 @@ def explain_records(assessment,decision,records,*,payloads=None,include_payload=
         'evidence_gaps':[] if assessment is None else assessment['body']['evidence_gaps'],
         'sources':[],'judgments':[{'reference':pin(r),'rule':r['body']['rule'],
             'execution_status':r['body']['execution_status'],'evaluation_status':r['body']['evaluation_status'],
-            'qualification':r['body']['qualification'],'semantic_output':r['body']['semantic_output']} for r in records if r['record_type']=='judgment'],
+            'qualification':r['body']['qualification'],'used_evidence':r['body']['used_evidence'],'semantic_output':r['body']['semantic_output']} for r in records if r['record_type']=='judgment'],
         'citations':[{'reference':pin(r),**r['body']} for r in records if r['record_type']=='evidence_relation'],
         'reconstruction':'not_requested' if not include_payload else 'available'}
     for record in records:

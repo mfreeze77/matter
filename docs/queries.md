@@ -21,3 +21,8 @@ Each page is internally consistent, including a split committed by another store
 during the read. Missing blobs yield unavailable reconstruction and incomplete
 flags. Payload reads are opt-in and checked against their original source digest.
 No dashboard, native transport or language-model explanation writer is added.
+
+Explanations use only the selected assessment's recorded references. Other current
+children remain in the inventory and do not become that assessment's evidence.
+Source/judgment/citation details follow the records page; `records_complete`
+identifies a partial explanation page. A future storage-history cut is refused.

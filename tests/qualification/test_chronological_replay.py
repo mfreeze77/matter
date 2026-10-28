@@ -67,3 +67,22 @@ class ChronologicalReplayTests(unittest.TestCase):
         value['steps'][0]['recorded_judgments']=[{'question':helpers.component('recorded'),
             'answer':{'label':'supported'},'qualification':'qualified'}]
         with self.assertRaises(ContractError):ReplayManifest(value,corpus=FrozenCorpus(helpers.corpus_value()))
+
+    def test_recorded_answers_must_be_known_and_bound_to_required_observations(self):
+        value=self.manifest();value['mode']='recorded';value['steps']=value['steps'][:1]
+        judgment={'question':helpers.component('recorded'),'answer':{'label':'recovered'},'qualification':'unknown',
+            'recorded_at':helpers.LATE,'observations':[{'episode_id':'late-published','observation_id':'late-cancel'}]}
+        value['steps'][0]['recorded_judgments']=[judgment]
+        with self.assertRaises(ContractError):ReplayManifest(value,corpus=FrozenCorpus(helpers.corpus_value()))
+        judgment['recorded_at']=helpers.NOW
+        with self.assertRaises(ContractError):ReplayManifest(value,corpus=FrozenCorpus(helpers.corpus_value()))
+        judgment['observations']=[{'episode_id':'late-published','observation_id':'initial'}]
+        manifest=ReplayManifest(value,corpus=FrozenCorpus(helpers.corpus_value()))
+        class Recorded:
+            reference=helpers.CoreReplayDriver.reference;mode='recorded';capture_only=True
+            def run_step(self,step):
+                self_test.assertEqual(step['recorded_judgments'][0]['qualification'],'unknown')
+                return value['steps'][0]['expected']
+        self_test=self
+        output=run_replay(manifest,corpus=FrozenCorpus(helpers.corpus_value()),driver=Recorded())
+        self.assertEqual(output['gates']['qualification'],'not_run')

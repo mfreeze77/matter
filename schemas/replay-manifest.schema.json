@@ -113,7 +113,9 @@
               "required": [
                 "question",
                 "answer",
-                "qualification"
+                "qualification",
+                "recorded_at",
+                "observations"
               ],
               "properties": {
                 "question": {
@@ -125,6 +127,32 @@
                     "unknown",
                     "unqualified"
                   ]
+                },
+                "recorded_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+                },
+                "observations": {
+                  "type": "array",
+                  "maxItems": 4096,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "episode_id",
+                      "observation_id"
+                    ],
+                    "properties": {
+                      "episode_id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "observation_id": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  },
+                  "uniqueItems": true
                 }
               }
             }
@@ -177,5 +205,29 @@
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/mfreeze77/matter/schemas/replay-manifest.schema.json",
-  "title": "Bounded recorded/deterministic replay manifest"
+  "title": "Bounded recorded/deterministic replay manifest",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "deterministic"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "steps": {
+            "items": {
+              "properties": {
+                "recorded_judgments": {
+                  "maxItems": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

@@ -70,3 +70,13 @@ class SplitTests(unittest.TestCase):
         with self.assertRaises(ContractError):ArmManifest(a,corpus=self.corpus)
         a,b=self.arms();a['cases'][0]['as_of']={'state':'known','value':'2000-01-01T00:00:00Z','precision':'second'}
         with self.assertRaises(ContractError):ArmManifest(a,corpus=self.corpus)
+
+    def test_reseed_never_relabels_former_tuning_as_clean_held_out(self):
+        first=self.splits()
+        second=make_splits(self.corpus,identity=first.value['id'],revision=2,seed='different-seed',previous=first)
+        for identity,partition in first.value['assignments'].items():
+            if partition=='tuning':self.assertFalse(second.report(corpus=self.corpus)['held_out_usable'][identity])
+        erased=second.value;erased['ever_tuning']=[]
+        with self.assertRaises(ContractError):SplitManifest(erased,corpus=self.corpus,previous=first)
+        orphan=first.value;orphan['revision']=5
+        with self.assertRaises(ContractError):SplitManifest(orphan,corpus=self.corpus)

@@ -19,3 +19,9 @@ qualification certificate. Race and transport fault schedules are separately
 referenced and are not executed by a sequential replay. An early effective date
 cannot make a late-published source available in an earlier prefix. Input gating
 does not establish that a pretrained model lacks outside knowledge.
+
+The manifest explicitly selects episode IDs. Recorded judgments also pin their
+recording time and observation inputs; both must lie inside the step's required
+and admitted prefix. Deterministic mode refuses recorded judgments. The synthetic
+core driver measures actual delivery records from its store instead of assuming
+zero sends.

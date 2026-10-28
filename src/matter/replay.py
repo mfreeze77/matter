@@ -30,6 +30,9 @@ class ReplayManifest(FrozenValue):
             ids.add(step['id'])
             if previous and compare_times(step['as_of'],previous)<0:_fail('replay_clock_regression')
             previous=step['as_of']
+            required={(x['episode_id'],x['observation_id']) for x in step['requires']}
+            for judgment in step['recorded_judgments']:
+                if compare_times(judgment['recorded_at'],step['as_of'])>0 or not {(x['episode_id'],x['observation_id']) for x in judgment['observations']}<=required:_fail('recorded_judgment_outside_knowledge_cut','E_EVIDENCE_UNAVAILABLE')
             if not {(x['episode_id'],x['observation_id']) for x in step['requires']}<=known:_fail('unknown_required_observation')
         self._freeze(value)
 
@@ -58,6 +61,8 @@ def run_replay(manifest,*,corpus,driver):
         available={(x['episode_id'],x['observation']['id']) for x in prefix['included']}
         if not {(x['episode_id'],x['observation_id']) for x in step['requires']}<=available:
             _fail('required_observation_unavailable','E_EVIDENCE_UNAVAILABLE')
+        if any(not {(x['episode_id'],x['observation_id']) for x in judgment['observations']}<=available for judgment in step['recorded_judgments']):
+            _fail('recorded_judgment_source_unavailable','E_EVIDENCE_UNAVAILABLE')
         admitted=[]
         for item in prefix['included']:
             source=item['observation']['source']

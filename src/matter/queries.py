@@ -15,7 +15,7 @@ from .assessments import assessment_current_ref
 from .identity_dependencies import _value
 from .storage import PROJECTION_TYPE,StorageError,entity_ref,pin
 from .semantic.packets import _Reads,_pin_references
-from .time import knowledge_eligible
+from .time import knowledge_eligible,compare_times
 
 
 def _fail(reason,code='E_EVIDENCE_INVALID'):raise ContractError(code,reason)
@@ -93,13 +93,10 @@ class QueryService:
         if len(authorizations)>128:_fail('delivery_query_limit','E_BUDGET_EXHAUSTED')
         if self.access is not None and access_context is None:_fail('query_access_context_required','E_AUTHORITY_REQUIRED')
         if self.access is None and access_context is not None:_fail('query_access_boundary_missing','E_AUTHORITY_REQUIRED')
-        cut=fragment(as_of,'known_time') if as_of is not None else self.controls._time()
-        # Metadata uses the storage knowledge clock. An injected domain clock
-        # may predate system receipts; current reads use an unbounded metadata
-        # cut while owners retain their actual domain/currentness clocks.
-        if as_of is None:
-            from datetime import datetime,timezone
-            cut={'state':'known','value':datetime.now(timezone.utc).isoformat(timespec='microseconds').replace('+00:00','Z'),'precision':'microsecond'}
+        from datetime import datetime,timezone
+        metadata_now={'state':'known','value':datetime.now(timezone.utc).isoformat(timespec='microseconds').replace('+00:00','Z'),'precision':'microsecond'}
+        cut=metadata_now if as_of is None else fragment(as_of,'known_time')
+        if compare_times(cut,metadata_now)>0:_fail('future_query_cut','E_POLICY_INVALID')
         with self.storage.snapshot() as raw:
             view=_ReadView(raw,self,actor,authority,cut,access_context)
             original=view.get(entity_ref(matter));group=read_group(view,self.scope_id,entity_ref(original))
@@ -131,6 +128,7 @@ class QueryService:
                     claim=add(proposition['claim'])
                     for ref in claim['body']['attribution']:add(ref)
                 for ref in assessed['body']['evidence_selection']['references']:add(ref)
+            explanation_records=dict(records)
             if as_of is None:
                 inventory=collect_children(view,self.scope_id,group['members'])
                 for item in inventory['children']:
@@ -174,7 +172,9 @@ class QueryService:
             next_offset=offset+limit
             next_cursor=None if next_offset>=len(ordered) else base64.urlsafe_b64encode(canonical_bytes({'query':query,'snapshot':snapshot,'offset':next_offset})).decode('ascii')
             from .explain import explain_records
-            explanation=explain_records(assessed,decision,ordered,payloads=self.payloads,include_payload=include_payload)
+            explanation=explain_records(assessed,decision,[r for r in ordered[offset:next_offset] if canonical_bytes(pin(r)) in explanation_records],
+                payloads=self.payloads,include_payload=include_payload)
+            explanation['records_complete']=offset==0 and next_cursor is None
             if explanation['reconstruction']=='unavailable':incomplete.append('retained_material_unavailable')
             return {'schema_version':'1.0','scope_id':self.scope_id,'requested':pin(original),'resolved':pin(survivor),
                 'redirected':entity_ref(original)!=entity_ref(survivor),'identity_members':[pin(x) for x in group['members']],

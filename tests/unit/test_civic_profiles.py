@@ -195,3 +195,26 @@ class CivicProfilesTests(unittest.TestCase):
         self.assertEqual(self.resolve([profile],at=at('19:29:59'),selector=SELECTOR)['state'],'unknown')
         result=self.resolve([profile],at=at('19:30:00'),selector=SELECTOR)
         self.assertTrue(result['outcomes'][0]['allowed']);self.assertFalse(result['eligible_for_host_proposal'])
+
+    def test_generic_supersession_and_review_target_withdrawal_do_not_leave_grant(self):
+        value=self.review(self.value());profile=self.profile(value);old=value['assertions'][0]['attestation']
+        command=_in_scope(control_command('generic-supersession',self.f.authority,targets=[self.f.source],
+            action='invalidate',kind='decision',supersedes=[old],now=self.f.now),self.f.storage.scope_id)
+        command['actor']=self.f.actor;command['body']['control']['body']['actor']=self.f.actor
+        self.assertEqual(self.f.controls.apply(self.f.controls.prepare(command))['status'],'success')
+        self.assertFalse(self.resolve([profile])['eligible_for_host_proposal'])
+        value=self.review(self.value('review-target'));profile=self.profile(value);old=value['assertions'][0]['attestation']
+        command=_in_scope(control_command('review-target-withdrawal',self.f.authority,targets=[old],
+            action='disposition',kind='decision',now=self.f.now),self.f.storage.scope_id)
+        command['actor']=self.f.actor;command['body']['control']['body']['actor']=self.f.actor
+        command['body']['control']['body']['effect']=control_effect('disposition','Withdraw this attestation.',
+            payload=domain('civic-review',{'scope_id':self.f.storage.scope_id,'assertion':profile.assertion_reference('power'),
+                'common_profile':self.f.profile.reference,'disposition':'withdrawn','reviewed_at':self.f.now}))
+        self.assertEqual(self.f.controls.apply(self.f.controls.prepare(command))['status'],'success')
+        self.assertFalse(self.resolve([profile])['eligible_for_host_proposal'])
+
+    def test_missing_review_has_named_authority_refusal(self):
+        value=self.value(status='reviewed_host')
+        with self.assertRaises(ContractError) as caught:self.profile(value)
+        self.assertEqual((caught.exception.code,caught.exception.detail),
+            ('E_AUTHORITY_REQUIRED','reviewed_assertion_requires_sources_and_attestation'))
