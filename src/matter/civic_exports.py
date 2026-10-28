@@ -17,7 +17,7 @@ from .observations import ObservationIngestor
 from .claims import ClaimService
 from .occurrences import OccurrenceService, ExactGroupingPolicy
 from .storage import pin, entity_ref, StorageError
-from ._rule_values import FrozenValue
+from ._rule_values import FrozenValue, fragment
 
 VERSION = 'matter.civic-export/1.0'
 NAMESPACE = 'matter.civic.exports'
@@ -87,11 +87,10 @@ def prepare_export(document, sources, *, jurisdiction, issuer, year, package_sha
     _text(jurisdiction, 'jurisdiction_required'); _text(issuer, 'issuer_required')
     if type(year) is not int or not 1900 <= year <= 2200:
         _fail('explicit_identity_year_required')
-    if not re.fullmatch('[0-9a-f]{64}', package_sha256):
+    if type(package_sha256) is not str or not re.fullmatch('[0-9a-f]{64}', package_sha256):
         _fail('package_sha256_required')
     _text(producer_revision, 'producer_revision_required')
-    if available_at.get('state') != 'known':
-        _fail('actual_availability_required')
+    fragment(available_at, 'known_time')
     if type(sources) is not dict or len(sources) > 64:
         _fail('bounded_source_map_required')
     if sum(len(v.get('bytes', b'')) for v in sources.values() if type(v) is dict and type(v.get('bytes')) is bytes) > 4194304:
@@ -108,21 +107,23 @@ def prepare_export(document, sources, *, jurisdiction, issuer, year, package_sha
         if type(row) is not dict:
             refusals.append({'index': n, 'reason': 'invalid_claim', 'original': deepcopy(row)}); continue
         matter, source = row.get('matter'), row.get('source')
-        if type(matter) is not dict or matter.get('kind') not in KINDS or type(matter.get('number')) is not str or not matter['number'].strip():
+        if type(matter) is not dict or type(matter.get('kind')) is not str or matter.get('kind') not in KINDS or type(matter.get('number')) is not str or not matter['number'].strip():
             reason = 'unscoped_or_invalid_matter'
         elif set(row) - {'matter', 'family', 'value', 'value_as_written', 'null_reason', 'disposition', 'source'}:
             reason = 'unsupported_claim_fields'
-        elif row.get('family') not in FAMILIES:
+        elif type(row.get('family')) is not str or row.get('family') not in FAMILIES:
             reason = 'unsupported_claim_family'
-        elif row.get('disposition') not in {'stated', 'ambiguous', 'unresolved'}:
+        elif type(row.get('disposition')) is not str or row.get('disposition') not in {'stated', 'ambiguous', 'unresolved'}:
             reason = 'unsupported_claim_disposition'
         elif type(source) is not dict or set(source) - SOURCE_FIELDS:
             reason = 'unsupported_source_fields'
         if reason:
             refusals.append({'index': n, 'reason': reason, 'original': deepcopy(row)}); continue
         sha = source.get('sha256')
+        if type(sha) is not str or not re.fullmatch('[0-9a-f]{64}', sha):
+            refusals.append({'index': n, 'reason': 'invalid_source_sha256', 'original': deepcopy(row)}); continue
         material = sources.get(sha)
-        if material is None:
+        if type(material) is not dict:
             refusals.append({'index': n, 'reason': 'source_bytes_unavailable', 'original': deepcopy(row)}); continue
         if sha not in normalized:
             raw = material.get('bytes')
@@ -135,7 +136,8 @@ def prepare_export(document, sources, *, jurisdiction, issuer, year, package_sha
                 'uri': uri, 'complete': material.get('complete') is True,
                 'appearance_keys': deepcopy(material.get('appearance_keys', []))}
             if (type(normalized[sha]['appearance_keys']) is not list or len(normalized[sha]['appearance_keys']) > 32
-                    or any(type(k) is not str or not 1 <= len(k) <= 2048 for k in normalized[sha]['appearance_keys'])):
+                    or any(type(k) is not str or not 1 <= len(k) <= 2048 for k in normalized[sha]['appearance_keys'])
+                    or len(set(normalized[sha]['appearance_keys'])) != len(normalized[sha]['appearance_keys'])):
                 _fail('bounded_host_appearance_keys_required')
         data = normalized[sha]
         lines, quote = source.get('source_lines'), source.get('quote')
@@ -152,7 +154,7 @@ def prepare_export(document, sources, *, jurisdiction, issuer, year, package_sha
             refusals.append({'index': n, 'reason': reason, 'original': deepcopy(row)}); continue
         key = canonical_digest({'jurisdiction': jurisdiction, 'issuer': issuer, 'year': year,
             'kind': matter['kind'], 'number': matter['number']}, 'matter.civic-subject.v1')
-        identity = canonical_digest({'row': row, 'subject_key': key, 'text_sha256': data['text_sha256']}, 'matter.civic-source-claim.v1')
+        identity = canonical_digest({'row': row, 'subject_key': key, 'derivation': {k:v for k,v in data.items() if k not in {'text','original_text','appearance_keys'}}}, 'matter.civic-source-claim.v1')
         if identity in used:
             refusals.append({'index': n, 'reason': 'duplicate_claim_row', 'original': deepcopy(row)}); continue
         used.add(identity)
@@ -213,14 +215,15 @@ class CivicImportService:
         source_refs, subjects, claim_refs = {}, {}, []
         for sha, data in prepared['sources'].items():
             raw = data['text'].encode()
-            body={'source_identity':{'namespace':NAMESPACE+':source','event_id':sha,'revision_id':data['text_sha256']},
+            derivation = canonical_digest({k:v for k,v in data.items() if k not in {'text','original_text','appearance_keys'}}, 'matter.civic-derivation.v1')
+            body={'source_identity':{'namespace':NAMESPACE+':source','event_id':sha,'revision_id':derivation},
                 'content':{'digest':data['text_sha256'],'byte_length':len(raw),'media_type':'text/plain',
                     'locator':{'kind':'whole_artifact','uri':data['uri']},'availability':{'status':'available','checked_at':at}},
                 'occurred_at':{'state':'unknown','reason':'not_reported'},
                 'source_published_at':{'state':'unknown','reason':'not_reported'},
                 'available_at':at,'ingested_at':at,'extraction':PRODUCER}
             # The source SHA names the original artifact; the retained payload is explicitly its derived citation view.
-            identity='source-'+sha+'-'+data['text_sha256']
+            identity='source-'+sha+'-'+derivation
             old=existing('observation',identity)
             if old is not None:
                 if (old['body']['content']['digest'] != data['text_sha256'] or old['body']['content']['locator'] != body['content']['locator']):
@@ -233,14 +236,15 @@ class CivicImportService:
             original_body['source_identity']['namespace']=NAMESPACE+':exported-text'
             original_body['source_identity']['revision_id']=data['original_text_sha256']
             original_body['content'].update(digest=data['original_text_sha256'],byte_length=len(original),media_type='text/markdown')
-            original_id='exported-'+sha+'-'+data['original_text_sha256']
+            original_id='exported-'+sha+'-'+canonical_digest({'text':data['original_text_sha256'],'uri':data['uri']},'matter.civic-exported-text.v1')
+            original_body['source_identity']['revision_id']=original_id
             parent=existing('observation',original_id)
             if parent is None:
                 parent_input=record('observation',original_id,original_body,origin='source')
                 parent_result=require(self.intake.ingest(self.intake.prepare(command(original_id,'ingest_observation',{'observation':parent_input})),payload=original))
                 parent=self.storage.get(parent_result['body']['observation'])
             obs=record('observation',identity,body,origin='derived',parents=[pin(parent)])
-            c=self.intake.prepare(command('source-'+sha+'-'+data['text_sha256'],'ingest_observation',{'observation':obs}))
+            c=self.intake.prepare(command(identity,'ingest_observation',{'observation':obs}))
             result=require(self.intake.ingest(c,payload=raw));source_refs[sha]=result['body']['observation']
         appearances={}
         for sha,data in prepared['sources'].items():
@@ -255,7 +259,7 @@ class CivicImportService:
                 if {canonical_bytes(x) for x in observations} == {canonical_bytes(x) for x in old['body']['observations']}:
                     occurrence_refs.append(pin(old));continue
             proposed=record('occurrence','appearance-'+identity,{'kind':'civic:source_appearance',
-                'identity_keys':[{'namespace':NAMESPACE+':appearance','value':key}],
+                'identity_keys':[{'namespace':NAMESPACE+':appearance','value':identity}],
                 'observations':observations,'provenance_groups':[], 'occurred_at':{'state':'unknown','reason':'not_reported'}})
             body={'creates':[proposed] if old is None else [],
                 'replacements':[] if old is None else [{'occurrence':pin(old),'observations':observations}],

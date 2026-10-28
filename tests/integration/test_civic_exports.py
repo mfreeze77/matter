@@ -102,5 +102,44 @@ class CivicExportTests(unittest.TestCase):
                 self.assertEqual(first['matters'],another['matters'])
                 self.assertNotEqual(first['occurrences'],another['occurrences'])
 
+    def test_malformed_rows_refuse_without_losing_valid_rows(self):
+        for path in ('kind','family','disposition','sha256'):
+            for bad in ([], {}):
+                doc,sources=fixture(); row=deepcopy(doc['claims'][0])
+                target=row['matter'] if path=='kind' else row['source'] if path=='sha256' else row
+                target[path]=bad;doc['claims'].append(row)
+                result=prepare(doc,sources).value
+                self.assertEqual(len(result['claims']),1)
+                self.assertEqual(len(result['refusals']),1)
+        doc,sources=fixture();sources[SHA]['appearance_keys']*=2
+        with self.assertRaisesRegex(ContractError,'bounded_host_appearance_keys_required'):prepare(doc,sources)
+
+    def test_scoped_appearance_union_and_changed_derivation(self):
+        with TemporaryDirectory() as directory:
+            scope='synthetic:civic-export';root=Path(directory)
+            with SQLiteStore(root/'state.sqlite',scope_id=scope) as store:
+                service=CivicImportService(store,FilePayloadStore(root/'payloads',scope_id=scope),
+                    actor={'scope_id':scope,'namespace':'test','id':'host'},
+                    authority={'scope_id':scope,'namespace':'test','record_type':'receipt','id':'host-grant'})
+                first=service.import_export(prepare())
+                doc,sources=fixture();other='d'*64
+                doc['claims'][0]['source']['sha256']=other
+                sources[other]=sources.pop(SHA)
+                sources[other]['bytes']+=b'Second report.\n'
+                sources[other]['text_sha256']=source_digest(sources[other]['bytes'])
+                second=service.import_export(prepare(doc,sources))
+                self.assertEqual(first['occurrences'][0]['id'],second['occurrences'][0]['id'])
+                self.assertNotEqual(first['occurrences'],second['occurrences'])
+                self.assertEqual(len(store.get(second['occurrences'][0])['body']['observations']),2)
+                self.assertEqual(service.import_export(prepare(doc,sources)),second)
+                doc['jurisdiction_key']='ks:county:other'
+                third=service.import_export(prepare(doc,sources,jurisdiction='ks:county:other'))
+                self.assertNotEqual(second['occurrences'][0]['id'],third['occurrences'][0]['id'])
+                doc,sources=fixture();sources[SHA]['complete']=True
+                changed=service.import_export(prepare(doc,sources))
+                self.assertNotEqual(first['claims'],changed['claims'])
+                self.assertEqual(service.import_export(prepare(doc,sources)),changed)
+                self.assertFalse(store.get(first['claims'][0])['body']['qualifiers'][0]['value']['source_derivation']['complete'])
+
 
 if __name__=='__main__':unittest.main()
