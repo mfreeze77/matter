@@ -15,7 +15,7 @@ dependencies = ["jsonschema>=4.23,<5", "referencing>=0.35,<1"]
 matter = "matter.__main__:main"
 
 [tool.setuptools]
-packages = ["matter", "matter._schemas", "matter.storage", "matter.storage.migrations", "matter.evaluators", "matter.semantic", "matter.semantic.providers", "matter.evaluation"]
+packages = ["matter", "matter._schemas", "matter.storage", "matter.storage.migrations", "matter.evaluators", "matter.semantic", "matter.semantic.providers", "matter.semantic.families", "matter.evaluation"]
 
 [tool.setuptools.package-dir]
 "" = "src"

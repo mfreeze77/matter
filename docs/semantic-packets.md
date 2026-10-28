@@ -41,7 +41,18 @@ A binding is either `{kind: "claim", claim: exact_claim_pin}` or
 namespaced_relation}`. Candidate endpoints may be observations, occurrences or
 matters. Every endpoint is read and matched against its exact same-scope pin;
 foreign scopes are refused before source rendering. Claim packets retain the
-exact proposition body rather than inventing one from a topic label.
+proposition values rather than inventing one from a topic label. Preparation
+revision 1.1 freezes references inside that selected body to exact, same-scope
+metadata committed at the packet cut, and includes their read dependencies.
+Bare mutable identities use a bounded lookup of the latest committed revision
+at that cut; later edits cannot change the rebuilt historical packet. Protected
+current-egress views retain their existing permission and currentness refusals.
+The immutable original body remains available through the claim pin. This is a
+packet view; it does not revise the claim or turn its assertions into evidence.
+Unavailable source content stays omitted with explicit incomplete coverage; a
+known attribution identity does not make its text available. Referenced metadata
+not committed at the cut refuses preparation. The revision changes the
+preparation fingerprint so prior packet/cache identities cannot silently mix.
 
 Each evidence declaration has exactly `reference`, `roles`, `locator`,
 `quotation` and `validation`. The reference pins an existing observation.

@@ -84,6 +84,11 @@ separate decision regions and revocation. These mechanisms issue no empirical
 qualification or action authority. Synthetic checks, offline replay, live calls
 and provider qualification remain separate evidence categories.
 
+MAT-033/034's [shadow question families](docs/semantic-families.md) define
+association, independent evidence relations, explicit change causes, matching
+recovery and audience contribution. Their diagnostic results remain unqualified
+and cannot publish assessments, resolve conditions or notify anyone.
+
 ## Deliver an eligible update
 
 MAT-021's [delivery service](docs/delivery.md) queues an immutable intent, leases
