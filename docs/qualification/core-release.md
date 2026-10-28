@@ -43,3 +43,7 @@ remain `not_run` even when the synthetic report passes.
 record the run and separate provider/domain work. MAT-040 still needs independent
 held-out labels, appropriate support, approved targets and reviewed results;
 MAT-047/048/049/050 and receiving acceptance retain their separate ownership.
+
+The final report contract is `matter.core-qualification-report.v2`. Earlier
+provisional v1 receipts are retained with their frozen schemas as historical
+evidence; they are not advertised as validating against the final v2 contract.

@@ -1,5 +1,28 @@
 # Civic evaluation follow-through
 
+## Final closeout
+
+MAT-022 and bounded MAT-025 are complete. MAT-040 has calibration/report
+mechanics but remains blocked on independent held-out labels, approved targets
+and sufficient actual support. The narrow installed walkthrough-schema failure
+is resolved; broader MAT-077 remains planned. No receiving deployment or real
+alerts were enabled.
+
+Executed evidence: 24 additional actual public-evidence JEV calls; 1,348 tests
+on the frozen installed wheel; 46 focused tests on the final wheel; 41 selected
+core checks producing a v2 report; and 39 repository/hardening checks. Final
+render/validation and independent-review details are below. The full-suite and
+core receipts retain their exact snapshots. The only runtime change after the
+v2 core matrix is the separate MAT-040 exact-ratio fix, covered by the final
+installed calibration/focused run. All neutral-core execution code is unchanged.
+
+Current core report:
+`data/validation/civic-followthrough-20261028/core-qualification-v2/report.json`.
+Current wheel/source inventory:
+`data/validation/civic-followthrough-20261028/qualified-final-runtime-manifest.json`.
+Earlier provisional receipts below are historical checkpoints, not substitutes
+for the final v2 report or final installed checks.
+
 PR #20 merged into main at `838f00bb3162fe9cf5c706b8cdfab3cefb395fd8` on
 2026-10-28. The operator waived waiting for GitHub CI; the tested head and
 recorded independent reviews were retained. No branches were deleted.
@@ -125,7 +148,7 @@ Report SHA-256 references under the external root:
 - `p3/source-grounded-v2-live/report-913398318019875.json`:
   `659b78110d164f824cd841ea8c4af7362fbf4c9b0d5c31ff82817a999e3b6493`
 
-## Implementation and validation in progress
+## Implementation and validation checkpoints
 
 MAT-022 adds the bounded investigation protocol described in
 [its API](../investigation.md). Existing control transactions, committed resource
@@ -195,7 +218,7 @@ and `TMPDIR=/private/tmp` for this macOS host. Package walkthroughs separately r
 with isolated Python and no schema directory. No multiprocessing test failure
 was hidden as a product success.
 
-The current built wheel has 197 runtime/SQL/schema files, each byte-matched to
+At the preliminary checkpoint, the built wheel had 197 runtime/SQL/schema files, each byte-matched to
 source (`stable-runtime-manifest.json`). Compared with the wheel used by the
 ongoing full run, only `matter/investigation.py` differs and the qualification
 report schema is newly packaged. The installed focused run on this current
@@ -212,11 +235,11 @@ credential/media/corpus paths. The value-level credential audit scanned 944
 public/retained files (including decoded raw-response fields), about 8.3 MB,
 with zero credential matches. No secret values were printed.
 
-The revised core matrix passed **41 tests in 408.948s**, with CORE-01–24 and
+At the provisional v1 checkpoint, the revised core matrix passed **41 tests in 408.948s**, with CORE-01–24 and
 AC-1–4 passed and all five declared provider/domain/backend/power-loss gates
 `not_run`. Actual report:
 `data/validation/civic-followthrough-20261028/core-qualification-stable/report.json`.
-The 197 engine/schema files still match that report's frozen imported runtime.
+The 197 engine/schema files matched that report's frozen imported runtime at that checkpoint. This v1 receipt is historical; the final v2 receipt below supersedes it.
 Later source changes strengthen an unselected access-refusal test and diagnostic
 preflight only; selected investigation assertions and shared fixture helpers
 remain AST-identical (`core-final-compatibility.json`). This equivalence check is
@@ -265,3 +288,56 @@ issued. MAT-077 remains planned despite the verified narrow schema repair.
 The final three-file delta review completed two passes with zero findings and
 zero warnings. The full installed regression is still running at this checkpoint;
 its exact final result will be appended before integration closeout.
+
+The complete frozen installed suite passed **1,348 tests in 3,647.332s**, with
+zero failures, errors or skips (`full-installed-summary.json`,
+`full-installed-final.log`). It used the standard unittest runner outside the
+checkout with the installed wheel first on the import path. The inventory for
+that run contains 196 files; final investigation/report-contract changes have
+their own current-wheel focused and integrated release receipts below. The
+existing environment dependencies were reused; this is not a multi-version or
+fresh-dependency-environment claim.
+
+Review of the neutral report gate rename correctly identified an incompatible
+v1-labelled provisional shape. The final report contract was bumped to
+`matter.core-qualification-report.v2`; original v1 receipts and schemas stay
+unchanged as historical evidence. They do not validate against the final v2
+contract and are not the final release gate. No compatibility alias couples the
+neutral core to a named receiving application. This is a report-format change,
+not a change to delivery or qualification authority.
+
+
+## Final executed package and core checks
+
+- Standard full installed run: **1,348 tests, 3,647.332s**, zero failures/errors/
+  skips. `full-installed-summary.json` names its frozen 196-file wheel and the
+  separate final deltas; this is not mislabelled a full rerun of the final head.
+- Final installed focused run: **46 tests, 110.363s**, zero failures/errors,
+  using `installed-qualified-final`. It includes all 26 investigation cases,
+  11 calibration cases, work-key and packaged-asset checks, both diagnostic-plan
+  tests and all three reporter failure controls.
+- Final v2 core matrix: **41 tests, 417.404s**, CORE-01–24 and AC-1–4 passed,
+  with provider accuracy, live usefulness, domain acceptance, other backends and
+  physical power loss explicitly unrun. The sole post-matrix package code delta
+  is `matter/evaluation/calibration.py`, outside the neutral-core path: exact
+  fraction comparisons prevent Decimal rounding from loosening predeclared
+  coverage/failure limits. Its direct regression passed 11 tests in 10.310s and
+  is also included in the final 46-check installed run. No provider result or
+  source fact changed through that fix.
+- Final wheel: 197 runtime/SQL/schema files byte-match source. All three
+  walkthroughs ran under isolated Python outside the checkout with no schema
+  directory. No credential/media/corpus path is in the wheel.
+- Repository/hardening regression: **39 tests, 1.067s**. Canonical render and
+  validation pass with 80 tickets, 104 requirements, 106 schemas and three
+  walkthroughs. Status totals: 40 done, 39 planned, one blocked (MAT-040),
+  including the unchanged 22 cross-repository roadmap items.
+
+The final v2 contract review covered both selected files in two passes with no
+findings or warnings. The final calculation-only review covered both selected files in two passes
+with zero findings or warnings. Final integration state is reported with the PR. No installed-dependency or credential blocker remains
+for these tests. Actual billed provider charges, empirical qualification and
+production receiving acceptance remain unestablished.
+
+Final source/wheel credential audit scanned 945 files, including decoded
+response fields, with zero credential matches and no forbidden wheel members.
+No credentials or real corpus files were added to Git.
