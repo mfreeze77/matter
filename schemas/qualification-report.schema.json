@@ -21,7 +21,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "matter.core-qualification-report.v1"
+      "const": "matter.core-qualification-report.v2"
     },
     "plan_id": {
       "type": "string",

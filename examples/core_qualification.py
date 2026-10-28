@@ -56,7 +56,7 @@ def build_report(plan,manifest,results,*,unchanged,execution_successful=True):
         return {k:{'status':'passed' if unchanged and execution_successful and all(results.get(i,{}).get('status')=='passed' for i in ids) else 'failed','checks':ids} for k,ids in mapping.items()}
     requirements=statuses(plan['requirements']);acceptance=statuses(plan['acceptance'])
     passed=all(v['status']=='passed' for v in [*requirements.values(),*acceptance.values()])
-    report={'schema_version':'matter.core-qualification-report.v1','plan_id':plan['id'],'mode':'synthetic_conformance',
+    report={'schema_version':'matter.core-qualification-report.v2','plan_id':plan['id'],'mode':'synthetic_conformance',
         'status':'passed' if passed else 'failed','manifest':manifest,'unchanged':unchanged,'execution_successful':execution_successful,
         'checks':{i:results.get(i,{'status':'not_run','elapsed_seconds':'0'}) for i in required},
         'unmapped_checks':{i:v for i,v in results.items() if i not in required},
