@@ -222,3 +222,36 @@ exploratory and exposed. Their 120 recorded question observations return
 insufficient support with no independent labels. Synthetic software tests of a
 passing report are explicitly fixtures; MAT-040 empirical qualification remains
 blocked on independently reviewed held-out episodes and approved targets.
+
+## Controlled question sensitivity
+
+MAT-041's `prepare_sensitivity` renders the entire frozen packet before returning
+a thirteen-request schedule: two identical bundled baselines, four option/label
+controls, and seven separately asked heads. Option mappings follow definitions
+back to original outcomes. Topic, continuing matter and occurrence questions
+remain distinct; complementary and equivalent propositions are compared both
+bundled and separate. Host reference labels never enter the rendered state.
+
+`sensitivity_report` consumes bound typed observations and retains missing,
+failed and method-mismatched heads. It compares deviations with the observed
+repeat envelope and an explicitly declared diagnostic tolerance, including the
+Choice outcome probability versus its corresponding proposition. It reports
+affected exact specification revisions and reference origins. Two repeats do
+not estimate population variability; consistency cannot establish correctness,
+joint probability, admission or a qualification certificate.
+Order/label variants compare against the single-Choice control, keeping their
+question context matched. Their noise allowance comes from the two bundled
+repeats; singleton repeat variability is not separately measured by this small
+schedule and the report states that limitation.
+
+The checkout exercise `python examples/question_sensitivity.py --model jev-1.14.0
+--output /absolute/new/run` defaults to a synthetic offline oracle and runs both
+arms through the existing core replay. `--live --env /absolute/credential/file`
+explicitly selects the existing provider runner and requires an external artifact
+directory. The bounded example uses thirteen calls, no retries, a thirty-second
+per-call timeout, a ten-minute wall limit and a $0.04 reservation ceiling. Review
+its dated price basis before another live use. Live receipts retain native and
+neutral responses; `analyze_recorded` can rebuild analysis without another call.
+All probe judgments remain unqualified and delivery remains capture-only.
+Recorded exploratory findings and software checks are in
+[the sensitivity receipt](validation/sensitivity-followthrough.md).

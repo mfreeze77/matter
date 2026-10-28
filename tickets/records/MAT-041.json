@@ -4,7 +4,7 @@
   "track": "evaluation",
   "phase": 4,
   "priority": "P1",
-  "status": "planned",
+  "status": "done",
   "type": "qualification",
   "owner_repo": "mfreeze77/matter",
   "component": "evaluation/question_sensitivity",
@@ -26,7 +26,7 @@
   ],
   "out_of_scope": [
     "Assuming hosted-model internal architecture",
-    "Applying another model paper’s failure rate to Matter"
+    "Applying another model paper\u2019s failure rate to Matter"
   ],
   "implementation": [
     "Prepare repeated identical requests to estimate within-snapshot variation before comparing altered renderings.",
@@ -55,7 +55,10 @@
   "artifacts": [
     "src/matter/evaluation/sensitivity.py",
     "tests/evaluation/test_sensitivity.py",
-    "tests/fixtures/evaluation/question_variants.json"
+    "tests/fixtures/evaluation/question_variants.json",
+    "examples/question_sensitivity.py",
+    "docs/evaluation.md",
+    "docs/validation/sensitivity-followthrough.md"
   ],
   "tests": [
     "A Noul and Choice about the same claim disagree.",
@@ -76,10 +79,17 @@
     "https://arxiv.org/html/2609.33209v1",
     "https://arxiv.org/abs/2609.33689",
     "https://arxiv.org/abs/2609.26758v2",
-    "matterjevmesh §§6,8"
+    "matterjevmesh \u00a7\u00a76,8"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "2026-10-28: Implemented frozen thirteen-request sensitivity schedules with two identical bundled baselines, four definition-mapped Choice controls and seven singleton heads. All state fields render before scheduling; host labels stay outside model inputs. Exact specification identities, result bindings, method confounds and missing/failed denominators are retained.",
+      "AC-1: Definition-based synthetic oracles verify reversed/rotated options, neutral labels and name/definition swaps. Order/label probes compare against the matching single-Choice context; a bundling-only fault flags bundling separately. Missing singleton controls make alteration comparisons not evaluated.",
+      "AC-2: Same-topic/different-matter and continuing-matter/new-occurrence fixtures have contrasting expected judgments. A deliberately stubborn evaluator fails all changed-meaning controls. These authored fixtures are not independently reviewed held-out labels.",
+      "AC-3: Separate/bundled, equivalent, complement and cross-primitive checks retain observed bundled-repeat ranges and an explicit exploratory tolerance. Behavioral tests detect excessive deviations and the existing composition boundary rejects undeclared probability multiplication; no joint probability or certificate is constructed.",
+      "Actual provider diagnostic: thirteen fresh jev-1.14.0 calls, no retries, twenty-five head observations, zero real deliveries. Final recorded analysis flags no deviation in twenty-five declared checks. Both actual offline core replay arms passed with all probe cases abstaining. Source controls are synthetic; consistency does not establish accuracy or MAT-040 qualification.",
+      "Verification: twelve final focused tests pass in checkout and installed runtime; earlier broader checkpoints passed 93 selected evaluation, 105 semantic/canonical and 35 installed runner/guard/offline tests. Three complete two-pass subscription reviews covered their selected files; confirmed findings were corrected. The final timeout-without-bytes correction has an actual fault regression and an isolated mutant that fails exactly once with no source modification or network access. Render, validation, installed source-byte matching, packaged walkthroughs and retained evidence are detailed in docs/validation/sensitivity-followthrough.md. MAT-040 remains blocked on independent held-out labels and approved targets."
+    ]
   }
 }

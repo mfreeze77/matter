@@ -46,7 +46,7 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-038: Build the deterministic offline evaluation harness](MAT-038.md) | evaluation | 4 | P0 | done | done | MAT-026, MAT-029, MAT-030, MAT-031, MAT-036, MAT-037 |
 | [MAT-039: Run optional real-provider shadow replay with exact receipts](MAT-039.md) | evaluation | 4 | P1 | done | done | MAT-032, MAT-033, MAT-034, MAT-036, MAT-037, MAT-038 |
 | [MAT-040: Fit thresholds and issue support-aware qualification records](MAT-040.md) | evaluation | 4 | P0 | blocked | blocked | MAT-031, MAT-037, MAT-039 |
-| [MAT-041: Evaluate label, order, changed-question and coherence sensitivity](MAT-041.md) | evaluation | 4 | P1 | planned | ready | MAT-027, MAT-037, MAT-039 |
+| [MAT-041: Evaluate label, order, changed-question and coherence sensitivity](MAT-041.md) | evaluation | 4 | P1 | done | done | MAT-027, MAT-037, MAT-039 |
 | [MAT-042: Compare matter outcomes and audit justified silence](MAT-042.md) | evaluation | 4 | P0 | planned | waiting | MAT-033, MAT-034, MAT-039, MAT-040, MAT-041, MAT-019, MAT-021 |
 | [MAT-043: Qualify availability, latency and concurrent completion behavior](MAT-043.md) | evaluation | 4 | P0 | planned | waiting | MAT-039, MAT-042, MAT-010, MAT-011, MAT-016, MAT-020, MAT-021, MAT-024 |
 | [MAT-044: Measure overhead and qualify execution budgets](MAT-044.md) | evaluation | 4 | P1 | planned | waiting | MAT-032, MAT-039, MAT-042, MAT-020 |
