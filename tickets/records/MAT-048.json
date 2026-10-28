@@ -4,7 +4,7 @@
   "track": "civic",
   "phase": 3,
   "priority": "P1",
-  "status": "planned",
+  "status": "in_progress",
   "type": "integration",
   "owner_repo": "mfreeze77/matter",
   "component": "adapters.civic.exports",
@@ -99,11 +99,13 @@
   ],
   "sources": [
     "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-087-source-backed-motion-intent-and-vote-mechanics.md",
-    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5\u201310 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
     "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
   ],
   "completion": {
     "state": "not_run",
-    "evidence": []
+    "evidence": [
+      "2026-10-28 authorized bounded civic source integration started. Keep DIAT completely out. Reuse existing packages and KS-1118 rehearsal; 54 GiB free, 50 GiB reserve, 10 GiB task cap, expected retained growth below 200 MiB. Crawler checkout has unrelated uncommitted work and stays untouched. MAT-047 authority/profile export is not established; no imported parser label grants authority, and full ticket completion remains dependent on that handoff."
+    ]
   }
 }
