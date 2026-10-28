@@ -4,7 +4,7 @@
   "track": "core",
   "phase": 4,
   "priority": "P0",
-  "status": "in_progress",
+  "status": "done",
   "type": "qualification",
   "owner_repo": "mfreeze77/matter",
   "component": "replay_conformance",
@@ -84,7 +84,12 @@
     "docs/contracts/lifecycle.md"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "Chronological replay over actual core services gates source, recorded judgment and host-control availability, compares portable golden outcomes on fresh stores, measures delivery records and retains separate provider/concurrency gates. Two synthetic domains and policy/history checks passed.",
+      "2026-10-28: Frozen runtime c0de7ad passed 1305 full checkout tests in 3328.017s. Additional f192e20 all-quiet episode test passed separately (1 test, 52.047s); it is not included in that full-run count.",
+      "Nineteen installed focused checks passed; all 189 runtime/SQL/schema files match source, wheel and installed bytes. The final runtime delta review covered 14 files with two passes, zero findings and no warnings; the additional test has separate review closeout.",
+      "Acceptance commands, source identities, corrected review findings and limitations: docs/validation/civic-evaluation-roadmap.md. Installed default walkthrough-schema lookup still fails separately. No private evidence, real delivery, provider qualification or StateCivics/crawler deployment is claimed."
+    ]
   }
 }

@@ -48,7 +48,7 @@ The provisional expected directions are not independent ground truth. These
 episodes are now exposed exploratory/tuning material, not untouched held-out
 qualification cases. Successful calls do not complete MAT-039 or MAT-040.
 
-MAT-046 follows next. Its planned `profiles/civic.py` path would collide with the
+At the diagnostic checkpoint MAT-046 followed next; its implementation and later checks are recorded below. Its planned `profiles/civic.py` path would collide with the
 existing `profiles.py` module; use an optional `matter.civic` adapter and flat
 packaged schemas, preserving the common core's import boundary. Existing
 StateCivics KS-1105 uses the no-login KS-841 rehearsal and its replay transport;
@@ -93,8 +93,8 @@ currentness uses bounded existing fence history, overlapping withdrawals persist
 withheld sources fail availability, schema/runtime constraints agree, the joint
 sitting example changes capacity within one recording, and refusal/mutation
 tests are sharper. The fixes and new roadmap modules require independent review
-before ticket closeout. Full regression and installed validation remain separate
-unrun checks for this batch.
+before ticket closeout. At that checkpoint full regression and installed validation remained separate
+unrun checks; later results are recorded below.
 
 ## Review boundary corrections and evaluator ports
 
@@ -168,3 +168,66 @@ checks passed 3 tests in 7.242s (`/tmp/matter-existing-admission-guards.log`).
 Final source freeze, full checkout discovery and review closeout follow below.
 New evaluation/qualification test directories are packages so ordinary discovery
 includes them. No additional provider trial or empirical qualification is implied.
+
+## Frozen validation checkpoint
+
+Runtime source is `c0de7ad`. The final two-pass delta review completed with
+**14 selected/reviewed files, zero findings and zero coverage warnings**
+(`data/validation/roadmap-final-review.json`). Earlier reviewed files retained
+unchanged bytes; the sequence of review receipts above records corrected findings.
+
+The final wheel SHA-256 is
+`5daf7cd5925c06b34dc953e5c0ee1c24a7e461dcf518534bc36351587cabdee9`.
+All **189 runtime/SQL/schema files** match source, wheel and installation exactly.
+The final installed target passed **19 focused checks in 11.720s**
+(`data/validation/roadmap-final-installed.log`). JavaScript verified 26 canonical
+and 8 exact-source vectors; all three checkout walkthroughs passed. The installed
+walkthrough default remains broken separately. `jsonschema` 4.26.0, `referencing`
+and setuptools 84.2.1 are available; no dependency-install blocker persists.
+
+A retained actual offline run passed on the frozen synthetic fault/episode suite:
+8 scheduled decisions, 1 successful fixture admission, 3 abstained, 3 failed and
+1 stale. Its report digest is
+`091a972c4ed7375cb6b05e65c37c5372d75054ccb44adcb18783eab088a544d3`;
+original report bytes hash to
+`443ccdb46b07e863ff754ff2a3e41f115fb31ad3dc375c9903c3837bdf375acf`.
+Inputs/report and a real-credential no-call preflight are retained under ignored
+`data/validation/roadmap-retained-offline/`. The preflight returned ready with
+zero dispatches. This is a synthetic contract workload, not an independent
+StateCivics accuracy corpus or a new actual provider trial.
+
+The full checkout discovery on this frozen source ran with
+`TMPDIR=/private/tmp .venv/bin/python -m unittest discover -s tests -v`;
+`data/validation/roadmap-full-checkout.log` records its result: **1305 tests passed in 3328.017s**, exit 0.
+The additional f192e20 negative policy test passed separately (1 test, 52.047s);
+it was added after discovery and is not part of the 1305-test count. Runtime
+files remain byte-identical to c0de7ad.
+
+## Canonical closeout
+
+MAT-046, MAT-023, MAT-024, MAT-037, MAT-038 and MAT-039 are complete for their
+recorded implementation/conformance scope. MAT-039 completion means the optional
+configured runner and its failure paths are implemented; the retained preflight
+made zero requests, and no systematic held-out provider trial is claimed.
+MAT-040 is blocked on verified independent held-out inputs and supporting actual
+provider results. Its targets/support must be predeclared; no threshold fitting
+or certificate issuance has run. The open corpus-location question remains an
+input request, not approval inferred from elapsed time.
+
+The StateCivics rehearsal/fast-forward resource was inspected/reused by contract
+and existing synthetic inputs; it was not rebuilt, deployed or requalified here.
+Crawler-owned MAT-047 and receiving-system integration/acceptance retain their
+own owners and work. The 22 cross-repository roadmap items remain unchanged.
+The installed-schema packaging gap remains open independently.
+
+The extra all-quiet negative test received its own two-pass review: **1 selected
+file, zero findings and zero warnings** (`data/validation/roadmap-silence-review.json`).
+Canonical regeneration/validation passed after closeout, and all **39 repository
+metadata/hardening checks passed in 0.862s**. The secret scan found no actual
+credential material in tracked changes; `.env` is ignored and untracked.
+
+Retained checkout artifacts use about 10.3 MiB allocated; the five review sessions
+use about 7.3 MiB more (about **17.6 MiB total retained allocation**). The volume
+had about **60.5 GiB free** at closeout, above the 50 GiB reserve. APFS allocated
+blocks do not imply additive free-space recovery. No cleanup or branch deletion
+was performed.

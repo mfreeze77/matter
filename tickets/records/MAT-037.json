@@ -4,7 +4,7 @@
   "track": "evaluation",
   "phase": 4,
   "priority": "P0",
-  "status": "in_progress",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "evaluation/splits",
@@ -76,7 +76,12 @@
     "https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/check.py"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "Grouped deterministic split manifests prevent source/copy/occurrence leakage, preserve ever-tuning/exposure history across revisions, retain partition support diagnostics, and compare exact principal A/B case/packet snapshots. Different retrieval is a separate experiment.",
+      "2026-10-28: Frozen runtime c0de7ad passed 1305 full checkout tests in 3328.017s. Additional f192e20 all-quiet episode test passed separately (1 test, 52.047s); it is not included in that full-run count.",
+      "Nineteen installed focused checks passed; all 189 runtime/SQL/schema files match source, wheel and installed bytes. The final runtime delta review covered 14 files with two passes, zero findings and no warnings; the additional test has separate review closeout.",
+      "Acceptance commands, source identities, corrected review findings and limitations: docs/validation/civic-evaluation-roadmap.md. Installed default walkthrough-schema lookup still fails separately. No private evidence, real delivery, provider qualification or StateCivics/crawler deployment is claimed."
+    ]
   }
 }
