@@ -320,7 +320,7 @@ class CivicImportService:
                     'availability':{'status':'available','checked_at':at}},
                 'occurred_at':{'state':'unknown','reason':'not_reported'},'source_published_at':{'state':'unknown','reason':'not_reported'},
                 'available_at':at,'ingested_at':at,'extraction':PRODUCER}
-            proposed=record('observation',checkpoint_id,body,origin='derived',parents=list(source_refs.values()))
+            proposed=record('observation',checkpoint_id,body,origin='derived' if source_refs else 'host',parents=list(source_refs.values()))
             receipt=require(self.intake.ingest(self.intake.prepare(command(checkpoint_id,'ingest_observation',{'observation':proposed})),payload=payload))
             checkpoint=self.storage.get(receipt['body']['observation'])
         return {'matters':list(subjects.values()),'observations':list(source_refs.values()),'claims':claim_refs,'occurrences':occurrence_refs,

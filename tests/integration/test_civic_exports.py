@@ -165,6 +165,33 @@ class CivicExportTests(unittest.TestCase):
                 self.assertEqual(checkpoint['unmapped_top_fields'],['future_contract'])
                 self.assertEqual(checkpoint['committed_references']['claims'],result['claims'])
                 self.assertEqual(service.import_export(plan),result)
+                other_doc,other_sources=fixture();other='e'*64
+                other_doc['claims'][0]['source']['sha256']=other
+                other_sources[other]=other_sources.pop(SHA)
+                service.import_export(prepare(other_doc,other_sources,package_sha256='f'*64))
+                replay=service.import_export(plan)
+                self.assertEqual(replay['checkpoint'],result['checkpoint'])
+                self.assertNotEqual(replay['occurrences'],result['occurrences'])
+                retained=json.loads(service.intake.read_payload(replay['checkpoint']).data)
+                self.assertEqual(retained['committed_references']['occurrences'],result['occurrences'])
+
+    def test_all_refusals_and_empty_export_still_persist_audit_checkpoint(self):
+        for empty in (False, True):
+            with self.subTest(empty=empty), TemporaryDirectory() as directory:
+                scope='synthetic:refusal-audit';root=Path(directory)
+                doc,sources=fixture()
+                if empty:doc['claims']=[]
+                else:doc['claims'][0]['family']='unsupported'
+                with SQLiteStore(root/'state.sqlite',scope_id=scope) as store:
+                    service=CivicImportService(store,FilePayloadStore(root/'payloads',scope_id=scope),
+                        actor={'scope_id':scope,'namespace':'test','id':'host'},
+                        authority={'scope_id':scope,'namespace':'test','record_type':'receipt','id':'host-grant'})
+                    result=service.import_export(prepare(doc,sources))
+                    self.assertFalse(result['claims']);self.assertFalse(result['observations'])
+                    self.assertEqual(store.get(result['checkpoint'])['provenance']['origin'],'host')
+                    checkpoint=json.loads(service.intake.read_payload(result['checkpoint']).data)
+                    self.assertEqual(len(checkpoint['refusals']),0 if empty else 1)
+                    self.assertEqual(service.import_export(prepare(doc,sources)),result)
 
 
 if __name__=='__main__':unittest.main()
