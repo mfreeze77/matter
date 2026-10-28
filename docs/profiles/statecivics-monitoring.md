@@ -11,8 +11,12 @@ Recorded bounded checkpoint: the StateCivics integration executed the
 synthetic structured-input scenario through the existing replay and Matter
 attention primitive, with observed in-app captures. See the
 [runtime receipt and remaining limits](../validation/statecivics-monitoring-replay.md).
-This exercises the monitoring membrane; civic source adaptation, learned
-judgments and receiving deployment retain their separate tickets.
+Later StateCivics KS-1118 also exercised a bounded operator-only hybrid with live
+JEV relevance/novelty contributions: the final guarded run produced 48 decisions
+and 15 captures from 45 actual calls. Current facts/cadence remain authored and
+observed prior capture material is explicit input. Threshold variation and eight
+illustrative treatment differences remain recorded; learned-provider qualification,
+civic source adaptation and receiving deployment retain their separate tickets.
 
 ## Synthetic first scenarios
 
@@ -129,8 +133,9 @@ investigation, projection, replay, qualification and shadow-family scopes.
 KS-698 owns the existing replay mechanics; StateCivics owns its runtime admission,
 context binding, synthesis and receiving acceptance. Existing KS-704 enrichment
 and KS-1071 Matter mapping are reuse/planning anchors, not proof that this bridge
-or the custom-alert writer is installed. No StateCivics or crawler edits are part
-of this scenario preparation.
+or the custom-alert writer is installed. The original scenario preparation made
+no StateCivics/crawler edits; the later bounded KS-1105/KS-1118 host implementation
+and actual evidence are recorded separately in the linked runtime receipt.
 
 The earlier installed walkthrough-schema lookup failure was separately repaired
 and verified in PR #21; see the [installed closeout](../validation/civic-followthrough.md).
