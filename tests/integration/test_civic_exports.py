@@ -141,5 +141,30 @@ class CivicExportTests(unittest.TestCase):
                 self.assertEqual(service.import_export(prepare(doc,sources)),changed)
                 self.assertFalse(store.get(first['claims'][0])['body']['qualifiers'][0]['value']['source_derivation']['complete'])
 
+    def test_unmapped_scope_and_noncanonical_document_refuse(self):
+        for field,value in (('subtype','special'),('issuer','different')):
+            doc,sources=fixture();doc['claims'][0]['matter'][field]=value
+            self.assertEqual(prepare(doc,sources).value['refusals'][0]['reason'],'unsupported_matter_scope')
+        doc,sources=fixture();doc['claims'][0]['value']=0.5
+        with self.assertRaisesRegex(ContractError,'non_canonical_export'):prepare(doc,sources)
+
+    def test_checkpoint_retains_package_identity_proposals_refusals_and_old_links(self):
+        with TemporaryDirectory() as directory:
+            scope='synthetic:checkpoint';root=Path(directory)
+            doc,sources=fixture();doc['identities']=[{'alias':'R2026001','status':'proposal'}]
+            doc['future_contract']='unmapped';bad=deepcopy(doc['claims'][0]);bad['family']='future_family';doc['claims'].append(bad)
+            plan=prepare(doc,sources)
+            with SQLiteStore(root/'state.sqlite',scope_id=scope) as store:
+                service=CivicImportService(store,FilePayloadStore(root/'payloads',scope_id=scope),
+                    actor={'scope_id':scope,'namespace':'test','id':'host'},
+                    authority={'scope_id':scope,'namespace':'test','record_type':'receipt','id':'host-grant'})
+                result=service.import_export(plan)
+                checkpoint=json.loads(service.intake.read_payload(result['checkpoint']).data)
+                self.assertEqual(checkpoint['native_identities'],doc['identities'])
+                self.assertEqual(checkpoint['refusals'][0]['reason'],'unsupported_claim_family')
+                self.assertEqual(checkpoint['unmapped_top_fields'],['future_contract'])
+                self.assertEqual(checkpoint['committed_references']['claims'],result['claims'])
+                self.assertEqual(service.import_export(plan),result)
+
 
 if __name__=='__main__':unittest.main()

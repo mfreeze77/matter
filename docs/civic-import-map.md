@@ -47,3 +47,15 @@ Tests use invented sources/names. Real copied data and provider artifacts stay i
 preflight: 54 GiB available, 50 GiB reserve, 10 GiB additional task ceiling;
 expected retained output under 200 MiB. Reuse existing environments/images and
 rehearsal PostgreSQL; no extra worktrees or infrastructure.
+
+
+Post-review checkpoint: each package/mapping import also persists a derived,
+source-linked observation containing producer/package identity, refusals, raw
+native identity proposals, unmapped fields and the exact initial committed refs.
+Repeated imports reuse that historical checkpoint; later occurrence membership
+must not rewrite it. Non-null subtype or new nested identity scope is refused
+until explicitly mapped. Unsupported canonical input refuses before writes.
+The preparer asserts the selected attachment and publisher event before using
+its locator. Producer decimal inventory metrics are preserved as tagged lexemes;
+native source claims use strict canonical decoding. See the executed
+[public-source validation receipt](validation/civic-source-integration.md).

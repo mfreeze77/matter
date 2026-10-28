@@ -10,8 +10,22 @@ import json
 from pathlib import Path
 from zipfile import ZipFile
 
-from matter.canonical import canonical_bytes, source_digest
+from matter.canonical import canonical_bytes, source_digest, loads
 from matter.civic_exports import prepare_export
+
+
+def metadata(raw):
+    # Producer inventories include decimal timing metrics. Preserve their exact
+    # lexemes as explicitly tagged metadata, never claim probabilities/numbers.
+    # The native claim contract itself still uses strict matter-json-v1 loads.
+    def unique(pairs):
+        result={}
+        for key,value in pairs:
+            if key in result:raise ValueError('duplicate_producer_metadata_key')
+            result[key]=value
+        return result
+    def nonfinite(_):raise ValueError('nonfinite_producer_metadata')
+    return json.loads(raw,object_pairs_hook=unique,parse_float=lambda token:{'json_decimal_lexeme':token},parse_constant=nonfinite)
 
 
 def prepare(package, output):
@@ -25,15 +39,19 @@ def prepare(package, output):
         if info.file_size>limit:raise ValueError('member_exceeds_bound')
         return z.read(info)
     with ZipFile(package) as z:
-        native=json.loads(member(z,'bundle/matter_source_claims.json',2097152))
-        documents=json.loads(member(z,'bundle/document_text.json',8388608))
-        manifest=json.loads(member(z,'bundle/capture_manifest.json',8388608))
+        native=loads(member(z,'bundle/matter_source_claims.json',2097152))
+        documents=metadata(member(z,'bundle/document_text.json',8388608))
+        manifest=metadata(member(z,'bundle/capture_manifest.json',8388608))
         # This is an explicit one-case exploratory selection, not discovery.
         claims=[r for r in native['claims'] if r['matter']['number']=='R2026005']
         if not claims:raise ValueError('selected_case_missing')
         sha_pdf=claims[0]['source']['sha256']
+        if any(r['source']['file_id']!=8751 or r['source']['sha256']!=sha_pdf for r in claims):
+            raise ValueError('selected_attachment_changed_requires_explicit_reselection')
         rows=documents if type(documents)is list else documents['documents']
         row=next(r for r in rows if r['sha256']==sha_pdf)
+        if row['year']!=2026 or not any(m.get('event_id')==1283 for m in row['meetings']):
+            raise ValueError('selected_publisher_appearance_changed')
         path='derived/pdf_text_layer/'+sha_pdf[:2]+'/'+sha_pdf+'.md'
         raw=member(z,path,524288)
         if source_digest(raw)!=row['text']['sha256']:raise ValueError('text_digest_mismatch')

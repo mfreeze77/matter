@@ -9,7 +9,7 @@ original text, producer quote and both hashes remain independently inspectable.
 from copy import deepcopy
 import re
 
-from .canonical import canonical_bytes, canonical_digest, source_digest
+from .canonical import canonical_bytes, canonical_digest, source_digest, CanonicalError
 from .contracts import ContractError
 from .identity_keys import ExactIdentityPolicy
 from .matters import MatterService
@@ -99,7 +99,11 @@ def prepare_export(document, sources, *, jurisdiction, issuer, year, package_sha
     identities = document.get('identities')
     if type(rows) is not list or type(identities) is not list or len(rows) > 4096 or len(identities) > 4096:
         _fail('bounded_claims_and_identities_required')
-    if len(canonical_bytes(document)) > 2097152:
+    try:
+        size=len(canonical_bytes(document))
+    except CanonicalError:
+        _fail('non_canonical_export')
+    if size > 2097152:
         _fail('export_byte_limit')
     prepared, refusals, normalized, used = [], [], {}, set()
     for n, row in enumerate(rows):
@@ -109,6 +113,8 @@ def prepare_export(document, sources, *, jurisdiction, issuer, year, package_sha
         matter, source = row.get('matter'), row.get('source')
         if type(matter) is not dict or type(matter.get('kind')) is not str or matter.get('kind') not in KINDS or type(matter.get('number')) is not str or not matter['number'].strip():
             reason = 'unscoped_or_invalid_matter'
+        elif set(matter) - {'kind','number','subtype'} or matter.get('subtype') is not None:
+            reason = 'unsupported_matter_scope'
         elif set(row) - {'matter', 'family', 'value', 'value_as_written', 'null_reason', 'disposition', 'source'}:
             reason = 'unsupported_claim_fields'
         elif type(row.get('family')) is not str or row.get('family') not in FAMILIES:
@@ -234,7 +240,6 @@ class CivicImportService:
             original=data['original_text'].encode()
             original_body=deepcopy(body)
             original_body['source_identity']['namespace']=NAMESPACE+':exported-text'
-            original_body['source_identity']['revision_id']=data['original_text_sha256']
             original_body['content'].update(digest=data['original_text_sha256'],byte_length=len(original),media_type='text/markdown')
             original_id='exported-'+sha+'-'+canonical_digest({'text':data['original_text_sha256'],'uri':data['uri']},'matter.civic-exported-text.v1')
             original_body['source_identity']['revision_id']=original_id
@@ -295,5 +300,29 @@ class CivicImportService:
             c=self.claims.prepare(command('claim-'+row['id'],'append_claim',{'claim':record('claim','claim-'+row['id'],body,
                 parents=[source_refs[row['source_sha256']]])}))
             result=require(self.claims.append(c));claim_refs.append(result['body']['claim'])
+        # Preserve import lineage independently of immutable source propositions.
+        # Replaying the same package/mapping keeps its ORIGINAL checkpoint even if
+        # another import has since extended an occurrence's current membership.
+        audit={k:deepcopy(prepared[k]) for k in ('jurisdiction','issuer','year','package_sha256',
+            'producer_revision','refusals','native_identities','unmapped_top_fields','identity_policy','withdrawals')}
+        audit['claim_ids']=[r['id'] for r in prepared['claims']]
+        audit['source_derivations']={sha:{k:v for k,v in data.items() if k not in {'text','original_text'}}
+            for sha,data in prepared['sources'].items()}
+        checkpoint_id='import-'+canonical_digest(audit,'matter.civic-import-checkpoint.v1')
+        checkpoint=existing('observation',checkpoint_id)
+        if checkpoint is None:
+            audit['committed_references']={'matters':list(subjects.values()),'sources':list(source_refs.values()),
+                'claims':claim_refs,'occurrences':occurrence_refs}
+            payload=canonical_bytes(audit)
+            body={'source_identity':{'namespace':NAMESPACE+':imports','event_id':checkpoint_id,'revision_id':'1.0'},
+                'content':{'digest':source_digest(payload),'byte_length':len(payload),'media_type':'application/json',
+                    'locator':{'kind':'whole_artifact','uri':'urn:matter:civic-import:'+checkpoint_id},
+                    'availability':{'status':'available','checked_at':at}},
+                'occurred_at':{'state':'unknown','reason':'not_reported'},'source_published_at':{'state':'unknown','reason':'not_reported'},
+                'available_at':at,'ingested_at':at,'extraction':PRODUCER}
+            proposed=record('observation',checkpoint_id,body,origin='derived',parents=list(source_refs.values()))
+            receipt=require(self.intake.ingest(self.intake.prepare(command(checkpoint_id,'ingest_observation',{'observation':proposed})),payload=payload))
+            checkpoint=self.storage.get(receipt['body']['observation'])
         return {'matters':list(subjects.values()),'observations':list(source_refs.values()),'claims':claim_refs,'occurrences':occurrence_refs,
-            'refusals':deepcopy(prepared['refusals']),'package_sha256':prepared['package_sha256'], 'producer_revision':prepared['producer_revision'], 'authority':'unresolved','qualification':'unknown','consequential_use':False}
+            'checkpoint':pin(checkpoint),'refusals':deepcopy(prepared['refusals']),
+            'package_sha256':prepared['package_sha256'], 'producer_revision':prepared['producer_revision'], 'authority':'unresolved','qualification':'unknown','consequential_use':False}

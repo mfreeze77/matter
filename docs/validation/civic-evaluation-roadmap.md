@@ -1,5 +1,14 @@
 # Civic and provider evaluation roadmap
 
+Later public-source checkpoint (October 28): the bounded MAT-048/MAT-049 slice
+now imports a retained crawler recommendation and separates source-only reading
+from two audience judgments through the existing rehearsal. Five live calls,
+eight decisions and four isolated captures (including two synthetic error
+controls) ran; stage/adoption restraint was useful, but stance and positive
+land-use relevance were underconfident. No qualification or production alert.
+[Exact source, connected receipts and open scope](civic-source-integration.md).
+DIAT is explicitly excluded.
+
 Current connected checkpoint (October 28): StateCivics KS-1118 now exercises the
 existing no-login rehearsal route → actual JEV → Matter attention → existing
 capture sink. The final guarded run made 45 live `jev-1.14.0` calls, 48 decisions
