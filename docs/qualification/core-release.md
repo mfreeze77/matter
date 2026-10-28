@@ -36,7 +36,7 @@ This is bounded synthetic conformance. It covers the specified assertion matrix,
 not all workloads, physical power failures or other storage backends. It does
 not qualify JEV interpretation, certify a civic authority or establish useful
 production alerts. `provider_accuracy`, `live_usefulness`,
-`statecivics_acceptance`, `other_storage_backends` and `physical_power_loss`
+`domain_acceptance`, `other_storage_backends` and `physical_power_loss`
 remain `not_run` even when the synthetic report passes.
 
 [Actual follow-through checks and limits](../validation/civic-followthrough.md)

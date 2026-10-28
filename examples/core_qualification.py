@@ -18,7 +18,7 @@ from matter.canonical import canonical_bytes, loads
 
 ROOT=Path(__file__).resolve().parents[1]
 PLAN=ROOT/'tests/fixtures/conformance/core-qualification.json'
-UNRUN=('provider_accuracy','live_usefulness','statecivics_acceptance','other_storage_backends','physical_power_loss')
+UNRUN=('provider_accuracy','live_usefulness','domain_acceptance','other_storage_backends','physical_power_loss')
 
 
 def sha(data):return hashlib.sha256(data).hexdigest()

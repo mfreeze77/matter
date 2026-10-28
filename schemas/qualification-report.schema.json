@@ -107,7 +107,7 @@
       "required": [
         "provider_accuracy",
         "live_usefulness",
-        "statecivics_acceptance",
+        "domain_acceptance",
         "other_storage_backends",
         "physical_power_loss"
       ],
@@ -118,7 +118,7 @@
         "live_usefulness": {
           "const": "not_run"
         },
-        "statecivics_acceptance": {
+        "domain_acceptance": {
           "const": "not_run"
         },
         "other_storage_backends": {
