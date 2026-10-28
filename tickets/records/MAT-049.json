@@ -113,6 +113,10 @@
     {
       "source": "examples/civic/purpose-comparison/runtime-inputs.json",
       "application": "Authored structured inputs are separate from the expected trace and contain no provider responses. StateCivics KS-1105 executed the installed Matter attention primitive through existing replay and in-app capture at f412e3415 and then the existing no-login rehearsal at 5af45f817 (48 decisions, 19 captures); this is bounded host mechanism evidence, not completion of civic adaptation or provider qualification."
+    },
+    {
+      "source": "mfreeze77/state-civics-ai:KS-1118, 08cd03dca; scripts/rehearsal/rehearse.sh replay-live",
+      "application": "Reuse the existing no-login route, scenario custody, PostgreSQL runtime and capture planner with one temporary operator-owned live interpreter process; preserve unrelated shared rehearsal code and instance state. Keep source facts/cadence authored and raw judgments unqualified; formal MAT-049 remains planned behind MAT-048."
     }
   ],
   "sources": [
@@ -125,7 +129,8 @@
   "completion": {
     "state": "not_run",
     "evidence": [
-      "2026-10-28 PR #18 merge reconciliation: preserved the synthetic client/context scenario pack, structured runtime inputs and four existing local follow-up commits with pinned KS-1105 no-login rehearsal receipts. Kept current MAT-046 implementation documentation, reconciled historical installed-schema/readiness notes, and kept MAT-049 planned/not_run. Fresh generated-file/repository validation and 39 repository/hardening checks passed; authoring checks verify three clients, four contexts, twelve releases, 48 expectations and the unchanged executed runtime-input SHA. No new host replay, JEV call, writer execution or completed civic acceptance is claimed for this merge."
+      "2026-10-28 PR #18 merge reconciliation: preserved the synthetic client/context scenario pack, structured runtime inputs and four existing local follow-up commits with pinned KS-1105 no-login rehearsal receipts. Kept current MAT-046 implementation documentation, reconciled historical installed-schema/readiness notes, and kept MAT-049 planned/not_run. Fresh generated-file/repository validation and 39 repository/hardening checks passed; authoring checks verify three clients, four contexts, twelve releases, 48 expectations and the unchanged executed runtime-input SHA. No new host replay, JEV call, writer execution or completed civic acceptance is claimed for this merge.",
+      "2026-10-28 StateCivics KS-1118 at 08cd03dca executed the connected capture-only hybrid: released synthetic timeline -> 45 live jev-1.14.0 calls -> 48 Matter attention decisions/12 releases -> 16 existing in-app captures, including four corrections. All 45 native responses valid; retries added no calls/captures and future evidence was 404 before/200 after release. Six illustrative expected treatments were withheld in the experimental abstention band; two later corrections became digests because earlier messages were not captured. This is exploratory integration evidence, not full civic extraction, an oracle-perfect trace, MAT-040 qualification or MAT-049 completion. 40 focused Docker and 32 exact PostgreSQL cases passed; details/pins in docs/validation/statecivics-monitoring-replay.md and host docs/evidence/ks1118-live-matter-replay.md."
     ]
   }
 }
