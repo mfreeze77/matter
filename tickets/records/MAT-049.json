@@ -112,7 +112,7 @@
     },
     {
       "source": "examples/civic/purpose-comparison/runtime-inputs.json",
-      "application": "Authored structured inputs are separate from the expected trace and contain no provider responses. StateCivics KS-1105 executed the installed Matter attention primitive through existing replay and in-app capture at f412e3415; this is bounded host mechanism evidence, not completion of civic adaptation or provider qualification."
+      "application": "Authored structured inputs are separate from the expected trace and contain no provider responses. StateCivics KS-1105 executed the installed Matter attention primitive through existing replay and in-app capture at f412e3415 and then the existing no-login rehearsal at 5af45f817 (48 decisions, 19 captures); this is bounded host mechanism evidence, not completion of civic adaptation or provider qualification."
     }
   ],
   "sources": [

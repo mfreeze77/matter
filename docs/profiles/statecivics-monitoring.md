@@ -51,7 +51,10 @@ requirements below describe the inspected implementation, not a requirement to
 add authentication to rehearsal. Reuse its replay/runtime mechanisms through
 rehearsal access; retain synthetic run isolation, cutoff fences and capture-only
 delivery. Acceptance must exercise the scenario controls without credentials or
-a login redirect. That browser check has not run yet.
+a login redirect. That browser check now passes at StateCivics `5af45f817`: the
+existing `http://localhost:8080/rehearsal/replay` served all twelve releases,
+48 decisions and 19 captures. See the linked runtime receipt for source pins,
+actual checks and remaining qualification limits.
 
 Read-only inspection of StateCivics at `d28663cc0` found (the inspected replay
 runtime, manifest, router, config and console files are unchanged from

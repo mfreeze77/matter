@@ -6,7 +6,56 @@ StateCivics implementation: local branch `feat/matter-monitoring-replay`, tested
 commit `f412e3415`. This is bounded mechanism evidence, not civic/provider
 qualification or production deployment.
 
-## Actual runtime evidence
+## No-login rehearsal closeout (October 28 UTC)
+
+The existing KS-841 stack now serves `http://localhost:8080/rehearsal/replay`
+without credentials or a login redirect. StateCivics source `5af45f817` was
+walked in Chrome using the shared replay console. Its original native-admin
+route remains separate. The KS-1106 work at `ca7b9a3aa` was merged into the task
+branch, retaining both ticket rows and the other session's ignored evidence.
+
+The final browser run (`941f5cec-6238-4447-8270-1515eab1343a`) completed all
+12 releases: **48 decisions, 19 in-app captures and 40 factual activity
+associations**, matching the independent expected trace. A separate HTTP read
+sent no cookie or bearer token and verified the same result. Run creation,
+Next, explicit digest capture, completion, reset and paced Play/Pause were
+exercised in the actual rehearsal. Before s09, only eight releases/32 decisions
+were available and its evidence returned 404. Foreign/missing-origin writes
+returned 403.
+
+Admission requires development mode, the explicit local rehearsal flag, local
+host/same-origin writes, the uncached marker and the actual PostgreSQL cluster
+identifier. A deliberately wrong cluster ID rejected catalog reads and run
+creation with 503 before effects; restoring it restored access. This is stronger
+than comparing database/role names, which rehearsal and production share.
+No copied product users were created. Effects remain in replay control/run
+schemas and the existing capture sink.
+
+Latest executed checks:
+
+- **339 backend tests passed** at `8a3e9df9c`, including native authority,
+  manifest/projection, API/route inventories, admission and delivery. Eleven
+  existing deprecation/SQLite cleanup warnings; no failures.
+- **29 targeted tests passed** at `d04479d5b`, including the async connection
+  guard's actual runtime dispatch and installed-input verification.
+- Full TypeScript check and **92 frontend tests passed** at `8a3e9df9c`.
+- **26 original SDK-free PostgreSQL cases passed** at `5af45f817` (the four
+  optional Matter cases were deselected), with no skips/errors/failures.
+- **30 PostgreSQL cases passed** at `8a3e9df9c`, no skips/errors/failures;
+  source/harness stability and owned-resource cleanup passed. The controller
+  now requires/hashes its actual decision trace.
+
+Private StateCivics artifacts: `.release/ks1105-matter-replay/` contains the
+browser/API receipts, cutoff snapshot and negative checks. Final actual trace
+SHA-256: `6f449b2a4eeca9cfb6e738a6e621a081eade298b668dfce2f9bddc5a66433314`.
+The 30-case proof is
+`.release/ks698-replay-runtime-reports-20261028021339-8061-30379/`; JUnit SHA-256:
+`917c72bc1aee1fc04f23d3fed84252706b04dd68e348548f19da9a3a6ddaa468`.
+Its controller-recorded trace SHA-256:
+`22eec8172db2ad4725c600370f049d173ccb40a91145f40222f5fcd651f21f4c`.
+
+## Earlier runtime checkpoint
+
 
 The existing KS-698 PostgreSQL proof controller ran the actual replay runtime,
 existing county event writer and subscriber feed, private intent/assessment
@@ -106,59 +155,35 @@ frontend freshness inputs/helper were unchanged and its existing freshness
 check passed. Backend selection was the adapter, manifest, projection, replay
 API and alert-delivery test modules. No alternate checkout was created.
 
-## Limitations and remaining work
+## Remaining limits and review disposition
 
-- These are deterministic structured-source checks, not recorded executor tests,
-  new live JEV calls, independent civic labels or provider qualification.
-- Owner correction after this checkpoint: replay must run in the existing
-  KS-841 rehearsal **without a login**. Its README and Compose configuration
-  confirm sign-in is already disabled and copied accounts/sessions are excluded.
-  The older KS-698 admin route requires a native session and a different database
-  identity; that is an integration mismatch to fix, not a login prerequisite for
-  the user. Rehearsal must reuse the replay mechanisms with synthetic run
-  isolation and capture-only delivery. No-login browser acceptance remains
-  untested. The PostgreSQL proof uses a controlled authority callback; route
-  admission tests control native transport seams. Neither proves rehearsal
-  browser access.
-- The LLM writer, real/private evidence and external alert delivery remain out
-  of this slice. MAT-046/047/048/049/050 and their canonical prerequisites remain
-  separate; this host fixture binding does not complete them.
-- The installed walkthrough-schema failure remains unresolved. Checkout or
-  replay success does not establish installed walkthrough success.
-- The shared StateCivics checkout was switched by another session to `main` at
-  `9a27309ad` after both frozen-source proofs. Implementation is safely committed
-  on its feature branch. Checkout ownership must be coordinated before further
-  edits, per that repository's AGENTS.md; no concurrent work was overwritten.
+- This is deterministic structured-source mechanism evidence. No new JEV,
+  recorded executor or LLM writer call occurred; no provider qualification,
+  real/private evidence, external delivery or production deployment is claimed.
+- MAT-046/047/048/049/050 and their canonical prerequisites remain separate.
+  MAT-049 stays planned; this bounded host integration does not complete civic
+  source adaptation or receiving-system acceptance for real evidence.
+- The installed walkthrough-schema failure remains unresolved and separate.
+- Rehearsal enablement reuses the existing archive freshness helper and requires
+  a clean tracked commit. After enabling, normal hot reload remains available;
+  the initial check does not qualify later source edits. Stale installed inputs
+  fail verification with preservation instructions, rather than being deleted.
 
-Initial independent review covered nine code files in two rounds, with 15
-findings and no skipped groups/warnings. Confirmed findings were addressed,
-including optional-SDK admission, immutable capture history, pending digest
-selection, meaningful cutoff probes, default gate compatibility, and Mac shell
-array handling. Final source review subsequently completed: 14 files, four
-groups, two rounds, eight findings, no skipped groups or warnings. The findings
-below remain unresolved while checkout ownership is pending:
+Initial nine-file and later fourteen-file reviews produced 15 and eight
+findings respectively; those confirmed findings were fixed. The no-login change
+and follow-ups received two-round independent reviews covering 17, eight, eight
+and four files, with 14, five, five and two findings respectively. All groups
+completed with no warnings. Confirmed fixes include truthful mode labels,
+malformed-input refusal/column limits, immutable capture and pending digests,
+artifact hashing, optional-SDK test specificity, route inventories, async
+connection dispatch, real cluster identity, client withdrawal handling and
+launcher cleanup/recovery. Clean-at-enable is the documented limitation above;
+no replacement gate was added. The final small wording corrections were
+manually checked against these findings.
 
-- The shared replay banner still describes retained history and the legacy
-  detector during the synthetic Matter mode; its mode-specific disclosure must
-  agree with the contextual-monitoring panel.
-- Malformed installed context IDs/timestamps or deeply nested input can escape
-  the sanitized admission error, although admission still fails closed.
-- Context/client name limits accepted by the installer exceed existing database
-  column limits; a longer valid-looking installation can fail during seeding.
-- Baseline context IDs need an enforced match to their manifest subject IDs,
-  which the capture button uses. The supplied installer already produces a
-  match, but admission does not require it.
-- The frontend snapshot contract comment and archive refusal message need small
-  corrections.
-- The controller records JUnit identity but does not require or hash its emitted
-  `matter-timeline.json`. That trace's existence/counts were inspected separately;
-  controller-bound artifact identity remains an open receipt gap.
-- In an SDK-free image, the bad-context admission test can pass on the unrelated
-  missing-SDK refusal. It needs a direct assertion of the intended context
-  validation error. The 199-test run above used the SDK image; this finding does
-  not invalidate that run, but weakens the ordinary-image regression check.
-
-Final review result is retained locally at `/tmp/ks1105-review-final.json`.
+Review results remain locally in `/tmp/ks1105-no-login-review.json`,
+`/tmp/ks1105-rehearsal-followup-review.json`, `/tmp/ks1105-cluster-review.json`
+and `/tmp/ks1105-launcher-final-review.json`.
 
 The separate Matter JSON review covered both changed JSON files in two rounds:
 zero findings or warnings. Its applicable rule checks key spelling; it is not
