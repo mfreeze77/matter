@@ -186,3 +186,14 @@ MAT-077's broader distribution work remains separate. No infrastructure,
 PostgreSQL backend, DIAT or alert-writing expansion was introduced. Storage was
 56 GiB free before image reuse, 53 GiB at closeout; reserve 50 GiB/task cap 10 GiB.
 The live artifact root is about 11 MiB. Both repositories have one worktree.
+
+### Concurrent ticket allocation discovered at closeout
+
+Read-only closeout found StateCivics branch `ks1119-ks1120` with an unrelated
+KS-1119 ticket (commit `52b5920cd`). Our civic ticket is
+`tickets/KS-1119-civic-public-source-monitoring.md` on
+`feat/civic-real-packet-monitoring`. Both branches and their unique work are
+preserved; no transcript/DIAT code was changed. StateCivics' stable-ID rule means
+allocation must be reconciled before integration. Owner input requested for moving
+our newly introduced, unmerged civic ticket to KS-1121; no renumbering performed
+without that input. This is a branch-integration blocker, not a live-test failure.
