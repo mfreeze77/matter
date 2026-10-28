@@ -41,7 +41,13 @@ A binding is either `{kind: "claim", claim: exact_claim_pin}` or
 namespaced_relation}`. Candidate endpoints may be observations, occurrences or
 matters. Every endpoint is read and matched against its exact same-scope pin;
 foreign scopes are refused before source rendering. Claim packets retain the
-exact proposition body rather than inventing one from a topic label.
+proposition values rather than inventing one from a topic label. Preparation
+revision 1.1 freezes references inside that selected body to exact, same-scope
+snapshots available at the packet cut, and includes their read dependencies.
+The immutable original body remains available through the claim pin. This is a
+packet view; it does not revise the claim or turn its assertions into evidence.
+Unavailable referenced records refuse preparation. The revision changes the
+preparation fingerprint so prior packet/cache identities cannot silently mix.
 
 Each evidence declaration has exactly `reference`, `roles`, `locator`,
 `quotation` and `validation`. The reference pins an existing observation.

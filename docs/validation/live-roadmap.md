@@ -287,3 +287,25 @@ private evidence or empirical qualification occurred. StateCivics profiles and
 receiving integration, MAT-039/040 evaluation, PostgreSQL and cross-repository work
 remain outside this completed slice. MAT-022 and the MAT-023 → 024 → 025 chain
 retain their canonical scope and prerequisites.
+
+## MAT-033/034 shadow question families
+
+The [family guide](../semantic-families.md) and
+[validation receipt](MAT-033-034.md) track 15 versioned association, independent
+claim/evidence, explicit change-cause, matching recovery and audience-contribution
+questions. They reuse the existing registry, prepared packets, executor, budgets,
+receipts and host lifecycle/attention services. A bounded context transform adds
+exact as-of host definitions and authority dependencies; a diagnostic projection
+preserves unknown qualification and grants no action authority.
+
+The initial 14-method checkout and installed runs passed; review remediation,
+final guard checks and the existing core regression are being closed out in that
+receipt before ticket completion. Reused PR18 context inputs remain authored
+synthetic fixtures. They do not establish a StateCivics runtime connection or
+observed JEV usefulness. Current source-head tracking must be explicitly declared
+by the host/profile so a correction invalidates queued advice; this reuses the
+existing dependency machinery and belongs in MAT-046's integration contract.
+
+The installed walkthrough-schema lookup still fails separately. No new live
+provider call, qualification, real alert, native delivery adapter or receiving
+application change is part of these shadow families.

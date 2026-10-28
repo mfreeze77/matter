@@ -13,7 +13,7 @@ from ..canonical import canonical_bytes, canonical_digest, source_digest
 from ..citations import verify_locator_validation
 from ..contracts import ContractError, validate_record
 from ..provenance_groups import resolve_groups
-from ..storage import StorageError, pin
+from ..storage import PROJECTION_TYPE, StorageError, pin
 from ..time import compare_times, knowledge_eligible
 
 
@@ -30,8 +30,9 @@ def preparation_reference():
                   "selection": "mandatory-first-canonical-pin", "availability": "inclusive-known-cut",
                   "text": "exact-whole-utf8-or-validated-quotation", "overflow": "whole-source-omission",
                   "lineage": "existing-resolve-groups-with-receipt-cut", "audit": "separate-from-model-state",
-                  "mechanical": "exact-times-counts-and-identifier-equality"}
-    return descriptor("matter", "semantic-packet-preparation", "1.0", definition,
+                  "mechanical": "exact-times-counts-and-identifier-equality",
+                  "claim_references": "exact-known-at-cut-with-recorded-dependencies"}
+    return descriptor("matter", "semantic-packet-preparation", "1.1", definition,
                       "matter.semantic.packet-preparation.v1")
 
 
@@ -124,13 +125,50 @@ class _Reads:
 
 
 def _known_record(reads, reference, boundary):
-    record = validate_record(reads.get(reference))
+    record = reads.get(reference)
+    if record['record_type'] == PROJECTION_TYPE:
+        receipt = validate_record(reads.receipt_for(reference))
+        return record, knowledge_eligible(receipt['provenance']['recorded_at'], boundary)
+    record = validate_record(record)
     if record["record_type"] == "observation":
         return record, knowledge_eligible(record["body"]["available_at"], boundary)
     if knowledge_eligible(record["provenance"]["recorded_at"], boundary) is not True:
         return record, False
     receipt = validate_record(reads.receipt_for(reference))
     return record, knowledge_eligible(receipt["provenance"]["recorded_at"], boundary)
+
+
+def _pin_references(reads, value, boundary):
+    """Freeze visible references, not new source content, through the existing view.
+
+    A selected claim/context view must satisfy the receipt/access scanners: all
+    visible references are exact, known at the cut and present in dependencies.
+    The immutable original records remain available through their original pins.
+    """
+    count = 0
+    def walk(item, depth=0):
+        nonlocal count
+        if depth > 64:
+            _fail(code='E_BUDGET_EXHAUSTED')
+        if type(item) is dict:
+            if {'scope_id', 'namespace', 'record_type', 'id'} <= set(item):
+                count += 1
+                if count > 16384:
+                    _fail(code='E_BUDGET_EXHAUSTED')
+                exact = fragment(item, 'pinned_ref' if 'revision' in item or 'digest' in item else 'entity_ref')
+                if exact['scope_id'] != reads.scope:
+                    _fail(code='E_SCOPE_FORBIDDEN')
+                if 'revision' not in exact and 'digest' not in exact:
+                    exact = pin(reads.view.get(exact))
+                _, known = _known_record(reads, exact, boundary)
+                if known is not True:
+                    _fail('A visible reference was unavailable at the original cut.', 'E_EVIDENCE_UNAVAILABLE')
+                return exact
+            return {key: walk(child, depth + 1) for key, child in item.items()}
+        if type(item) is list:
+            return [walk(child, depth + 1) for child in item]
+        return deepcopy(item)
+    return walk(value)
 
 
 def _binding(reads, value, boundary):
@@ -142,7 +180,8 @@ def _binding(reads, value, boundary):
         record, known = _known_record(reads, reference, boundary)
         if known is not True:
             _fail("The bound claim was unavailable at the knowledge cut.", "E_EVIDENCE_UNAVAILABLE")
-        return {"kind": "claim", "claim": reference, "proposition": deepcopy(record["body"])}
+        return {"kind": "claim", "claim": reference,
+                "proposition": _pin_references(reads, record['body'], boundary)}
     if value.get("kind") == "candidate_relation":
         data = checked(value, required=("kind", "left", "right", "relation"))
         fragment(data["relation"], "namespaced_name")

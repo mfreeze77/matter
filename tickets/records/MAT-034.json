@@ -4,7 +4,7 @@
   "track": "jev",
   "phase": 3,
   "priority": "P1",
-  "status": "planned",
+  "status": "in_progress",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "semantic/families/attention",
