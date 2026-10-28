@@ -7,6 +7,13 @@ intelligent alert. StateCivics interfaces can evolve to support the integration.
 Its existing civic matter records and pages remain a separate implementation;
 their shared name does not select the integration surface.
 
+Current bounded checkpoint: a StateCivics feature branch has executed the
+synthetic structured-input scenario through the existing replay and Matter
+attention primitive, with observed in-app captures. See the
+[runtime receipt and remaining limits](../validation/statecivics-monitoring-replay.md).
+This exercises the monitoring membrane; civic source adaptation, learned
+judgments and receiving deployment retain their separate tickets.
+
 ## Synthetic first scenarios
 
 The [scenario pack](../../examples/civic/purpose-comparison/monitoring-scenarios.json)
@@ -28,9 +35,12 @@ is a permanent label for an entire organization.
 
 This is an illustrative planning fixture, not a runtime schema, a ready-to-load
 KS-698 manifest, recorded model output or a qualification corpus. Its labels are
-agent-authored expectations. Keep the expected section outside evaluator-visible
+agent-authored expectations. The separate
+[runtime-inputs file](../../examples/civic/purpose-comparison/runtime-inputs.json)
+contains structured inputs without those expectations. Keep the expected section outside evaluator-visible
 inputs. Delivery checkpoints describe observations the eventual test must make,
-not receipts that already exist. No integrated scenario has been executed.
+not receipts by themselves. The newer runtime checkpoint above records what
+actually executed; its authored structured facts do not establish semantic extraction quality.
 
 ## Reuse the existing replay
 
@@ -116,7 +126,8 @@ checkout validation nor replay plans resolve installed-package behavior.
 
 Completion of this preparation means a parseable scenario with coherent source,
 context and expectation references, current ticket links and a reviewed handoff.
-Integrated replay, actual JEV calls, writer calls, provider qualification,
-receiving-system acceptance and external alert delivery remain **not run here**.
+The newer receipt records the bounded structured-input runtime replay. Actual
+JEV calls, writer calls, provider qualification, receiving-system acceptance and
+external alert delivery remain **not run in this slice**.
 Executed authoring checks and review limits are recorded in the
 [preparation receipt](../validation/statecivics-monitoring-scenarios.md).
