@@ -231,3 +231,10 @@ use about 7.3 MiB more (about **17.6 MiB total retained allocation**). The volum
 had about **60.5 GiB free** at closeout, above the 50 GiB reserve. APFS allocated
 blocks do not imply additive free-space recovery. No cleanup or branch deletion
 was performed.
+
+The final completion-record/index review also completed two passes: **8 selected
+JSON files, zero findings and zero coverage warnings**
+(`data/validation/roadmap-closeout-review.json`). Canonical status is 38 done,
+41 planned and 1 blocked (MAT-040); 20 Matter-owned items and the unchanged
+22 cross-repository roadmap items remain open. This closeout does not turn the
+optional provider runner into a completed held-out provider study.
