@@ -4,7 +4,7 @@
   "track": "rules",
   "phase": 4,
   "priority": "P1",
-  "status": "planned",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "investigation",
@@ -78,7 +78,11 @@
     "docs/contracts/lifecycle.md"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "2026-10-28: AC-1/2/3 and additional failure paths executed through actual SQLite controls, committed shared resource reservations, intake and payload storage. Checkout investigation suite passed 25 tests in 77.977s; current installed focused run passed 43 tests in 96.338s, with four later source-delta checks passing in 20.362s. These include newly ingested observations, mandatory counterevidence, access refusal with a valid allocation, unchanged-gap suppression, unknown interruption, exact stop replay and finish races. See docs/validation/civic-followthrough.md.",
+      "2026-10-28: Four two-pass full-scope reviews and a clean three-file final delta review covered the implementation. Confirmed findings were corrected; the alleged wrong-record KeyError was not reproduced because the observation-only schema and SQLite record-kind checks already reject it, and a public-API regression confirms honest source_unavailable. Disabling the MAT-072 guard makes the strengthened synthetic refusal test fail as expected.",
+      "Existing BudgetService concurrency tests and the shared-allocation guard prevent independent gaps from reminting the same budget. No connector, automatic fallback read, provider escalation or human question is built. Host readers enforce transport timeouts and ingest sourced results; repeated bookkeeping contention or READ denial may require explicit host finalization without another read. Integrated full regression is recorded separately in docs/validation/civic-followthrough.md."
+    ]
   }
 }

@@ -76,6 +76,8 @@
   ],
   "completion": {
     "state": "not_run",
-    "evidence": []
+    "evidence": [
+      "2026-10-28: Narrow installed walkthrough-schema failure is fixed using bundled importlib.resources. All three walkthroughs ran from the actual installed wheel under isolated Python outside the checkout, with no schema directory; 197 package runtime/SQL/schema files match source, and private/credential/media paths are absent from the wheel. The full installed run and final review limits are in docs/validation/civic-followthrough.md. This does not close broader distribution/CI/provenance acceptance, supported-version checks or the MAT-074 prerequisite; MAT-077 remains planned."
+    ]
   }
 }

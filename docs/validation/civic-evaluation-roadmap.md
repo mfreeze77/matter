@@ -516,3 +516,14 @@ labels, adequate episode/polarity support and defensible results; real-client
 monitoring/delivery usefulness needs the receiving integration and its own
 acceptance. Neither follows from these twenty calls. The installed walkthrough
 schema failure remains open independently.
+
+## Follow-through after PR #20
+
+PR #20 merged as `838f00bb3162fe9cf5c706b8cdfab3cefb395fd8`.
+The [follow-through receipt](civic-followthrough.md) records 24 additional actual
+JEV calls on four custody-verified public documents from the existing latest
+crawler dropoffs, reusing MAT-072 and the existing runner. It also records the
+separate installed-schema repair and MAT-022/calibration implementation checks.
+The 24 calls are distinct from the earlier 20 calls above. Their exposed cases
+supply findings and a score-blind review handoff, not held-out labels, approved
+thresholds, provider qualification or production StateCivics acceptance.
