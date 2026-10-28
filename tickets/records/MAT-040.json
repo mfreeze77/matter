@@ -4,7 +4,7 @@
   "track": "evaluation",
   "phase": 4,
   "priority": "P0",
-  "status": "planned",
+  "status": "blocked",
   "type": "qualification",
   "owner_repo": "mfreeze77/matter",
   "component": "evaluation/calibration",
@@ -19,7 +19,7 @@
     "EVAL-14",
     "JEV-08"
   ],
-  "summary": "Measure each semantic family on the frozen corpus and produce qualification records only when predeclared targets and support requirements hold. Treat threshold fitting, held-out checking and runtime applicability as separate steps, avoiding confidence-only admission or copied benchmark numbers.",
+  "summary": "Measure each semantic family on the frozen corpus and produce qualification records only when predeclared targets and support requirements hold. Treat threshold fitting, held-out checking and runtime applicability as separate steps, avoiding confidence-only admission or copied benchmark numbers. Current execution blocker (2026-10-28): no independently adjudicated untouched held-out corpus and supporting actual provider results have been verified for this scope. Checked-in synthetic labels and the six exposed interpretation cases are not qualification evidence. Targets/support must be predeclared before fitting; no threshold or certificate is issued. See docs/validation/civic-evaluation-roadmap.md.",
   "in_scope": [
     "Training-only threshold selection and held-out family reports",
     "Support counts, clustered uncertainty, abstention and certificate creation"
@@ -77,12 +77,14 @@
     }
   ],
   "sources": [
-    "matterjevmesh §8",
+    "matterjevmesh \u00a78",
     "https://arxiv.org/abs/2609.37647",
     "https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/runtime.py"
   ],
   "completion": {
     "state": "not_run",
-    "evidence": []
+    "evidence": [
+      "2026-10-28: Eight actual matched synthetic runner calls and twelve actual public-evidence exploratory calls now recorded in docs/validation/civic-evaluation-roadmap.md. These exposed, agent-authored contexts/expectations do not supply independent untouched held-out labels, sufficient episode/polarity support or fitted/admitted qualification records. This missing qualification evidence does not block exploratory live testing, which actually ran. No threshold or certificate has been issued."
+    ]
   }
 }

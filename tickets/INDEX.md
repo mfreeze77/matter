@@ -28,8 +28,8 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-020: Schedule temporal reevaluation with durable resource and attention budgets](MAT-020.md) | core | 3 | P0 | done | done | MAT-003, MAT-010, MAT-011, MAT-014, MAT-016, MAT-019 |
 | [MAT-021: Deliver through a freshness-checked outbox with independent outcome receipts](MAT-021.md) | core | 3 | P0 | done | done | MAT-003, MAT-011, MAT-016, MAT-019, MAT-020 |
 | [MAT-022: Support bounded evidence-gap investigation without forced human escalation](MAT-022.md) | rules | 4 | P1 | planned | ready | MAT-010, MAT-011, MAT-012, MAT-014, MAT-016, MAT-020 |
-| [MAT-023: Expose consistent projections and decision explanations](MAT-023.md) | core | 4 | P1 | planned | ready | MAT-003, MAT-007, MAT-009, MAT-015, MAT-016, MAT-017, MAT-019, MAT-021 |
-| [MAT-024: Build chronological replay and language-neutral conformance fixtures](MAT-024.md) | core | 4 | P0 | planned | waiting | MAT-002, MAT-010, MAT-014, MAT-015, MAT-016, MAT-017, MAT-019, MAT-020, MAT-021, MAT-023 |
+| [MAT-023: Expose consistent projections and decision explanations](MAT-023.md) | core | 4 | P1 | done | done | MAT-003, MAT-007, MAT-009, MAT-015, MAT-016, MAT-017, MAT-019, MAT-021 |
+| [MAT-024: Build chronological replay and language-neutral conformance fixtures](MAT-024.md) | core | 4 | P0 | done | done | MAT-002, MAT-010, MAT-014, MAT-015, MAT-016, MAT-017, MAT-019, MAT-020, MAT-021, MAT-023 |
 | [MAT-025: Qualify the neutral core through adversarial multi-audience episodes](MAT-025.md) | core | 5 | P0 | planned | waiting | MAT-002, MAT-003, MAT-004, MAT-005, MAT-006, MAT-007, MAT-008, MAT-009, MAT-010, MAT-011, MAT-012, MAT-013, MAT-014, MAT-015, MAT-016, MAT-017, MAT-018, MAT-019, MAT-020, MAT-021, MAT-022, MAT-023, MAT-024 |
 | [MAT-026: Define the provider-neutral typed executor](MAT-026.md) | jev | 2 | P0 | done | done | MAT-001, MAT-002, MAT-012 |
 | [MAT-027: Implement versioned question specifications and rendering](MAT-027.md) | jev | 2 | P0 | done | done | MAT-026, MAT-007 |
@@ -42,17 +42,17 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-034: Add shadow change, recovery and audience-contribution families](MAT-034.md) | jev | 3 | P1 | done | done | MAT-027, MAT-028, MAT-029, MAT-031, MAT-017, MAT-018, MAT-019, MAT-021 |
 | [MAT-035: Add bounded investigation judgments and stopping outcomes](MAT-035.md) | jev | 4 | P1 | planned | waiting | MAT-028, MAT-029, MAT-031, MAT-033, MAT-034, MAT-022, MAT-040 |
 | [MAT-036: Freeze episode corpora and independent label provenance](MAT-036.md) | evaluation | 2 | P0 | done | done | MAT-001, MAT-004, MAT-006, MAT-010 |
-| [MAT-037: Create grouped splits and comparable baseline manifests](MAT-037.md) | evaluation | 4 | P0 | planned | waiting | MAT-036, MAT-024 |
-| [MAT-038: Build the deterministic offline evaluation harness](MAT-038.md) | evaluation | 4 | P0 | planned | waiting | MAT-026, MAT-029, MAT-030, MAT-031, MAT-036, MAT-037 |
-| [MAT-039: Run optional real-provider shadow replay with exact receipts](MAT-039.md) | evaluation | 4 | P1 | planned | waiting | MAT-032, MAT-033, MAT-034, MAT-036, MAT-037, MAT-038 |
-| [MAT-040: Fit thresholds and issue support-aware qualification records](MAT-040.md) | evaluation | 4 | P0 | planned | waiting | MAT-031, MAT-037, MAT-039 |
-| [MAT-041: Evaluate label, order, changed-question and coherence sensitivity](MAT-041.md) | evaluation | 4 | P1 | planned | waiting | MAT-027, MAT-037, MAT-039 |
+| [MAT-037: Create grouped splits and comparable baseline manifests](MAT-037.md) | evaluation | 4 | P0 | done | done | MAT-036, MAT-024 |
+| [MAT-038: Build the deterministic offline evaluation harness](MAT-038.md) | evaluation | 4 | P0 | done | done | MAT-026, MAT-029, MAT-030, MAT-031, MAT-036, MAT-037 |
+| [MAT-039: Run optional real-provider shadow replay with exact receipts](MAT-039.md) | evaluation | 4 | P1 | done | done | MAT-032, MAT-033, MAT-034, MAT-036, MAT-037, MAT-038 |
+| [MAT-040: Fit thresholds and issue support-aware qualification records](MAT-040.md) | evaluation | 4 | P0 | blocked | blocked | MAT-031, MAT-037, MAT-039 |
+| [MAT-041: Evaluate label, order, changed-question and coherence sensitivity](MAT-041.md) | evaluation | 4 | P1 | planned | ready | MAT-027, MAT-037, MAT-039 |
 | [MAT-042: Compare matter outcomes and audit justified silence](MAT-042.md) | evaluation | 4 | P0 | planned | waiting | MAT-033, MAT-034, MAT-039, MAT-040, MAT-041, MAT-019, MAT-021 |
 | [MAT-043: Qualify availability, latency and concurrent completion behavior](MAT-043.md) | evaluation | 4 | P0 | planned | waiting | MAT-039, MAT-042, MAT-010, MAT-011, MAT-016, MAT-020, MAT-021, MAT-024 |
 | [MAT-044: Measure overhead and qualify execution budgets](MAT-044.md) | evaluation | 4 | P1 | planned | waiting | MAT-032, MAT-039, MAT-042, MAT-020 |
 | [MAT-045: Assemble reproducible qualification and release evidence](MAT-045.md) | evaluation | 5 | P0 | planned | waiting | MAT-035, MAT-040, MAT-041, MAT-042, MAT-043, MAT-044, MAT-025 |
-| [MAT-046: Define civic profile and authority-manifest contracts](MAT-046.md) | civic | 2 | P0 | planned | ready | MAT-001, MAT-002, MAT-012, MAT-013 |
-| [MAT-047: Export crawler jurisdiction overrides and authority evidence](MAT-047.md) | civic | 3 | P1 | planned | waiting | MAT-001, MAT-046, MAT-007, MAT-010, MAT-011 |
+| [MAT-046: Define civic profile and authority-manifest contracts](MAT-046.md) | civic | 2 | P0 | done | done | MAT-001, MAT-002, MAT-012, MAT-013 |
+| [MAT-047: Export crawler jurisdiction overrides and authority evidence](MAT-047.md) | civic | 3 | P1 | planned | ready | MAT-001, MAT-046, MAT-007, MAT-010, MAT-011 |
 | [MAT-048: Adapt civic source claims and stages into neutral matter history](MAT-048.md) | civic | 3 | P1 | planned | waiting | MAT-001, MAT-004, MAT-005, MAT-006, MAT-007, MAT-008, MAT-009, MAT-010, MAT-046, MAT-047 |
 | [MAT-049: Assess civic developments by purpose and meaningful audience change](MAT-049.md) | civic | 4 | P1 | planned | waiting | MAT-001, MAT-015, MAT-016, MAT-017, MAT-018, MAT-019, MAT-021, MAT-048 |
 | [MAT-050: Qualify civic temporal, authority and receiver boundaries](MAT-050.md) | civic | 5 | P0 | planned | waiting | MAT-001, MAT-024, MAT-025, MAT-037, MAT-042, MAT-048, MAT-049 |
@@ -79,7 +79,7 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-071: Qualify chronological and live Oil matter behavior against retained value](MAT-071.md) | oil | 5 | P0 | planned | waiting | MAT-001, MAT-024, MAT-025, MAT-036, MAT-037, MAT-038, MAT-039, MAT-040, MAT-041, MAT-042, MAT-043, MAT-044, MAT-045, MAT-066, MAT-067, MAT-068, MAT-069, MAT-070 |
 | [MAT-072: Enforce host scope, access and provider egress contracts](MAT-072.md) | operations | 2 | P0 | done | done | MAT-002, MAT-003, MAT-007, MAT-011, MAT-028 |
 | [MAT-073: Implement retention, revocation and auditable archival](MAT-073.md) | operations | 3 | P1 | planned | ready | MAT-003, MAT-007, MAT-016, MAT-021, MAT-072 |
-| [MAT-074: Version schemas, migrations and cross-language conformance](MAT-074.md) | operations | 4 | P0 | planned | waiting | MAT-002, MAT-003, MAT-012, MAT-013, MAT-024 |
+| [MAT-074: Version schemas, migrations and cross-language conformance](MAT-074.md) | operations | 4 | P0 | planned | ready | MAT-002, MAT-003, MAT-012, MAT-013, MAT-024 |
 | [MAT-075: Expose neutral inspection and client operations](MAT-075.md) | operations | 4 | P1 | planned | waiting | MAT-015, MAT-018, MAT-023, MAT-072, MAT-074 |
 | [MAT-076: Validate and distribute immutable policy bundles](MAT-076.md) | operations | 4 | P1 | planned | waiting | MAT-012, MAT-013, MAT-014, MAT-031, MAT-074 |
 | [MAT-077: Harden package distribution, CI and reuse provenance](MAT-077.md) | operations | 5 | P1 | planned | waiting | MAT-025, MAT-032, MAT-038, MAT-074 |

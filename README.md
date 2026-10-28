@@ -42,8 +42,10 @@ vendor client, issue qualifications or authorize host actions.
 
 MAT-036 adds [frozen episode corpora](docs/evaluation-corpus.md) with source
 hashes, availability cuts, occurrence lineage and independent label provenance.
-Tracked examples are synthetic; real corpora remain external. Dataset splits,
-provider evaluation and integrated release qualification remain future tickets.
+Tracked examples are synthetic; real corpora remain external. MAT-037's grouped splits, MAT-038's offline harness and MAT-039's optional
+provider-shadow runner now supply reusable evaluation mechanisms; their
+[actual validation and limits](docs/validation/civic-evaluation-roadmap.md) remain
+separate from empirical qualification and integrated release evidence.
 
 The [foundation validation receipt](docs/validation/ready-foundations.md) records
 the profile/executor/corpus batch. The [staging validation receipt](docs/validation/staging-foundations.md)
@@ -100,8 +102,24 @@ receipts. Lookup-only reconciliation can resolve a reliable receipt without
 another send. No retry scheduler or native notification adapter is supplied.
 
 The synthetic civic-shaped tests validate these shared mechanisms. StateCivics
-still needs its explicit civic profiles, reviewed authority contracts and
-receiving integration; this milestone does not qualify that application.
+must install applicable source-backed civic profiles and reviewed authority,
+and complete receiving integration; this milestone does not qualify that application.
+
+## Inspect and replay recorded decisions
+
+MAT-023's [queries and explanations](docs/queries.md) compose current READ rights,
+identity redirects, original assessment policy, quiet reasons and actual delivery
+outcomes in one snapshot. Missing source bytes remain unavailable. Historical
+full child inventory is explicitly incomplete; original selected assessments
+retain their exact evidence scope.
+
+MAT-024's [chronological replay](docs/replay.md) drives existing core services
+with frozen availability cuts and portable golden results. It does not establish
+provider accuracy or concurrency safety. MAT-046's optional
+[civic profiles](docs/profiles/civic.md) bind act-specific applicability to sources
+and registered host reviews without adding civic meanings to the common core.
+The [evaluation ports](docs/evaluation.md) reuse exact fixture execution and the
+existing TypeSafe adapter; unqualified shadow results have no action authority.
 
 ## Run the scaffold
 
@@ -374,7 +392,7 @@ python examples/time_coverage.py
 
 ## What this repo owns
 
-Matter owns the neutral contracts and future reusable implementation. Oil is the first operational integration workload. Civic adapters preserve their own record and authority semantics. DIAT owns speaker learning, meeting fingerprints, anonymous-track experiments, and private corpus processing. JEV is one replaceable evaluator behind the common contract.
+Matter owns the neutral contracts and reusable implementation. Oil is the first operational integration workload. Civic adapters preserve their own record and authority semantics. DIAT owns speaker learning, meeting fingerprints, anonymous-track experiments, and private corpus processing. JEV is one replaceable evaluator behind the common contract.
 
 Creating a domain ticket here records planned work and its target owner; it does not modify another repository or change a deployed system. The [ownership decision](docs/decisions/0001-core-ownership.md) resolves the older notes' alternative implementation sequences.
 

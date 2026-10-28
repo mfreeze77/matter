@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "description": "Independently authored synthetic wires, not model predictions or empirical labels.",
+  "responses": {
+    "positive": "{\"answers\":[{\"id\":\"support\",\"primitive\":\"proposition_probability\",\"probability\":\"0.99\"},{\"id\":\"contradiction\",\"primitive\":\"proposition_probability\",\"probability\":\"0.01\"}],\"resolved_model\":\"synthetic-fixed\"}",
+    "abstain": "{\"answers\":[{\"id\":\"support\",\"primitive\":\"proposition_probability\",\"probability\":\"0.5\"},{\"id\":\"contradiction\",\"primitive\":\"proposition_probability\",\"probability\":\"0.5\"}],\"resolved_model\":\"synthetic-fixed\"}",
+    "partial": "{\"answers\":[{\"id\":\"support\",\"primitive\":\"proposition_probability\",\"probability\":\"0.99\"}],\"resolved_model\":\"synthetic-fixed\"}",
+    "malformed": "{not-json}",
+    "conflicting": "{\"answers\":[{\"id\":\"support\",\"primitive\":\"proposition_probability\",\"probability\":\"0.99\"},{\"id\":\"contradiction\",\"primitive\":\"proposition_probability\",\"probability\":\"0.99\"}],\"resolved_model\":\"synthetic-fixed\"}"
+  }
+}

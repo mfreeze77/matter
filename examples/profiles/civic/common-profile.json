@@ -1,0 +1,43 @@
+{
+  "components": {
+    "evidence": {
+      "capabilities": [],
+      "conflict_resolvers": [],
+      "conformance_cases": [
+        {
+          "invariant": "No authority without actual host review.",
+          "name": "contract-only"
+        }
+      ],
+      "data_scopes": [],
+      "dependencies": [],
+      "description": "Invented civic contract settings; no rule executes.",
+      "lifecycle_extensions": [],
+      "outputs": [],
+      "parameters": {},
+      "resource_limits": {
+        "max_calls": 0,
+        "max_elapsed_ms": 0,
+        "max_evidence": 0,
+        "max_input_bytes": 0,
+        "max_output_bytes": 0
+      },
+      "rules": [],
+      "semantic_version": "1.0"
+    }
+  },
+  "description": "Synthetic settings only.",
+  "incomplete_evaluation": "retain_unresolved",
+  "namespace": "synthetic",
+  "profile_id": "civic-base",
+  "required_outputs": [],
+  "resource_limits": {
+    "max_calls": 0,
+    "max_elapsed_ms": 0,
+    "max_evidence": 0,
+    "max_input_bytes": 0,
+    "max_output_bytes": 0
+  },
+  "schema_version": "1.0",
+  "semantic_version": "1.0"
+}

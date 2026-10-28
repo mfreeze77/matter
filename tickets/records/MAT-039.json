@@ -4,7 +4,7 @@
   "track": "evaluation",
   "phase": 4,
   "priority": "P1",
-  "status": "planned",
+  "status": "done",
   "type": "integration",
   "owner_repo": "mfreeze77/matter",
   "component": "evaluation/provider",
@@ -58,7 +58,9 @@
   "artifacts": [
     "src/matter/evaluation/provider.py",
     "tests/evaluation/test_provider_runner.py",
-    "docs/evaluation.md"
+    "docs/evaluation.md",
+    "examples/guarded_evidence_diagnostic.py",
+    "tests/evaluation/test_guarded_provider.py"
   ],
   "tests": [
     "Resolved model differs from the requested alias.",
@@ -76,12 +78,19 @@
     }
   ],
   "sources": [
-    "matterjevmesh §§7–8,10",
-    "docs/jev.md — Execution and receipts",
+    "matterjevmesh \u00a7\u00a77\u20138,10",
+    "docs/jev.md \u2014 Execution and receipts",
     "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/decisions/system_one_http.py"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "Optional synthetic provider-shadow runner reuses TypeSafe with explicit model/scope/credential source, matching passed offline schedule, full episode coverage, call/time/cost limits, atomic starts/results, sticky model/usage stops, non-dispatch accounting and honest interrupted/cached recovery. Ten injected-HTTP checks passed. A retained real-credential preflight sent zero requests. The six actual JEV interpretation calls earlier in this task are separate; no systematic held-out provider evaluation or empirical qualification was performed.",
+      "2026-10-28: Frozen runtime c0de7ad passed 1305 full checkout tests in 3328.017s. Additional f192e20 all-quiet episode test passed separately (1 test, 52.047s); it is not included in that full-run count.",
+      "Nineteen installed focused checks passed; all 189 runtime/SQL/schema files match source, wheel and installed bytes. The final runtime delta review covered 14 files with two passes, zero findings and no warnings; the additional test has separate review closeout.",
+      "Acceptance commands, source identities, corrected review findings and limitations: docs/validation/civic-evaluation-roadmap.md. Installed default walkthrough-schema lookup still fails separately. No private evidence, real delivery, provider qualification or StateCivics/crawler deployment is claimed.",
+      "2026-10-28 live completion: run_provider with default real HTTP completed all eight retained offline-matched synthetic jobs against jev-1.14.0 (8 fresh, 0 cached/unknown/non-dispatched). Twenty new live calls total in this pass include two six-call real-public-evidence exploratory runs; these are not held-out provider evaluation or qualification. Exact inputs, usage/cost reservations, native responses and report hashes: docs/validation/civic-evaluation-roadmap.md.",
+      "Added a separate exploratory run_guarded_diagnostic entry point using the same execution/receipt/budget loop and actual MAT-072 AccessService.dispatch bindings. It does not invent a passed OfflineReport for real data. The final public-source run removes authored current-interpretation hints. All real source/response bytes are external; only code and artifact references are tracked."
+    ]
   }
 }
