@@ -14,8 +14,8 @@
   },
   "counts_by_status": {
     "blocked": 1,
-    "done": 40,
-    "planned": 39
+    "done": 41,
+    "planned": 38
   },
   "tickets": [
     {
@@ -910,7 +910,7 @@
       "track": "evaluation",
       "phase": 4,
       "priority": "P1",
-      "status": "planned",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-027",
@@ -923,7 +923,7 @@
         "JEV-03",
         "JEV-09"
       ],
-      "readiness": "ready",
+      "readiness": "done",
       "path": "records/MAT-041.json"
     },
     {

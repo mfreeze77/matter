@@ -527,3 +527,15 @@ separate installed-schema repair and MAT-022/calibration implementation checks.
 The 24 calls are distinct from the earlier 20 calls above. Their exposed cases
 supply findings and a score-blind review handoff, not held-out labels, approved
 thresholds, provider qualification or production StateCivics acceptance.
+
+## Sensitivity follow-through after PR #21
+
+PR #21 merged as `f12c6ce0978092c6fb0fa0de03abfa8230bb81dd`.
+The [MAT-041 receipt](sensitivity-followthrough.md) records controlled question
+remapping, meaning changes, repeat variation and coherence checks through the
+existing offline and provider runners, including thirteen additional actual
+JEV calls on explicitly synthetic facts. These calls establish no independent
+held-out accuracy or qualification. The same receipt records verified cleanup
+of four obsolete worktrees, preserving branches and generated artifacts.
+The narrow installed walkthrough-schema repair was verified separately in PR
+#21; the earlier open-failure statement above describes its historical checkpoint.
