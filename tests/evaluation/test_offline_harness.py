@@ -104,3 +104,28 @@ class OfflineHarnessTests(unittest.TestCase):
         self.assertFalse(quiet.value['passed'])
         important=next(a for a in quiet.value['attempts'] if a['scenario']=='positive')
         self.assertEqual(important['status'],'abstained');self.assertFalse(important['matches_expected_status'])
+
+    def test_actual_all_quiet_policy_fails_complete_episode_even_with_valid_primitives(self):
+        from unittest.mock import patch
+        original=core.CoreReplayDriver;observed=[]
+        def always_quiet():
+            driver=original()
+            policy=driver.h.policy.value
+            # A genuine configured policy defect: no observed signal can meet
+            # relevance. Run actual attention decisions and keep their receipts;
+            # do not edit the result frames or the independent golden outcomes.
+            policy['semantic_version']='synthetic-all-quiet'
+            policy['fields'][0]['accepted_values']=['synthetic:never-present']
+            driver.h.install_policy(policy)
+            run=driver.run_step
+            def record(request):
+                result=run(request)
+                observed.append(driver.last[3]['treatment'])
+                return result
+            driver.run_step=record
+            return driver
+        with patch.object(core,'CoreReplayDriver',side_effect=always_quiet):report=self.run_suite()
+        self.assertEqual(set(observed),{'quiet'})
+        self.assertTrue(all(a['matches_expected_status'] for a in report.value['attempts']))
+        self.assertTrue(all(not e['replay']['passed'] for e in report.value['episodes']))
+        self.assertFalse(report.value['passed'])
