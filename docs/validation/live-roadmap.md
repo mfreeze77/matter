@@ -298,9 +298,13 @@ receipts and host lifecycle/attention services. A bounded context transform adds
 exact as-of host definitions and authority dependencies; a diagnostic projection
 preserves unknown qualification and grants no action authority.
 
-The initial 14-method checkout and installed runs passed; review remediation,
-final guard checks and the existing core regression are being closed out in that
-receipt before ticket completion. Reused PR18 context inputs remain authored
+Final checks passed 186 semantic and 17 access methods, plus 56 selected installed
+methods including all 17 family cases. The final four-file delta review completed
+two passes with zero findings or warnings. Preparation 1.1 pins nested reference
+metadata at the original cut, preserves unknown-source coverage, and keeps later
+matter edits out of rebuilt historical packets. The receipt separately records
+the pre-fix full run's macOS temporary-path failure and its successful targeted
+rerun; no clean full final-source run is claimed. Reused PR18 context inputs remain authored
 synthetic fixtures. They do not establish a StateCivics runtime connection or
 observed JEV usefulness. Current source-head tracking must be explicitly declared
 by the host/profile so a correction invalidates queued advice; this reuses the

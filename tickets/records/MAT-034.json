@@ -4,7 +4,7 @@
   "track": "jev",
   "phase": 3,
   "priority": "P1",
-  "status": "in_progress",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "semantic/families/attention",
@@ -59,7 +59,10 @@
   "artifacts": [
     "src/matter/semantic/families/attention.py",
     "tests/semantic/test_attention_families.py",
-    "tests/fixtures/semantic/recovery_episodes.json"
+    "tests/fixtures/semantic/recovery_episodes.json",
+    "src/matter/semantic/families/__init__.py",
+    "docs/semantic-families.md",
+    "docs/validation/MAT-033-034.md"
   ],
   "tests": [
     "A late result after recovery remains historical only.",
@@ -77,11 +80,15 @@
     }
   ],
   "sources": [
-    "matterjevmesh §§3D,5–7,9",
+    "matterjevmesh \u00a7\u00a73D,5\u20137,9",
     "https://github.com/mfreeze77/oil/blob/3d7c629fd45067de405c1bbae0a2aa0e4036399a/src/intent_oil/cognition_store.py"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "2026-10-27: Actual unrelated/matching recovery and late-event transitions, audience preferences, quiet unknown/duplicate cases, source-head invalidation, historical cuts and public/protected durable comparison execution passed. Scope, source identities, failed probes and acceptance evidence: docs/validation/MAT-033-034.md.",
+      "Final affected checks: 186 semantic tests and 17 access tests passed; 56 installed checks passed, including all 17 family methods. All 177 packaged runtime/SQL/schema files match source and installation, with 98 schemas and all 78 package/modules importing from the wheel. Final four-file delta source review completed two passes with zero findings or warnings.",
+      "These are synthetic/offline conformance and actual core-service mechanism checks, with no new live provider call or empirical qualification. The installed walkthrough-schema lookup remains broken. The pre-reference full checkout run had one macOS temporary-path assertion failure, whose exact targeted rerun passed; no clean full final-source run is claimed."
+    ]
   }
 }

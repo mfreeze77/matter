@@ -13,8 +13,7 @@
     "rules": 7
   },
   "counts_by_status": {
-    "done": 30,
-    "in_progress": 2,
+    "done": 32,
     "planned": 48
   },
   "tickets": [
@@ -719,7 +718,7 @@
       "track": "jev",
       "phase": 3,
       "priority": "P1",
-      "status": "in_progress",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-027",
@@ -735,7 +734,7 @@
         "JEV-14",
         "JEV-15"
       ],
-      "readiness": "in_progress",
+      "readiness": "done",
       "path": "records/MAT-033.json"
     },
     {
@@ -744,7 +743,7 @@
       "track": "jev",
       "phase": 3,
       "priority": "P1",
-      "status": "in_progress",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-027",
@@ -761,7 +760,7 @@
         "JEV-11",
         "JEV-14"
       ],
-      "readiness": "in_progress",
+      "readiness": "done",
       "path": "records/MAT-034.json"
     },
     {
