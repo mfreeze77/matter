@@ -1,0 +1,94 @@
+{
+  "schema_version": "1.0",
+  "namespace": "synthetic:civic",
+  "id": "act-specific-final",
+  "version": "1.0",
+  "schema": {
+    "namespace": "matter",
+    "id": "civic-profile",
+    "version": "1.0",
+    "digest": "a2804f66e6ded578db5889b72968f459f0c3ff1f5675b9171f80c68197583caa"
+  },
+  "common_profile": {
+    "namespace": "synthetic",
+    "id": "civic-base",
+    "version": "1.0",
+    "digest": "b4e23fd947dfd27b5932f1d1dc6945e8795af6f8cca9121156ebca43bfeb90f8"
+  },
+  "producer": {
+    "namespace": "synthetic",
+    "id": "contract-examples",
+    "version": "1.0",
+    "digest": "435d340287c67ee7bcc45da226fe2ceef1761d624d8cf10c01c409a3baa19b62"
+  },
+  "producer_code_sha256": "435d340287c67ee7bcc45da226fe2ceef1761d624d8cf10c01c409a3baa19b62",
+  "scope_id": "synthetic:civic",
+  "applies": {
+    "jurisdiction": "synthetic:region",
+    "body": "synthetic:board",
+    "category": "synthetic:school-policy",
+    "act": "synthetic:adopt"
+  },
+  "effective": {
+    "start": {
+      "state": "known",
+      "value": "2026-01-01T00:00:00Z",
+      "precision": "second"
+    },
+    "end": {
+      "state": "unknown",
+      "reason": "not_applicable"
+    },
+    "bounds": "closed_open"
+  },
+  "available_at": {
+    "state": "known",
+    "value": "2026-01-01T00:00:00Z",
+    "precision": "second"
+  },
+  "source_stages": [
+    "synthetic:recommendation",
+    "synthetic:reported-final"
+  ],
+  "parents": [],
+  "assertions": [
+    {
+      "id": "power",
+      "selector": {
+        "jurisdiction": "synthetic:region",
+        "body": "synthetic:board",
+        "category": "synthetic:school-policy",
+        "act": "synthetic:adopt"
+      },
+      "capability": "synthetic:final-adoption",
+      "allowed": true,
+      "effective": {
+        "start": {
+          "state": "known",
+          "value": "2026-01-01T00:00:00Z",
+          "precision": "second"
+        },
+        "end": {
+          "state": "unknown",
+          "reason": "not_applicable"
+        },
+        "bounds": "closed_open"
+      },
+      "disposition": "unreviewed",
+      "sources": [
+        {
+          "reference": {
+            "scope_id": "synthetic:civic",
+            "namespace": "synthetic:sources",
+            "record_type": "observation",
+            "id": "authority-source",
+            "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      ],
+      "attestation": null,
+      "overrides": []
+    }
+  ]
+}

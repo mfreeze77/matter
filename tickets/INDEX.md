@@ -51,7 +51,7 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-043: Qualify availability, latency and concurrent completion behavior](MAT-043.md) | evaluation | 4 | P0 | planned | waiting | MAT-039, MAT-042, MAT-010, MAT-011, MAT-016, MAT-020, MAT-021, MAT-024 |
 | [MAT-044: Measure overhead and qualify execution budgets](MAT-044.md) | evaluation | 4 | P1 | planned | waiting | MAT-032, MAT-039, MAT-042, MAT-020 |
 | [MAT-045: Assemble reproducible qualification and release evidence](MAT-045.md) | evaluation | 5 | P0 | planned | waiting | MAT-035, MAT-040, MAT-041, MAT-042, MAT-043, MAT-044, MAT-025 |
-| [MAT-046: Define civic profile and authority-manifest contracts](MAT-046.md) | civic | 2 | P0 | planned | ready | MAT-001, MAT-002, MAT-012, MAT-013 |
+| [MAT-046: Define civic profile and authority-manifest contracts](MAT-046.md) | civic | 2 | P0 | in_progress | in_progress | MAT-001, MAT-002, MAT-012, MAT-013 |
 | [MAT-047: Export crawler jurisdiction overrides and authority evidence](MAT-047.md) | civic | 3 | P1 | planned | waiting | MAT-001, MAT-046, MAT-007, MAT-010, MAT-011 |
 | [MAT-048: Adapt civic source claims and stages into neutral matter history](MAT-048.md) | civic | 3 | P1 | planned | waiting | MAT-001, MAT-004, MAT-005, MAT-006, MAT-007, MAT-008, MAT-009, MAT-010, MAT-046, MAT-047 |
 | [MAT-049: Assess civic developments by purpose and meaningful audience change](MAT-049.md) | civic | 4 | P1 | planned | waiting | MAT-001, MAT-015, MAT-016, MAT-017, MAT-018, MAT-019, MAT-021, MAT-048 |

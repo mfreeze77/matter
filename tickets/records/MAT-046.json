@@ -4,7 +4,7 @@
   "track": "civic",
   "phase": 2,
   "priority": "P0",
-  "status": "planned",
+  "status": "in_progress",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "profiles.civic.contracts",
@@ -62,10 +62,12 @@
     }
   ],
   "artifacts": [
-    "mfreeze77/matter:schemas/profiles/civic-profile.v1.schema.json",
-    "mfreeze77/matter:src/matter/profiles/civic.py",
-    "mfreeze77/matter:examples/profiles/civic/",
-    "mfreeze77/matter:docs/profiles/civic.md"
+    "src/matter/civic.py",
+    "schemas/civic-profile.schema.json",
+    "schemas/civic-review.schema.json",
+    "tests/unit/test_civic_profiles.py",
+    "examples/profiles/civic/",
+    "docs/profiles/civic.md"
   ],
   "tests": [
     "Recommendation versus final authority for the same act",
@@ -90,7 +92,7 @@
   "sources": [
     "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/src/civic_crawler/jurisdictions/ks/ks_county_wyandotte/minutes.json",
     "https://github.com/mfreeze77/statecivics-local-crawler/blob/f2fd7d39f97fb4f3510e3edef9c0c852e0b5f36f/tickets/T-104-related-jurisdiction-and-authority-relationships.md",
-    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5–10 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
+    "User clarification, 2026-10-08, active Matter build: DIAT owns meeting learning; roughly 315 hours/5\u201310 recurring people is user-reported; crawler owns jurisdiction knowledge; private exported-data experiments only.",
     "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
   ],
   "completion": {
