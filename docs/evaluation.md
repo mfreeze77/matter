@@ -225,10 +225,13 @@ blocked on independently reviewed held-out episodes and approved targets.
 
 The [MAT-040 label/target handoff](qualification/MAT-040-label-target-handoff.md)
 now supplies source-cited teacher drafts, a separate blank human worksheet,
-metadata-only fresh-cohort recruitment candidates, and a concrete unapproved
-capture-only target proposal. Existing exposed cases remain development data
-after human review. Target approval, genuine independent review and a fresh
-cohort are separate prerequisites; no qualification follows from preparation.
+metadata-only fresh-cohort recruitment candidates, and capture-only pilot
+targets subsequently [approved by the operator](qualification/MAT-040-target-approval.json).
+The agent's [executed study](validation/MAT-040-approved-study.md) records fresh
+source screening, 84 model-origin judgments and explicit calibration refusal.
+Existing exposed cases remain development data after human review. Approval and
+testing-team assignment do not make model labels human-reviewed or supply
+independent support; no qualification follows from preparation or assignment.
 
 ## Controlled question sensitivity
 

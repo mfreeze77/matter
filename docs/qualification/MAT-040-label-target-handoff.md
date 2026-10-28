@@ -4,8 +4,14 @@ Preparation is complete; empirical qualification is not. The work reuses the
 existing public-source pack, score-blind worksheet, retained exploratory JEV
 responses, corpus/split contracts and calibration implementation. No new client,
 rehearsal infrastructure, provider call, production alert or certificate was
-created. MAT-040 stays blocked pending genuine independent labels, a fresh
-cohort, approved targets and supporting held-out results.
+created in that preparation pass. The operator has since approved the exact
+pilot targets and assigned the agent as testing team; see the
+[approval record](MAT-040-target-approval.json) and
+[executed study receipt](../validation/MAT-040-approved-study.md).
+MAT-040 remains blocked on human reference provenance, sufficient independent
+support and supporting held-out results. Team nomination and target approval
+are no longer pending inputs. Artifact descriptions below retain the original
+preparation checkpoint.
 
 ## Prepared artifacts
 
@@ -73,12 +79,16 @@ status and disagreements. Do not relabel the author's drafts as independent.
 A qualified second adjudicator is needed when a real disagreement remains;
 no fictitious consensus or reviewer identity is recorded by this preparation.
 
-## Proposed first qualification study
+## Approved first qualification study
 
 The machine-readable [pilot target proposal](MAT-040-pilot-targets.proposed.json)
-is **proposed, not approved**. Its exact byte SHA-256 is
+is the immutable original proposal. The operator explicitly approved its exact
+pilot settings in the subsequent [approval record](MAT-040-target-approval.json).
+The original file remains unchanged; approval was not inferred from a merge.
+Its exact byte SHA-256 is
 `e8b2ae1ad3d11fc33571f24b587802e4a5da16f49f1556d648462ad61e2b9adf`;
-the external proposal copy is identical. Approval was requested, not inferred.
+the external proposal copy is identical. The separate stricter future-use
+proposal remains outside this pilot approval.
 
 Start with the exact revision-2 audience-objective question on the declared
 public county/city text and finance, land-use and school-IT experimental purposes.
@@ -86,7 +96,7 @@ This is a capture-only/manual-review pilot. It does not authorize production
 alerts, qualify other question families, transfer to arbitrary clients or stance
 classification, or include the later custom alert-writing step.
 
-Proposed study settings:
+Approved pilot study settings:
 
 - At least 95% lower correctness bound for each accepted decision polarity at
   95% family-wise confidence across two polarities. Use the existing one-sided
@@ -159,12 +169,13 @@ was about 58 GiB free; expected new artifacts below 20 MiB, with the existing
 50 GiB reserve and 10 GiB task cap. No new environment, worktree or corpus/media
 copy was created.
 
-Two specific inputs remain: approve or amend the exact pilot proposal; name an
-independent human reviewer/data custodian and point to the existing team's fresh
-cohort if available. Then freeze genuine review returns and the untouched study
-split before using the existing fitter, provider runner and host-reviewed
-certificate gates. No reviewer was contacted, no approval was fabricated and no
-qualification was issued.
+The operator resolved the two requested assignment/approval inputs. The agent
+then screened fresh candidate lineages, completed 84 score-blind model judgments
+on 42 new documents, verified all original PDFs and ran the eligibility gates.
+Those results and the specific remaining requirements are in the executed study
+receipt. Model assignment is not human reference provenance; the gate is kept
+intact. No external reviewer nomination is being requested again, no approval
+was fabricated and no qualification was issued.
 
 Final repository checks passed: generated projections, validation (80 tickets,
 104 requirements, 106 schemas, three walkthroughs) and whitespace/diff checks.

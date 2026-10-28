@@ -10,9 +10,12 @@ alerts were enabled.
 
 The subsequent [label/target handoff](../qualification/MAT-040-label-target-handoff.md)
 prepares 120 explicitly teacher-origin drafts, retains a separate blank human
-worksheet, and proposes specific capture-only pilot gates. It preserves all
-prior exposures and requests actual reviewer/cohort identity and operator target
-approval. It does not turn these exploratory calls into held-out results.
+worksheet, and proposes specific capture-only pilot gates. The operator has
+since approved those targets and assigned the agent as testing team. The
+[executed study receipt](MAT-040-approved-study.md) records 84 further
+model-origin judgments, verified originals and the remaining eligibility/support
+failures. It preserves prior exposures and does not turn exploratory calls into
+held-out results.
 
 Executed evidence: 24 additional actual public-evidence JEV calls; 1,348 tests
 on the frozen installed wheel; 46 focused tests on the final wheel; 41 selected
