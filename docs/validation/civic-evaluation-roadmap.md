@@ -59,3 +59,39 @@ source text; this does not establish raw-document extraction accuracy. The
 compound adoption claim and provisional expectation that duplicate relevance
 should be high may confound the objective/novelty heads. Do not tune a release
 threshold from these six exposed cases. Independent adjudication remains needed.
+
+## Civic/query/replay/split implementation checks
+
+The focused run `PYTHONPATH=tests .venv/bin/python -m unittest
+unit.test_civic_profiles integration.test_explanation_queries
+qualification.test_chronological_replay evaluation.test_splits -v` passed 29
+tests in 177.891s (log `/tmp/matter-roadmap-focused.log`). A later focused run
+passed the second synthetic lifecycle domain, the refusal of a self-qualified
+recorded judgment, and the two existing actual policy-change/history checks
+(4 tests, 31.596s; `/tmp/mat024-additional.log`). Named civic refusal assertions
+passed all 13 civic tests (7.054s; `/tmp/mat046-named-refusals.log`).
+
+MAT-023 uses one current-authorized snapshot and binds cursors to its read pins.
+The concurrent split test exercises this backend's intentional rollback-journal
+serialization: the writer commits after the read snapshot releases; it does not
+certify WAL or arbitrary concurrency. Missing payloads remain unavailable; quiet
+reasons and unobserved delivery outcomes remain distinct.
+
+MAT-024 reuses actual claim, assessment, lifecycle, attention and query services
+on fresh SQLite stores. Golden frames normalize only portable receipt aliases
+and outcomes; native evidence/records are not rewritten. A late-published
+cancellation with an earlier effective time cannot enter the earlier prefix.
+Reference frames are authored synthetic conformance data, not independent labels.
+MAT-037 groups whole episodes by source revision/hash, observation, occurrence and
+provenance connectivity; records held-out exposure and refuses hidden packet
+differences between principal arms. Empty/insufficient partitions do not qualify
+anything.
+
+The first two-pass source review covered 13 files without coverage warnings and
+raised seven findings. Confirmed findings were fixed: assertion-specific review
+currentness uses bounded existing fence history, overlapping withdrawals persist,
+withheld sources fail availability, schema/runtime constraints agree, the joint
+sitting example changes capacity within one recording, and refusal/mutation
+tests are sharper. The fixes and new roadmap modules require independent review
+before ticket closeout. Full regression and installed validation remain separate
+unrun checks for this batch.

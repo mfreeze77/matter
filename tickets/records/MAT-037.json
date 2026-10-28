@@ -4,7 +4,7 @@
   "track": "evaluation",
   "phase": 4,
   "priority": "P0",
-  "status": "planned",
+  "status": "in_progress",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "evaluation/splits",
@@ -71,8 +71,8 @@
     }
   ],
   "sources": [
-    "matterjevmesh §§8,10",
-    "docs/evaluation.md — Comparable arms and splits",
+    "matterjevmesh \u00a7\u00a78,10",
+    "docs/evaluation.md \u2014 Comparable arms and splits",
     "https://github.com/abhixhek/jevcal/blob/ae8f3144d69c9cb0e5e0a2c17f70b9d14714cb9f/src/jevcal/check.py"
   ],
   "completion": {

@@ -35,9 +35,12 @@ for identity,allowed,status,body in [('recommendation-only',False,'unreviewed','
  if identity=='joint-body-change':
   from copy import deepcopy
   first=deepcopy(value['assertions'][0]);first['selector']['body']='synthetic:advisory'
-  first['effective']['end']={'state':'known','value':'2030-01-01T00:00:00Z','precision':'second'}
+  value['effective']={'start':{'state':'known','value':'2026-10-01T19:00:00Z','precision':'second'},
+    'end':{'state':'known','value':'2026-10-01T21:00:00Z','precision':'second'},'bounds':'closed_open'}
+  first['effective']=deepcopy(value['effective']);first['effective']['end']={'state':'known','value':'2026-10-01T19:30:00Z','precision':'second'}
   second=deepcopy(value['assertions'][0]);second['id']='later-body';second['selector']['body']='synthetic:board'
-  second['effective']['start']={'state':'known','value':'2030-01-01T00:00:00Z','precision':'second'}
+  second['effective']=deepcopy(value['effective']);second['allowed']=True
+  second['effective']['start']={'state':'known','value':'2026-10-01T19:30:00Z','precision':'second'}
   value['assertions']=[first,second]
  CivicProfile(value,profile=common);save(identity+'.json',value)
 print('Four invented unreviewed civic manifests validated against the common profile.')

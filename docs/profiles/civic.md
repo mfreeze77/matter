@@ -16,9 +16,14 @@ return conflict rather than the most permissive value.
 
 `CivicRegistry.resolve(..., selector, capability, at, as_of, view, controls, token)`
 uses one existing storage snapshot and a current READ token. It checks actual
-observation hashes and availability. A reviewed assertion needs an actual active
+observation hashes and availability. A reviewed assertion needs an actual registered
 host control with a `civic-review` payload bound to that assertion, common profile,
-scope and review time. The control must target exactly its source records. A
+scope and review time. The granting control must target exactly its source records. Currentness is
+checked per assertion through bounded registered source-fence history (256
+revisions per source, 4096 distinct controls maximum). Unrelated reviews cannot
+displace one another. Later matching withdrawals on overlapping or scope-wide
+targets remain effective after unrelated dispositions. Exceeding the scan bound
+refuses the result; it does not reuse an old grant. A
 parser `final` tag, supported source or copied host-looking JSON cannot substitute
 for a registered current host review. Withdrawn, superseded, future or disputed
 review cannot enable the host-proposal gate. The caller owns access/egress and

@@ -73,7 +73,27 @@
           "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
         },
         "end": {
-          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+          "oneOf": [
+            {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "state",
+                "reason"
+              ],
+              "properties": {
+                "state": {
+                  "const": "unknown"
+                },
+                "reason": {
+                  "const": "not_applicable"
+                }
+              }
+            }
+          ]
         },
         "bounds": {
           "const": "closed_open"
@@ -160,7 +180,27 @@
                 "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
               },
               "end": {
-                "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/time_value"
+                "oneOf": [
+                  {
+                    "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "state",
+                      "reason"
+                    ],
+                    "properties": {
+                      "state": {
+                        "const": "unknown"
+                      },
+                      "reason": {
+                        "const": "not_applicable"
+                      }
+                    }
+                  }
+                ]
               },
               "bounds": {
                 "const": "closed_open"
@@ -233,6 +273,27 @@
           "sources",
           "attestation",
           "overrides"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "disposition": {
+                  "const": "reviewed_host"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "sources": {
+                  "minItems": 1
+                },
+                "attestation": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
+                }
+              }
+            }
+          }
         ]
       },
       "maxItems": 128

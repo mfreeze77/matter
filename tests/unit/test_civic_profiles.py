@@ -33,24 +33,24 @@ class CivicProfilesTests(unittest.TestCase):
             'scope_id':self.f.storage.scope_id,'applies':selector,'effective':period,'available_at':self.f.now,
             'source_stages':['synthetic:recommendation','synthetic:parser-final'], 'parents':[],
             'assertions':[{'id':'power','selector':selector,'capability':'synthetic:final-adoption',
-                'allowed':allowed,'effective':period,'disposition':status,
+                'allowed':allowed,'effective':deepcopy(period),'disposition':status,
                 'sources':[{'reference':pin(self.f.source),'sha256':self.f.source['body']['content']['digest']}],
                 'attestation':None,'overrides':[]}]}
 
     def profile(self,value):return CivicProfile(value,profile=self.f.profile)
 
-    def review(self,value,*,change=None):
+    def review(self,value,*,change=None,index=0):
         self.sequence+=1;draft=self.profile(value)
-        payload={'scope_id':self.f.storage.scope_id,'assertion':draft.assertion_reference('power'),
+        payload={'scope_id':self.f.storage.scope_id,'assertion':draft.assertion_reference(value['assertions'][index]['id']),
             'common_profile':self.f.profile.reference,'disposition':'reviewed_host','reviewed_at':self.f.now}
         if change:change(payload)
         command=_in_scope(control_command('civic-review-'+str(self.sequence),self.f.authority,
-            targets=[self.f.source],action='disposition',kind='decision',now=self.f.now),self.f.storage.scope_id)
+            targets=[s['reference'] for s in value['assertions'][index]['sources']],action='disposition',kind='decision',now=self.f.now),self.f.storage.scope_id)
         command['actor']=self.f.actor;command['body']['control']['body']['actor']=self.f.actor
         command['body']['control']['body']['effect']=control_effect('disposition','Explicit synthetic host authority review.',payload=domain('civic-review',payload))
         result=self.f.controls.apply(self.f.controls.prepare(command))
         self.assertEqual(result['status'],'success',result)
-        reviewed=deepcopy(value);reviewed['assertions'][0].update(disposition='reviewed_host',attestation=result['body']['control'])
+        reviewed=deepcopy(value);reviewed['assertions'][index].update(disposition='reviewed_host',attestation=result['body']['control'])
         return reviewed
 
     def resolve(self,profiles,*,selector=None,at=AT,as_of=AT,root=None):
@@ -72,13 +72,16 @@ class CivicProfilesTests(unittest.TestCase):
 
     def test_review_must_bind_exact_assertion_source_scope_and_time(self):
         wrong=self.review(self.value(),change=lambda p:p['assertion'].update(digest='b'*64))
-        with self.assertRaises(ContractError):self.resolve([self.profile(wrong)])
+        with self.assertRaises(ContractError) as caught:self.resolve([self.profile(wrong)])
+        self.assertEqual((caught.exception.code,caught.exception.detail),('E_AUTHORITY_REQUIRED','host_review_binding_mismatch'))
         wrong=self.review(self.value('other'),change=lambda p:p.update(reviewed_at={'state':'known','value':'2080-01-01T00:00:00Z','precision':'second'}))
         self.assertFalse(self.resolve([self.profile(wrong)])['eligible_for_host_proposal'])
         mutated=self.review(self.value('mutated'));mutated['assertions'][0]['sources'][0]['sha256']='b'*64
-        with self.assertRaises(ContractError):self.resolve([self.profile(mutated)])
+        with self.assertRaises(ContractError) as caught:self.resolve([self.profile(mutated)])
+        self.assertEqual((caught.exception.code,caught.exception.detail),('E_EVIDENCE_INVALID','source_hash_mismatch'))
         foreign=self.value();foreign['assertions'][0]['sources'][0]['reference']['scope_id']='foreign'
-        with self.assertRaises(ContractError):self.profile(foreign)
+        with self.assertRaises(ContractError) as caught:self.profile(foreign)
+        self.assertEqual((caught.exception.code,caught.exception.detail),('E_SCOPE_FORBIDDEN','foreign_source'))
 
     def test_explicit_narrow_override_is_order_independent_and_cannot_broaden(self):
         wide={k:'*' for k in SELECTOR};parent=self.profile(self.review(self.value('parent',selector=wide,allowed=False)))
@@ -89,7 +92,8 @@ class CivicProfilesTests(unittest.TestCase):
         # Constructor order does not select a policy. Root is explicit.
         self.assertEqual(first,self.resolve([child,parent],root=child))
         bad=self.value('bad',selector=wide);bad['parents']=[child.reference]
-        with self.assertRaises(ContractError):self.resolve([parent,child,self.profile(bad)])
+        with self.assertRaises(ContractError) as caught:self.resolve([parent,child,self.profile(bad)])
+        self.assertEqual((caught.exception.code,caught.exception.detail),('E_SCOPE_FORBIDDEN','parent_scope_mismatch'))
 
     def test_equal_applicability_conflict_is_not_most_permissive_choice(self):
         p=self.profile(self.review(self.value('p',allowed=False)))
@@ -99,12 +103,16 @@ class CivicProfilesTests(unittest.TestCase):
 
     def test_missing_changed_parent_and_schema_or_common_profile_are_refused(self):
         parent=self.profile(self.value());v=self.value('child');v['parents']=[parent.reference]
-        with self.assertRaises(ContractError):self.resolve([self.profile(v)])
+        with self.assertRaises(ContractError) as caught:self.resolve([self.profile(v)])
+        self.assertEqual((caught.exception.code,caught.exception.detail),('E_EVIDENCE_INVALID','missing_or_changed_parent'))
         v['parents'][0]['digest']='b'*64
-        with self.assertRaises(ContractError):self.resolve([parent,self.profile(v)])
+        with self.assertRaises(ContractError) as caught:self.resolve([parent,self.profile(v)])
+        self.assertEqual((caught.exception.code,caught.exception.detail),('E_EVIDENCE_INVALID','missing_or_changed_parent'))
         for field in ('schema','common_profile'):
             bad=self.value();bad[field]['digest']='b'*64
-            with self.assertRaises(ContractError):self.profile(bad)
+            with self.assertRaises(ContractError) as caught:self.profile(bad)
+            self.assertEqual((caught.exception.code,caught.exception.detail),
+                ('E_EVIDENCE_INVALID','schema_digest_mismatch') if field=='schema' else ('E_POLICY_INVALID','common_profile_mismatch'))
 
     def test_body_and_effective_period_boundaries_preserve_unknown(self):
         profile=self.profile(self.review(self.value()))
@@ -137,4 +145,53 @@ class CivicProfilesTests(unittest.TestCase):
     def test_review_cannot_be_transplanted_to_changed_profile_applicability(self):
         value=self.review(self.value())
         value['effective']['start']={'state':'known','value':'2025-01-01T00:00:00Z','precision':'second'}
-        with self.assertRaises(ContractError):self.resolve([self.profile(value)])
+        with self.assertRaises(ContractError) as caught:self.resolve([self.profile(value)])
+        self.assertEqual((caught.exception.code,caught.exception.detail),('E_AUTHORITY_REQUIRED','host_review_binding_mismatch'))
+
+    def test_two_reviewed_categories_sharing_a_source_remain_independently_current(self):
+        v=self.value(selector={**SELECTOR,'category':'*'})
+        a=v['assertions'][0];a['selector']=dict(SELECTOR)
+        b=deepcopy(a);b.update(id='other-category',selector={**SELECTOR,'category':'synthetic:finance'},allowed=False)
+        v['assertions'].append(b);v=self.review(self.review(v),index=1);profile=self.profile(v)
+        self.assertTrue(self.resolve([profile])['eligible_for_host_proposal'])
+        result=self.resolve([profile],selector=b['selector'])
+        self.assertTrue(result['outcomes'][0]['review_verified'])
+        self.assertFalse(result['eligible_for_host_proposal'])
+
+    def test_withdrawal_over_overlapping_targets_survives_unrelated_later_review(self):
+        v=self.review(self.value());profile=self.profile(v)
+        payload={'scope_id':self.f.storage.scope_id,'assertion':profile.assertion_reference('power'),
+            'common_profile':self.f.profile.reference,'disposition':'withdrawn','reviewed_at':self.f.now}
+        command=_in_scope(control_command('overlapping-withdrawal',self.f.authority,targets=[self.f.source,self.f.subject],
+            action='disposition',kind='decision',now=self.f.now),self.f.storage.scope_id)
+        command['actor']=self.f.actor;command['body']['control']['body']['actor']=self.f.actor
+        command['body']['control']['body']['effect']=control_effect('disposition','Withdraw on an overlapping source scope.',payload=domain('civic-review',payload))
+        self.assertEqual(self.f.controls.apply(self.f.controls.prepare(command))['status'],'success')
+        self.review(self.value('unrelated'))
+        self.assertFalse(self.resolve([profile])['eligible_for_host_proposal'])
+
+    def test_withheld_source_does_not_establish_available_authority(self):
+        from observation_helpers import observation_command
+        command=observation_command('withheld-source','withheld',scope_id=self.f.storage.scope_id)
+        command['body']['observation']['body']['content']['availability'].update(status='withheld',reason='Synthetic withheld source.')
+        from matter.observations import ObservationIngestor
+        ingestor=ObservationIngestor(self.f.storage,self.f.payloads)
+        result=ingestor.ingest(ingestor.prepare(command))
+        self.assertEqual(result['status'],'success',result)
+        source=self.f.storage.get(result['body']['observation']);v=self.value()
+        v['assertions'][0]['sources']=[{'reference':pin(source),'sha256':source['body']['content']['digest']}]
+        result=self.resolve([self.profile(self.review(v))])
+        self.assertFalse(result['eligible_for_host_proposal']);self.assertFalse(result['outcomes'][0]['source_available'])
+
+    def test_joint_recording_body_change_is_act_scoped_inside_one_sitting(self):
+        import json
+        from pathlib import Path
+        v=json.loads((Path(__file__).parents[2]/'examples/profiles/civic/joint-body-change.json').read_text())
+        v['scope_id']=self.f.storage.scope_id;v['common_profile']=self.f.profile.reference
+        for a in v['assertions']:
+            a['sources']=[{'reference':pin(self.f.source),'sha256':self.f.source['body']['content']['digest']}]
+        profile=self.profile(v)
+        at=lambda t:{'state':'known','value':'2026-10-01T'+t+'Z','precision':'second'}
+        self.assertEqual(self.resolve([profile],at=at('19:29:59'),selector=SELECTOR)['state'],'unknown')
+        result=self.resolve([profile],at=at('19:30:00'),selector=SELECTOR)
+        self.assertTrue(result['outcomes'][0]['allowed']);self.assertFalse(result['eligible_for_host_proposal'])

@@ -9,6 +9,7 @@ from .contracts import ContractError
 from .profiles import ProfileDefinition
 from .storage import entity_ref, pin
 from .time import compare_times, knowledge_eligible
+from .controls import control_fence_ref,_fence,_control,_active as _control_active
 
 FIELDS=('jurisdiction','body','category','act')
 
@@ -29,6 +30,39 @@ def _period(value):
 
 def _active(value,at):
     return compare_times(at,value['start'])>=0 and (value['end']['state']=='unknown' or compare_times(at,value['end'])<0)
+
+
+def _reviews(view,scope,sources,remember):
+    """Per-assertion history from existing registered source-control fences.
+
+    A source can support many assertions. Generic fence dispositions overwrite
+    each other, so their *history*, rather than just active_controls, is needed.
+    This bounded scan also sees withdrawals on overlapping or scope-wide targets.
+    It is metadata lookup, never a replacement control lane or review registry.
+    """
+    reviews={};seen=set();count=0
+    for target in [None,*sources]:
+        head=_fence(view,scope,target)
+        if head is None:continue
+        if head['revision']>256:_fail('review_history_limit','E_BUDGET_EXHAUSTED')
+        address=control_fence_ref(scope,target)
+        for revision in range(1,head['revision']+1):
+            fence=view.get({**address,'revision':revision});remember(pin(fence))
+            checked=domain('control-fence',fence['value']['value'])
+            if fence['value']!=checked or checked['value']['target']!=target:_fail('review_fence_invalid')
+            reference=checked['value']['last_control'];key=canonical_bytes(reference)
+            if key in seen:continue
+            seen.add(key);count+=1
+            if count>4096:_fail('review_history_limit','E_BUDGET_EXHAUSTED')
+            record=_control(view,reference);remember(pin(record))
+            effect=record['body']['effect']['value'];payload=effect.get('payload')
+            if payload is None or payload.get('schema',{}).get('id')!='civic-review':continue
+            value=domain('civic-review',payload.get('value'))
+            if payload!=value or record['provenance']['origin']!='host' or effect['action']!='disposition' or record['body']['control_kind']!='decision':
+                _fail('host_review_binding_mismatch','E_AUTHORITY_REQUIRED')
+            if value['value']['scope_id']!=scope:_fail('foreign_review','E_SCOPE_FORBIDDEN')
+            reviews[key]=record
+    return list(reviews.values())
 
 
 class CivicProfile(FrozenValue):
@@ -136,8 +170,10 @@ class CivicRegistry:
             for declared in assertion['sources']:
                 source=view.get(declared['reference']);remember(pin(source))
                 if source['scope_id']!=scope or source['body']['content']['digest']!=declared['sha256']:_fail('source_hash_mismatch')
-                available &= knowledge_eligible(source['body']['available_at'],as_of) is True
+                available &= (source['body']['content']['availability']['status']=='available' and
+                    knowledge_eligible(source['body']['available_at'],as_of) is True)
             source_available[canonical_bytes(ref)]=bool(available)
+        review_history=_reviews(view,scope,sorted({canonical_bytes(entity_ref(s['reference'])):entity_ref(s['reference']) for _,a,_ in selected for s in a['sources']}.values(),key=canonical_bytes),remember)
         outcomes=[]
         for profile,assertion,ref in candidates:
             reason=assertion['disposition'];verified=False;available=source_available[canonical_bytes(ref)]
@@ -153,8 +189,9 @@ class CivicRegistry:
                     or review['provenance']['origin']!='host' or review['body']['control_kind']!='decision'
                     or {canonical_bytes(x) for x in review['body']['scope']['targets']} != {canonical_bytes(entity_ref(s['reference'])) for s in assertion['sources']}):
                     _fail('host_review_binding_mismatch','E_AUTHORITY_REQUIRED')
-                current=review_ref in token['active_controls']
-                current &= all(review_ref not in view.get(other).get('supersedes',[]) for other in token['active_controls'] if other!=review_ref)
+                matching=[r for r in review_history if r['body']['effect']['value']['payload']['value']['assertion']==ref]
+                latest=max(matching,key=lambda r:r['body']['control_epoch']) if matching else None
+                current=latest is not None and pin(latest)==review_ref and _control_active(latest,controls._time())
                 known=all(knowledge_eligible(t,as_of) is True for t in (review['provenance']['recorded_at'],proof['provenance']['recorded_at'],checked['value']['reviewed_at']))
                 verified=bool(current and known and available)
                 if not verified:reason='review_not_current_or_available'

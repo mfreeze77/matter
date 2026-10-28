@@ -4,7 +4,7 @@
   "track": "core",
   "phase": 4,
   "priority": "P1",
-  "status": "planned",
+  "status": "in_progress",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "queries_explanations",

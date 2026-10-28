@@ -7,7 +7,7 @@
     "namespace": "matter",
     "id": "civic-profile",
     "version": "1.0",
-    "digest": "a2804f66e6ded578db5889b72968f459f0c3ff1f5675b9171f80c68197583caa"
+    "digest": "e8a52b868f71f2948f3ef7f9ef8d7c8cc421a5f2817193947c2c1c582a3a957b"
   },
   "common_profile": {
     "namespace": "synthetic",
@@ -19,9 +19,9 @@
     "namespace": "synthetic",
     "id": "contract-examples",
     "version": "1.0",
-    "digest": "435d340287c67ee7bcc45da226fe2ceef1761d624d8cf10c01c409a3baa19b62"
+    "digest": "dbf7c2936f51b6c07461eb290a46e7a8cd7723234b29869dfd64893919a4293d"
   },
-  "producer_code_sha256": "435d340287c67ee7bcc45da226fe2ceef1761d624d8cf10c01c409a3baa19b62",
+  "producer_code_sha256": "dbf7c2936f51b6c07461eb290a46e7a8cd7723234b29869dfd64893919a4293d",
   "scope_id": "synthetic:civic",
   "applies": {
     "jurisdiction": "synthetic:region",
@@ -32,12 +32,13 @@
   "effective": {
     "start": {
       "state": "known",
-      "value": "2026-01-01T00:00:00Z",
+      "value": "2026-10-01T19:00:00Z",
       "precision": "second"
     },
     "end": {
-      "state": "unknown",
-      "reason": "not_applicable"
+      "state": "known",
+      "value": "2026-10-01T21:00:00Z",
+      "precision": "second"
     },
     "bounds": "closed_open"
   },
@@ -65,12 +66,12 @@
       "effective": {
         "start": {
           "state": "known",
-          "value": "2026-01-01T00:00:00Z",
+          "value": "2026-10-01T19:00:00Z",
           "precision": "second"
         },
         "end": {
           "state": "known",
-          "value": "2030-01-01T00:00:00Z",
+          "value": "2026-10-01T19:30:00Z",
           "precision": "second"
         },
         "bounds": "closed_open"
@@ -100,16 +101,17 @@
         "act": "synthetic:adopt"
       },
       "capability": "synthetic:final-adoption",
-      "allowed": false,
+      "allowed": true,
       "effective": {
         "start": {
           "state": "known",
-          "value": "2030-01-01T00:00:00Z",
+          "value": "2026-10-01T19:30:00Z",
           "precision": "second"
         },
         "end": {
-          "state": "unknown",
-          "reason": "not_applicable"
+          "state": "known",
+          "value": "2026-10-01T21:00:00Z",
+          "precision": "second"
         },
         "bounds": "closed_open"
       },

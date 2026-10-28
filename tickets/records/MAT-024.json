@@ -4,7 +4,7 @@
   "track": "core",
   "phase": 4,
   "priority": "P0",
-  "status": "planned",
+  "status": "in_progress",
   "type": "qualification",
   "owner_repo": "mfreeze77/matter",
   "component": "replay_conformance",

@@ -14,8 +14,8 @@
   },
   "counts_by_status": {
     "done": 32,
-    "in_progress": 1,
-    "planned": 47
+    "in_progress": 4,
+    "planned": 44
   },
   "tickets": [
     {
@@ -448,7 +448,7 @@
       "track": "core",
       "phase": 4,
       "priority": "P1",
-      "status": "planned",
+      "status": "in_progress",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-003",
@@ -463,7 +463,7 @@
       "requirements": [
         "CORE-22"
       ],
-      "readiness": "ready",
+      "readiness": "in_progress",
       "path": "records/MAT-023.json"
     },
     {
@@ -472,7 +472,7 @@
       "track": "core",
       "phase": 4,
       "priority": "P0",
-      "status": "planned",
+      "status": "in_progress",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-002",
@@ -489,7 +489,7 @@
       "requirements": [
         "CORE-23"
       ],
-      "readiness": "waiting",
+      "readiness": "in_progress",
       "path": "records/MAT-024.json"
     },
     {
@@ -818,7 +818,7 @@
       "track": "evaluation",
       "phase": 4,
       "priority": "P0",
-      "status": "planned",
+      "status": "in_progress",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-036",
@@ -829,7 +829,7 @@
         "EVAL-03",
         "EVAL-01"
       ],
-      "readiness": "waiting",
+      "readiness": "in_progress",
       "path": "records/MAT-037.json"
     },
     {
