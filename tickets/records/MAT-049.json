@@ -104,7 +104,7 @@
     },
     {
       "source": "mfreeze77/state-civics-ai:KS-698 and src/kansas_accountability/services/historical_replay_runtime.py at 1f7011fd8",
-      "application": "Reuse existing isolated historical replay, domain cutoff, paced Next controls and inspectable delivery sink. The current two statewide scenarios report model_mode unavailable; Matter/local scenario support remains integration work."
+      "application": "Reuse existing isolated historical replay, domain cutoff, paced Next controls and inspectable delivery sink. The inspected legacy scenarios reported model_mode unavailable; later KS-1105 structured Matter/no-login rehearsal evidence is recorded separately in docs/validation/statecivics-monitoring-replay.md. Civic source adaptation and empirical provider qualification remain separate."
     },
     {
       "source": "mfreeze77/state-civics-ai:KS-704, KS-705 and KS-706",
@@ -124,6 +124,8 @@
   ],
   "completion": {
     "state": "not_run",
-    "evidence": []
+    "evidence": [
+      "2026-10-28 PR #18 merge reconciliation: preserved the synthetic client/context scenario pack, structured runtime inputs and four existing local follow-up commits with pinned KS-1105 no-login rehearsal receipts. Kept current MAT-046 implementation documentation, reconciled historical installed-schema/readiness notes, and kept MAT-049 planned/not_run. Fresh generated-file/repository validation and 39 repository/hardening checks passed; authoring checks verify three clients, four contexts, twelve releases, 48 expectations and the unchanged executed runtime-input SHA. No new host replay, JEV call, writer execution or completed civic acceptance is claimed for this merge."
+    ]
   }
 }

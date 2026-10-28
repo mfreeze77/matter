@@ -1,0 +1,198 @@
+{
+  "schema_version": "1.0",
+  "id": "late-published-cancellation",
+  "scope_id": "synthetic:claims",
+  "mode": "deterministic",
+  "corpus_digest": "91ffe893be1ec2d7aa2e193310e221a20617c6bb51810d2a82308932569743ff",
+  "driver": {
+    "namespace": "example",
+    "id": "actual-core-replay-v1",
+    "version": "1.0",
+    "digest": "041b69fefeca59d519e4fff1400f75485d9db3cc38aac6291c0ceceb81b7c3c7"
+  },
+  "profiles": [
+    {
+      "namespace": "example",
+      "id": "assessment-policy",
+      "version": "1.0",
+      "digest": "7f27bf66dc6b8433030cef7c23d4dd8689444f02218e05f97660e5d472d3ad63"
+    }
+  ],
+  "controls": [],
+  "steps": [
+    {
+      "id": "establish",
+      "as_of": {
+        "state": "known",
+        "value": "2026-10-10T12:00:00Z",
+        "precision": "second"
+      },
+      "operation": "synthetic:apply",
+      "input": {
+        "observation_id": "initial",
+        "signal": "present",
+        "status": "supported",
+        "edge": "establish"
+      },
+      "requires": [
+        {
+          "episode_id": "late-published",
+          "observation_id": "initial"
+        }
+      ],
+      "recorded_judgments": [],
+      "expected": {
+        "conclusions": [
+          "supported"
+        ],
+        "receipts": [
+          {
+            "id": "assessment-assess-1",
+            "kind": "assessment"
+          },
+          {
+            "id": "establish:attention",
+            "kind": "attention",
+            "treatment": "update",
+            "stage": "operation",
+            "outcome": "matter:attention_update"
+          }
+        ],
+        "quiet_reasons": [],
+        "transitions": [
+          "applied:establish"
+        ],
+        "delivery_count": 0,
+        "sources_used": [
+          {
+            "episode_id": "late-published",
+            "observation_id": "initial"
+          }
+        ]
+      }
+    },
+    {
+      "id": "before-late-arrival",
+      "as_of": {
+        "state": "known",
+        "value": "2026-10-10T12:00:00Z",
+        "precision": "second"
+      },
+      "operation": "synthetic:inspect",
+      "input": {},
+      "requires": [
+        {
+          "episode_id": "late-published",
+          "observation_id": "initial"
+        }
+      ],
+      "recorded_judgments": [],
+      "expected": {
+        "conclusions": [
+          "supported"
+        ],
+        "receipts": [
+          {
+            "id": "assessment-assess-1",
+            "kind": "assessment"
+          },
+          {
+            "id": "establish:attention",
+            "kind": "attention",
+            "treatment": "update",
+            "stage": "operation",
+            "outcome": "matter:attention_update"
+          }
+        ],
+        "quiet_reasons": [],
+        "transitions": [
+          "applied:establish"
+        ],
+        "delivery_count": 0,
+        "sources_used": [
+          {
+            "episode_id": "late-published",
+            "observation_id": "initial"
+          }
+        ]
+      }
+    },
+    {
+      "id": "late-arrival",
+      "as_of": {
+        "state": "known",
+        "value": "2026-10-11T12:00:00Z",
+        "precision": "second"
+      },
+      "operation": "synthetic:apply",
+      "input": {
+        "observation_id": "late-cancel",
+        "signal": "recovered",
+        "status": "supported",
+        "edge": "resolve"
+      },
+      "requires": [
+        {
+          "episode_id": "late-published",
+          "observation_id": "initial"
+        },
+        {
+          "episode_id": "late-published",
+          "observation_id": "late-cancel"
+        }
+      ],
+      "recorded_judgments": [],
+      "expected": {
+        "conclusions": [
+          "supported"
+        ],
+        "receipts": [
+          {
+            "id": "assessment-assess-1",
+            "kind": "assessment"
+          },
+          {
+            "id": "establish:attention",
+            "kind": "attention",
+            "treatment": "update",
+            "stage": "operation",
+            "outcome": "matter:attention_update"
+          },
+          {
+            "id": "assessment-assess-3",
+            "kind": "assessment"
+          },
+          {
+            "id": "late-arrival:attention",
+            "kind": "attention",
+            "treatment": "quiet",
+            "stage": "operation",
+            "outcome": "matter:attention_quiet"
+          }
+        ],
+        "quiet_reasons": [
+          "no_relevance"
+        ],
+        "transitions": [
+          "applied:establish",
+          "applied:resolve"
+        ],
+        "delivery_count": 0,
+        "sources_used": [
+          {
+            "episode_id": "late-published",
+            "observation_id": "initial"
+          },
+          {
+            "episode_id": "late-published",
+            "observation_id": "late-cancel"
+          }
+        ]
+      }
+    }
+  ],
+  "fault_schedules": [],
+  "episode_ids": [
+    "late-published"
+  ]
+}

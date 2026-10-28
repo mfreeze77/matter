@@ -1,5 +1,13 @@
 # StateCivics contextual monitoring replay checkpoint
 
+PR #18 merge reconciliation: historical execution/source pins below are retained.
+Current Matter `main` at `bcd48c6` already includes civic profile, replay and
+provider-evaluation mechanisms. This merge adds the missing synthetic scenarios,
+structured runtime inputs and their existing rehearsal receipts; no runtime code
+or StateCivics checkout is changed. Later actual JEV calls are recorded separately
+in [the approved-target study](MAT-040-approved-study.md), not attributed to this
+synthetic host replay. MAT-049 remains planned.
+
 Date: October 27, 2026 (execution receipts extend into October 28 UTC).
 Matter preparation: PR #18, `a6bb1776aa73`; SDK core unchanged from `acc7b0cad2`.
 StateCivics implementation: local branch `feat/matter-monitoring-replay`, tested
@@ -170,7 +178,9 @@ API and alert-delivery test modules. No alternate checkout was created.
 - MAT-046/047/048/049/050 and their canonical prerequisites remain separate.
   MAT-049 stays planned; this bounded host integration does not complete civic
   source adaptation or receiving-system acceptance for real evidence.
-- The installed walkthrough-schema failure remains unresolved and separate.
+- At the initial checkpoint the installed walkthrough-schema failure was open.
+  PR #21 subsequently repaired it and verified the installed wheel; see
+  [the installed closeout](civic-followthrough.md). Broader MAT-077 remains planned.
 - Rehearsal enablement reuses the existing archive freshness helper and requires
   a clean tracked commit. After enabling, normal hot reload remains available;
   the initial check does not qualify later source edits. Stale installed inputs
@@ -199,3 +209,21 @@ behavioral integration evidence.
 Storage: 69 GiB free initially, 63 GiB at the last check, above the 50 GiB reserve.
 The retained private traces/logs are small; no real corpus or production copy was
 made. Test PostgreSQL used bounded tmpfs and cleaned up its owned resources.
+
+
+## Matter PR #18 merge verification
+
+The merge retains all four local follow-up commits that had not yet been pushed
+with PR #18, including structured runtime inputs and the existing host receipts.
+The sole conflict in the civic profile guide was resolved by preserving current
+MAT-046 runtime documentation and adding the monitoring-intent link. Historical
+readiness/schema notes are explicitly reconciled with later completed work.
+
+Fresh Matter checks passed: 39 repository/hardening tests, generated projections,
+repository validation (80 tickets, 104 requirements, 106 schemas, three existing
+walkthroughs), whitespace checks, and synthetic authoring checks for three clients,
+four contexts, twelve ordered releases and 48 declared treatments. The runtime
+input hash still matches the recorded executed host fixture. These are merge and
+authoring checks; no new StateCivics/browser/PostgreSQL/provider run or deployment
+was performed. MAT-049 stays planned. Final review/merge receipts are retained
+under ignored `data/validation/pr18-merge-20261028/`.

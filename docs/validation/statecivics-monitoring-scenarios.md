@@ -1,5 +1,12 @@
 # StateCivics monitoring scenario preparation
 
+Historical preparation receipt, reconciled when merging PR #18. The later
+[no-login rehearsal receipt](statecivics-monitoring-replay.md) supersedes the
+initial replay-readiness uncertainty below. The narrow installed schema failure
+was separately fixed/verified in PR #21; broader MAT-077 remains planned. Tests
+and source pins below describe their actual earlier checkpoint. Later live JEV
+experiments are separate evidence and do not qualify these authored scenarios.
+
 Date: October 27, 2026. Base Matter commit: `acc7b0cad2`.
 Scope: synthetic scenario authoring, integration intent and existing replay
 source/configuration discovery. No production runtime implementation changed.

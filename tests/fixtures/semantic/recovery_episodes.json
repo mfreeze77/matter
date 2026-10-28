@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0",
+  "label_provenance": "Agent-authored conformance recordings; not independent labels or provider evaluation.",
+  "original_condition": {"key": "required-integration", "circumstance": "target=service-a;revision=r1;environment=rehearsal;check=integration"},
+  "cases": [
+    {"id": "other-success", "condition": {"key": "unit-check", "circumstance": "target=service-a;revision=r1;environment=rehearsal;check=unit"}, "recovery": "0.01", "transition": "held_for_evidence"},
+    {"id": "matching-success", "condition": {"key": "required-integration", "circumstance": "target=service-a;revision=r1;environment=rehearsal;check=integration"}, "recovery": "0.99", "transition": "applied"}
+  ]
+}

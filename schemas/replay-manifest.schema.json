@@ -1,0 +1,246 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "scope_id",
+    "mode",
+    "corpus_digest",
+    "driver",
+    "profiles",
+    "controls",
+    "steps",
+    "fault_schedules",
+    "episode_ids"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope_id": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/identifier"
+    },
+    "mode": {
+      "enum": [
+        "deterministic",
+        "recorded"
+      ]
+    },
+    "corpus_digest": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+    },
+    "driver": {
+      "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+    },
+    "profiles": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+      },
+      "minItems": 1
+    },
+    "controls": {
+      "type": "array",
+      "maxItems": 4096,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "recorded_at",
+          "command"
+        ],
+        "properties": {
+          "recorded_at": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+          },
+          "command": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "maxItems": 4096,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "as_of",
+          "requires",
+          "operation",
+          "input",
+          "recorded_judgments",
+          "expected"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "as_of": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+          },
+          "requires": {
+            "type": "array",
+            "maxItems": 4096,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "episode_id",
+                "observation_id"
+              ],
+              "properties": {
+                "episode_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "observation_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "uniqueItems": true
+          },
+          "operation": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/namespaced_name"
+          },
+          "input": {
+            "type": "object"
+          },
+          "recorded_judgments": {
+            "type": "array",
+            "maxItems": 256,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "question",
+                "answer",
+                "qualification",
+                "recorded_at",
+                "observations"
+              ],
+              "properties": {
+                "question": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+                },
+                "answer": {},
+                "qualification": {
+                  "enum": [
+                    "unknown",
+                    "unqualified"
+                  ]
+                },
+                "recorded_at": {
+                  "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+                },
+                "observations": {
+                  "type": "array",
+                  "maxItems": 4096,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "episode_id",
+                      "observation_id"
+                    ],
+                    "properties": {
+                      "episode_id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "observation_id": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  },
+                  "uniqueItems": true
+                }
+              }
+            }
+          },
+          "expected": {
+            "type": "object"
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "fault_schedules": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reference",
+          "sha256",
+          "kind"
+        ],
+        "properties": {
+          "reference": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+          },
+          "kind": {
+            "enum": [
+              "race",
+              "transport"
+            ]
+          }
+        }
+      }
+    },
+    "episode_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/replay-manifest.schema.json",
+  "title": "Bounded recorded/deterministic replay manifest",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "deterministic"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "steps": {
+            "items": {
+              "properties": {
+                "recorded_judgments": {
+                  "maxItems": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "mode": "synthetic_recordings",
+  "label_provenance": "Agent-authored conformance expectations, not independent provider evaluation.",
+  "association_cases": [
+    {"id":"two-projects", "left":"Cloud plan for project A at Cedar School.", "right":"Cloud plan for project B at Cedar School.", "answers":{"association":"different","relationship.topic":"0.99","relationship.matter":"0.01","relationship.occurrence":"0.01"}},
+    {"id":"two-tasks", "left":"Task A: correct the cloud export quota warning.", "right":"Task B: correct the cloud storage quota warning; a separately owned and tracked task.", "answers":{"association":"different","relationship.topic":"0.99","relationship.matter":"0.01","relationship.occurrence":"0.01"}},
+    {"id":"two-executions", "left":"Required check for task A, revision r1, execution 1 failed.", "right":"Required check for task A, revision r1, execution 2 failed with the same diagnostic.", "answers":{"association":"same_matter","relationship.topic":"0.99","relationship.matter":"0.99","relationship.occurrence":"0.01"}},
+    {"id":"two-people", "left":"Synthetic person Alex A, employee key school:17, requests access.", "right":"Synthetic person Alex B, employee key school:24, requests access with identical words.", "answers":{"association":"different","relationship.topic":"0.99","relationship.matter":"0.01","relationship.occurrence":"0.01"}},
+    {"id":"later-meeting", "left":"Case A hearing on November 1.", "right":"Case A hearing on November 8.", "answers":{"association":"same_matter","relationship.topic":"0.99","relationship.matter":"0.99","relationship.occurrence":"0.01"}},
+    {"id":"ambiguous-alias", "left":"A person called Alex reports a proposal.", "right":"A different source mentions Alex; no enrollment or identity proof.", "answers":{"association":"insufficient","relationship.topic":"0.5","relationship.matter":"0.5","relationship.occurrence":"0.5"}}
+  ],
+  "claim_cases": [
+    {"id":"planned-funding", "claim":"An allocation for project A has been approved.", "components":{"synthetic:approval":"An allocation for project A has been approved."}, "text":"Funding is expected next year, subject to approval. No allocation has been approved.", "answers":{"evidence.support":"0.01","evidence.contradiction":"0.99","evidence.qualification":"0.99","evidence.established":"0.01"}},
+    {"id":"award-record", "claim":"An allocation for project A has been approved.", "components":{"synthetic:approval":"An allocation for project A has been approved."}, "text":"The reviewed award document records an approved allocation for project A, effective today.", "answers":{"evidence.support":"0.99","evidence.contradiction":"0.01","evidence.qualification":"0.05","evidence.established":"0.99"}},
+    {"id":"unit-only", "claim":"The unit test and the required integration check both passed.", "components":{"synthetic:unit":"The unit test passed.","synthetic:integration":"The required integration check passed."}, "text":"The unit test passed. The required integration check has not run.", "answers":{"evidence.support":"0.99","evidence.contradiction":"0.99","evidence.qualification":"0.99","evidence.established":"0.01"}}
+  ]
+}

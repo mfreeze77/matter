@@ -7,7 +7,7 @@ intelligent alert. StateCivics interfaces can evolve to support the integration.
 Its existing civic matter records and pages remain a separate implementation;
 their shared name does not select the integration surface.
 
-Current bounded checkpoint: a StateCivics feature branch has executed the
+Recorded bounded checkpoint: the StateCivics integration executed the
 synthetic structured-input scenario through the existing replay and Matter
 attention primitive, with observed in-app captures. See the
 [runtime receipt and remaining limits](../validation/statecivics-monitoring-replay.md).
@@ -80,9 +80,9 @@ with `ks-rehearsal-edge-1` publishing `127.0.0.1:8080`. A five-second GET of
 only the three replay configuration variables in the backend process returned
 none; this does not rule out other configuration sources or prove instance
 readiness. No environment file or credential was read, and no service or
-configuration was changed. The candidate local route is identified; the installed
-scenario root and usable instance remain unverified. Use the existing rehearsal
-launcher and KS-698 owners to resolve them. Do not build a second timeline,
+configuration was changed. Those observations describe the initial discovery checkpoint. The later
+no-login rehearsal acceptance above supersedes that readiness uncertainty.
+Continue using the existing rehearsal launcher and KS-698/KS-841 mechanisms. Do not build a second timeline,
 database, queue, source reader or notification system.
 
 The first bridge should feed cutoff-visible releases and versioned host context
@@ -132,9 +132,10 @@ and KS-1071 Matter mapping are reuse/planning anchors, not proof that this bridg
 or the custom-alert writer is installed. No StateCivics or crawler edits are part
 of this scenario preparation.
 
-The separate installed walkthrough-schema lookup failure remains a validation
-gap recorded in [live-roadmap](../validation/live-roadmap.md). Neither this pack,
-checkout validation nor replay plans resolve installed-package behavior.
+The earlier installed walkthrough-schema lookup failure was separately repaired
+and verified in PR #21; see the [installed closeout](../validation/civic-followthrough.md).
+That repair came from installed-wheel evidence, not these scenario-authoring
+checks. The broader MAT-077 distribution work remains planned.
 
 Completion of this preparation means a parseable scenario with coherent source,
 context and expectation references, current ticket links and a reviewed handoff.

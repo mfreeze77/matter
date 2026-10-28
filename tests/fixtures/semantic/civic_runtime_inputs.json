@@ -1,0 +1,449 @@
+{
+  "schema_version": 1,
+  "description": "Synthetic structured inputs for the PR18 scenario. No expected treatment or assertion is included; these are authored source interpretations, not JEV outputs.",
+  "contexts": [
+    {
+      "id": "cloud-affairs",
+      "client_id": "cloud-company",
+      "revision": "v1",
+      "available_at": "2026-11-01T08:00:00Z",
+      "territory": [
+        "synthetic:kansas"
+      ],
+      "purpose": "Monitor school cloud-service policy and eligible procurement opportunities.",
+      "approved_positions": [
+        {
+          "provision": "open interoperability",
+          "position": "proponent"
+        },
+        {
+          "provision": "mandatory facial recognition",
+          "position": "neutral"
+        }
+      ],
+      "policy": "Digest applicable drafts; update on an actionable comment deadline or eligible solicitation. Topic overlap alone is quiet. Neutral stance does not mean commercially irrelevant.",
+      "digest_tags": [
+        "draft",
+        "recommendation",
+        "recommendation_retracted"
+      ],
+      "update_tags": [
+        "comment_deadline",
+        "solicitation",
+        "cancellation"
+      ],
+      "material_fields": [
+        "policy_stage",
+        "interoperability",
+        "comment_deadline",
+        "procurement_stage",
+        "closing"
+      ],
+      "opportunity_monitoring": true
+    },
+    {
+      "id": "privacy-advocacy",
+      "client_id": "privacy-coalition",
+      "revision": "v1",
+      "available_at": "2026-11-01T08:00:00Z",
+      "territory": [
+        "synthetic:kansas"
+      ],
+      "purpose": "Monitor student biometric collection and opportunities to influence it.",
+      "approved_positions": [
+        {
+          "provision": "explicit student-data consent",
+          "position": "proponent"
+        },
+        {
+          "provision": "mandatory facial recognition",
+          "position": "opponent"
+        }
+      ],
+      "policy": "Update on a newly proposed biometric requirement or actionable hearing. Preserve mixed positions on separate provisions. Procurement without biometric consequences is quiet.",
+      "digest_tags": [
+        "draft",
+        "recommendation",
+        "recommendation_retracted",
+        "biometrics_removed"
+      ],
+      "update_tags": [
+        "biometrics_requirement",
+        "comment_deadline"
+      ],
+      "material_fields": [
+        "policy_stage",
+        "biometrics",
+        "comment_deadline"
+      ],
+      "opportunity_monitoring": false
+    },
+    {
+      "id": "district-it",
+      "client_id": "school-district",
+      "revision": "v1",
+      "available_at": "2026-11-01T08:00:00Z",
+      "territory": [
+        "synthetic:kansas",
+        "synthetic:cedar-district"
+      ],
+      "purpose": "Prepare district IT procurement and assess possible operational requirements.",
+      "approved_positions": [],
+      "position_when_unspecified": "unknown",
+      "policy": "Digest pending requirements; update on an actionable hearing or changed specification. A next step already owned is quiet unless its obligations materially change. Do not infer a district position from its institutional role.",
+      "digest_tags": [
+        "draft",
+        "recommendation",
+        "recommendation_retracted"
+      ],
+      "update_tags": [
+        "comment_deadline",
+        "solicitation",
+        "specification_change",
+        "cancellation"
+      ],
+      "material_fields": [
+        "policy_stage",
+        "interoperability",
+        "biometrics",
+        "comment_deadline",
+        "procurement_stage",
+        "closing"
+      ],
+      "opportunity_monitoring": false
+    },
+    {
+      "id": "district-finance",
+      "client_id": "school-district",
+      "revision": "v1",
+      "available_at": "2026-11-01T08:00:00Z",
+      "territory": [
+        "synthetic:kansas",
+        "synthetic:cedar-district"
+      ],
+      "purpose": "Prepare the next budget review; monitor funding commitments and credible cost exposure.",
+      "approved_positions": [],
+      "position_when_unspecified": "unknown",
+      "policy": "Digest scoped potential costs. Update on a supported funding commitment or an assigned review deadline. A proposal, recommendation or RFP alone proves no appropriation.",
+      "digest_tags": [
+        "cost_exposure"
+      ],
+      "update_tags": [
+        "assigned_review",
+        "funding_commitment",
+        "cancellation"
+      ],
+      "material_fields": [
+        "funding",
+        "estimated_cost",
+        "procurement_stage"
+      ],
+      "opportunity_monitoring": false
+    }
+  ],
+  "steps": [
+    {
+      "id": "s01",
+      "available_at": "2026-11-01T09:00:00Z",
+      "occurred_at": "2026-11-01T08:30:00Z",
+      "subject_id": "policy-26",
+      "input_kind": "source",
+      "input": {
+        "synthetic": true,
+        "text": "An agenda lists a routine presentation about Google Workspace and school technology. It states no policy proposal, position, purchase, vote or deadline.",
+        "source_id": "agenda:1",
+        "source_scope": "synthetic:kansas",
+        "tags": [
+          "keyword_mention"
+        ],
+        "topics": [],
+        "facts": {
+          "policy_stage": "mention"
+        }
+      }
+    },
+    {
+      "id": "s02",
+      "available_at": "2026-11-02T09:00:00Z",
+      "occurred_at": "2026-11-02T08:00:00Z",
+      "subject_id": "policy-26",
+      "input_kind": "source",
+      "input": {
+        "synthetic": true,
+        "text": "A draft proposes open cloud interoperability, explicit consent for student-data collection, and mandatory facial recognition. It states no enacted rule, funding commitment or implementation date. Its sponsor says they support the draft.",
+        "source_id": "draft:1",
+        "source_scope": "synthetic:kansas",
+        "tags": [
+          "draft",
+          "biometrics_requirement",
+          "cost_exposure"
+        ],
+        "topics": [],
+        "facts": {
+          "biometrics": true,
+          "interoperability": true,
+          "funding": "unknown",
+          "policy_stage": "draft"
+        }
+      }
+    },
+    {
+      "id": "s03",
+      "available_at": "2026-11-03T09:00:00Z",
+      "occurred_at": "2026-11-03T08:00:00Z",
+      "subject_id": "policy-26",
+      "input_kind": "source",
+      "input": {
+        "synthetic": true,
+        "text": "The official notice schedules a hearing on draft:1 for November 6 and closes written comments November 5 at 17:00 UTC.",
+        "source_id": "hearing-notice:1",
+        "source_scope": "synthetic:kansas",
+        "tags": [
+          "comment_deadline",
+          "cost_exposure"
+        ],
+        "topics": [],
+        "facts": {
+          "biometrics": true,
+          "interoperability": true,
+          "comment_deadline": "2026-11-05T17:00:00Z",
+          "funding": "unknown",
+          "policy_stage": "hearing_scheduled"
+        }
+      }
+    },
+    {
+      "id": "s04",
+      "available_at": "2026-11-03T10:00:00Z",
+      "occurred_at": null,
+      "subject_id": "policy-26",
+      "input_kind": "source",
+      "input": {
+        "synthetic": true,
+        "text": "A newsletter repeats the same hearing and comment deadline without new facts.",
+        "source_id": "hearing-notice-reprint:1",
+        "source_scope": "synthetic:kansas",
+        "tags": [
+          "comment_deadline",
+          "cost_exposure"
+        ],
+        "topics": [],
+        "facts": {
+          "biometrics": true,
+          "interoperability": true,
+          "comment_deadline": "2026-11-05T17:00:00Z",
+          "funding": "unknown",
+          "policy_stage": "hearing_scheduled"
+        },
+        "same_occurrence_as": "hearing-notice:1"
+      }
+    },
+    {
+      "id": "s05",
+      "available_at": "2026-11-06T18:00:00Z",
+      "occurred_at": "2026-11-06T15:00:00Z",
+      "subject_id": "policy-26",
+      "input_kind": "source",
+      "input": {
+        "synthetic": true,
+        "text": "Minutes state that an advisory committee recommended the draft. No final adopting act or appropriation is supplied.",
+        "source_id": "committee-minutes:1",
+        "source_scope": "synthetic:kansas",
+        "tags": [
+          "recommendation"
+        ],
+        "topics": [],
+        "facts": {
+          "biometrics": true,
+          "interoperability": true,
+          "funding": "unknown",
+          "policy_stage": "recommended"
+        }
+      }
+    },
+    {
+      "id": "s06",
+      "available_at": "2026-11-07T09:00:00Z",
+      "occurred_at": "2026-11-07T08:00:00Z",
+      "subject_id": "rfp-26",
+      "input_kind": "source",
+      "input": {
+        "synthetic": true,
+        "text": "The district publishes a cloud-services solicitation open to eligible providers, including facial recognition, closing November 12 at 17:00 UTC. Funding authority is not included. The district IT team's recorded work item already owns the publication and initial response review.",
+        "source_id": "solicitation:1",
+        "source_scope": "synthetic:kansas",
+        "tags": [
+          "solicitation",
+          "biometrics_requirement",
+          "cost_exposure"
+        ],
+        "topics": [],
+        "facts": {
+          "biometrics": true,
+          "closing": "2026-11-12T17:00:00Z",
+          "funding": "unknown",
+          "procurement_stage": "solicitation"
+        },
+        "handled_by": [
+          "district-it"
+        ]
+      }
+    },
+    {
+      "id": "s07",
+      "available_at": "2026-11-08T09:00:00Z",
+      "occurred_at": "2026-11-08T08:00:00Z",
+      "subject_id": "rfp-26",
+      "input_kind": "source",
+      "input": {
+        "synthetic": true,
+        "text": "A published correction removes facial recognition and extends closing to November 20 at 17:00 UTC.",
+        "source_id": "solicitation:2",
+        "source_scope": "synthetic:kansas",
+        "tags": [
+          "solicitation",
+          "specification_change",
+          "biometrics_removed",
+          "cost_exposure"
+        ],
+        "topics": [],
+        "facts": {
+          "biometrics": false,
+          "closing": "2026-11-20T17:00:00Z",
+          "funding": "unknown",
+          "procurement_stage": "solicitation"
+        },
+        "correction_of": [
+          "solicitation:1"
+        ]
+      }
+    },
+    {
+      "id": "s08",
+      "available_at": "2026-11-08T10:00:00Z",
+      "occurred_at": null,
+      "subject_id": "rfp-26",
+      "input_kind": "context_change",
+      "input": {
+        "synthetic": true,
+        "text": "A published correction removes facial recognition and extends closing to November 20 at 17:00 UTC.",
+        "source_id": "solicitation:2",
+        "source_scope": "synthetic:kansas",
+        "tags": [
+          "assigned_review"
+        ],
+        "topics": [],
+        "facts": {
+          "biometrics": false,
+          "closing": "2026-11-20T17:00:00Z",
+          "funding": "unknown",
+          "procurement_stage": "solicitation"
+        },
+        "context_update": {
+          "id": "district-finance",
+          "revision": "v2",
+          "purpose": "Complete the assigned November 9 funding review for rfp-26.",
+          "assigned_review": true
+        }
+      }
+    },
+    {
+      "id": "s09",
+      "available_at": "2026-11-09T09:00:00Z",
+      "occurred_at": "2026-11-06T15:00:00Z",
+      "subject_id": "policy-26",
+      "input_kind": "source",
+      "input": {
+        "synthetic": true,
+        "text": "Corrected minutes retract the reported recommendation and state that the item was deferred. No later final act is available.",
+        "source_id": "committee-minutes:2",
+        "source_scope": "synthetic:kansas",
+        "tags": [
+          "recommendation_retracted"
+        ],
+        "topics": [],
+        "facts": {
+          "biometrics": true,
+          "interoperability": true,
+          "funding": "unknown",
+          "policy_stage": "deferred"
+        },
+        "correction_of": [
+          "committee-minutes:1"
+        ]
+      }
+    },
+    {
+      "id": "s10",
+      "available_at": "2026-11-10T09:00:00Z",
+      "occurred_at": null,
+      "subject_id": "rfp-26",
+      "input_kind": "source",
+      "input": {
+        "synthetic": true,
+        "text": "An unrelated school district outside all four territories uses the same RFP number and mentions Google cloud services.",
+        "source_id": "other-place-rfp:1",
+        "source_scope": "synthetic:other-state",
+        "tags": [
+          "solicitation"
+        ],
+        "topics": [],
+        "facts": {
+          "biometrics": false,
+          "closing": "2026-11-20T17:00:00Z",
+          "funding": "unknown",
+          "procurement_stage": "solicitation"
+        }
+      }
+    },
+    {
+      "id": "s11",
+      "available_at": "2026-11-11T09:00:00Z",
+      "occurred_at": null,
+      "subject_id": "rfp-26",
+      "input_kind": "unavailable_evidence",
+      "input": {
+        "synthetic": true,
+        "text": "The requested funding record is unavailable. In separate proposed variants, JEV times out or the optional LLM writer fails.",
+        "source_id": "funding-record:unavailable",
+        "source_scope": "synthetic:kansas",
+        "tags": [],
+        "topics": [],
+        "facts": {
+          "biometrics": false,
+          "closing": "2026-11-20T17:00:00Z",
+          "funding": "unknown",
+          "procurement_stage": "solicitation"
+        },
+        "gap": "funding_record_unavailable"
+      }
+    },
+    {
+      "id": "s12",
+      "available_at": "2026-11-12T09:00:00Z",
+      "occurred_at": "2026-11-12T08:00:00Z",
+      "subject_id": "rfp-26",
+      "input_kind": "source",
+      "input": {
+        "synthetic": true,
+        "text": "The issuer cancels rfp-26 before its closing date. The separate policy proposal remains deferred.",
+        "source_id": "cancellation:1",
+        "source_scope": "synthetic:kansas",
+        "tags": [
+          "cancellation",
+          "cost_exposure"
+        ],
+        "topics": [],
+        "facts": {
+          "biometrics": false,
+          "closing": null,
+          "funding": "unknown",
+          "procurement_stage": "cancelled"
+        },
+        "withdraws": [
+          "solicitation:2"
+        ]
+      }
+    }
+  ]
+}

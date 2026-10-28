@@ -1,12 +1,11 @@
 # Evaluation and release evidence
 
-Status: evaluation contract covering MAT-036 through MAT-045. MAT-036 supplies
-the [frozen corpus interface](evaluation-corpus.md) and synthetic episode
-fixtures. The grouped splits, evaluator harness, provider trials, qualification
-and release evidence in MAT-037 through MAT-045 remain planned. Examples and
-synthetic fixtures demonstrate contracts; they do not establish provider
-accuracy, live usefulness, or production readiness. Results must identify which
-mode actually ran and which gates remain unrun.
+Status: MAT-036 supplies frozen corpora. MAT-037 grouped splits/paired arms,
+MAT-038 offline execution and MAT-039 optional provider-shadow execution are
+merged in PR #20; validation/review closeout is recorded
+in [the current receipt](validation/civic-evaluation-roadmap.md). Qualification
+and later release evidence remain separate. Synthetic labels do not establish
+provider accuracy, live usefulness or production readiness.
 
 ## Questions the evaluation must answer
 
@@ -124,3 +123,145 @@ These are proposed cases, not executed tests or new qualification results.
 Provider quality, interface conformance, and application usefulness remain
 separate outcomes. Existing host authority, control/currentness, provenance,
 and release gates apply to every new comparison.
+
+## Executable evaluation ports
+
+`evaluation.splits.make_splits` groups whole episodes using source revisions,
+byte-identical copies, observations, occurrences and inherited provenance. New
+manifest revisions retain `ever_tuning` and explicit exposure history. Reseeding
+never converts previously assigned tuning material into untouched held-out data.
+The host retains the immutable revision chain; a fresh chain starts at revision
+one. Declared human label provenance does not prove that actual adjudication
+occurred. Empty partitions and synthetic starter labels cannot qualify a method.
+
+`evaluation.arms.ArmManifest` freezes every eligible case and its cut, packet
+profile and digest. Principal A/B comparisons require exact equality of these
+inputs and the deterministic policy; different retrieval requires an explicit
+separate experiment on both arms.
+
+`evaluation.offline.run_offline` runs exact digest-keyed `FixtureExecutor` bytes,
+keeps all scheduled terminal outcomes, and calls the host's existing admission
+and complete-episode replay ports. The configured admission callback is trusted
+host code: the runner does not manufacture certificates or infer stale source
+state from model text. The tests declare a synthetic admission/fault matrix,
+separately run actual SQLite core episodes for both arms, and reject all-silent
+fixture responses on the case requiring a contribution. No unqualified learned
+result is published by these tests. Existing receipt/qualification service checks
+remain the evidence for actual source-currentness/certificate refusal.
+
+`evaluation.provider.provider_preflight` performs no requests or artifact writes.
+`run_provider(..., live=True)` additionally requires a matching passed offline
+schedule, explicit TypeSafe model/scope/credential source, destination, call/time
+and conservative cost limits. It reuses the existing adapter. Execution context
+metadata changes for the live attempt; frozen state and rendered questions do
+not. This paired lane accepts synthetic corpus artifacts only. For exploratory
+public/cleared evidence, `run_guarded_diagnostic` shares its bounded execution
+and artifact accounting while requiring exact `GuardedProviderCase` bindings
+to the existing MAT-072 access service, original context, detached view and
+guarded rendered questions. It dispatches through `AccessService.dispatch`,
+including fresh pre/post-I/O checks; it cannot use a permission boolean callback.
+It does not fabricate offline, paired-arm or held-out evidence. The example
+`examples/guarded_evidence_diagnostic.py` keeps real corpus bytes/results in an
+explicit external directory; no real delivery or qualification is enabled. No credential value is written to the run manifest.
+
+Provider artifacts retain starts before dispatch, native/neutral result bytes,
+requested/resolved model, usage, faults, per-attempt cost reservations and unknown
+billing. Reservations use the configured price basis and per-request context
+ceiling; estimates are not invoices. One worker and zero automatic retries keep
+the execution bounded. A missing terminal record remains outcome-unknown on
+resume; it is never automatically reissued. Cached responses are labeled replay,
+and repeated calls share their episode/provenance independence unit. Neither
+successful calls nor a completed shadow runner qualify any question family.
+
+Guarded dispatch refusals preserve the whole attempted prefix and reservations.
+Known pre-I/O refusal is definite non-dispatch; a response withheld after observed
+I/O is an incomplete outcome, even though the request is counted as observed.
+A revoked resume returns source-free ledger accounting only, including earlier
+attempts; it releases no response bodies or source/job identifiers and cannot
+renew controls or dispatch. Previously completed responses in that prefix are
+also withheld from the refusal report.
+
+## Calibration implementation and empirical boundary
+
+MAT-040's `CalibrationPlan` freezes an exact method identity, corpus/split,
+positive and negative outcomes, candidate regions, targets, independent support,
+confidence, coverage and provider-failure limits before fitting. No release
+numbers are supplied as universal defaults. `partition_corpus(..., 'tuning')`
+strips other partitions' episodes and labels before `fit_thresholds` receives
+anything. Fitting retains every tried configuration and returns `insufficient`
+when no predeclared candidate passes. `TrialObservation` binds typed batch/result
+and rendered-question identities; missing, failed, mismatched or unavailable
+trials remain in the measured denominators.
+
+`evaluate_thresholds` consumes only an unexposed qualification partition. It
+reports per-class errors, accepted coverage, abstention, failures, and support
+collapsed by connected episode/source provenance. Its conservative one-sided
+Clopper–Pearson lower bound follows binomial-test inversion in
+[NIST TN 2119, section 4.1](https://nvlpubs.nist.gov/nistpubs/TechnicalNotes/NIST.TN.2119.pdf).
+A group is correct only when all its accepted cases are correct. Bonferroni
+adjusts enabled decision polarities. This is a bound on group-level correctness,
+not a per-message accuracy interval; representative independent groups remain
+an empirical assumption. Exact Decimal arithmetic uses 80-digit inversion and
+rounds the lower bound downward. Numerical conformance is tested against the
+published 17/20 example. No external statistical package or Jevcal code is copied.
+
+The report returns `next_split` with exposure history. The host must retain that
+immutable history before another experiment; reusing an old snapshot cannot
+establish untouched held-out status. The code does not invent label provenance,
+representative sampling or operator approval of targets.
+
+`certificate_from_review` constructs an existing MAT-031 certificate candidate
+only after a passing independent-label report has an exact admitted host-origin
+evaluation review receipt and retained artifact pins. It neither writes a review
+receipt nor installs the candidate. Installation, applicability and revocation
+continue through the existing qualification service. Failed or insufficient
+measurements cannot be turned into a certificate by the fitter.
+
+The new [public-source pack and checks](validation/civic-followthrough.md) are
+exploratory and exposed. Their 120 recorded question observations return
+insufficient support with no independent labels. Synthetic software tests of a
+passing report are explicitly fixtures; MAT-040 empirical qualification remains
+blocked on independently reviewed held-out episodes and approved targets.
+
+The [MAT-040 label/target handoff](qualification/MAT-040-label-target-handoff.md)
+now supplies source-cited teacher drafts, a separate blank human worksheet,
+metadata-only fresh-cohort recruitment candidates, and capture-only pilot
+targets subsequently [approved by the operator](qualification/MAT-040-target-approval.json).
+The agent's [executed study](validation/MAT-040-approved-study.md) records fresh
+source screening, 84 model-origin judgments and explicit calibration refusal.
+Existing exposed cases remain development data after human review. Approval and
+testing-team assignment do not make model labels human-reviewed or supply
+independent support; no qualification follows from preparation or assignment.
+
+## Controlled question sensitivity
+
+MAT-041's `prepare_sensitivity` renders the entire frozen packet before returning
+a thirteen-request schedule: two identical bundled baselines, four option/label
+controls, and seven separately asked heads. Option mappings follow definitions
+back to original outcomes. Topic, continuing matter and occurrence questions
+remain distinct; complementary and equivalent propositions are compared both
+bundled and separate. Host reference labels never enter the rendered state.
+
+`sensitivity_report` consumes bound typed observations and retains missing,
+failed and method-mismatched heads. It compares deviations with the observed
+repeat envelope and an explicitly declared diagnostic tolerance, including the
+Choice outcome probability versus its corresponding proposition. It reports
+affected exact specification revisions and reference origins. Two repeats do
+not estimate population variability; consistency cannot establish correctness,
+joint probability, admission or a qualification certificate.
+Order/label variants compare against the single-Choice control, keeping their
+question context matched. Their noise allowance comes from the two bundled
+repeats; singleton repeat variability is not separately measured by this small
+schedule and the report states that limitation.
+
+The checkout exercise `python examples/question_sensitivity.py --model jev-1.14.0
+--output /absolute/new/run` defaults to a synthetic offline oracle and runs both
+arms through the existing core replay. `--live --env /absolute/credential/file`
+explicitly selects the existing provider runner and requires an external artifact
+directory. The bounded example uses thirteen calls, no retries, a thirty-second
+per-call timeout, a ten-minute wall limit and a $0.04 reservation ceiling. Review
+its dated price basis before another live use. Live receipts retain native and
+neutral responses; `analyze_recorded` can rebuild analysis without another call.
+All probe judgments remain unqualified and delivery remains capture-only.
+Recorded exploratory findings and software checks are in
+[the sensitivity receipt](validation/sensitivity-followthrough.md).

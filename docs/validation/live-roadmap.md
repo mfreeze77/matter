@@ -287,3 +287,41 @@ private evidence or empirical qualification occurred. StateCivics profiles and
 receiving integration, MAT-039/040 evaluation, PostgreSQL and cross-repository work
 remain outside this completed slice. MAT-022 and the MAT-023 → 024 → 025 chain
 retain their canonical scope and prerequisites.
+
+## MAT-033/034 shadow question families
+
+Implementation and synthetic acceptance are complete in
+[PR #19](https://github.com/mfreeze77/matter/pull/19).
+
+The [family guide](../semantic-families.md) and
+[validation receipt](MAT-033-034.md) track 15 versioned association, independent
+claim/evidence, explicit change-cause, matching recovery and audience-contribution
+questions. They reuse the existing registry, prepared packets, executor, budgets,
+receipts and host lifecycle/attention services. A bounded context transform adds
+exact as-of host definitions and authority dependencies; a diagnostic projection
+preserves unknown qualification and grants no action authority.
+
+Final checks passed 186 semantic and 17 access methods, plus 56 selected installed
+methods including all 17 family cases. The final four-file delta review completed
+two passes with zero findings or warnings. Preparation 1.1 pins nested reference
+metadata at the original cut, preserves unknown-source coverage, and keeps later
+matter edits out of rebuilt historical packets. The receipt separately records
+the pre-fix full run's macOS temporary-path failure and its successful targeted
+rerun; no clean full final-source run is claimed. Reused PR18 context inputs remain authored
+synthetic fixtures. They do not establish a StateCivics runtime connection or
+observed JEV usefulness. Current source-head tracking must be explicitly declared
+by the host/profile so a correction invalidates queued advice; this reuses the
+existing dependency machinery and belongs in MAT-046's integration contract.
+
+The installed walkthrough-schema lookup still fails separately. No new live
+provider call, qualification, real alert, native delivery adapter or receiving
+application change is part of these shadow families.
+
+## Installed-schema follow-through, 2026-10-28
+
+The separate walkthrough default-schema failure reported above is now repaired
+and directly verified with the built wheel under isolated Python outside the
+checkout, without a schema directory. See the [follow-through receipt](civic-followthrough.md)
+for the exact package inventory, checks and remaining broader MAT-077 scope.
+Earlier failure receipts remain historical evidence; checkout passes were not
+used as a substitute for this installed verification.

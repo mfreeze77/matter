@@ -4,7 +4,7 @@
   "track": "jev",
   "phase": 3,
   "priority": "P1",
-  "status": "planned",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "semantic/families/evidence",
@@ -58,7 +58,10 @@
   "artifacts": [
     "src/matter/semantic/families/evidence.py",
     "tests/semantic/test_evidence_families.py",
-    "tests/fixtures/semantic/evidence_families.json"
+    "tests/fixtures/semantic/evidence_families.json",
+    "src/matter/semantic/families/__init__.py",
+    "docs/semantic-families.md",
+    "docs/validation/MAT-033-034.md"
   ],
   "tests": [
     "Two notices at one location have different project identifiers.",
@@ -76,12 +79,17 @@
     }
   ],
   "sources": [
-    "matterjevmesh §3",
+    "matterjevmesh \u00a73",
     "https://github.com/libingzheren/Jev-Mem/blob/7ab0c73c6d8f4f611ad252c1e6ba8083f8df0e44/memory/jev_questions.py",
-    "jevinmatter — procedural evidence is a soft contextual example"
+    "jevinmatter \u2014 procedural evidence is a soft contextual example"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "2026-10-27: Fixed association choices and independent topic/matter/occurrence and claim-evidence heads preserve source lineage and cannot accept identity or action proposals. Scope, source identities, failed probes and acceptance evidence: docs/validation/MAT-033-034.md.",
+      "Final affected checks: 186 semantic tests and 17 access tests passed; 56 installed checks passed, including all 17 family methods. All 177 packaged runtime/SQL/schema files match source and installation, with 98 schemas and all 78 package/modules importing from the wheel. Final four-file delta source review completed two passes with zero findings or warnings.",
+      "These are synthetic/offline conformance and actual core-service mechanism checks, with no new live provider call or empirical qualification. The installed walkthrough-schema lookup remains broken. The pre-reference full checkout run had one macOS temporary-path assertion failure, whose exact targeted rerun passed; no clean full final-source run is claimed.",
+      "Tracked in PR #19 (https://github.com/mfreeze77/matter/pull/19). Final tested runtime is 95542ff; implementation source review, installed byte proof and separate packaging/full-run limits are recorded in docs/validation/MAT-033-034.md."
+    ]
   }
 }

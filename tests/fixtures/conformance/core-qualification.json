@@ -1,0 +1,129 @@
+{
+  "schema_version": "matter.core-qualification-plan.v1",
+  "id": "neutral-core-20261028",
+  "requirements": {
+    "CORE-01": [
+      "contract.test_operation_contracts.OperationContractTests.test_fixture_inventory_covers_every_operation_and_success_outcome"
+    ],
+    "CORE-02": [
+      "integration.test_storage_crashes.StorageInterruptionTests.test_forced_exit_around_receipt_and_commit_boundaries_preserves_atomicity",
+      "integration.test_storage_crashes.StorageInterruptionTests.test_two_processes_cannot_commit_incompatible_changes_from_one_revision"
+    ],
+    "CORE-03": [
+      "integration.test_observation_revisions.ObservationRevisionTests.test_retry_and_redelivery_keep_original_result_after_supersession_without_payload_recheck"
+    ],
+    "CORE-04": [
+      "integration.test_matter_continuity.MatterContinuityTests.test_declared_subject_survives_new_process_run_proposal_and_later_evidence"
+    ],
+    "CORE-05": [
+      "integration.test_occurrence_grouping.OccurrenceGroupingTests.test_parented_and_evaluator_reports_cannot_be_assigned_an_independent_root_group"
+    ],
+    "CORE-06": [
+      "integration.test_claim_evidence.ClaimEvidenceIntegrationTests.test_contradictory_sources_and_withdrawn_relation_history_survive_restart"
+    ],
+    "CORE-07": [
+      "integration.test_association_acceptance.AssociationAcceptanceTests.test_high_confidence_semantic_proposal_cannot_override_protected_pair"
+    ],
+    "CORE-08": [
+      "integration.test_merge_corrections.MergeCorrectionTests.test_correction_protection_blocks_indirect_remerge_via_new_survivor"
+    ],
+    "CORE-09": [
+      "integration.test_absence_coverage.AbsenceCoverageTests.test_empty_complete_partial_failed_and_not_expected_are_distinct",
+      "integration.test_absence_coverage.AbsenceCoverageTests.test_unknown_relevant_arrival_stales_absence_without_claiming_positive_match"
+    ],
+    "CORE-10": [
+      "integration.test_control_bypass.ControlBypassTests.test_source_role_spoofing_is_data_and_creates_no_control",
+      "integration.test_rule_controls.RuleControlIntegrationTests.test_actual_stop_during_deterministic_binding_discards_semantic_output"
+    ],
+    "CORE-11": [
+      "unit.test_rule_boundaries.RuleBoundaryTests.test_missing_exact_recording_and_output_budget_have_no_conclusion"
+    ],
+    "CORE-12": [
+      "unit.test_profile_validation.ProfileTests.test_two_profiles_bind_same_matter_concurrently_without_mutation"
+    ],
+    "CORE-13": [
+      "unit.test_rule_dag.RuleDagTests.test_recovery_receives_validated_selected_candidate_revision"
+    ],
+    "CORE-14": [
+      "integration.test_assessment_commit.AssessmentCommitTests.test_real_evidence_acceptance_race_retains_noncurrent_attempt"
+    ],
+    "CORE-15": [
+      "integration.test_dependency_invalidation.DependencyCoverageTests.test_duplicate_intake_and_exact_retry_do_not_revision_or_repeat_invalidation",
+      "integration.test_dependency_invalidation.DependencyCoverageTests.test_freshness_token_refuses_stale_context_and_keeps_original_history"
+    ],
+    "CORE-16": [
+      "integration.test_lifecycle_episodes.LifecycleEpisodes.test_matching_recovery_is_automatic_and_current_is_registered",
+      "integration.test_lifecycle_episodes.LifecycleEpisodes.test_old_occurrence_redelivery_stays_resolved_but_new_happening_reopens",
+      "integration.test_lifecycle_episodes.LifecycleEpisodes.test_genuine_recurrence_after_routine_prior_occurrence_membership_revision"
+    ],
+    "CORE-17": [
+      "integration.test_audience_attention.AudienceAttentionTests.test_owned_next_step_is_quiet_for_human_and_hint_for_working_agent"
+    ],
+    "CORE-18": [
+      "integration.test_audience_attention.AudienceAttentionTests.test_delivered_baseline_survives_paraphrase_and_internal_reassessment_never_advances_it",
+      "integration.test_audience_attention.AudienceAttentionTests.test_ambiguous_evidence_is_quiet_not_a_human_request",
+      "integration.test_audience_attention.AudienceAttentionTests.test_uninformed_audience_single_critical_fact_and_explicit_reserved_decision"
+    ],
+    "CORE-19": [
+      "integration.test_timers_and_budgets.TimerBudgetTests.test_deadline_crossing_updates_actual_attention_without_semantic_invocation",
+      "integration.test_timers_and_budgets.TimerBudgetTests.test_concurrent_connections_cannot_exceed_one_shared_remaining_budget"
+    ],
+    "CORE-20": [
+      "integration.test_dispatch_races.DispatchRaces.test_queue_is_durable_and_exact_replay_makes_no_transport_call",
+      "integration.test_dispatch_races.DispatchRaces.test_cancellation_before_authorization_prevents_any_send_or_budget_commit",
+      "integration.test_delivery_unknown.DeliveryUnknown.test_crash_after_external_acceptance_before_local_receipt_never_reissues_send",
+      "integration.test_delivery_unknown.DeliveryUnknown.test_timeout_without_idempotency_or_lookup"
+    ],
+    "CORE-21": [
+      "integration.test_investigation_limits.InvestigationTests.test_counterevidence_requirement_cannot_be_displaced_by_agreeing_source",
+      "integration.test_investigation_limits.InvestigationTests.test_renewed_budget_or_token_cannot_reset_unchanged_gap",
+      "integration.test_investigation_limits.InvestigationTests.test_manual_stop_or_empty_finish_cannot_forge_satisfied_evidence"
+    ],
+    "CORE-22": [
+      "integration.test_explanation_queries.ExplanationQueriesTests.test_quiet_reasons_retain_delivered_vs_inadequate_evidence"
+    ],
+    "CORE-23": [
+      "qualification.test_chronological_replay.ChronologicalReplayTests.test_fresh_stores_reproduce_frames_without_extra_delivery_records",
+      "qualification.test_chronological_replay.ChronologicalReplayTests.test_second_domain_uses_different_declared_edges_on_same_operations"
+    ],
+    "CORE-24": [
+      "qualification.test_core_report.CoreReportTests.test_missing_skipped_failed_or_unrun_evidence_cannot_pass",
+      "qualification.test_core_report.CoreReportTests.test_report_keeps_unrun_gates_and_refuses_changed_manifest",
+      "qualification.test_core_report.CoreReportTests.test_fixture_errors_are_recorded_and_cannot_leave_a_passing_report"
+    ]
+  },
+  "acceptance": {
+    "AC-1": [
+      "unit.test_profile_validation.ProfileTests.test_two_profiles_bind_same_matter_concurrently_without_mutation",
+      "qualification.test_chronological_replay.ChronologicalReplayTests.test_fresh_stores_reproduce_frames_without_extra_delivery_records",
+      "qualification.test_chronological_replay.ChronologicalReplayTests.test_second_domain_uses_different_declared_edges_on_same_operations"
+    ],
+    "AC-2": [
+      "integration.test_storage_crashes.StorageInterruptionTests.test_forced_exit_around_receipt_and_commit_boundaries_preserves_atomicity",
+      "integration.test_storage_crashes.StorageInterruptionTests.test_two_processes_cannot_commit_incompatible_changes_from_one_revision",
+      "integration.test_assessment_commit.AssessmentCommitTests.test_real_evidence_acceptance_race_retains_noncurrent_attempt",
+      "integration.test_dispatch_races.DispatchRaces.test_queue_is_durable_and_exact_replay_makes_no_transport_call",
+      "integration.test_dispatch_races.DispatchRaces.test_cancellation_before_authorization_prevents_any_send_or_budget_commit",
+      "integration.test_delivery_unknown.DeliveryUnknown.test_crash_after_external_acceptance_before_local_receipt_never_reissues_send",
+      "integration.test_delivery_unknown.DeliveryUnknown.test_timeout_without_idempotency_or_lookup"
+    ],
+    "AC-3": [
+      "qualification.test_core_report.CoreReportTests.test_missing_skipped_failed_or_unrun_evidence_cannot_pass",
+      "qualification.test_core_report.CoreReportTests.test_report_keeps_unrun_gates_and_refuses_changed_manifest",
+      "qualification.test_core_report.CoreReportTests.test_fixture_errors_are_recorded_and_cannot_leave_a_passing_report"
+    ],
+    "AC-4": [
+      "integration.test_dependency_invalidation.DependencyCoverageTests.test_duplicate_intake_and_exact_retry_do_not_revision_or_repeat_invalidation",
+      "integration.test_lifecycle_episodes.LifecycleEpisodes.test_matching_recovery_is_automatic_and_current_is_registered",
+      "integration.test_audience_attention.AudienceAttentionTests.test_delivered_baseline_survives_paraphrase_and_internal_reassessment_never_advances_it",
+      "integration.test_timers_and_budgets.TimerBudgetTests.test_deadline_crossing_updates_actual_attention_without_semantic_invocation"
+    ]
+  },
+  "limits": [
+    "Synthetic conformance of selected shared invariants, not all possible faults.",
+    "Process interruption, not physical power loss.",
+    "SQLite DELETE journal, synchronous EXTRA, foreign_keys ON; other backends/modes unrun.",
+    "Existing authored assertions are the expected outcomes; hashes freeze their source and fixture inputs.",
+    "No provider calls, domain qualification, real delivery or usefulness acceptance."
+  ]
+}

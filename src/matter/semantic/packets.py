@@ -13,7 +13,7 @@ from ..canonical import canonical_bytes, canonical_digest, source_digest
 from ..citations import verify_locator_validation
 from ..contracts import ContractError, validate_record
 from ..provenance_groups import resolve_groups
-from ..storage import StorageError, pin
+from ..storage import PROJECTION_TYPE, StorageError, pin
 from ..time import compare_times, knowledge_eligible
 
 
@@ -30,8 +30,10 @@ def preparation_reference():
                   "selection": "mandatory-first-canonical-pin", "availability": "inclusive-known-cut",
                   "text": "exact-whole-utf8-or-validated-quotation", "overflow": "whole-source-omission",
                   "lineage": "existing-resolve-groups-with-receipt-cut", "audit": "separate-from-model-state",
-                  "mechanical": "exact-times-counts-and-identifier-equality"}
-    return descriptor("matter", "semantic-packet-preparation", "1.0", definition,
+                  "mechanical": "exact-times-counts-and-identifier-equality",
+                  "claim_references": "exact-committed-metadata-at-cut-content-eligibility-separate",
+                  "reference_history": "bounded-128-revisions"}
+    return descriptor("matter", "semantic-packet-preparation", "1.1", definition,
                       "matter.semantic.packet-preparation.v1")
 
 
@@ -124,13 +126,79 @@ class _Reads:
 
 
 def _known_record(reads, reference, boundary):
-    record = validate_record(reads.get(reference))
+    record = reads.get(reference)
+    if record['record_type'] == PROJECTION_TYPE:
+        receipt = validate_record(reads.receipt_for(reference))
+        return record, knowledge_eligible(receipt['provenance']['recorded_at'], boundary)
+    record = validate_record(record)
     if record["record_type"] == "observation":
         return record, knowledge_eligible(record["body"]["available_at"], boundary)
     if knowledge_eligible(record["provenance"]["recorded_at"], boundary) is not True:
         return record, False
     receipt = validate_record(reads.receipt_for(reference))
     return record, knowledge_eligible(receipt["provenance"]["recorded_at"], boundary)
+
+
+def _pin_references(reads, value, boundary):
+    """Freeze visible references, not new source content, through the existing view.
+
+    A selected claim/context view must satisfy the receipt/access scanners: all
+    visible references are exact, committed at the cut and present in dependencies.
+    Knowing a reference is not permission to select its unavailable source text.
+    The immutable original records remain available through their original pins.
+    """
+    count, resolved = 0, {}
+
+    def committed(collector, reference):
+        record = collector.get(reference)
+        receipt = collector.receipt_for(reference)
+        return record, knowledge_eligible(receipt['provenance']['recorded_at'], boundary) is True
+
+    def at_cut(reference):
+        head = reads.view.get(reference)
+        exact = pin(head)
+        probe = _Reads(reads.view, reads.scope)
+        if committed(probe, exact)[1]:
+            return exact
+        # Storage revisions are contiguous. Use its existing historical get,
+        # bounded without loading an entire history. An access view keeps its
+        # own currentness/permission refusal; never unwrap it to bypass that.
+        revision = head.get('revision', 1)
+        for prior in range(revision - 1, max(0, revision - MAX_CANDIDATES), -1):
+            exact = {**reference, 'revision': prior}
+            if committed(probe, exact)[1]:
+                return exact
+        if revision > MAX_CANDIDATES:
+            _fail('Reference history exceeds the bounded scan.', 'E_BUDGET_EXHAUSTED')
+        _fail('The referenced identity did not exist at the cut.', 'E_EVIDENCE_UNAVAILABLE')
+
+    def walk(item, depth=0):
+        nonlocal count
+        if depth > 64:
+            _fail(code='E_BUDGET_EXHAUSTED')
+        if type(item) is dict:
+            if {'scope_id', 'namespace', 'record_type', 'id'} <= set(item):
+                count += 1
+                if count > 16384:
+                    _fail(code='E_BUDGET_EXHAUSTED')
+                key = canonical_bytes(item)
+                if key in resolved:
+                    return dict(resolved[key])
+                exact = fragment(item, 'pinned_ref' if 'revision' in item or 'digest' in item else 'entity_ref')
+                if exact['scope_id'] != reads.scope:
+                    _fail(code='E_SCOPE_FORBIDDEN')
+                if 'revision' not in exact and 'digest' not in exact:
+                    exact = at_cut(exact)
+                pinned_key = canonical_bytes(exact)
+                if pinned_key not in resolved and not committed(reads, exact)[1]:
+                    _fail('Reference metadata was not committed at the original cut.', 'E_EVIDENCE_UNAVAILABLE')
+                resolved[key] = resolved[pinned_key] = exact
+                return dict(exact)
+            return {key: walk(child, depth + 1) for key, child in item.items()}
+        if type(item) is list:
+            return [walk(child, depth + 1) for child in item]
+        return deepcopy(item)
+    return walk(value)
 
 
 def _binding(reads, value, boundary):
@@ -142,7 +210,8 @@ def _binding(reads, value, boundary):
         record, known = _known_record(reads, reference, boundary)
         if known is not True:
             _fail("The bound claim was unavailable at the knowledge cut.", "E_EVIDENCE_UNAVAILABLE")
-        return {"kind": "claim", "claim": reference, "proposition": deepcopy(record["body"])}
+        return {"kind": "claim", "claim": reference,
+                "proposition": _pin_references(reads, record['body'], boundary)}
     if value.get("kind") == "candidate_relation":
         data = checked(value, required=("kind", "left", "right", "relation"))
         fragment(data["relation"], "namespaced_name")
