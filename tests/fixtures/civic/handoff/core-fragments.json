@@ -1,0 +1,19 @@
+[
+  "component_ref",
+  "domain_value",
+  "entity_ref",
+  "identifier",
+  "known_time",
+  "locator",
+  "namespace",
+  "namespaced_name",
+  "pinned_ref",
+  "quiet_reason",
+  "receipt_ref",
+  "reference_kind",
+  "revision",
+  "sha256",
+  "text",
+  "time_value",
+  "unknown_time"
+]
