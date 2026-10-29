@@ -44,6 +44,11 @@ change source authority, activate an objective or authorize delivery.
 The contract should be callable within the existing host; no new service, queue,
 client directory, source ledger or dashboard-specific common-core vocabulary.
 Cross-service Workbench data stays behind its existing authorized API boundary.
+A broad objective is not itself a civic matter. D1 must specify how its versioned
+context template binds to an actual authorized candidate subject at dispatch,
+without manufacturing a civic identity. New records/subjects that did not exist
+when the objective was activated must remain discoverable through existing event
+and candidate-scope watches; an exact-follow-only implementation is insufficient.
 
 ### Input groups to specify
 
@@ -190,11 +195,15 @@ before code relying on it begins; unresolved choices do not become silent defaul
 ## Ownership and implementation order
 
 1. MAT-081 specifies the boundary and frozen compatibility/negative examples.
+   KS-1122 may contribute design review before its implementation dependencies
+   clear; MAT-081 does not wait for KS-1122 implementation to complete.
    KS-1122 records the host scope/default/permission mapping against it and closes
    the relevant KS-701 acceptance. A proposed boundary is not an implemented API.
 2. After contract agreement, MAT-082 implements the bounded Matter adapter while
    StateCivics KS-1123 adds the minimal saved-objective/review/activation controls.
    This describes dependency readiness, not authorization for parallel execution.
+   MAT-082 completes on bounded synthetic adapter conformance; KS-1126 later owns
+   the actual saved-objective receiving proof and is not its completion gate.
 3. KS-1124 connects approved intent/evidence to that adapter and the existing
    capture sink, with current authorization, exact retry and stale-result guards.
 4. KS-1125 connects reasons/feedback and scoped edit/disposition effects.
@@ -252,3 +261,19 @@ KS-1124 (dispatcher), KS-1125 (explanations/feedback), KS-1126 (two-objective
 rehearsal), KS-1127 (incoming-live capture). All newly planned; none implemented
 or qualified by this document. StateCivics' local plan carries its exact paths and
 local dependency edges; this is the proposed shared boundary's single owner.
+
+
+## Planning verification (not runtime acceptance)
+
+Canonical ticket generation/check and repository validation passed with 82
+tickets, 104 requirements, 106 existing runtime schemas and three walkthroughs.
+New MAT-081/082 remain planned/not_run. Cross-side planning checks found an
+acyclic new-ticket graph, existing source/local-doc paths, unique index rows and
+named external MAT-081/082 dependencies for each StateCivics consumer.
+StateCivics' existing Docker ticket metadata/contiguity check passed once at
+`2069223eb`; this is metadata evidence, not execution of the new acceptance cases.
+The two-pass JSON ticket review found an adapter-versus-host completion-gate
+ambiguity; corrected MAT-082 to synthetic component conformance, with actual
+saved-objective acceptance remaining KS-1126-owned. Markdown was inspected as
+planning content; it is excluded by the default code-review rules. No runtime
+source file, provider call, production dataset or deployment was changed.
