@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "ticket_count": 80,
+  "ticket_count": 82,
   "counts_by_track": {
-    "civic": 5,
+    "civic": 7,
     "core": 17,
     "diat": 15,
     "evaluation": 10,
@@ -16,7 +16,7 @@
     "blocked": 1,
     "done": 41,
     "in_progress": 2,
-    "planned": 36
+    "planned": 38
   },
   "tickets": [
     {
@@ -1964,6 +1964,69 @@
       ],
       "readiness": "waiting",
       "path": "records/MAT-080.json"
+    },
+    {
+      "id": "MAT-081",
+      "title": "Specify the versioned dashboard intent, evidence and decision handoff",
+      "track": "civic",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-018",
+        "MAT-023",
+        "MAT-028",
+        "MAT-072"
+      ],
+      "requirements": [
+        "CORE-17",
+        "CORE-22",
+        "CIV-01",
+        "CIV-05",
+        "CIV-06",
+        "CIV-07",
+        "CIV-09",
+        "OPS-01"
+      ],
+      "readiness": "ready",
+      "path": "records/MAT-081.json"
+    },
+    {
+      "id": "MAT-082",
+      "title": "Adapt approved monitoring objectives to bounded Matter audience decisions",
+      "track": "civic",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-081",
+        "MAT-015",
+        "MAT-016",
+        "MAT-018",
+        "MAT-019",
+        "MAT-021",
+        "MAT-023",
+        "MAT-024",
+        "MAT-028",
+        "MAT-031",
+        "MAT-032",
+        "MAT-072"
+      ],
+      "requirements": [
+        "CORE-17",
+        "CORE-18",
+        "CORE-22",
+        "CIV-01",
+        "CIV-05",
+        "CIV-06",
+        "CIV-07",
+        "CIV-09",
+        "OPS-01"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-082.json"
     }
   ]
 }
