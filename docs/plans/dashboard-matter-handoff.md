@@ -277,3 +277,15 @@ ambiguity; corrected MAT-082 to synthetic component conformance, with actual
 saved-objective acceptance remaining KS-1126-owned. Markdown was inspected as
 planning content; it is excluded by the default code-review rules. No runtime
 source file, provider call, production dataset or deployment was changed.
+
+Final review delta: the corrected MAT-082 canonical record received two passes,
+zero findings and zero coverage warnings. The initial four-JSON-record review
+also had no coverage warnings. Markdown planning content was manually checked
+against the paired StateCivics tickets and current code; it was not represented
+as code-review coverage. StateCivics tickets are committed locally on
+`plan/dashboard-matter-handoff` (`7c61e7b89` at the planning closeout), based on the
+existing KS-1121 work/current main. Matter's plan is stacked on the existing
+`feat/civic-source-adapter` branch so the new plan does not silently merge that
+implementation or alter main. Ticket IDs KS-1122–1127 and MAT-081/082 are reserved
+by these committed records; inspect branches as well as main before allocating
+further IDs.
