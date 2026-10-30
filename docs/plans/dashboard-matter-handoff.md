@@ -28,7 +28,8 @@ broad dashboard redesign and the later custom alert writer are outside this plan
   owns broader JEV/local suggestions and place choice; KS-1071 owns client-board
   local-record usability. This work does not redo or close those whole tickets.
 - KS-1118 is on StateCivics main. KS-1121 public-source rehearsal code is on
-  the backed-up planning branch, not main (the main ticket status is inaccurate); Matter PR #26 is open. These are tested foundations, not a
+  the backed-up planning branch, not main; `e2dcb04cc` corrected its main ticket
+  status to blocked. Matter PR #26 is open. These are tested foundations, not a
   connection to real saved dashboard configuration or production alert readiness.
   The five-call public study found underconfident stance/positive relevance;
   retained limitations remain in `docs/validation/civic-source-integration.md`.
@@ -199,9 +200,12 @@ before code relying on it begins; unresolved choices do not become silent defaul
 Dependency clarification, 2026-10-29: MAT-082 follows MAT-081 freeze and
 uses PR #26 civic_exports/civic_attention after merge or by stacking. Only
 KS-1124/1126 directly require the KS-1121 study code, after #26 and a rebuilt SDK
-image. KS-1122 does not wait for that code. Main's wrong KS-1121 status and missing
-StateCivics plan links are host-owned record corrections, not evidence of shipped
-features; Matter does not edit that checkout in this slice.
+image. KS-1122 does not wait for that code. StateCivics `e2dcb04cc`, verified
+on main through `8955f16d8`, corrected KS-1121's status and dependencies and
+restored `docs/plans/dashboard-matter-integration.md`. KS-701 remains in_review
+and gates KS-1122 acceptance, not this contract design. Those record corrections
+do not supply the missing host runtime capabilities. Matter has not edited that
+checkout in this slice.
 
 Both sides keep their own store/schema/authorization owners. Cross-repo gates
 are named explicitly in tickets; they are not encoded as pretend local ticket IDs

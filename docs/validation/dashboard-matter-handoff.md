@@ -119,3 +119,29 @@ are the retained reviewable artifacts in Git.
 
 No runtime source, host checkout, provider configuration or deployment changed.
 MAT-081 remains in progress and unfrozen; the PR is a candidate review handoff.
+
+## StateCivics record correction verified
+
+Read-only follow-up confirmed `e2dcb04cc` is an ancestor of StateCivics main
+`8955f16d8`. KS-1121 is blocked; KS-1122's dependency is KS-701; KS-1124 and
+KS-1126 directly include KS-1121; the referenced integration plan exists again.
+KS-701 remains in_review and gates KS-1122 acceptance, not MAT-081 design.
+A path-limited diff from `e349713e6` through that inspected main returned no
+changes in the six host intent/schema/router/watchlist/planner files on which
+the candidate is based. The original pending-record-correction note above is
+historical and now resolved. These documentation corrections do not merge
+KS-1121 implementation, rebuild an SDK image or configure the live host seam.
+
+The host reports the rehearsal stack is free; it was not started or changed by
+this read-only verification/documentation follow-up. Capture-target selection
+remains awaiting the owner's answer. No freeze, MAT-082 execution or production
+committee repair is claimed. This follow-up changes only Matter Markdown notes;
+its local rendering/validation checks are recorded with the commit/PR update.
+
+Follow-up checks: `.venv/bin/python -m matter render --check` and
+`.venv/bin/python -m matter validate` passed (82 tickets, 104 requirements,
+106 runtime schemas, three walkthroughs). `git diff --check` passed. Review
+selection contained zero eligible files because all three changes are Markdown;
+the diff was manually checked against the cited host records, not represented
+as an independent code review. Runtime tests were not repeated for this factual
+Markdown-only update.

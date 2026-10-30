@@ -83,9 +83,13 @@ The following are **StateCivics work still to build**, not main capabilities:
 Matter PR #26 supplies `civic_exports`/`civic_attention`; merge it first or stack
 MAT-082 on it. MAT-081 can be specified now. Only KS-1124 and KS-1126 directly
 need KS-1121's rehearsal code, after #26 and the rebuilt Matter SDK image.
-KS-1122 design/scope work does not wait for that study code. Incorrect ticket
-status or missing host plan links require host-owned record correction; this
-spec does not claim those corrections or a merge occurred.
+KS-1122 design/scope work does not wait for that study code. StateCivics commit
+`e2dcb04cc` is now on main: KS-1121 is marked blocked,
+KS-1122 no longer waits on it, KS-1124/1126 do, and the cited plan is restored.
+These are record corrections, not a merge of KS-1121 runtime code. KS-701 remains
+`in_review` and must close before KS-1122 acceptance; it does not block MAT-081
+contract design. The relevant host code is unchanged from `e349713e6` through
+inspected main `8955f16d8`.
 
 ## Boundary and encoding
 
