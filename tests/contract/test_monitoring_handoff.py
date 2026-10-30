@@ -37,6 +37,7 @@ class MonitoringHandoffContractTests(unittest.TestCase):
         )
 
     def test_portable_core_fragments_match_governing_schema(self):
+        self.assertEqual(self.schema, read(ROOT / "schemas/monitoring-handoff.schema.json"))
         core = read(ROOT / "schemas/core-record.schema.json")["$defs"]
         for name in read(FIXTURES / "core-fragments.json"):
             with self.subTest(fragment=name):
@@ -89,14 +90,14 @@ class MonitoringHandoffContractTests(unittest.TestCase):
         semantic = {case["id"] for case in self.manifest["cases"]
                     if case["category"] == "semantic_refusal_example"}
         self.assertEqual(semantic, {"unknown-outcome", "future-source", "foreign-client",
-                                    "stale-intent", "missing-host-controls"})
+                                    "stale-intent", "missing-host-controls", "foreign-jurisdiction"})
         for name in semantic:
             # These wire-valid examples need actual MAT-082/host runtime guards.
             self.validator.validate(read(FIXTURES / f"{name}-request.json"))
             self.assertEqual(read(FIXTURES / f"{name}-expected.json")["message_type"],
                              "monitoring_refusal")
         self.assertFalse(self.manifest["runtime_executed"])
-        self.assertEqual(self.manifest["status"], "candidate_not_frozen")
+        self.assertEqual(self.manifest["status"], "frozen_compatibility_examples")
 
     def test_contrasting_audiences_keep_shared_facts_and_separate_contexts(self):
         a, b = (read(FIXTURES / f"client-{name}-request.json") for name in ("a", "b"))
@@ -116,7 +117,8 @@ class MonitoringHandoffContractTests(unittest.TestCase):
         for field in ("id", "revision_id", "content_hash"):
             self.assertEqual(len({r["intent"][field] for r in requests}), len(requests))
         self.assertEqual(len({r["idempotency_key"] for r in requests}), len(requests))
-        # D1 does not yet decide whether two objectives share an owned target.
+        # D1 permits two objectives sharing an owned target; only cross-audience
+        # fixture targets are distinct here, not a mandatory one-item-per-intent policy.
         for field in ("watchlist_item_id", "user_activity_event_id"):
             self.assertEqual(len({r["capture_binding"][field] for r in (a, b, personal)}), 3)
         for component in ("audience", "responsibility"):
@@ -138,6 +140,15 @@ class MonitoringHandoffContractTests(unittest.TestCase):
                 for case in self.manifest["cases"]]
         self.assertEqual(len(keys), len(set(keys)))
 
+    def test_handled_feedback_is_scoped_outside_immutable_intent(self):
+        correction = read(FIXTURES / "correction-request.json")
+        handled = read(FIXTURES / "handled-correction-request.json")
+        self.assertEqual(handled["intent"], correction["intent"])
+        self.assertEqual(handled["context_components"], correction["context_components"])
+        self.assertTrue(handled["dispositions"])
+        self.assertNotIn("already_handled", handled["intent"]["responsibility"])
+        self.assertEqual(read(FIXTURES / "handled-correction-expected.json")["treatment"], "correction")
+
     def test_uncorrelatable_errors_do_not_echo_invalid_request_identifiers(self):
         refusal = read(FIXTURES / "uncorrelatable-refusal.json")
         self.validator.validate(refusal)
@@ -153,13 +164,14 @@ class MonitoringHandoffContractTests(unittest.TestCase):
         changed["evidence"]["sources"][0]["available_at"]["value"] = "2026-02-30T09:00:00Z"
         self.assertTrue(list(self.validator.iter_errors(changed)))
 
-    def test_candidate_inventory_pins_exact_fixture_and_schema_bytes(self):
-        inventory = read(FIXTURES / "candidate-lock.json")
+    def test_frozen_inventory_pins_exact_fixture_and_schema_bytes(self):
+        inventory = read(FIXTURES / "contract-lock.json")
         self.assertEqual(inventory["contract_version"], self.manifest["contract_version"])
-        self.assertEqual(inventory["status"], "candidate_not_frozen")
-        expected = {str(SCHEMA.relative_to(ROOT))} | {
+        self.assertEqual(inventory["status"], "frozen_compatibility_examples")
+        expected = {str(SCHEMA.relative_to(ROOT)), "schemas/monitoring-handoff.schema.json",
+                    "docs/contracts/monitoring-handoff.md", "docs/decisions/0002-monitoring-handoff.md"} | {
             str(path.relative_to(ROOT)) for path in FIXTURES.glob("*.json")
-            if path.name != "candidate-lock.json"
+            if path.name != "contract-lock.json"
         }
         actual = {entry["path"] for entry in inventory["artifacts"]}
         self.assertEqual(len(actual), len(inventory["artifacts"]))

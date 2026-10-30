@@ -145,3 +145,42 @@ selection contained zero eligible files because all three changes are Markdown;
 the diff was manually checked against the cited host records, not represented
 as an independent code review. Runtime tests were not repeated for this factual
 Markdown-only update.
+
+## Owner-approved capture target and version 1 freeze
+
+Owner explicitly approved a real owned watchlist/item and refusal until it exists
+and is authorized, then directed contract freeze and MAT-082. Decision 0002
+separates that product approval from bounded engineering D2–D7 dispositions and
+host implementation work. Version `monitoring-handoff/1.0.0` and contract-lock
+pin the specification, decision, portable/installed schema and authored synthetic
+examples: fifteen request/response pairs and nineteen invalid wire vectors.
+Nine targeted tests, render/check and validation passed (82 tickets, 104
+requirements, 107 schemas, three walkthroughs). No live/provider/host receiving
+acceptance is established by freeze. Independent review disposition follows.
+
+Sixteen invented use cases are documented in the separate research catalog with
+ten primary workflow references, explicit access limitations and an inference/
+fiction label. Research does not establish buyer demand, integrations or useful
+provider accuracy; it adds no mandatory new crawler feed or runtime scenario.
+
+Storage: free disk measured 29 GiB, below the standing 50 GiB reserve. Continue
+only lightweight source work and bounded targeted SQLite tests using the existing
+environment. Task artifacts under data/validation/monitoring-adapter-20261030
+and test scratch are budgeted below 100 MiB; no full qualification, bulk copies,
+container rebuilds or full stress suite are launched. Retain review summaries
+and actual run receipts, with synthetic examples in Git; temporary test stores
+use their existing cleanup. No other session's evidence is removed.
+
+Freeze review completed two passes over six selected files, no coverage warnings.
+Its one medium finding was confirmed: intent-wide handled status had no exact
+contribution scope. Removed that boolean, added bounded references to existing
+scoped dispositions outside the immutable intent, and added handled-then-correction
+and forbidden-global-boolean examples. Ten targeted tests now pass with sixteen
+request/response pairs and twenty invalid vectors. The earlier fifteen/nineteen
+counts are the pre-review checkpoint. Review of the corrected boundary continues
+with MAT-082; no clean independent verdict on the last correction is claimed here.
+
+Post-correction contract suite: 178 tests passed in the existing environment;
+render/check and repository validation passed at the freeze checkpoint. The
+specification freeze is a component interface milestone; no StateCivics runtime
+file or deployment was changed. MAT-082 proceeds on a separate stacked branch.

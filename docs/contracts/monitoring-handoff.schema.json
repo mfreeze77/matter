@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/mfreeze77/matter/docs/contracts/monitoring-handoff.schema.json",
-  "title": "MAT-081 monitoring handoff candidate 1: wire shape only, not authority or a runtime adapter",
+  "$id": "https://github.com/mfreeze77/matter/schemas/monitoring-handoff.schema.json",
+  "title": "MAT-081 monitoring handoff 1.0.0: wire shape only, not authority or a runtime adapter",
   "oneOf": [
     {
       "$ref": "#/$defs/request"
@@ -659,8 +659,7 @@
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "owner_id",
-            "already_handled"
+            "owner_id"
           ],
           "properties": {
             "owner_id": {
@@ -672,9 +671,6 @@
                   "type": "null"
                 }
               ]
-            },
-            "already_handled": {
-              "type": "boolean"
             }
           }
         },
@@ -1172,6 +1168,7 @@
         "context_selection",
         "evidence",
         "baseline",
+        "dispositions",
         "capture_binding",
         "evaluation",
         "budgets"
@@ -1181,7 +1178,7 @@
           "const": "monitoring_request"
         },
         "contract_version": {
-          "const": "monitoring-handoff/1.0.0-candidate.1"
+          "const": "monitoring-handoff/1.0.0"
         },
         "request_id": {
           "$ref": "#/$defs/id"
@@ -1228,6 +1225,14 @@
         },
         "baseline": {
           "$ref": "#/$defs/baseline"
+        },
+        "dispositions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pinned_ref"
+          },
+          "minItems": 0,
+          "maxItems": 32
         },
         "capture_binding": {
           "$ref": "#/$defs/capture_binding"
@@ -1354,7 +1359,7 @@
           "const": "monitoring_result"
         },
         "contract_version": {
-          "const": "monitoring-handoff/1.0.0-candidate.1"
+          "const": "monitoring-handoff/1.0.0"
         },
         "request_id": {
           "$ref": "#/$defs/id"
@@ -1477,7 +1482,7 @@
           "const": "monitoring_refusal"
         },
         "contract_version": {
-          "const": "monitoring-handoff/1.0.0-candidate.1"
+          "const": "monitoring-handoff/1.0.0"
         },
         "request_id": {
           "anyOf": [

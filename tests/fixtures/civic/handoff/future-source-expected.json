@@ -1,1 +1,1 @@
-{"code":"E_EVIDENCE_UNAVAILABLE","contract_version":"monitoring-handoff/1.0.0-candidate.1","message_type":"monitoring_refusal","reason":"source_unavailable","request_id":"request-future"}
+{"code":"E_EVIDENCE_UNAVAILABLE","contract_version":"monitoring-handoff/1.0.0","message_type":"monitoring_refusal","reason":"source_unavailable","request_id":"request-future"}

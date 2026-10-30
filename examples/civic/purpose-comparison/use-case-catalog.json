@@ -1,0 +1,456 @@
+{
+  "schema_version": "matter-use-case-catalog/1.0",
+  "status": "illustrative_planning_only",
+  "research_checked_at": "2026-10-30T04:19:13Z",
+  "research_claim": "Sources document workflows, not customer demand, contracted users, feed availability or Matter accuracy. Every scenario and organization is invented.",
+  "execution": "No source in this catalog is ingested, connected or evaluated by virtue of being listed. Initial runtime remains two saved objectives, capture only.",
+  "sources": [
+    {
+      "id": "S1",
+      "title": "USAC E-Rate competitive bidding",
+      "url": "https://www.usac.org/e-rate/applicant-process/competitive-bidding/28-day-waiting-period/",
+      "workflow_basis": "Schools/libraries and suppliers must distinguish posting, bid deadlines, allowable contract dates and substantive amendments.",
+      "access": "opened_primary_page"
+    },
+    {
+      "id": "S2",
+      "title": "Overland Park development review",
+      "url": "https://codes.opkansas.org/municipal-code/doc-view.aspx?ajax=0&secid=5207",
+      "workflow_basis": "Zoning changes have hearings and notice processes; a preliminary plan is not interchangeable with every later approval.",
+      "access": "indexed_primary_page"
+    },
+    {
+      "id": "S3",
+      "title": "NC Broadband rights of way",
+      "url": "https://www.ncbroadband.gov/technical-assistance/playbook/policy-broadband/rights-way",
+      "workflow_basis": "Broadband projects depend on easements, local permissions and rights-of-way coordination.",
+      "access": "opened_primary_page"
+    },
+    {
+      "id": "S4",
+      "title": "Grants.gov eligibility",
+      "url": "https://www.grants.gov/learn-grants/grant-eligibility",
+      "workflow_basis": "Eligible categories include governments, tribes, school districts, housing authorities and nonprofits; each opportunity has its own conditions.",
+      "access": "opened_primary_page"
+    },
+    {
+      "id": "S5",
+      "title": "EPA public comment opportunities",
+      "url": "https://www.epa.gov/publicnotices/how-find-dockets-and-other-public-comment-opportunities",
+      "workflow_basis": "Dockets, proposed/final rules, environmental reviews and pesticide decisions offer distinct participation opportunities.",
+      "access": "opened_primary_page"
+    },
+    {
+      "id": "S6",
+      "title": "KCC public comments",
+      "url": "https://www.kcc.ks.gov/public-comments-frequently-asked-questions",
+      "workflow_basis": "Utility rate and siting comment deadlines may precede the evidentiary hearing.",
+      "access": "opened_primary_page"
+    },
+    {
+      "id": "S7",
+      "title": "GSA solicitation research",
+      "url": "https://www.gsa.gov/sell-to-government/step-2-compete-for-a-contract/research-active-solicitations?topnav=sell-to-government",
+      "workflow_basis": "Contractors can research active public solicitations; opportunity fit differs from a general industry mention.",
+      "access": "indexed_primary_page"
+    },
+    {
+      "id": "S8",
+      "title": "LA Metro participation",
+      "url": "https://www.metro.net/projects/public-participation-plan-development/",
+      "workflow_basis": "Public participation covers fares, service adjustments, transit projects and equity programs.",
+      "access": "opened_primary_page"
+    },
+    {
+      "id": "S9",
+      "title": "DOL construction contract tools",
+      "url": "https://www.dol.gov/agencies/whd/government-contracts/construction/tools",
+      "workflow_basis": "Construction procurement uses project-relevant wage determinations, published through SAM.gov.",
+      "access": "indexed_primary_page_open_403"
+    },
+    {
+      "id": "S10",
+      "title": "FEMA flood map updates",
+      "url": "https://msc.fema.gov/msccontent/Flood_Hazard_Mapping_Updates_Overview_Fact_Sheet.pdf",
+      "workflow_basis": "Map revisions and effective-map status can matter to specific properties; preliminary information is not automatically effective.",
+      "access": "indexed_primary_excerpt_only"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "school_board",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "School board / superintendent",
+      "fictional_client_or_personal": "Willow School Board",
+      "proposed_objective": {
+        "purpose": "Prepare school connectivity policy and hearing decisions, separate from vendor selection.",
+        "scope": "school connectivity policy, facilities and public hearings",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "Routine mention of broadband in acknowledgements; an unchanged agenda reprint."
+      },
+      "source_ids": [
+        "S1"
+      ],
+      "invented_development": "A committee recommends a connectivity policy and publishes a hearing notice.",
+      "illustrative_useful_output": "Digest the proposal and hearing opportunity; retain recommendation-only status.",
+      "expected_silence": "Routine mention of broadband in acknowledgements; an unchanged agenda reprint.",
+      "correction_control": "A corrected notice moves the hearing; correct the actual prior captured date.",
+      "contrasting_audience": "District technology supplier needs an open procurement, so policy discussion alone stays quiet.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "school_procurement",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "School district IT / purchasing",
+      "fictional_client_or_personal": "Willow District IT",
+      "proposed_objective": {
+        "purpose": "Track approved network procurement opportunities, material bid amendments and deadlines.",
+        "scope": "school network procurement",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "Connectivity policy recommendation without a solicitation; award close-out for an old purchase."
+      },
+      "source_ids": [
+        "S1"
+      ],
+      "invented_development": "An actual request for network services is published with a submission deadline.",
+      "illustrative_useful_output": "Inspect the service scope and explicit dates; capture a fitting solicitation or amendment.",
+      "expected_silence": "Connectivity policy recommendation without a solicitation; award close-out for an old purchase.",
+      "correction_control": "An amendment changes eligible equipment or deadline; do not treat the minimum waiting period as the bid deadline.",
+      "contrasting_audience": "The school board may care about policy even before an actionable solicitation exists.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "land_developer",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "Land developer / project manager",
+      "fictional_client_or_personal": "Prairie Infill Partners",
+      "proposed_objective": {
+        "purpose": "Track access, density and hearing changes affecting the approved Northfield project.",
+        "scope": "one named jurisdiction; approved project/parcel references",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "Another city uses the same case number; unrelated rezonings; repeated staff boilerplate."
+      },
+      "source_ids": [
+        "S2"
+      ],
+      "invented_development": "A planning recommendation changes access conditions on the project and schedules a hearing.",
+      "illustrative_useful_output": "Capture the changed condition/opportunity; keep final approval unresolved.",
+      "expected_silence": "Another city uses the same case number; unrelated rezonings; repeated staff boilerplate.",
+      "correction_control": "A later source corrects the parcel or hearing date; distinguish that from reversing final approval.",
+      "contrasting_audience": "An adjacent neighborhood group watches traffic/affordability consequences rather than entitlement speed.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "real_estate_agent",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "Real estate agent / brokerage",
+      "fictional_client_or_personal": "Meadow Homes Advisory",
+      "proposed_objective": {
+        "purpose": "Track verified land-use and access changes around an opted-in listing portfolio.",
+        "scope": "explicit listings and authorized surrounding area in one place",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "County-wide real-estate headlines; a preliminary map presented as already effective; another client portfolio."
+      },
+      "source_ids": [
+        "S2",
+        "S10"
+      ],
+      "invented_development": "A published zoning or map notice specifically affects an approved property scope.",
+      "illustrative_useful_output": "Capture the source stage and potentially relevant change for professional review.",
+      "expected_silence": "County-wide real-estate headlines; a preliminary map presented as already effective; another client portfolio.",
+      "correction_control": "Withdraw a previously captured property match if an amendment shows it covered another parcel.",
+      "contrasting_audience": "A developer may favor greater density while an individual buyer only needs access/hazard implications; do not infer either stance.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "tech_company",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "Technology company / public affairs",
+      "fictional_client_or_personal": "Cedar Cloud Systems",
+      "proposed_objective": {
+        "purpose": "Track interoperability requirements and qualified public procurement opportunities.",
+        "scope": "one place; approved interoperability provisions and services",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "Company-name mentions, congratulatory speeches, unrelated IT awards or close-outs."
+      },
+      "source_ids": [
+        "S1",
+        "S7"
+      ],
+      "invented_development": "An agency opens a consultation on interoperability; later it issues a relevant solicitation.",
+      "illustrative_useful_output": "Keep the consultation and procurement as distinct useful developments with explicit next steps.",
+      "expected_silence": "Company-name mentions, congratulatory speeches, unrelated IT awards or close-outs.",
+      "correction_control": "Correct an earlier captured new-grant/new-contract claim when the source is only existing-program close-out.",
+      "contrasting_audience": "A privacy coalition can support interoperability while opposing biometric mandates in the same proposal.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "broadband_coop",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "Broadband cooperative / infrastructure lead",
+      "fictional_client_or_personal": "Tallgrass Fiber Cooperative",
+      "proposed_objective": {
+        "purpose": "Track rights-of-way, conduit access and permits for an approved service-area build.",
+        "scope": "approved corridor within one jurisdiction",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "General broadband praise; ordinances outside the build; archived identical permit language."
+      },
+      "source_ids": [
+        "S3"
+      ],
+      "invented_development": "A proposed right-of-way ordinance changes permit procedures in the build corridor.",
+      "illustrative_useful_output": "Capture material procedure changes and comment timing; keep proposal versus effective permission distinct.",
+      "expected_silence": "General broadband praise; ordinances outside the build; archived identical permit language.",
+      "correction_control": "A corrected route attachment removes a segment from scope; refresh pending relevance and cite the amendment.",
+      "contrasting_audience": "A resident association follows disruption and restoration schedules, not provider build economics.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "housing_nonprofit",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "Housing nonprofit / grant lead",
+      "fictional_client_or_personal": "Common Ground Housing",
+      "proposed_objective": {
+        "purpose": "Find eligible housing-program opportunities and changes affecting a submitted application.",
+        "scope": "one local service area; approved population/program fit",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "Awards already made; close-out of an existing grant; a program restricted to another applicant type."
+      },
+      "source_ids": [
+        "S4"
+      ],
+      "invented_development": "A notice opens a housing grant and specifies eligible applicants and a deadline.",
+      "illustrative_useful_output": "Capture possible eligibility with cited limitations; send to the assigned grant lead for review.",
+      "expected_silence": "Awards already made; close-out of an existing grant; a program restricted to another applicant type.",
+      "correction_control": "An amendment excludes the organization type; correct the previous opportunity capture, without declaring legal eligibility.",
+      "contrasting_audience": "A housing authority and a nonprofit may have different eligibility for the same notice.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "tribal_program",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "Tribal government / program officer",
+      "fictional_client_or_personal": "Riverbend Tribal Programs",
+      "proposed_objective": {
+        "purpose": "Track infrastructure funding and consultation opportunities relevant to approved public projects.",
+        "scope": "approved one-place project scope; public or expressly cleared evidence only",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "Generic tribal keywords; other communities projects; inferred sensitive cultural locations."
+      },
+      "source_ids": [
+        "S4",
+        "S5"
+      ],
+      "invented_development": "A notice specifies a tribal-eligible program or a consultation affecting a public project.",
+      "illustrative_useful_output": "Capture the relevant opportunity and actual response deadline for the responsible office.",
+      "expected_silence": "Generic tribal keywords; other communities projects; inferred sensitive cultural locations.",
+      "correction_control": "Correct a grant-match if revised eligibility or geography excludes this project.",
+      "contrasting_audience": "A nearby municipality may be eligible under a different track; never copy private tribal rationale across audiences.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "ratepayer_group",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "Utility customer / consumer group",
+      "fictional_client_or_personal": "County Energy Consumers",
+      "proposed_objective": {
+        "purpose": "Track rate/siting changes and comment opportunities affecting approved customer classes.",
+        "scope": "specified utility docket and service class",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "Utility-name mentions in unrelated cases; unchanged filings; a proposal described as an adopted rate."
+      },
+      "source_ids": [
+        "S6"
+      ],
+      "invented_development": "A docket notice opens comments and sets a deadline before its hearing.",
+      "illustrative_useful_output": "Capture the comment cutoff, proposed impact and uncertainty, separately from the hearing.",
+      "expected_silence": "Utility-name mentions in unrelated cases; unchanged filings; a proposal described as an adopted rate.",
+      "correction_control": "A revised tariff changes the applicable class; correct the earlier client implication.",
+      "contrasting_audience": "An industrial customer may care about demand charges while household customers care about residential provisions.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "manufacturer",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "Manufacturer / plant operations",
+      "fictional_client_or_personal": "Plainview Manufacturing",
+      "proposed_objective": {
+        "purpose": "Track industrial tariff, access and operating-policy changes for the approved plant.",
+        "scope": "one plant/project and customer class",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "Residential-only rate changes; unrelated permits; another plant with a similar name."
+      },
+      "source_ids": [
+        "S6",
+        "S5"
+      ],
+      "invented_development": "A proposed tariff changes industrial demand charges or a permit docket changes an operating condition.",
+      "illustrative_useful_output": "Capture the matching provision and review window; do not estimate costs without approved consumption data.",
+      "expected_silence": "Residential-only rate changes; unrelated permits; another plant with a similar name.",
+      "correction_control": "A correction limits the tariff to another service class; retract the prior matching implication.",
+      "contrasting_audience": "The same utility docket may be quiet for a nonprofit on a different tariff.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "construction_contractor",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "Construction contractor / estimator",
+      "fictional_client_or_personal": "Flint Works Construction",
+      "proposed_objective": {
+        "purpose": "Track fitting solicitations, bid amendments and referenced wage-determination revisions.",
+        "scope": "approved project class and one place",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "Unrelated contract awards; narrative rewording with identical requirements; an inapplicable geographic schedule."
+      },
+      "source_ids": [
+        "S7",
+        "S9"
+      ],
+      "invented_development": "A bid amendment changes the required work or referenced wage determination.",
+      "illustrative_useful_output": "Capture the material amendment and explicit deadline for estimator review.",
+      "expected_silence": "Unrelated contract awards; narrative rewording with identical requirements; an inapplicable geographic schedule.",
+      "correction_control": "A replacement amendment restores the prior deadline; preserve both versions and what was actually captured.",
+      "contrasting_audience": "A subcontractor may care only about a particular trade package, not every prime-contract update.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "transit_advocate",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "Transit rider / disability advocate",
+      "fictional_client_or_personal": "Accessible Routes Coalition",
+      "proposed_objective": {
+        "purpose": "Track proposed service changes that affect approved accessible-route connections.",
+        "scope": "specific route/service area and accessibility concerns",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "Bus references outside selected routes; duplicated survey reminders; unrelated capital-project branding."
+      },
+      "source_ids": [
+        "S8"
+      ],
+      "invented_development": "A transit board proposes a service adjustment and opens public input.",
+      "illustrative_useful_output": "Capture affected connections and participation dates; separate proposal from adopted timetable.",
+      "expected_silence": "Bus references outside selected routes; duplicated survey reminders; unrelated capital-project branding.",
+      "correction_control": "A corrected map restores a connection previously shown removed; correct the prior consequence.",
+      "contrasting_audience": "A nearby employer follows shift access while the coalition follows accessible transfers.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "environmental_group",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "Watershed or environmental group",
+      "fictional_client_or_personal": "Clear Creek Watershed",
+      "proposed_objective": {
+        "purpose": "Track permit/rule changes affecting the approved watershed and comment opportunities.",
+        "scope": "explicit watershed/project scope within one place",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "Environment keywords outside scope; identical filings; draft described as final authorization."
+      },
+      "source_ids": [
+        "S5"
+      ],
+      "invented_development": "A public docket opens on a discharge or infrastructure proposal in scope.",
+      "illustrative_useful_output": "Capture a substantive provision and response window with cited evidence gaps.",
+      "expected_silence": "Environment keywords outside scope; identical filings; draft described as final authorization.",
+      "correction_control": "Correct the scope if a new map locates the discharge in another watershed.",
+      "contrasting_audience": "A farm cooperative may evaluate water availability while a conservation group evaluates habitat effects.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "university_lab",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "University / research administrator",
+      "fictional_client_or_personal": "Regional Mobility Lab",
+      "proposed_objective": {
+        "purpose": "Find program opportunities matching the labs approved research and applicant status.",
+        "scope": "approved project and funding interests; one jurisdiction initially",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "Awards/close-outs; opportunities restricted to another institution type; generic research mentions."
+      },
+      "source_ids": [
+        "S4"
+      ],
+      "invented_development": "A notice opens a research opportunity with institution-specific eligibility.",
+      "illustrative_useful_output": "Capture a potential fit and actual submission milestone for grants-office review.",
+      "expected_silence": "Awards/close-outs; opportunities restricted to another institution type; generic research mentions.",
+      "correction_control": "An amendment changes cost-share or eligibility; refresh the pending result and preserve prior communicated limits.",
+      "contrasting_audience": "A small business collaborator can have a different eligibility result from the university.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "local_journalist",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "Local journalist / editor",
+      "fictional_client_or_personal": "Civic Ledger Desk",
+      "proposed_objective": {
+        "purpose": "Track substantive reversals, decisions and corrections in an approved reporting beat.",
+        "scope": "one public body/topic; public evidence",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "Repeated stories derived from one source; unnamed actor stance inferred from a group vote."
+      },
+      "source_ids": [
+        "S2",
+        "S5"
+      ],
+      "invented_development": "A recommendation is followed by a recorded vote, or an official correction changes a material assertion.",
+      "illustrative_useful_output": "Capture the changed stage and source citation for editorial verification.",
+      "expected_silence": "Repeated stories derived from one source; unnamed actor stance inferred from a group vote.",
+      "correction_control": "Correct the desk capture when an official source revises the earlier claim; do not silently overwrite the chronology.",
+      "contrasting_audience": "A public-affairs client wants action implications; an editor wants verified changes, not client advocacy.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    },
+    {
+      "id": "personal_resident",
+      "scenario_kind": "invented_scenario_informed_by_primary_workflow",
+      "user_role": "Resident / parent / neighborhood volunteer",
+      "fictional_client_or_personal": "Personal objective without client",
+      "proposed_objective": {
+        "purpose": "Track a chosen school or neighborhood issue and useful participation opportunities.",
+        "scope": "one chosen place; no synthetic client record required",
+        "positions": "Explicit provision-level choices only; unspecified is unknown.",
+        "responsibility": "A named role selected by the user; no inferred assignment.",
+        "timing_delivery": "Capture only; explicit notice deadlines and host-selected immediate/digest checkpoint.",
+        "exclusions": "Every keyword match; other neighborhoods; private contact details; already handled unchanged notices."
+      },
+      "source_ids": [
+        "S2",
+        "S8"
+      ],
+      "invented_development": "A hearing or route proposal affects the residents explicitly saved objective.",
+      "illustrative_useful_output": "Capture a meaningful change or actionable deadline according to that persons preferences.",
+      "expected_silence": "Every keyword match; other neighborhoods; private contact details; already handled unchanged notices.",
+      "correction_control": "A correction of an earlier captured date remains useful even after the person marked the original notice handled.",
+      "contrasting_audience": "Two people in the same neighborhood can have different priorities and receive different treatments.",
+      "status": "planning_example_not_runtime_or_qualification_evidence"
+    }
+  ]
+}

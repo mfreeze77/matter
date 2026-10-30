@@ -283,3 +283,14 @@ existing KS-1121 work/current main. Matter's plan is stacked on the existing
 implementation or alter main. Ticket IDs KS-1122–1127 and MAT-081/082 are reserved
 by these committed records; inspect branches as well as main before allocating
 further IDs.
+
+## Version 1 contract freeze
+
+The owner approved an owned watchlist/item capture target and refusal until it
+exists and is authorized. [Decision 0002](../decisions/0002-monitoring-handoff.md)
+records bounded D1–D7 dispositions for `monitoring-handoff/1.0.0`; the shared
+specification and compatibility examples are frozen for MAT-082 component work.
+Host lifecycle/access/scope/provider implementation and KS-701 closeout remain
+host work. No production delivery or provider qualification follows from freeze.
+The [broader workflow catalog](../research/civic-monitoring-use-cases.md) informs
+future examples without expanding the first two-objective runtime slice.

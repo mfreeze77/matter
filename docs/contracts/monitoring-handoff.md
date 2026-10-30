@@ -1,15 +1,15 @@
 # MAT-081: saved monitoring intent handoff
 
-Status: **candidate, not frozen**, 2026-10-29. Version:
-`monitoring-handoff/1.0.0-candidate.1`. This specifies an optional civic adapter,
+Status: **frozen for component implementation**, 2026-10-30 UTC. Version:
+`monitoring-handoff/1.0.0`. This specifies an optional civic adapter,
 not a new neutral-core type, API endpoint, permission engine or shipped callable.
-MAT-082 implements it after agreement. Neither this document nor its examples
+MAT-082 implements this version. Neither this document nor its examples
 authorize production alerts or establish provider qualification.
 
 The wire definition is [monitoring-handoff.schema.json](monitoring-handoff.schema.json).
 The [synthetic compatibility vectors](../../tests/fixtures/civic/handoff/manifest.json)
-and their [candidate byte inventory](../../tests/fixtures/civic/handoff/candidate-lock.json)
-are review inputs. Their references, hashes and expected decisions are invented;
+and their [frozen byte inventory](../../tests/fixtures/civic/handoff/contract-lock.json)
+are pinned compatibility inputs. Their references, hashes and expected decisions are invented;
 they create no host records, PreparedPacket, grants, assessments or captures.
 They are not an evaluation corpus or a runtime validation receipt.
 
@@ -42,8 +42,9 @@ Projection mapping for host implementation review:
 - Existing entity type/ID → record scope. The existing API entity-type grammar
   and 300-character entity-ID limit are retained. Broad objective scope is new.
 - Existing nullable active-from/until need a documented effective-interval
-  projection before freeze. The candidate requires a resolved start and allows
-  no scheduled end; don't guess a missing start from evidence or a model answer.
+  projection: absent active-from uses the stored approved-at, explicit start
+  is preserved, and absent end means no scheduled end. Evidence/model text
+  cannot choose activation time.
 - Approved positions, selected defaults, responsibility, lifecycle state and
   component pins require an explicit typed host projection/version mapping.
   Do not reinterpret arbitrary `assumptions` JSON as approved structured fields.
@@ -67,13 +68,14 @@ The following are **StateCivics work still to build**, not main capabilities:
    behavior. Main has create/revise/retire only. Generic UI workflow drafts
    are not an implemented monitoring lifecycle.
 3. KS-1122: discriminated broad objective scope without a fake civic record;
-   retain one place per objective for this proposed slice. New authorized
+   retain one place per objective for this slice. New authorized
    candidate records may appear after activation. Exact-follow-only dispatch
    would miss that requirement.
 4. KS-1122/1124: provision or select an owned watchlist/item capture binding
    for broad objectives and associate the real candidate ActivityEvent. The
-   candidate contract requires these references; **how a record-free objective
-   acquires them remains a host decision awaiting confirmation**. Do not invent
+   frozen contract requires these references. The owner approved requiring a
+   real owned watchlist/item, refusing evaluation until it exists and is
+   authorized. Provision/select it in the host; do not create a second sink. Do not invent
    a bill, source event or null foreign key. A record-free preview without this
    binding would need a separately agreed contract mode; it is not this slice.
 5. KS-1124: configure the production assessment seam. At this baseline,
@@ -116,10 +118,10 @@ zeros; other opaque IDs must match the schema. Do not parse string IDs into
 authority. `null` means absent only where explicitly admitted. Empty client IDs,
 unknown fields, unsupported tags and coerced types are rejected, not defaulted.
 
-All messages require the exact candidate version. A changed required field,
+All messages require the exact contract version. A changed required field,
 enum meaning, hashing rule or semantic guard requires a new tag and a new fixture
 inventory; consumers explicitly admit a version. No silent fallback or ignoring
-unknown fields. There is no stable 1.0 compatibility promise before freeze.
+unknown fields. There is no stable 1.0 compatibility promise before use.
 
 ## Request projection
 
@@ -142,7 +144,7 @@ limits and nullability; the guards below are additional semantic obligations.
 - Provision positions are at most 32 approved entries: proponent, opponent,
   neutral or unknown. Omitted position stays unknown; legacy `monitor` is a
   monitoring preference, never neutral stance. No model-inferred client position
-  becomes approved. Responsibility names an optional owner and handled status;
+  becomes approved. Responsibility names an optional owner;
   active interval is explicit. `active_until: null` means no scheduled end,
   not irrevocable access. Reject end at/before start and inactive intent.
 - `defaults` is a snapshot with optional selected client-profile pin. Do not
@@ -182,11 +184,17 @@ limits and nullability; the guards below are additional semantic obligations.
   it was captured or delivered. Historical imported delivery baselines require
   actual evidence and do not enable delivery in this mode. Different clients,
   subjects or purposes do not share communicated history by default.
+- `dispositions` pins up to 32 existing scoped host disposition/current records.
+  Resolve them under current access and check exact purpose/audience/subject and
+  contribution. Feedback is not an intent-wide boolean or an immutable-revision
+  edit; changed disposition pointers invalidate their consumers independently.
+  A handled old contribution does not suppress a new deadline or linked
+  correction. Model text cannot create or broaden a disposition.
 - `capture_binding` pins real watchlist, item, factual activity and user-activity
   association. Verify all belong to the current authorized audience/candidate.
   Broad objective identity remains distinct from candidate civic identity.
 - `evaluation` pins policy, 1–16 questions, provider, explicit model and adapter.
-  This candidate is always `unqualified`. `budgets` caps calls (1–64), per-call
+  This version is always `unqualified`. `budgets` caps calls (1–64), per-call
   timeout (1–120 seconds), wall time (1–3,600 seconds), request/response bytes
   (1–65,536) and decimal USD cost, with an exact price-reservation basis pin.
   Reject zero cost, unavailable pricing/reservation or timeout above wall limit.
@@ -299,7 +307,7 @@ Late source release refreshes the relevant prefix; do not rewrite earlier result
 Authorization, credential, expiry, cost and cancellation checks always use the
 actual current host clock, even for historical evidence.
 
-Candidate lifecycle sequences, **host work not shipped on the pinned main**:
+Contract lifecycle sequences, **host work not shipped on the pinned main**:
 
 - Autosave draft → no approved request/provider evaluation/capture. Explicit
   user review/submission → immutable approved revision, effective snapshot and
@@ -315,35 +323,29 @@ Candidate lifecycle sequences, **host work not shipped on the pinned main**:
   pause/revoke mapping and reactivation semantics remain StateCivics work.
 - Already-handled feedback → scoped disposition, not source rewrite/global
   negative label. A new material deadline or correction may still matter.
-  Undo/expiry and purpose-edit baseline compatibility need explicit host design.
+  Undo uses an explicit host disposition revision/removal. No hidden expiry
+  timer is introduced; purpose-incompatible ordinary baselines are withheld for
+  reconciliation while actual older conveyed history remains available for a
+  linked correction under current access.
 
-## Decisions and freeze gate
+## Frozen decisions and ownership
 
-These are bounded candidate restrictions/proposals, not newly approved product
-requirements. StateCivics owner review is still needed before dependent code:
+[Decision 0002](../decisions/0002-monitoring-handoff.md) records D1–D7.
+The owner explicitly approved the owned capture target and directed progress;
+the remaining protocol dispositions are bounded engineering choices, not claims
+of owner approval of UI labels or implemented host controls. Snapshot defaults,
+approved provision-specific stance, explicit submission, reconstructed selected
+rehearsal context, preserved conveyed baselines/scoped feedback and in-app-only
+capture define this version. Host UI wording and provisioning mechanics remain
+host-owned without changing those invariants.
 
-- **D1 (KS-1122):** proposed record/objective discriminator, one place, no fake
-  record. **Open:** owned watchlist/item provisioning for broad-objective capture.
-- **D2 (KS-1122/1123):** propose snapshot selected defaults at activation. Linked
-  defaults are deferred; any later support must create dependencies/revisions.
-- **D3 (KS-1123 + MAT-081):** propose provision-specific approved four-way stance;
-  no automatic conversion of legacy record-level positions to every provision.
-- **D4 (KS-1123):** require explicit approved submission, never draft autosave.
-  Save/activate labels, pause/revoke/reactivation mechanics remain host choices.
-- **D5 (KS-1126 + MAT-081):** propose retrospective-selected rehearsal context,
-  labeled reconstructed, with scheduled revision changes. Actual historical-as-of
-  user preference is deferred; this version rejects a silent historical claim.
-- **D6 (KS-1125 + MAT-082):** preserve real baseline/unknown outcomes and scoped
-  dispositions. Freeze purpose-edit compatibility and feedback undo/expiry before
-  their affected implementation; no blanket correction suppression.
-- **D7 (KS-1123/1127):** first slice in-app capture only; host immediate/digest
-  checkpoint, current grants and explicit live limits. Production cadence,
-  destinations, custom writer and consequential qualification remain separate.
-
-Freeze requires recorded host mapping/decisions, resolved capture binding,
-schema/example review, pinned artifact inventory and successful compatibility
-checks. The inventory is currently **candidate_not_frozen**. Do not close MAT-081
-or start MAT-082 by relabeling author-created examples as a host review receipt.
+The [contract lock](../../tests/fixtures/civic/handoff/contract-lock.json) pins
+this specification, decision record, portable/installed schema and synthetic
+compatibility vectors. MAT-081 freezes the boundary; MAT-082 and KS-1122 may now
+implement against it. Actual host lifecycle/access/record-free capture/live seam
+are still missing work, not prerequisites that must be secretly implemented to
+specify them. Research-driven examples in the separate use-case catalog are not
+normative wire changes, provider labels or new MAT-082 completion requirements.
 
 ## Verification handoff
 
@@ -366,7 +368,7 @@ packet exclusion, partial-coverage withholding, outcome reconciliation and retry
 failure-path checks. No provider, capture or production assessment was executed
 by this contract work.
 
-After freeze: MAT-082 synthetic component conformance and KS-1122 host scope
+Next: MAT-082 synthetic component conformance and KS-1122 host scope
 mapping → KS-1123 minimal saved-objective UI → KS-1124 dispatcher → KS-1125
 reasons/feedback → KS-1126 two actual saved objectives through existing no-login
 rehearsal → KS-1127 incoming-live capture using the same boundary. Respect actual
