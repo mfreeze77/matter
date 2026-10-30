@@ -2,7 +2,7 @@
   "track": "civic",
   "phase": 4,
   "priority": "P1",
-  "status": "planned",
+  "status": "done",
   "type": "integration",
   "owner_repo": "mfreeze77/matter",
   "id": "MAT-082",
@@ -86,9 +86,10 @@
     }
   ],
   "artifacts": [
-    "src/matter/adapters/statecivics_monitoring.py (planned optional adapter)",
-    "tests/integration/test_monitoring_handoff.py (planned)",
-    "docs/validation/dashboard-matter-handoff.md (future executed receipt)"
+    "src/matter/statecivics_monitoring.py",
+    "tests/integration/test_monitoring_handoff.py",
+    "docs/validation/dashboard-matter-handoff.md",
+    "docs/adapters/statecivics-monitoring.md"
   ],
   "tests": [
     "Two objectives under contrasting client contexts: useful positive plus justified silence, unchanged shared facts.",
@@ -130,10 +131,19 @@
     "docs/attention.md",
     "docs/delivery.md",
     "docs/validation/civic-source-integration.md",
-    "Owner request, 2026-10-28: plan and ticket the saved-dashboard objectives -> JEV-powered Matter handoff for both availability-ordered timeline replay and incoming live data; planning only, DIAT excluded."
+    "Owner request, 2026-10-28: plan and ticket the saved-dashboard objectives -> JEV-powered Matter handoff for both availability-ordered timeline replay and incoming live data; planning only, DIAT excluded.",
+    "docs/contracts/monitoring-handoff.md",
+    "docs/decisions/0002-monitoring-handoff.md",
+    "Owner authorization, 2026-10-30: use a real owned watchlist/item with refusal until authorized, continue through MAT-081 freeze and MAT-082; broaden researched illustrative use cases without expanding the first two-objective capture-only slice."
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "Bounded MAT-082 component implementation: optional statecivics_monitoring composes actual access/context, prepared-packet, committed-budget, durable-execution and current-attention services against frozen monitoring-handoff/1.0.0. No replacement infrastructure or StateCivics runtime changes.",
+      "24 distinct component test methods have passing receipts across bounded segments and affected-case reruns. Includes actual two-audience positive/quiet decisions, owned-target refusal, queued/in-flight grant withdrawal, exact recovery past deadline, observed-baseline duplicate/correction checks, scoped handled/new-deadline behavior, in-flight preference semantic reuse, new candidate admission, recorded replay/live parity and future-source canary exclusion. See docs/validation/dashboard-matter-handoff.md and external run manifest for limits and failed checkpoints.",
+      "179 contract tests and two existing availability/candidate-watch regressions passed. Current wheel module/schema/question/refusal smoke passed outside checkout; render/check, repository validation and whitespace checks passed. The separate installed walkthrough-schema failure is not cleared and the full repository/stress suite was not rerun.",
+      "Two-pass independent reviews completed for all selected files; confirmed findings were corrected and affected cases rerun. Unpinned-position warnings were manually checked; no separate clean independent verdict after final corrections is claimed.",
+      "All new executor responses and host projections are authored synthetic conformance. Zero live JEV calls, no actual StateCivics receiving run or provider qualification. KS-1122/1124/1126 mapping/control/SDK and receiving work, wider MAT-048/049 and MAT-040 human-reviewed qualification remain separate."
+    ]
   }
 }

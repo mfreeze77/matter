@@ -194,3 +194,105 @@ these remain authored wire examples, not actual prepared packets. Regenerated
 the contract inventory; eleven targeted contract tests pass. Wire shape and
 adopted semantics are unchanged at 1.0.0. Updated the plan's old candidate/
 unresolved-target passages to the current frozen decision.
+
+## MAT-082 bounded component closeout
+
+Implemented `matter.statecivics_monitoring` against frozen version 1.0.0, stacked
+on the MAT-081 freeze/correction (`3aeb564`, `f95a57e`). This optional adapter
+composes existing context/control/access, source packets, committed allocations,
+durable executor receipts and current attention services. It adds no database,
+queue, retriever, JEV client or production delivery route. The host still supplies
+its actual registered assessment/admission policy; a primitive probability is
+not converted into a qualified assertion by this adapter.
+
+**Executed software evidence:** 24 distinct component test methods have passing
+receipts across bounded segments and affected-case reruns, plus 179 contract
+tests and two existing regressions for late availability and new candidate
+watches. This is not a claim of one clean whole-repository discovery run. The
+current environment has Python 3.12.14, jsonschema 4.26.0 and referencing 0.37.0;
+the earlier missing-package limitation does not apply to these checks.
+
+- Two authored objectives share one actual stored source finding but produce
+  separate native positive/quiet decisions. Personal binding and foreign audience
+  grants are checked; pausing one objective leaves the other current.
+- Missing/unauthorized/muted targets, drafts, pause/revocation, stale intent,
+  expiry and price/budget limits refuse. Current grant revocation was exercised
+  both at dispatch (zero fixture transport invocations) and during I/O (one
+  invocation); answers are withheld and regrant does not cause a blind resend.
+- Exact body retry recovers one actual durable execution; a changed body under
+  the same key conflicts. Completed and unknown attempts recover correctly past
+  their original deadline without needing a configured executor. Cancellation
+  remains cancellation after resume. Failed recording never releases an
+  unrecorded answer as durable success.
+- An actual native output milestone suppresses repeat material. Omitting known
+  history refuses; an explicit linked retraction still produces correction with
+  uncertainty. Scoped acknowledgement of the old assessment does not silence a
+  new declared deadline. These are synthetic typed-claim/host-milestone cases,
+  not government source-revision accuracy measurements.
+- A real new candidate created after broad context activation is accepted when
+  granted; removing its grant refuses. Preference editing during an actual
+  fixture executor invocation withholds the old handoff while retaining the
+  completed execution. A new output command reuses the identical semantic result
+  with no second invocation under still-current semantic grants.
+- Replay and live-input serialization both ran through actual guarded packets,
+  durable recorded execution and native attention evaluation. Two authored
+  responses produced equivalent treatment/material/capture keys. Context-policy
+  fields remain honestly distinct. A real stored future-available source is
+  excluded from the packets and both provider requests (canary checked). The
+  actual assessment's selected-source set and observation availability are
+  checked before projection; current assessment status cannot widen the cutoff.
+- A forged projection cannot be captured. Quiet never calls the sink. Known
+  pre-write guard refusal stays a refusal; opaque failure, skipped/swallowed
+  guard or possible partial write stays unknown. The sink callback is a fixture,
+  not StateCivics AlertPlanner receiving evidence. Atomic writes, persistent
+  outcome reconciliation and capture-key deduplication remain the real host's
+  responsibility.
+
+**Review:** each review used two passes and covered all selected files. The
+initial adapter review had nine comments (one duplicate); follow-up had five
+(one duplicate); final review had eight (four duplicates). Confirmed findings
+were corrected: budget-code preservation, received-response retention, truthful
+capture/recording outcomes, guard misuse/partial writes, resumed cancellation,
+deadline recovery, foreign-grant checking and stronger actual transport/parity
+checks. Warnings reported unpinned comment positions, not unreviewed files;
+findings were matched manually. The final corrections have targeted passing
+checks and manual source review; no separate clean independent verdict after
+those corrections is claimed. Freeze review's handled-scope and availability
+pair findings were also corrected as recorded above.
+
+Early runs failed for fixture assembly/import/discovery mistakes and the budget
+error bug; they are not passes. The first 24-test checkpoint (ten contract plus
+fourteen component tests) had two failures. History was mistakenly nominated as
+a current assessment dependency, then omitted from the attention reader's
+authorized history; these assembly errors were corrected separately. The
+expanded revocation case first exhausted its ten-second fixture reservation;
+the second distinct command now receives its own real committed allocation.
+The parity setup first reused a reservation with an old token after source
+selection changed; it now reserves against the exact refreshed token. No gate
+was disabled to obtain the passing receipts.
+
+Raw logs/reviews and the code/test hashes are retained externally under
+`data/validation/monitoring-adapter-20261030/` (gitignored). Tests use authored
+responses and a declared synthetic 2050 clock/window; their wall times are not
+provider latency evidence. **Zero live JEV calls** were made in this slice; the
+two parity invocations are recorded-fixture execution. Research examples are
+invented planning material, not independent labels or qualification evidence.
+
+The current wheel was built without dependency downloads and its monitoring
+module, bundled schema, question construction and refusal mapping were loaded
+outside the checkout. Render/check, repository validation and diff whitespace
+checks passed. This limited packaging smoke does **not** fix or clear the
+separate installed walkthrough-schema failure. The entire installed walkthrough
+and whole-repository/stress/qualification suites were not rerun here. Free disk
+was about 46 GiB at closeout, below the standing 50 GiB reserve; task artifacts
+remain below the declared 100 MiB budget and only bounded work was run.
+
+**External acceptance remains:** merge/build the source-adapter/SDK stack and
+implement StateCivics real controls, broad-scope mapping, lifecycle, capture
+associations and registered dispatcher configuration. KS-1122 still needs KS-701
+acceptance; KS-1124/1126 need KS-1121 and the rebuilt SDK. KS-1126 owns the actual
+two saved-objective receiving/rehearsal run; KS-1127 owns subsequent incoming-live
+shadow use. MAT-048/049 wider scope, MAT-040 qualification/human-reviewed labels,
+production alerts, the custom writer, DIAT and PostgreSQL are not completed by
+this component evidence. StateCivics files, containers and deployment were not
+changed. No loose worktree was created; only the current Matter worktree remains.
