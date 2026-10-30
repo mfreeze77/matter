@@ -124,7 +124,11 @@ def _require_correction_lineage(view, *, access, context, roots, candidate, targ
             _fail("E_SCOPE_FORBIDDEN")
         if kind == "observation" and (prior["body"]["available_at"]["state"] != "known" or
                 compare_times(prior["body"]["available_at"], as_of) > 0):
-            _fail("E_EVIDENCE_UNAVAILABLE")
+            if key in wanted:
+                _fail("E_EVIDENCE_UNAVAILABLE")
+            # Unavailable history cannot prove a path, but another available
+            # branch may prove the declared link without using those bytes.
+            continue
         ancestors.add(key)
         pending.extend((kind, parent) for parent in prior.get("supersedes", []))
     if not wanted <= ancestors:

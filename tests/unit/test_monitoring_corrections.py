@@ -114,3 +114,11 @@ class MonitoringCorrectionTests(unittest.TestCase):
             self.check([root], [target], allowed)
         self.assertEqual(error.exception.code, "E_BUDGET_EXHAUSTED")
         self.assertLessEqual(len(self.reads), 128)
+
+    def test_unused_unavailable_observation_branch_does_not_hide_available_link(self):
+        _, target = self.record("observation", "target")
+        _, middle = self.record("observation", "middle", parents=[target])
+        _, unavailable = self.record("observation", "unavailable", available={"state": "unknown", "reason": "unavailable"})
+        current, _ = self.record("observation", "current", parents=[unavailable, middle])
+        self.check([current], [target], [unavailable, middle, target])
+        self.assertEqual(self.reads, [unavailable, middle, target])
