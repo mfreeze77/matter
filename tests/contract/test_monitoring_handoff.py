@@ -149,6 +149,19 @@ class MonitoringHandoffContractTests(unittest.TestCase):
         self.assertNotIn("already_handled", handled["intent"]["responsibility"])
         self.assertEqual(read(FIXTURES / "handled-correction-expected.json")["treatment"], "correction")
 
+    def test_same_late_source_is_withheld_then_available_under_a_distinct_packet(self):
+        from matter.time import compare_times
+        future = read(FIXTURES / "future-source-request.json")["evidence"]
+        late = read(FIXTURES / "late-source-released-request.json")["evidence"]
+        self.assertEqual(future["sources"], late["sources"])
+        available = late["sources"][0]["available_at"]
+        self.assertLess(compare_times(future["knowledge_cut"], available), 0)
+        self.assertGreaterEqual(compare_times(late["knowledge_cut"], available), 0)
+        self.assertNotEqual(future["packet_digest"], late["packet_digest"])
+        self.assertNotEqual(future["host_packet_id"], late["host_packet_id"])
+        self.assertEqual(read(FIXTURES / "future-source-expected.json")["message_type"], "monitoring_refusal")
+        self.assertEqual(read(FIXTURES / "late-source-released-expected.json")["message_type"], "monitoring_result")
+
     def test_uncorrelatable_errors_do_not_echo_invalid_request_identifiers(self):
         refusal = read(FIXTURES / "uncorrelatable-refusal.json")
         self.validator.validate(refusal)

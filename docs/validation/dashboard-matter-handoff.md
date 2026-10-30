@@ -184,3 +184,13 @@ Post-correction contract suite: 178 tests passed in the existing environment;
 render/check and repository validation passed at the freeze checkpoint. The
 specification freeze is a component interface milestone; no StateCivics runtime
 file or deployment was changed. MAT-082 proceeds on a separate stacked branch.
+
+
+Freeze follow-up review: two passes reviewed all six selected files, one low test
+finding, no warnings. Added a paired availability assertion: the identical late
+source is refused at the early cut and has a result at the later cut. The later
+example now has a distinct illustrative packet ID/digest for its changed cutoff;
+these remain authored wire examples, not actual prepared packets. Regenerated
+the contract inventory; eleven targeted contract tests pass. Wire shape and
+adopted semantics are unchanged at 1.0.0. Updated the plan's old candidate/
+unresolved-target passages to the current frozen decision.

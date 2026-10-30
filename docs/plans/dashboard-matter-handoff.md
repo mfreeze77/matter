@@ -62,7 +62,7 @@ and candidate-scope watches; an exact-follow-only implementation is insufficient
    components. Say which selected client-default values were used and their
    versions. One client's several objectives stay separate.
 3. Purpose text; scoped subjects/places; changes of interest; issue/provision
-   positions and exclusions; assigned responsibility/already-handled status;
+   positions and exclusions; assigned responsibility and separately scoped dispositions;
    active dates; audience and delivery preferences. Missing stance is unknown,
    not neutral. Legacy `monitor` is a watching preference, not a source position.
 4. A separate authorized evidence manifest: exact source/version hashes and
@@ -82,12 +82,13 @@ and candidate-scope watches; an exact-follow-only implementation is insufficient
    Domain/replay time never substitutes for the actual authority/provider clock.
    Direct pause/retire/revoke/edit commands use the host control path immediately.
 
-### Candidate envelope and validation boundary
+### Frozen envelope and validation boundary
 
-MAT-081 now has a [candidate specification](../contracts/monitoring-handoff.md),
+MAT-081 now has a [frozen specification](../contracts/monitoring-handoff.md),
 portable schema and synthetic compatibility examples, tagged
-`monitoring-handoff/1.0.0-candidate.1`. It remains unfrozen; this is not a
-shipped runtime API. That specification supersedes the earlier draft field names.
+`monitoring-handoff/1.0.0`. Decision 0002 records the owner-approved capture target
+and bounded engineering dispositions. This specification supersedes the earlier
+draft field names; freeze alone does not ship a host runtime API.
 The request projects approved intent, authenticated host-binding identifiers,
 context components, evidence, baseline, capture binding, evaluation and budgets.
 The actual trusted host controls and MAT-028 PreparedPacket are injected alongside
@@ -97,9 +98,10 @@ Pinned StateCivics main has real ownership checks and create/revise/retire, but
 no production MAT-072 host-control adapter, draft/pause/revoke lifecycle, broad
 record-free create scope or live assessment provider (the seam returns 503).
 Current capture requires a real watchlist/item and ActivityEvent association.
-Owned broad-objective capture provisioning is an explicit unresolved host choice,
-not existing functionality. See the specification's host-build list and D1-D7
-freeze gate before dependent implementation.
+The owner selected a real owned watchlist/item target with refusal until it
+exists and is authorized. Broad-objective capture provisioning remains host work,
+not existing functionality. See the specification's host-build list and adopted
+D1–D7 decisions before connecting dependent host implementation.
 
 ### Output groups to specify
 
