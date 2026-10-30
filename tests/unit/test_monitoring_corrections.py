@@ -90,11 +90,19 @@ class MonitoringCorrectionTests(unittest.TestCase):
         for kind, subject, code in (("claim", dict(self.candidate, id="other"), "E_SCOPE_FORBIDDEN"),
                                     ("observation", None, "E_EVIDENCE_UNAVAILABLE")):
             with self.subTest(kind=kind):
+                self.reads.clear()
                 _, prior = self.record(kind, "prior", subject=subject)
                 current, _ = self.record("claim", "current", parents=[prior])
+                targets = [prior]
+                if kind == "observation":
+                    # Select claim roots too, then actually follow and reject
+                    # the corrupt cross-type edge rather than filtering it out.
+                    _, claim_target = self.record("claim", "unlinked-target")
+                    targets.append(claim_target)
                 with self.assertRaises(ContractError) as error:
-                    self.check([current], [prior], [prior])
+                    self.check([current], targets, targets)
                 self.assertEqual(error.exception.code, code)
+                self.assertEqual(self.reads, [prior])
 
     def test_transitive_link_does_not_read_an_ungranted_sibling_branch(self):
         _, target = self.record("claim", "target")
@@ -122,3 +130,16 @@ class MonitoringCorrectionTests(unittest.TestCase):
         current, _ = self.record("observation", "current", parents=[unavailable, middle])
         self.check([current], [target], [unavailable, middle, target])
         self.assertEqual(self.reads, [unavailable, middle, target])
+
+    def test_unavailable_intermediate_observation_cannot_prove_a_link(self):
+        for available in ({"state": "unknown", "reason": "unavailable"},
+                          dict(NOW, value="2050-01-02T00:00:00Z")):
+            with self.subTest(available=available):
+                self.reads.clear()
+                _, target = self.record("observation", "target")
+                _, middle = self.record("observation", "middle", parents=[target], available=available)
+                current, _ = self.record("observation", "current", parents=[middle])
+                with self.assertRaises(ContractError) as error:
+                    self.check([current], [target], [middle, target])
+                self.assertEqual(error.exception.code, "E_EVIDENCE_UNAVAILABLE")
+                self.assertEqual(self.reads, [middle])
