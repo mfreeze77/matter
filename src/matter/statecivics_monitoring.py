@@ -19,7 +19,7 @@ from .budgets import milliseconds
 from .canonical import canonical_bytes, canonical_digest, loads
 from .contexts import _active, _binding
 from .dispositions import DispositionDefinition, disposition_ref
-from .contracts import CanonicalError, ContractError, _FORMAT_CHECKER
+from .contracts import CanonicalError, ContractError, ERROR_CODES, _FORMAT_CHECKER
 from .semantic import Batch
 from .semantic.contracts import _result
 from .semantic.cache import attempt_ref
@@ -482,8 +482,9 @@ class AdmittedMonitoring:
             _fail("E_CANCELLED")
         if result["status"] not in {"completed", "reused"}:
             code = result.get("operation", {}).get("error", {}).get("code", "E_POLICY_INVALID")
-            allowed = _validator("refusal").schema["$defs"]["refusal"]["properties"]["code"]["enum"]
-            _fail(code if code in allowed else "E_POLICY_INVALID")
+            # Preserve native failures until monitoring_refusal maps them to
+            # the wire vocabulary; persistence failure is not invalid input.
+            _fail(code if type(code) is str and code in ERROR_CODES else "E_POLICY_INVALID")
         return result
 
     def project(self, *, attention, read_token, access_context, source_finding):
@@ -528,9 +529,6 @@ class AdmittedMonitoring:
             required = [source_finding, *[ref for kind, ref in current.contexts.items() if kind != "preference"], *req["dispositions"]]
             if any(canonical_bytes(ref) not in consumed for ref in required):
                 _fail("E_DEPENDENCY_STALE")
-            if not set(canonical_bytes(s["reference"]) for s in req["evidence"]["sources"]) <= set(
-                    canonical_bytes(ref) for ref in assessment["body"]["evidence_selection"]["references"]):
-                _fail("E_EVIDENCE_UNAVAILABLE")
         if req["evidence"]["coverage"] != "complete" and value["treatment"] not in {"quiet", "correction"}:
             _fail("E_EVIDENCE_UNAVAILABLE")
         result = {"message_type": "monitoring_result", "contract_version": VERSION, "request_id": req["request_id"],

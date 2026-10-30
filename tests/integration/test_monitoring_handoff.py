@@ -862,16 +862,25 @@ class MonitoringHandoffTests(unittest.TestCase):
         h = self.h
         commit = h.receipts.commit
         refused_phase = ["started"]
+        failure_code = ["E_BUDGET_EXHAUSTED"]
         def refuse_recording(command, *args, **kwargs):
             phase = command["body"]["receipt"]["body"]["details"]["value"]["phase"]
             if phase == refused_phase[0]:
-                return {"status": "failure", "error": {"code": "E_BUDGET_EXHAUSTED"}}
+                return {"status": "failure", "error": {"code": failure_code[0]}}
             return commit(command, *args, **kwargs)
         with patch.object(h.receipts, "commit", refuse_recording):
-            with self.assertRaises(ContractError) as no_start:
-                h.execute()
-            self.assertEqual(no_start.exception.code, "E_BUDGET_EXHAUSTED")
-            self.assertEqual(h.calls, [])
+            for native, wire in (("E_BUDGET_EXHAUSTED", "E_BUDGET_EXHAUSTED"),
+                                 ("E_STORAGE_UNAVAILABLE", "E_EVIDENCE_UNAVAILABLE"),
+                                 ("E_NOT_FOUND", "E_EVIDENCE_UNAVAILABLE"),
+                                 ("E_REVISION_CONFLICT", "E_DEPENDENCY_STALE")):
+                with self.subTest(native=native):
+                    failure_code[0] = native
+                    with self.assertRaises(ContractError) as no_start:
+                        h.execute()
+                    self.assertEqual(no_start.exception.code, native)
+                    self.assertEqual(monitoring_refusal(no_start.exception,
+                        request_id=h.req["request_id"])["code"], wire)
+                    self.assertEqual(h.calls, [])
             refused_phase[0] = "completed"
             with self.assertRaises(ContractError) as unrecorded:
                 h.execute()
