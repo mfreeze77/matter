@@ -614,6 +614,21 @@ class MonitoringHandoffTests(unittest.TestCase):
         self.assertEqual(corrected["treatment"], "correction")
         self.assertIn("correction_delta", corrected["reasons"])
         self.assertIn("insufficient_evidence", corrected["reasons"])
+        # Even readable same-subject records cannot invent a correction edge.
+        with patch.object(lifecycle_fixtures, "FUTURE", future_end):
+            unrelated = h.e.claim("unlinked", h.e.condition_b, "present", h.source, effective=h.f.now)
+        h.refresh(extra=[pin(unrelated)])
+        for forged in (pin(unrelated), pin(h.claim), pin(h.source)):
+            with self.subTest(forged=forged["id"]):
+                h.req["evidence"]["correction_of"] = [forged]
+                h.state = replace(h.state, projection={k: deepcopy(h.req[k]) for k in HOST_FIELDS})
+                with self.assertRaises(ContractError) as unlinked:
+                    h.admit()
+                self.assertEqual(unlinked.exception.code, "E_EVIDENCE_UNAVAILABLE")
+                self.assertEqual(h.calls, [])
+        h.req["evidence"]["correction_of"] = [pin(original)]
+        h.state = replace(h.state, projection={k: deepcopy(h.req[k]) for k in HOST_FIELDS})
+        h.admit()
 
     def test_real_access_policy_revocation_expiry_and_budget_refuse_before_io(self):
         h = self.h

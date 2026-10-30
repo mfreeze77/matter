@@ -266,6 +266,33 @@ class AdmittedMonitoring:
             if sorted(req["evidence"]["occurrences"], key=canonical_bytes) != sorted(state["mechanical"]["occurrence_inputs"], key=canonical_bytes):
                 _fail("E_EVIDENCE_UNAVAILABLE")
             host.access.require_current(view, host.access_context, references=req["evidence"]["correction_of"])
+            if req["evidence"]["correction_of"]:
+                # A readable reference alone is not a source correction. Trace
+                # the existing immutable supersedes edges, never descendants or
+                # analyst feedback, from the actual bound inputs.
+                roots = [claim, finding, *[view.get(item["reference"]) for item in state["evidence"]]]
+                pending = [(root["record_type"], ref) for root in roots for ref in root.get("supersedes", [])]
+                ancestors = set()
+                while pending:
+                    kind, ref = pending.pop()
+                    key = canonical_bytes(ref)
+                    if key in ancestors:
+                        continue
+                    if len(ancestors) >= 128:
+                        _fail("E_BUDGET_EXHAUSTED")
+                    host.access.require_current(view, host.access_context, references=[ref])
+                    prior = view.get(ref)
+                    if prior["record_type"] != kind:
+                        _fail("E_EVIDENCE_UNAVAILABLE")
+                    if kind in {"claim", "assessment"} and prior["body"].get("subject", prior["body"].get("matter")) != entity_ref(current.candidate):
+                        _fail("E_SCOPE_FORBIDDEN")
+                    if kind == "observation" and (prior["body"]["available_at"]["state"] != "known" or
+                            compare_times(prior["body"]["available_at"], state["as_of"]) > 0):
+                        _fail("E_EVIDENCE_UNAVAILABLE")
+                    ancestors.add(key)
+                    pending.extend((kind, parent) for parent in prior.get("supersedes", []))
+                if not {canonical_bytes(ref) for ref in req["evidence"]["correction_of"]} <= ancestors:
+                    _fail("E_EVIDENCE_UNAVAILABLE")
             if set(current.contexts) != set(req["context_components"]):
                 _fail()
             for kind, reference in current.contexts.items():
