@@ -94,6 +94,43 @@ def monitoring_refusal(error, *, request_id=None):
         "request_id": request_id, "code": code, "reason": reason}, "refusal")
 
 
+def _require_correction_lineage(view, *, access, context, roots, candidate, targets, as_of):
+    """Verify only authorized ancestor paths needed for declared corrections."""
+    wanted = {canonical_bytes(ref) for ref in targets}
+    kinds = {ref["record_type"] for ref in targets}
+    allowed = {canonical_bytes(ref) for ref in context.value["dependencies"]}
+    pending = [(root["record_type"], ref) for root in roots if root["record_type"] in kinds
+               for ref in root.get("supersedes", [])]
+    visited, ancestors = set(), set()
+    while pending and not wanted <= ancestors:
+        # Prefer an explicit target over another branch's incidental history.
+        pending.sort(key=lambda item: canonical_bytes(item[1]) not in wanted)
+        kind, ref = pending.pop(0)
+        key = canonical_bytes(ref)
+        if key in visited:
+            continue
+        if len(visited) >= 128:
+            _fail("E_BUDGET_EXHAUSTED")
+        visited.add(key)
+        # Missing permission on an unused branch is not a reason to discard a
+        # separately verifiable link. Never retrieve that branch's body.
+        if key not in allowed:
+            continue
+        access.require_current(view, context, references=[ref])
+        prior = view.get(ref)
+        if prior["record_type"] != kind:
+            _fail("E_EVIDENCE_UNAVAILABLE")
+        if kind in {"claim", "assessment"} and prior["body"].get("subject", prior["body"].get("matter")) != entity_ref(candidate):
+            _fail("E_SCOPE_FORBIDDEN")
+        if kind == "observation" and (prior["body"]["available_at"]["state"] != "known" or
+                compare_times(prior["body"]["available_at"], as_of) > 0):
+            _fail("E_EVIDENCE_UNAVAILABLE")
+        ancestors.add(key)
+        pending.extend((kind, parent) for parent in prior.get("supersedes", []))
+    if not wanted <= ancestors:
+        _fail("E_EVIDENCE_UNAVAILABLE")
+
+
 @dataclass(frozen=True)
 class HostMonitoringState:
     """Current server-owned projection; no browser or model constructs this.
@@ -270,29 +307,11 @@ class AdmittedMonitoring:
                 # A readable reference alone is not a source correction. Trace
                 # the existing immutable supersedes edges, never descendants or
                 # analyst feedback, from the actual bound inputs.
-                roots = [claim, finding, *[view.get(item["reference"]) for item in state["evidence"]]]
-                pending = [(root["record_type"], ref) for root in roots for ref in root.get("supersedes", [])]
-                ancestors = set()
-                while pending:
-                    kind, ref = pending.pop()
-                    key = canonical_bytes(ref)
-                    if key in ancestors:
-                        continue
-                    if len(ancestors) >= 128:
-                        _fail("E_BUDGET_EXHAUSTED")
-                    host.access.require_current(view, host.access_context, references=[ref])
-                    prior = view.get(ref)
-                    if prior["record_type"] != kind:
-                        _fail("E_EVIDENCE_UNAVAILABLE")
-                    if kind in {"claim", "assessment"} and prior["body"].get("subject", prior["body"].get("matter")) != entity_ref(current.candidate):
-                        _fail("E_SCOPE_FORBIDDEN")
-                    if kind == "observation" and (prior["body"]["available_at"]["state"] != "known" or
-                            compare_times(prior["body"]["available_at"], state["as_of"]) > 0):
-                        _fail("E_EVIDENCE_UNAVAILABLE")
-                    ancestors.add(key)
-                    pending.extend((kind, parent) for parent in prior.get("supersedes", []))
-                if not {canonical_bytes(ref) for ref in req["evidence"]["correction_of"]} <= ancestors:
-                    _fail("E_EVIDENCE_UNAVAILABLE")
+                roots = [claim, finding]
+                if any(ref["record_type"] == "observation" for ref in req["evidence"]["correction_of"]):
+                    roots.extend(view.get(item["reference"]) for item in state["evidence"])
+                _require_correction_lineage(view, access=host.access, context=host.access_context,
+                    roots=roots, candidate=current.candidate, targets=req["evidence"]["correction_of"], as_of=state["as_of"])
             if set(current.contexts) != set(req["context_components"]):
                 _fail()
             for kind, reference in current.contexts.items():
