@@ -122,6 +122,24 @@ def project_material(policy, assessment, claims):
     return material, selections, values
 
 
+def select_attention_treatment(*, hard_quiet, correction, ordinary_quiet, decision_ready,
+                               handled_by_owner, audience_kind, owned_by_audience,
+                               preference, routine_treatment):
+    """Neutral routing precedence; inputs carry no evidence/action authority."""
+    if hard_quiet:
+        return "quiet", None
+    if correction:
+        return "correction", "correction_delta"
+    if ordinary_quiet:
+        return "quiet", None
+    if decision_ready:
+        return "decision_request", "reserved_decision_required"
+    if handled_by_owner:
+        return "quiet", None
+    return ("host_hint" if audience_kind == "host_agent" and owned_by_audience else
+            (preference or routine_treatment)), "material_change"
+
+
 def decide_attention(policy, assessment, values, material, baseline, *, purpose_active, audience_active,
                      audience_reference, audience_kind, owned, lifecycle_role, dispositions, preference=None,
                      linked_fields=(), owned_by_audience=False, selections=None):
@@ -171,21 +189,14 @@ def decide_attention(policy, assessment, values, material, baseline, *, purpose_
     decision_ready = (decision is not None and decision["audience"] == audience_reference and audience_kind in {"human", "role"}
         and any(field["name"] == decision["field"] and admitted(field) for field in policy.value["fields"]))
     hard_quiet = not purpose_active or not audience_active or not changed or bool(dispositions)
-    if hard_quiet:
-        treatment = "quiet"
-    elif correction:
-        treatment = "correction"
-        reasons.append("correction_delta")
-    elif not active["relevance"] or any(reason in reasons for reason in ("insufficient_evidence", "incomplete_coverage", "recovery_established")):
-        treatment = "quiet"
-    elif decision_ready:
-        treatment = "decision_request"
-        reasons.append("reserved_decision_required")
-    elif "handled_by_owner" in reasons:
-        treatment = "quiet"
-    else:
-        treatment = "host_hint" if audience_kind == "host_agent" and owned_by_audience else (preference or policy.value["routine_treatment"])
-        reasons.append("critical_fact" if active["critical"] else "material_change")
+    treatment, reason = select_attention_treatment(hard_quiet=hard_quiet, correction=correction,
+        ordinary_quiet=not active["relevance"] or any(reason in reasons for reason in
+            ("insufficient_evidence", "incomplete_coverage", "recovery_established")),
+        decision_ready=decision_ready, handled_by_owner="handled_by_owner" in reasons,
+        audience_kind=audience_kind, owned_by_audience=owned_by_audience,
+        preference=preference, routine_treatment=policy.value["routine_treatment"])
+    if reason is not None:
+        reasons.append("critical_fact" if reason == "material_change" and active["critical"] else reason)
     if treatment == "quiet" and not reasons:
         reasons.append("no_material_change")
     return {"treatment": treatment, "reasons": list(dict.fromkeys(reasons)), "changed_fields": changed,

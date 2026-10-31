@@ -1,0 +1,508 @@
+{
+  "evidence_kind": "synthetic_recorded_runtime",
+  "provider_calls_live": 0,
+  "request": {
+    "baseline": {
+      "status": "no_observed_output"
+    },
+    "budgets": {
+      "max_calls": 4,
+      "max_cost_usd": "0.02",
+      "max_request_bytes": 65536,
+      "max_response_bytes": 65536,
+      "price_basis": {
+        "digest": "1e91b4b81fcce11b409dce71f40434eb03302300778bc4d0e7a356f21411caaf",
+        "id": "fixture-price-reservation",
+        "namespace": "synthetic.monitoring",
+        "version": "1.0"
+      },
+      "timeout_seconds": 20,
+      "wall_seconds": 300
+    },
+    "capture_binding": {
+      "activity_event_id": "501",
+      "user_activity_event_id": "512",
+      "watchlist_id": "402",
+      "watchlist_item_id": "412"
+    },
+    "context_components": {
+      "responsibility": {
+        "namespace": "example:contexts",
+        "id": "monitoring-responsibility",
+        "version": "1.0",
+        "digest": "357013a67fba8df2c39370c1f42b0754de584c62330124ee5f6bed35572a2b8f"
+      },
+      "preference": {
+        "namespace": "example:contexts",
+        "id": "monitoring-preference",
+        "version": "1.0",
+        "digest": "72d4b38b4e1e5af5a9f9e4ca8aee9d2e61403b297d1d9182e58307f1f69f35b3"
+      },
+      "scope": {
+        "namespace": "example:contexts",
+        "id": "procurement-scope",
+        "version": "1.0",
+        "digest": "77e2ece1064ae81abf7cc2b3b6f848ef4912e3a7d1403bf2261a58862113f93f"
+      },
+      "purpose": {
+        "namespace": "example:contexts",
+        "id": "procurement-purpose",
+        "version": "1.0",
+        "digest": "2b9e0945771a17566ca7e875c0c903bde6767aa3f3416ddc9d64eba3f38ad869"
+      },
+      "audience": {
+        "namespace": "example:contexts",
+        "id": "procurement-audience",
+        "version": "1.0",
+        "digest": "37dc37ff3baa0a87a6f3b38e4cf9a923104766c1d4548818e206863cdb299d03"
+      }
+    },
+    "context_selection": {
+      "effective_at": {
+        "state": "known",
+        "value": "2050-01-01T00:00:00Z",
+        "precision": "second"
+      },
+      "policy": "retrospective_selected"
+    },
+    "contract_version": "monitoring-handoff/1.1.0",
+    "dispositions": [],
+    "evaluation": {
+      "adapter": {
+        "namespace": "example",
+        "id": "fixture-adapter",
+        "version": "1.0",
+        "digest": "aa0130aaa88c2718626dc77e89e89f786b2f52278fe7c12f63de76ecbb30bcf2"
+      },
+      "model": "synthetic-fixed",
+      "policy": {
+        "namespace": "example",
+        "id": "attention",
+        "version": "1.0",
+        "digest": "c68af55d8233f185971f01e7998a9369cff0a88a99b1e17e3c0657906848dda6"
+      },
+      "provider": {
+        "namespace": "example",
+        "id": "monitoring-fixture-provider",
+        "version": "1.0",
+        "digest": "3cfa8b124ab85bfee96ed35ba8659f046e6ad18dbfca68e00aea7b7e72aea90b"
+      },
+      "qualification": "unqualified",
+      "questions": [
+        {
+          "namespace": "matter.statecivics",
+          "id": "monitoring-objective",
+          "version": "1.0",
+          "digest": "339e1dfdf977956977ae1b5f271f5df711462a5aa037ac49fcbc95a3ed2391ce"
+        },
+        {
+          "namespace": "matter.statecivics",
+          "id": "monitoring-novelty",
+          "version": "1.0",
+          "digest": "4428747c3336e687a147345934ff25a6f86d3a89570eaf0e19f4f2addd37b534"
+        }
+      ]
+    },
+    "evidence": {
+      "correction_of": [],
+      "coverage": "complete",
+      "coverage_reason": "Complete only for the supplied synthetic notice, not the jurisdiction or legal effect.",
+      "host_packet_id": "packet-501",
+      "knowledge_cut": {
+        "state": "known",
+        "value": "2050-01-01T00:00:00Z",
+        "precision": "second"
+      },
+      "occurrences": [
+        {
+          "scope_id": "synthetic:claims",
+          "namespace": "example",
+          "record_type": "occurrence",
+          "id": "happening-shared-monitoring-source",
+          "revision": 1
+        }
+      ],
+      "packet_digest": "fe12ff42783c65658fad9e1a0c0a0d0e3e678952676fd624eb630b0432ea1e7d",
+      "sources": [
+        {
+          "artifact_sha256": "2f470c91109878b8e8a6c4b149ddd9deaf908a3c83effeae0bbad68329857900",
+          "available_at": {
+            "precision": "second",
+            "state": "known",
+            "value": "2050-01-01T00:00:00Z"
+          },
+          "effective_at": {
+            "precision": "second",
+            "state": "known",
+            "value": "2026-11-12T10:00:00Z"
+          },
+          "locator": {
+            "kind": "whole_artifact",
+            "uri": "urn:synthetic:source:example:publisher:event-shared-monitoring-source"
+          },
+          "occurred_at": {
+            "precision": "second",
+            "state": "known",
+            "value": "2050-01-01T00:00:00Z"
+          },
+          "origin": "source",
+          "parents": [],
+          "published_at": {
+            "reason": "not_reported",
+            "state": "unknown"
+          },
+          "reference": {
+            "scope_id": "synthetic:claims",
+            "namespace": "example",
+            "record_type": "observation",
+            "id": "source-shared-monitoring-source",
+            "digest": "ed4667f8cb42bec0df60c08d1c8245e5c0b728ac791183633e3faabbfb4247c8"
+          },
+          "selected_text_sha256": "2f470c91109878b8e8a6c4b149ddd9deaf908a3c83effeae0bbad68329857900"
+        }
+      ]
+    },
+    "host_binding": {
+      "client_id": "302",
+      "jurisdiction_key": "synthetic:district:example",
+      "user_id": "101",
+      "workspace_id": "201"
+    },
+    "idempotency_key": "audience-b-quiet",
+    "intent": {
+      "active_from": {
+        "state": "known",
+        "value": "2050-01-01T00:00:00Z",
+        "precision": "second"
+      },
+      "active_until": null,
+      "approval": {
+        "actor_id": "101",
+        "approved_at": {
+          "state": "known",
+          "value": "2050-01-01T00:00:00Z",
+          "precision": "second"
+        },
+        "kind": "subscriber_approved"
+      },
+      "concepts": [
+        "open procurement"
+      ],
+      "content_hash": "9553821031fadf9a15f3e3ac24f84ec059ac1b3128a4f7750e72f368a7f73ae6",
+      "defaults": {
+        "mode": "snapshot",
+        "profile_reference": {
+          "digest": "29f9864966c93f19b51a6884399b4c3b350e2b95abbc82c18f199c5cd7f9a9b0",
+          "id": "client-a-defaults-v1",
+          "namespace": "synthetic.monitoring",
+          "version": "1.0"
+        }
+      },
+      "exclusions": [
+        "routine keyword mentions"
+      ],
+      "id": "intent-b",
+      "interests": [
+        "interoperability"
+      ],
+      "positions": [
+        {
+          "origin": "user_approved",
+          "position": "proponent",
+          "provision": "open interoperability"
+        }
+      ],
+      "preference": {
+        "cadence": "digest",
+        "channels": [
+          "in_app"
+        ]
+      },
+      "purpose": "Find open school technology procurements to bid on.",
+      "requested_events": [
+        "proposal",
+        "hearing",
+        "correction"
+      ],
+      "responsibility": {
+        "owner_id": null
+      },
+      "revision_id": "intent-b-v1",
+      "revision_number": 1,
+      "scope": {
+        "kind": "objective",
+        "objective_id": "intent-b"
+      }
+    },
+    "message_type": "monitoring_request",
+    "mode": "rehearsal_capture",
+    "request_id": "audience-b-quiet",
+    "proposal_basis": {
+      "kind": "unqualified_model_capture",
+      "capture_policy": {
+        "scope_id": "synthetic:claims",
+        "namespace": "statecivics.monitoring.capture",
+        "record_type": "matter:projection",
+        "id": "policy-fcbafad673e87ad6888aabf5fa6e26392e06600cd994f7df90f1debf126bb1fd",
+        "revision": 1
+      },
+      "source_reading": {
+        "scope_id": "synthetic:claims",
+        "namespace": "matter.semantic.executions",
+        "record_type": "receipt",
+        "id": "c36fd66d438b20979d675f9954d9dee0d2d263e42cfb267aec5dd24641ac0573",
+        "digest": "079e115d593d20ce164c44afdd961aaf13e2685296080b52f3e85743f3c929e7"
+      }
+    }
+  },
+  "result": {
+    "assessment_reference": null,
+    "baseline_reference": null,
+    "capture_key": "efec7a4e55b9c45a9eed025198d25e4473b9d61271c431739fa76a7934635d13",
+    "citations": [
+      {
+        "locator": {
+          "kind": "whole_artifact",
+          "uri": "urn:synthetic:source:example:publisher:event-shared-monitoring-source"
+        },
+        "selected_text_sha256": "2f470c91109878b8e8a6c4b149ddd9deaf908a3c83effeae0bbad68329857900",
+        "source": {
+          "digest": "ed4667f8cb42bec0df60c08d1c8245e5c0b728ac791183633e3faabbfb4247c8",
+          "id": "source-shared-monitoring-source",
+          "namespace": "example",
+          "record_type": "observation",
+          "scope_id": "synthetic:claims"
+        }
+      }
+    ],
+    "consequential_use": false,
+    "context_components": {
+      "audience": {
+        "digest": "37dc37ff3baa0a87a6f3b38e4cf9a923104766c1d4548818e206863cdb299d03",
+        "id": "procurement-audience",
+        "namespace": "example:contexts",
+        "version": "1.0"
+      },
+      "preference": {
+        "digest": "72d4b38b4e1e5af5a9f9e4ca8aee9d2e61403b297d1d9182e58307f1f69f35b3",
+        "id": "monitoring-preference",
+        "namespace": "example:contexts",
+        "version": "1.0"
+      },
+      "purpose": {
+        "digest": "2b9e0945771a17566ca7e875c0c903bde6767aa3f3416ddc9d64eba3f38ad869",
+        "id": "procurement-purpose",
+        "namespace": "example:contexts",
+        "version": "1.0"
+      },
+      "responsibility": {
+        "digest": "357013a67fba8df2c39370c1f42b0754de584c62330124ee5f6bed35572a2b8f",
+        "id": "monitoring-responsibility",
+        "namespace": "example:contexts",
+        "version": "1.0"
+      },
+      "scope": {
+        "digest": "77e2ece1064ae81abf7cc2b3b6f848ef4912e3a7d1403bf2261a58862113f93f",
+        "id": "procurement-scope",
+        "namespace": "example:contexts",
+        "version": "1.0"
+      }
+    },
+    "contract_version": "monitoring-handoff/1.1.0",
+    "coverage": "complete",
+    "currentness": "guard_required_before_capture",
+    "decision_basis": {
+      "capture_admission_reference": {
+        "id": "admission-1b658fc11b0c89f06716b11ccce1ca3e2fbfb117751f0bcb45ad5cffef830c0b",
+        "namespace": "statecivics.monitoring.capture",
+        "record_type": "matter:projection",
+        "revision": 1,
+        "scope_id": "synthetic:claims"
+      },
+      "capture_policy": {
+        "id": "policy-fcbafad673e87ad6888aabf5fa6e26392e06600cd994f7df90f1debf126bb1fd",
+        "namespace": "statecivics.monitoring.capture",
+        "record_type": "matter:projection",
+        "revision": 1,
+        "scope_id": "synthetic:claims"
+      },
+      "execution_reference": {
+        "digest": "148dbbf42ba61ef68429a9361e7055e89b6bd86babec458b8bbb8a0d2f22e65f",
+        "id": "cc10c955ae9af4a13432a8d065222bfe6633011b6e5dc87bac6a3924a88451a7",
+        "namespace": "matter.semantic.executions",
+        "record_type": "receipt",
+        "scope_id": "synthetic:claims"
+      },
+      "judgments": {
+        "novelty": "negative",
+        "objective": "negative"
+      },
+      "kind": "unqualified_model_capture",
+      "original_execution_reference": {
+        "digest": "148dbbf42ba61ef68429a9361e7055e89b6bd86babec458b8bbb8a0d2f22e65f",
+        "id": "cc10c955ae9af4a13432a8d065222bfe6633011b6e5dc87bac6a3924a88451a7",
+        "namespace": "matter.semantic.executions",
+        "record_type": "receipt",
+        "scope_id": "synthetic:claims"
+      }
+    },
+    "dependencies": [
+      {
+        "digest": "079e115d593d20ce164c44afdd961aaf13e2685296080b52f3e85743f3c929e7",
+        "id": "c36fd66d438b20979d675f9954d9dee0d2d263e42cfb267aec5dd24641ac0573",
+        "namespace": "matter.semantic.executions",
+        "record_type": "receipt",
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "digest": "0dd7a8faa7d02837156a2994502fca7287fbac531b276b31f6719690fd555f9c",
+        "id": "command-4f0a4c976166e30a66cc2a023fcbf9dce212c470219f86aed52ba4fb78120c96",
+        "namespace": "matter.storage",
+        "record_type": "receipt",
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "digest": "148dbbf42ba61ef68429a9361e7055e89b6bd86babec458b8bbb8a0d2f22e65f",
+        "id": "cc10c955ae9af4a13432a8d065222bfe6633011b6e5dc87bac6a3924a88451a7",
+        "namespace": "matter.semantic.executions",
+        "record_type": "receipt",
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "digest": "3ea9d2ebebcdbd51a8de8e3e7c303d02690b099fa375aa4bbcbfc9afdc9ad7f7",
+        "id": "shared-monitoring-finding",
+        "namespace": "example",
+        "record_type": "claim",
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "digest": "7a6db7e490bca6be442680560e5abe700c8b6a2ec0a798922acec7ed30225b83",
+        "id": "command-5f18b0b02a5d7d867592df01232bff22885015d3cc687bcb85955c6203aa6060",
+        "namespace": "matter.storage",
+        "record_type": "receipt",
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "digest": "7b8a3cca19937465391a4a233c74c48a43e17049bbd79156b4e0e3b533be535e",
+        "id": "command-93fbc2205e9c216069ea5bf9be02babf47d507d0e45899aa0fe0c649b643a1c4",
+        "namespace": "matter.storage",
+        "record_type": "receipt",
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "digest": "9f1ac5a6a7d9058b784773d95346bde1065ea7b9ba42574a1967ccb35080cf26",
+        "id": "command-9641cf566f103ee2cd5341b84bd5c5bb759fc00d8b4015f1acb749c98cb45745",
+        "namespace": "matter.storage",
+        "record_type": "receipt",
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "digest": "ed4667f8cb42bec0df60c08d1c8245e5c0b728ac791183633e3faabbfb4247c8",
+        "id": "source-shared-monitoring-source",
+        "namespace": "example",
+        "record_type": "observation",
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "id": "context-51099f50fc6126d9d2925a0a3c5115877cd6fc6e5653d7b6866306c7a4987569",
+        "namespace": "example:contexts",
+        "record_type": "matter:projection",
+        "revision": 1,
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "id": "context-a074e0773e306dc6e5a73e35846db15d43eaf4dd7e87bc1ce4af2d27f04aad7b",
+        "namespace": "example:contexts",
+        "record_type": "matter:projection",
+        "revision": 1,
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "id": "context-ac53e125bc1a075ab377d67d72bdc4e5ef7ade4c370eb58ec3d7dc2b5c461f7c",
+        "namespace": "example:contexts",
+        "record_type": "matter:projection",
+        "revision": 1,
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "id": "context-b87333df32317caa60fd3e3a1192e1f6beb096c021d9d4ac2892e3fd185b912e",
+        "namespace": "example:contexts",
+        "record_type": "matter:projection",
+        "revision": 1,
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "id": "context-bafc88e4f44dec6fd952f58ba09f3f9d7ad40e99e3869bb8b3c7d4f914f39ae7",
+        "namespace": "example:contexts",
+        "record_type": "matter:projection",
+        "revision": 1,
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "id": "happening-shared-monitoring-source",
+        "namespace": "example",
+        "record_type": "occurrence",
+        "revision": 1,
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "id": "policy-fcbafad673e87ad6888aabf5fa6e26392e06600cd994f7df90f1debf126bb1fd",
+        "namespace": "statecivics.monitoring.capture",
+        "record_type": "matter:projection",
+        "revision": 1,
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "id": "root-b592b1f1e6baca941f09e685f01d844c201fc1e851e5810081c0c2fd3f53f86c",
+        "namespace": "matter.provenance_groups",
+        "record_type": "matter:projection",
+        "revision": 1,
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "id": "subject-a",
+        "namespace": "example",
+        "record_type": "matter",
+        "revision": 1,
+        "scope_id": "synthetic:claims"
+      }
+    ],
+    "evidence_packet_digest": "fe12ff42783c65658fad9e1a0c0a0d0e3e678952676fd624eb630b0432ea1e7d",
+    "intent_revision_id": "intent-b-v1",
+    "message_type": "monitoring_result",
+    "outcome": "proposal",
+    "permitted_use": "capture_only",
+    "proposed_next_steps": [],
+    "qualification": "unqualified",
+    "reasons": [
+      "unqualified_model_negative"
+    ],
+    "request_id": "audience-b-quiet",
+    "result_id": "monitoring-82254a9f32badc3776919fda67021454ba2e0bb28a240c60c30f232387e57d06",
+    "source_finding_reference": {
+      "digest": "3ea9d2ebebcdbd51a8de8e3e7c303d02690b099fa375aa4bbcbfc9afdc9ad7f7",
+      "id": "shared-monitoring-finding",
+      "namespace": "example",
+      "record_type": "claim",
+      "scope_id": "synthetic:claims"
+    },
+    "treatment": "quiet",
+    "uncertainty": [
+      "Unqualified model study judgment; no supported source claim, qualification or delivery authority."
+    ]
+  },
+  "expected": {
+    "treatment": "quiet",
+    "judgments": {
+      "novelty": "negative",
+      "objective": "negative"
+    }
+  },
+  "source_finding": {
+    "scope_id": "synthetic:claims",
+    "namespace": "example",
+    "record_type": "claim",
+    "id": "shared-monitoring-finding",
+    "digest": "3ea9d2ebebcdbd51a8de8e3e7c303d02690b099fa375aa4bbcbfc9afdc9ad7f7"
+  }
+}

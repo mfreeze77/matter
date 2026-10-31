@@ -153,6 +153,7 @@ class HostMonitoringState:
     reserved_cost_usd: str
     source_finding: dict
     baseline_compatible: bool = True
+    capture_policy: object = None
 
 
 @dataclass(frozen=True)
@@ -165,6 +166,7 @@ class MonitoringHost:
     attention: object = None
     output_access: object = None
     output_access_context: object = None
+    capture_service: object = None
 
 
 def monitoring_questions():
@@ -195,8 +197,12 @@ def monitoring_questions():
 class AdmittedMonitoring:
     """One exact command, original access and source packet. No action authority."""
 
+    _version = VERSION
+    _host_fields = _HOST_FIELDS
+    _validate = staticmethod(validate_handoff)
+
     def __init__(self, request, *, host, packet):
-        self._request = validate_handoff(request)
+        self._request = self._validate(request)
         if (not isinstance(host, MonitoringHost) or not isinstance(host.access, AccessService)
                 or not isinstance(host.access_context, AccessContext) or not isinstance(packet, PreparedPacket)
                 or not callable(host.current_state) or not callable(host.clock) or host.access.current_read is None):
@@ -231,7 +237,7 @@ class AdmittedMonitoring:
         projection = deepcopy(current.projection)
         if req["host_binding"] != host.binding or projection.get("host_binding") != host.binding:
             _fail("E_SCOPE_FORBIDDEN")
-        if set(projection) != set(_HOST_FIELDS):
+        if set(projection) != set(self._host_fields):
             _fail()
         if current.status != "active":
             _fail("E_CANCELLED")
@@ -244,7 +250,7 @@ class AdmittedMonitoring:
             _fail("E_AUTHORITY_REQUIRED")
         if current.capture_muted:
             _fail("E_CANCELLED")
-        if any(projection[name] != req[name] for name in _HOST_FIELDS):
+        if any(projection[name] != req[name] for name in self._host_fields):
             _fail("E_DEPENDENCY_STALE")
         if not current.baseline_compatible:
             _fail("E_DEPENDENCY_STALE")
@@ -394,7 +400,7 @@ class AdmittedMonitoring:
             "components": {k: v for k, v in req["context_components"].items() if k != "preference"}, "observed_baseline": material,
             "baseline_status": req["baseline"]["status"], "qualification": "unqualified"}
         data["state"]["preparation"] = descriptor("matter.statecivics", "monitoring-context", "1.0",
-            {"base": data["state"]["preparation"], "contract": VERSION, "context_clock": "explicit_separate_from_evidence"},
+            {"base": data["state"]["preparation"], "contract": self._version, "context_clock": "explicit_separate_from_evidence"},
             "matter.monitoring-transform.v1")
         with self.host.access.current_read() as view:
             scoped = []
@@ -404,12 +410,13 @@ class AdmittedMonitoring:
                     scoped.append({key: definition[key] for key in ("kind", "subject", "status")})
             data["state"]["monitoring"]["dispositions"] = scoped
             if req["baseline"]["status"] != "no_observed_output":
-                data["state"]["monitoring"]["baseline_assessment"] = req["baseline"]["assessment_reference"]
+                key, ref = self._baseline_dependency()
+                data["state"]["monitoring"][key] = ref
             dependencies = {canonical_bytes(ref): ref for ref in data["dependencies"]}
             for ref in req["dispositions"]:
                 dependencies[canonical_bytes(ref)] = ref
             if req["baseline"]["status"] != "no_observed_output":
-                ref = req["baseline"]["assessment_reference"]
+                _, ref = self._baseline_dependency()
                 dependencies[canonical_bytes(ref)] = ref
             for item in scoped:
                 dependencies[canonical_bytes(item["subject"])] = item["subject"]
@@ -418,6 +425,9 @@ class AdmittedMonitoring:
         if len(canonical_bytes(data)) > 1048576:
             _fail("E_BUDGET_EXHAUSTED")
         return PreparedPacket(data, _prepared=True)
+
+    def _baseline_dependency(self):
+        return "baseline_assessment", self._request["baseline"]["assessment_reference"]
 
     def _conveyed_material(self):
         baseline = self._request["baseline"]
@@ -499,7 +509,8 @@ class AdmittedMonitoring:
         marker = descriptor("matter.statecivics", "monitoring-command", "1.0", {"digest": self.digest}, "matter.monitoring-binding.v1")
         native = receipts.request(batch, packet=packet, rendered_questions=rendered_questions,
             token=host.access_context.value["token"], model_binding=model_binding, access_context=host.access_context,
-            stage={"plan": descriptor("matter.statecivics", "monitoring-semantics", "1.0", {"contract": VERSION,
+            precision=self._execution_precision(),
+            stage={"plan": descriptor("matter.statecivics", "monitoring-semantics", "1.0", {"contract": self._version,
                 "consumes": ["source", "purpose", "scope", "audience", "responsibility", "baseline", "dispositions"]},
                 "matter.monitoring-semantic-plan.v1"),
                 "members": [{"stage_id": "audience", "transform": packet.state["preparation"], "parent_traces": [marker]}]})
@@ -520,7 +531,8 @@ class AdmittedMonitoring:
             return host.access.dispatch(detached, host.access_context, args["batch"], args["executor"],
                 rendered_questions=rendered_questions, clock=host.clock, precision=args["precision"])
         result = receipts.run(native, executor=executor, token=host.access_context.value["token"], logical_request_id=logical,
-            attempt_id="initial", allocation=allocation, access_context=host.access_context, dispatch=dispatch)
+            attempt_id="initial", allocation=allocation, access_context=host.access_context, dispatch=dispatch,
+            parents=self._execution_parents())
         self.require_current()
         if (result["status"] in {"started", "unknown"} or
                 (result["dispatched"] and result["status"] != "completed")):
@@ -536,6 +548,12 @@ class AdmittedMonitoring:
             # the wire vocabulary; persistence failure is not invalid input.
             _fail(code if type(code) is str and code in ERROR_CODES else "E_POLICY_INVALID")
         return result
+
+    def _execution_precision(self):
+        return None
+
+    def _execution_parents(self):
+        return ()
 
     def project(self, *, attention, read_token, access_context, source_finding):
         """Project a real current MAT-019 decision; never manufacture an assessment."""
@@ -581,7 +599,7 @@ class AdmittedMonitoring:
                 _fail("E_DEPENDENCY_STALE")
         if req["evidence"]["coverage"] != "complete" and value["treatment"] not in {"quiet", "correction"}:
             _fail("E_EVIDENCE_UNAVAILABLE")
-        result = {"message_type": "monitoring_result", "contract_version": VERSION, "request_id": req["request_id"],
+        result = {"message_type": "monitoring_result", "contract_version": self._version, "request_id": req["request_id"],
             "result_id": "monitoring-" + self.digest, "outcome": "proposal", "treatment": value["treatment"],
             "intent_revision_id": req["intent"]["revision_id"], "evidence_packet_digest": req["evidence"]["packet_digest"],
             "context_components": req["context_components"], "source_finding_reference": source_finding,
@@ -593,26 +611,33 @@ class AdmittedMonitoring:
             "dependencies": [value["assessment"], pin(record), *current.contexts.values(), *req["dispositions"]],
             "baseline_reference": req["baseline"].get("receipt"), "proposed_next_steps": []}
         self.require_current()
-        result = validate_handoff(result, "result")
-        capture_key = canonical_digest({"host": self.host.binding, "intent": req["intent"]["id"],
-            "candidate": entity_ref(current.candidate), "purpose": req["context_components"]["purpose"],
-            "scope": req["context_components"]["scope"], "audience": req["context_components"]["audience"],
-            "material": value["material_digest"], "contract": value["material_contract"],
-            "baseline": req["baseline"].get("receipt")}, "matter.monitoring-capture.v1")
+        result = self._validate(self._native_result(result, record), "result")
+        capture_key = conveyed_capture_identity(host_binding=self.host.binding, intent_id=req["intent"]["id"],
+            candidate=current.candidate, components=req["context_components"], material_digest=value["material_digest"],
+            material_contract=value["material_contract"], baseline_reference=req["baseline"].get("receipt"))
         self._projection = (deepcopy(result), {"attention": attention, "read_token": deepcopy(read_token),
                             "access_context": access_context, "source_finding": deepcopy(source_finding)}, capture_key)
         return result
 
+    def _native_result(self, result, record):
+        return result
+
+    def _reproject(self, arguments):
+        return self.project(**arguments)
+
+    def _capture_guard_current(self):
+        return self.require_current()
+
     def handoff(self, result, *, capture):
         """Fresh host handoff, not a delivery outcome or new capture implementation."""
         self.require_current()
-        value = validate_handoff(result, "result")
+        value = self._validate(result, "result")
         if self._projection is None:
             _fail("E_AUTHORITY_REQUIRED")
         if self._capture_unknown:
             _fail("E_DELIVERY_UNKNOWN")
         original, arguments, capture_key = self._projection
-        if value != original or self.project(**arguments) != original:
+        if value != original or self._reproject(arguments) != original:
             _fail("E_DEPENDENCY_STALE")
         if (value["result_id"] != "monitoring-" + self.digest or value["request_id"] != self._request["request_id"]
                 or not callable(capture)):
@@ -625,7 +650,7 @@ class AdmittedMonitoring:
         def capture_guard():
             guard_called.append(True)
             try:
-                current = self.require_current()
+                current = self._capture_guard_current()
                 guard_passed.append(True)
                 return current
             except ContractError as error:
@@ -643,6 +668,15 @@ class AdmittedMonitoring:
             self._capture_unknown = True
             _fail("E_DELIVERY_UNKNOWN")
         return outcome
+
+
+def conveyed_capture_identity(*, host_binding, intent_id, candidate, components, material_digest,
+                             material_contract, baseline_reference=None):
+    """Shared host/SDK key; excludes execution IDs, probability and cadence."""
+    return canonical_digest({"host": host_binding, "intent": intent_id, "candidate": entity_ref(candidate),
+        "purpose": components["purpose"], "scope": components["scope"], "audience": components["audience"],
+        "material": material_digest, "contract": material_contract, "baseline": baseline_reference},
+        "matter.monitoring-capture.v1")
 
 
 def packet_state_view(view, packet, *, access, context):

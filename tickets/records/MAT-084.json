@@ -4,7 +4,7 @@
   "track": "civic",
   "phase": 4,
   "priority": "P1",
-  "status": "planned",
+  "status": "in_progress",
   "type": "integration",
   "owner_repo": "mfreeze77/matter",
   "component": "adapters.statecivics.capture_admission",
@@ -42,7 +42,7 @@
     "SQLite regression repair (MAT-083), DIAT, PostgreSQL and inventing another rehearsal or evaluation infrastructure."
   ],
   "implementation": [
-    "Resolve the proposed boundary in docs/plans/unqualified-monitoring-capture.md before freezing executable changes. Target package matter-foundation 0.1.0.dev16 and explicitly negotiated monitoring-handoff/1.1.0; these are planned, unreleased targets, not existing exports or artifacts. Preserve the frozen 1.0.0 schema, lock and legacy AttentionService project path.",
+    "Owner and KS-1124 consumer authorized implementation from ffdb9a4. Implement SDK 0.1.0.dev16 and opt-in monitoring-handoff/1.1.0 beside unchanged frozen 1.0.0. Publish recorded two-audience and mixed-baseline vectors before freeze; KS-1124 must run them in its SDK image before 1.1 is frozen.",
     "Reuse actual durable semantic receipt validation, original/reused execution provenance, exact numeric and whole-batch admission, original control token and question/model/packet/intent bindings. A standalone probability, detached BatchResult, altered receipt, failed sibling or unresolved execution cannot acquire capture admission.",
     "Reuse the existing ability to persist an explicitly unqualified semantic admission. Add only bounded capture policy/proposal composition where existing ports do not provide it. Do not change SemanticAdmission qualification to qualified/not_required, counterfeit an assessment, or map a model relevance answer to a supported source claim. Capture classification is a separate study decision.",
     "Define a server-owned, immutable capture policy with explicit positive/negative/abstention regions and exact question/precision bindings. It is a study selection policy, not an accuracy target or certificate. Objective and novelty remain separate, with no multiplied importance score. Missing/uncertain/failed answers remain unknown and do not trigger a generic human question.",
@@ -52,7 +52,11 @@
     "Add explicit 1.1.0 result provenance: native_attention retains a real assessment reference; unqualified_model_capture has assessment_reference null and exact capture-admission/execution/policy/question provenance. Extend observed-capture baseline provenance for this second kind without fabricating an assessment or delivered milestone. Keep qualification unqualified, permitted_use capture_only and consequential_use false.",
     "Keep existing HostMonitoringState fields and source_finding meaning. The proposed optional capture_policy pin defaults to None; model capture also needs an explicitly configured trusted host admission service. Neither wire JSON nor a raw probability can supply that authority. Final callable names, shapes and policy details must be frozen and tested before KS-1124 switches.",
     "Verify paired positive/quiet model judgments over the same authorized source and contrasting audiences, duplicates/provider jitter, observed baselines, linked corrections/new deadlines after handled feedback, unknown outcomes, partial coverage, in-flight edits/revocation, replay cuts and production-port refusal. Reuse existing synthetic fixtures and capture sinks; keep recorded conformance separate from fresh live interpretation and MAT-040 qualification.",
-    "Publish the exact implemented version, API/wire/HostMonitoringState diff, source/wheel hashes, imports and installed checks for KS-1124. Its replacement of the deterministic fallback and KS-1126 receiving acceptance remain StateCivics work; no feature availability is claimed by this ticket's plan."
+    "Publish the exact implemented version, API/wire/HostMonitoringState diff, source/wheel hashes, imports and installed checks for KS-1124. Its replacement of the deterministic fallback and KS-1126 receiving acceptance remain StateCivics work; no feature availability is claimed by this ticket's plan.",
+    "Export conveyed-material capture identity as one function shared with StateCivics; no duplicate delivery-key implementation.",
+    "Share a source-only reading across independently authorized audiences, keeping each objective/novelty execution bound to its own audience access. Prefer typed capture-only reuse eligibility, never a false qualified classifier.",
+    "No default policy thresholds. The owner configures study regions explicitly; 0.8/0.2 are only prior KS-1121/example values, with the gap abstaining as unknown.",
+    "Current candidate uses a separate stored CaptureAdmission, not a native SemanticAdmission or assessment. It composes the existing receipt/control/dependency ports and shared neutral routing. Explicit native PrecisionProfile values are bound in the immutable capture policy and checked against current/original execution assumptions. No reviewer/certificate identity is invented to instantiate qualification services."
   ],
   "acceptance": [
     {
@@ -86,7 +90,15 @@
     "src/matter/statecivics_monitoring.py",
     "docs/adapters/statecivics-monitoring.md",
     "tests/integration/test_monitoring_handoff.py",
-    "docs/validation/MAT-084.md"
+    "docs/validation/MAT-084.md",
+    "src/matter/statecivics_capture.py",
+    "docs/adapters/statecivics-capture.md",
+    "schemas/monitoring-handoff-v1.1.schema.json",
+    "docs/contracts/monitoring-handoff-v1.1.schema.json",
+    "tests/integration/test_monitoring_capture.py",
+    "tests/unit/test_monitoring_capture_policy.py",
+    "tests/contract/test_monitoring_capture_vectors.py",
+    "tests/fixtures/civic/handoff-v1.1/manifest.json"
   ],
   "tests": [
     "Two contrasting audiences, same shared source, actual persisted model answers: positive, confident quiet and abstention/unknown remain distinct.",
@@ -128,10 +140,13 @@
     "docs/semantic-qualification.md",
     "docs/semantic-families.md",
     "docs/plans/unqualified-monitoring-capture.md",
-    "Owner-relayed KS-1124 request, 2026-10-31: a Matter-owned capture-only path driven by unqualified monitoring judgments, with unchanged currentness/budget/receipt/access guards; name its ticket, version and wire/HostMonitoringState differences. Current host deterministic intent-field rule is not_required; model answers remain unqualified notes."
+    "Owner-relayed KS-1124 request, 2026-10-31: a Matter-owned capture-only path driven by unqualified monitoring judgments, with unchanged currentness/budget/receipt/access guards; name its ticket, version and wire/HostMonitoringState differences. Current host deterministic intent-field rule is not_required; model answers remain unqualified notes.",
+    "Owner/KS-1124 consumer implementation approval, 2026-10-31: PR #31 ffdb9a4 accepted; deterministic fallback uses only approved objective fields and event. Require vectors before freeze, exported identity, source sharing/per-audience access, typed study reuse and no default thresholds."
   ],
   "completion": {
     "state": "not_run",
-    "evidence": []
+    "evidence": [
+      "Implementation candidate only: docs/validation/MAT-084.md records executed checkpoints, review findings, retained synthetic runtime vectors and pending installed/final review checks. Contract freeze and KS-1124 receiving-image acceptance have not occurred."
+    ]
   }
 }

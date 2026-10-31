@@ -1,11 +1,13 @@
 # Unqualified monitoring capture: MAT-084 proposal
 
-Status: **proposed, not implemented or frozen**. Tracks
-[MAT-084](../../tickets/MAT-084.md). Planned SDK target:
-`matter-foundation==0.1.0.dev16`; planned negotiated wire:
-`monitoring-handoff/1.1.0`. The currently merged package remains `0.1.0.dev15`,
-with frozen wire `monitoring-handoff/1.0.0`. No callable, wheel hash or release
-availability is promised by this draft.
+Status: **implementation candidate, not frozen**. Owner/KS-1124 approved
+implementation of PR #31 at `ffdb9a4` on 2026-10-31. The current candidate targets
+`matter-foundation==0.1.0.dev16` and opt-in `monitoring-handoff/1.1.0`, beside
+unchanged frozen 1.0. Final API and validation evidence are maintained in the
+[implementation handoff](../adapters/statecivics-capture.md) and
+[validation receipt](../validation/MAT-084.md). The consumer must run the
+recorded vectors in its SDK image before freeze. The proposal below records
+intent; the implementation handoff describes actual candidate behavior.
 
 ## Confirmed gap and existing fallback
 
@@ -24,8 +26,8 @@ assessment basis, not a claim that JEV drives the existing attention decision.
 Do not substitute model-derived labels into that deterministic rule and retain
 `not_required` as a shortcut. The new study path must say what it actually uses.
 
-This change prepares the ticket and contract proposal only; the runtime
-extension and final compatibility freeze have not been implemented.
+The bounded runtime extension is being verified; final consumer conformance and
+contract freeze remain pending.
 
 ## Planned shared boundary
 
@@ -95,7 +97,8 @@ resolved/requested model, packet/context, original command and original token.
 Raw probabilities, detached or altered results, invalid sibling heads, failures
 and unresolved outcomes cannot enter this path. Reuse refers to the original
 physical execution and adds no trial or call.
-Current native cache reuse may require a qualified classifier. The study path
+The inspected native receipt cache supports explicitly unqualified reuse when
+no qualified classifier is supplied. The study path
 must not return `qualified` merely to gain a cache hit. Reuse needs an explicitly
 typed capture-only eligibility decision under current access, or it must be
 withheld; exact-command durable recovery remains separate. Preserve the existing

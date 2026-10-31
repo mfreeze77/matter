@@ -1,0 +1,41 @@
+{
+  "contract_version": "monitoring-handoff/1.1.0",
+  "status": "candidate_consumer_run_required",
+  "evidence_kind": "synthetic_recorded_runtime",
+  "provider_calls_live": 0,
+  "generators": {
+    "audience_vectors": "integration.test_monitoring_capture.SourceReadingCaptureTests.test_one_source_reading_two_audiences_positive_quiet_and_unknown; source-reuse-v11.log: 1 passed, 934.805s, one source and three explicit fresh authored audience trials",
+    "mixed_baseline": "integration.test_monitoring_capture.MixedCaptureBaselineTests; mixed-v8.log: 1 passed, 394.411s"
+  },
+  "limitations": [
+    "These portable wires do not rehydrate grants, host rows, source records or execution authority.",
+    "Recorded runtime checkpoints precede the additive protected-root eligibility precheck, explicit capture-policy precision binding and runtime-version correction; final SDK bytes and checks are pinned separately.",
+    "Not a StateCivics SDK-image acceptance receipt, live interpretation study, qualification or production authority."
+  ],
+  "vectors": [
+    {
+      "name": "audience-a-positive",
+      "file": "audience-a-positive.json",
+      "sha256": "ce8c55cfdd7acc948b45f0a89a3d77c16097205cc1984f859fa4dd7651b3ab03",
+      "live_calls": 0
+    },
+    {
+      "name": "audience-b-quiet",
+      "file": "audience-b-quiet.json",
+      "sha256": "1600a9d3dc1c5e2061c94f1d4e8b535741c768f55f39681fe291ec277688e46d",
+      "live_calls": 0
+    },
+    {
+      "name": "audience-b-unknown",
+      "file": "audience-b-unknown.json",
+      "sha256": "1079390946acb4ae28cf475316420129eda771733ac5940a725b33709fd883a7",
+      "live_calls": 0
+    },
+    {
+      "name": "mixed-native-study-baseline",
+      "file": "mixed-native-study-baseline.json",
+      "sha256": "ef6f520af4407c8e93ddae8fa34f00428742d9708634d0ce55a5c285cb4abb71",
+      "live_calls": 0
+    }
+  ]
+}
