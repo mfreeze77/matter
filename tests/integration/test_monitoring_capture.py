@@ -434,3 +434,40 @@ class StudyCaptureHistoryTests(unittest.TestCase):
         self.assertIn("correction_delta", correction["reasons"])
         self.assertIsNone(correction["assessment_reference"])
         record_vector("study-baseline-linked-correction", h, corrected, correction)
+
+
+class CaptureAdmissionRecoveryTests(unittest.TestCase):
+    def test_definite_control_conflict_uses_explicit_fresh_attempt_without_model_resend(self):
+        from unittest.mock import patch
+        h = CaptureFixture(self)
+        admitted = h.admit()
+        execution = h.execute(admitted)
+        original_execute = h.f.storage.execute
+        injected = []
+        def racing(command, *args, **kwargs):
+            if not injected and command["operation"] == "record_control":
+                payload = command["body"]["control"]["body"]["effect"]["value"]["payload"]["value"]
+                if payload["action"] == "admit_capture":
+                    injected.append(True)
+                    other = h.capture_policy.value; other["id"] = "unrelated-policy"
+                    h.capture_service.install_policy(MonitoringCapturePolicy(other), actor=h.f.actor,
+                        authority=h.f.authority, command_id="unrelated-control", idempotency_key="unrelated-control")
+            return original_execute(command, *args, **kwargs)
+        with patch.object(h.f.storage, "execute", racing), self.assertRaises(ContractError) as conflict:
+            admitted.admit_capture(execution=execution["execution"])
+        self.assertEqual(injected, [True])
+        self.assertEqual(conflict.exception.code, "E_DEPENDENCY_STALE")
+        # Exact idempotency preserves the actual recorded failure. It must not
+        # silently mint another command, renew work tokens or resend a model.
+        with self.assertRaises(ContractError) as exact:
+            admitted.admit_capture(execution=execution["execution"])
+        self.assertEqual(exact.exception.code, "E_DEPENDENCY_STALE")
+        admission = admitted.admit_capture(execution=execution["execution"],
+            command_id="fresh-capture-control-attempt", idempotency_key="fresh-capture-control-attempt")
+        result = admitted.project_capture(admission=admission)
+        self.assertEqual(result["treatment"], "digest")
+        self.assertEqual(result["decision_basis"]["original_execution_reference"], execution["execution"])
+        again = admitted.admit_capture(execution=execution["execution"],
+            command_id="fresh-capture-control-attempt", idempotency_key="fresh-capture-control-attempt")
+        self.assertEqual(again.reference, admission.reference)
+        self.assertEqual(len(h.calls), 1)
