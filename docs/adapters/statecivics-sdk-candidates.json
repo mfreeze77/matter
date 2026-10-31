@@ -1,0 +1,43 @@
+{
+  "built_with": {
+    "python": "3.12.14",
+    "pip": "25.0.1",
+    "setuptools": "84.2.1",
+    "wheel": "0.46.3"
+  },
+  "package": "matter-foundation",
+  "version": "0.1.0.dev15",
+  "candidates": [
+    {
+      "purpose": "ks1121",
+      "source_commit": "9cf444a86c238dc135736f7a8b6dfe7e062c2e2c",
+      "wheel_path": "data/validation/sdk-handoff-20261030/wheels/ks1121/matter_foundation-0.1.0.dev15-py3-none-any.whl",
+      "wheel_sha256": "20c317c6a45a372adcfbe3078e8eaf3601fc71648f0c79da95b78b05cdbeff46",
+      "wheel_bytes": 531463,
+      "runtime_files": 200,
+      "source_bytes_verified": true,
+      "source_date_epoch": 1793230530,
+      "runtime_inventory": "data/validation/sdk-handoff-20261030/inventory-ks1121.json"
+    },
+    {
+      "purpose": "saved-objectives-handoff",
+      "source_commit": "59bfed9680f60f98d4a6e4cfd16d6569c1b516c7",
+      "wheel_path": "data/validation/sdk-handoff-20261030/wheels/saved-objectives-handoff/matter_foundation-0.1.0.dev15-py3-none-any.whl",
+      "wheel_sha256": "13f6b3156bb33664300597aaa533a71764a700bda3a810d8a569989809b4ca37",
+      "wheel_bytes": 546565,
+      "runtime_files": 202,
+      "source_bytes_verified": true,
+      "source_date_epoch": 1793404067,
+      "runtime_inventory": "data/validation/sdk-handoff-20261030/inventory-saved-objectives-handoff.json"
+    }
+  ],
+  "contract_version": "monitoring-handoff/1.0.0",
+  "contract_lock": {
+    "path": "tests/fixtures/civic/handoff/contract-lock.json",
+    "sha256": "ffe1dc889b50dec3a7efb07e4796ee62e194569be826e8f53b303f96203f1fa7",
+    "artifacts_verified": 60
+  },
+  "source_date_epoch": "each source commit's git %ct",
+  "network": "no-index/no-deps build and install; network-denied installed smoke and behavioral checks",
+  "status": "unmerged source candidates; not a published release or deployed SDK image"
+}
