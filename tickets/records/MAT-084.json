@@ -98,7 +98,8 @@
     "tests/integration/test_monitoring_capture.py",
     "tests/unit/test_monitoring_capture_policy.py",
     "tests/contract/test_monitoring_capture_vectors.py",
-    "tests/fixtures/civic/handoff-v1.1/manifest.json"
+    "tests/fixtures/civic/handoff-v1.1/manifest.json",
+    "docs/adapters/statecivics-capture-sdk-handoff.md"
   ],
   "tests": [
     "Two contrasting audiences, same shared source, actual persisted model answers: positive, confident quiet and abstention/unknown remain distinct.",
@@ -146,7 +147,7 @@
   "completion": {
     "state": "not_run",
     "evidence": [
-      "Implementation candidate only: docs/validation/MAT-084.md records executed checkpoints, review findings, retained synthetic runtime vectors and pending installed/final review checks. Contract freeze and KS-1124 receiving-image acceptance have not occurred."
+      "Implemented candidate runtime 1f525c6a66593573f2ae5d2af1eaf2bd00460a35; SDK 0.1.0.dev16 and opt-in 1.1 remain unfrozen. docs/validation/MAT-084.md and docs/adapters/statecivics-capture-sdk-handoff.md pin actual checks, full wheel hash, 204 byte-equal packaged files, six recorded runtime vectors and the KS-1124 image-run/freeze gate. Final bounded-attempt installed checks/review are in progress; no live calls, qualification, receiving acceptance or production delivery claimed."
     ]
   }
 }

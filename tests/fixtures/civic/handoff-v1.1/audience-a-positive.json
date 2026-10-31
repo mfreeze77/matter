@@ -1,6 +1,47 @@
 {
   "evidence_kind": "synthetic_recorded_runtime",
   "provider_calls_live": 0,
+  "capture_policy": {
+    "id": "illustrative-policy",
+    "material_paths": [
+      "/body/value/value/signal"
+    ],
+    "namespace": "synthetic.capture",
+    "native_baseline": null,
+    "precision": {
+      "id": "exact-decimal",
+      "probability_quantum": "0",
+      "rounding": "nearest",
+      "score_quantum": "0",
+      "version": "1.0"
+    },
+    "questions": {
+      "novelty": {
+        "digest": "4428747c3336e687a147345934ff25a6f86d3a89570eaf0e19f4f2addd37b534",
+        "id": "monitoring-novelty",
+        "namespace": "matter.statecivics",
+        "version": "1.0"
+      },
+      "objective": {
+        "digest": "339e1dfdf977956977ae1b5f271f5df711462a5aa037ac49fcbc95a3ed2391ce",
+        "id": "monitoring-objective",
+        "namespace": "matter.statecivics",
+        "version": "1.0"
+      }
+    },
+    "regions": {
+      "novelty": {
+        "negative_maximum": "0.2",
+        "positive_minimum": "0.8"
+      },
+      "objective": {
+        "negative_maximum": "0.2",
+        "positive_minimum": "0.8"
+      }
+    },
+    "schema_version": "1.1",
+    "semantic_version": "1.0"
+  },
   "request": {
     "baseline": {
       "status": "no_observed_output"
@@ -122,7 +163,7 @@
           "revision": 1
         }
       ],
-      "packet_digest": "5ddea9dfe247e97e29c45d4211eac997b5b8bee8c4fa7413af7a5714e8c93e71",
+      "packet_digest": "f7ef956ac3c2d50463e0aa20ddc61d20e6782f4466f3c058debcd4f311ecc48c",
       "sources": [
         {
           "artifact_sha256": "2f470c91109878b8e8a6c4b149ddd9deaf908a3c83effeae0bbad68329857900",
@@ -243,15 +284,15 @@
         "scope_id": "synthetic:claims",
         "namespace": "statecivics.monitoring.capture",
         "record_type": "matter:projection",
-        "id": "policy-fcbafad673e87ad6888aabf5fa6e26392e06600cd994f7df90f1debf126bb1fd",
+        "id": "policy-06882230f7b13f66fc8e59f481bd63b8afda279bfb4a2ac53cfb617b4a7817d0",
         "revision": 1
       },
       "source_reading": {
         "scope_id": "synthetic:claims",
         "namespace": "matter.semantic.executions",
         "record_type": "receipt",
-        "id": "c36fd66d438b20979d675f9954d9dee0d2d263e42cfb267aec5dd24641ac0573",
-        "digest": "079e115d593d20ce164c44afdd961aaf13e2685296080b52f3e85743f3c929e7"
+        "id": "995d58621bf62c59130b506550d813bd2ca5b666418fbd4bc53ff57903ee32a6",
+        "digest": "ea0ba3515dfb2eb3a0d0d584639b5420efdebb3d5e39895301fecc00a87654c1"
       }
     }
   },
@@ -313,22 +354,22 @@
     "currentness": "guard_required_before_capture",
     "decision_basis": {
       "capture_admission_reference": {
-        "id": "admission-1abbe042f9f832911bd0cc56f425fb7fdc8a7200bef880c1c549d9d1aea21896",
+        "id": "admission-457700f0731910d4ad902c1b0ee53280ec9b178aad13c8351e99ff2617137e17",
         "namespace": "statecivics.monitoring.capture",
         "record_type": "matter:projection",
         "revision": 1,
         "scope_id": "synthetic:claims"
       },
       "capture_policy": {
-        "id": "policy-fcbafad673e87ad6888aabf5fa6e26392e06600cd994f7df90f1debf126bb1fd",
+        "id": "policy-06882230f7b13f66fc8e59f481bd63b8afda279bfb4a2ac53cfb617b4a7817d0",
         "namespace": "statecivics.monitoring.capture",
         "record_type": "matter:projection",
         "revision": 1,
         "scope_id": "synthetic:claims"
       },
       "execution_reference": {
-        "digest": "4ca05d7fb459caf7f7be9dae3f1b406109a7ecdd0e3362ecedb33e1c3f2acb8a",
-        "id": "b8bb312d4d0c3631f3b9cc981a30ba91c5aceeb7a4fbfd4bed082c238db343ad",
+        "digest": "60c080a7e88e5b1976ff7c2f7bcce1b5032170c4e082a554205c6762151533db",
+        "id": "26a801cd18667f6b48d699cae89a1d7e9a2bc0a9e3456fbbf9b8c697fc0f255e",
         "namespace": "matter.semantic.executions",
         "record_type": "receipt",
         "scope_id": "synthetic:claims"
@@ -339,8 +380,8 @@
       },
       "kind": "unqualified_model_capture",
       "original_execution_reference": {
-        "digest": "4ca05d7fb459caf7f7be9dae3f1b406109a7ecdd0e3362ecedb33e1c3f2acb8a",
-        "id": "b8bb312d4d0c3631f3b9cc981a30ba91c5aceeb7a4fbfd4bed082c238db343ad",
+        "digest": "60c080a7e88e5b1976ff7c2f7bcce1b5032170c4e082a554205c6762151533db",
+        "id": "26a801cd18667f6b48d699cae89a1d7e9a2bc0a9e3456fbbf9b8c697fc0f255e",
         "namespace": "matter.semantic.executions",
         "record_type": "receipt",
         "scope_id": "synthetic:claims"
@@ -348,14 +389,14 @@
     },
     "dependencies": [
       {
-        "digest": "079e115d593d20ce164c44afdd961aaf13e2685296080b52f3e85743f3c929e7",
-        "id": "c36fd66d438b20979d675f9954d9dee0d2d263e42cfb267aec5dd24641ac0573",
-        "namespace": "matter.semantic.executions",
+        "digest": "22eeda8174b1eefb80d3cbf0c946fbb750021f7910b813a66bb7c27b1ebe18e1",
+        "id": "command-9641cf566f103ee2cd5341b84bd5c5bb759fc00d8b4015f1acb749c98cb45745",
+        "namespace": "matter.storage",
         "record_type": "receipt",
         "scope_id": "synthetic:claims"
       },
       {
-        "digest": "0dd7a8faa7d02837156a2994502fca7287fbac531b276b31f6719690fd555f9c",
+        "digest": "3372a6390c0807623ebbbd229231ae94f483663e24d30ad1e3e04f3c3f3a22bd",
         "id": "command-4f0a4c976166e30a66cc2a023fcbf9dce212c470219f86aed52ba4fb78120c96",
         "namespace": "matter.storage",
         "record_type": "receipt",
@@ -369,30 +410,30 @@
         "scope_id": "synthetic:claims"
       },
       {
-        "digest": "4ca05d7fb459caf7f7be9dae3f1b406109a7ecdd0e3362ecedb33e1c3f2acb8a",
-        "id": "b8bb312d4d0c3631f3b9cc981a30ba91c5aceeb7a4fbfd4bed082c238db343ad",
+        "digest": "60c080a7e88e5b1976ff7c2f7bcce1b5032170c4e082a554205c6762151533db",
+        "id": "26a801cd18667f6b48d699cae89a1d7e9a2bc0a9e3456fbbf9b8c697fc0f255e",
         "namespace": "matter.semantic.executions",
         "record_type": "receipt",
         "scope_id": "synthetic:claims"
       },
       {
-        "digest": "7a6db7e490bca6be442680560e5abe700c8b6a2ec0a798922acec7ed30225b83",
+        "digest": "6f0c1e071e36da33d1c71cf811999e3913e72acb975de88e06848ee2b38a27a1",
         "id": "command-5f18b0b02a5d7d867592df01232bff22885015d3cc687bcb85955c6203aa6060",
         "namespace": "matter.storage",
         "record_type": "receipt",
         "scope_id": "synthetic:claims"
       },
       {
-        "digest": "7b8a3cca19937465391a4a233c74c48a43e17049bbd79156b4e0e3b533be535e",
+        "digest": "d11b7f437309f3e1f8d17573075851a8f0c78a24af159f8822713d37d37c7469",
         "id": "command-93fbc2205e9c216069ea5bf9be02babf47d507d0e45899aa0fe0c649b643a1c4",
         "namespace": "matter.storage",
         "record_type": "receipt",
         "scope_id": "synthetic:claims"
       },
       {
-        "digest": "9f1ac5a6a7d9058b784773d95346bde1065ea7b9ba42574a1967ccb35080cf26",
-        "id": "command-9641cf566f103ee2cd5341b84bd5c5bb759fc00d8b4015f1acb749c98cb45745",
-        "namespace": "matter.storage",
+        "digest": "ea0ba3515dfb2eb3a0d0d584639b5420efdebb3d5e39895301fecc00a87654c1",
+        "id": "995d58621bf62c59130b506550d813bd2ca5b666418fbd4bc53ff57903ee32a6",
+        "namespace": "matter.semantic.executions",
         "record_type": "receipt",
         "scope_id": "synthetic:claims"
       },
@@ -446,7 +487,7 @@
         "scope_id": "synthetic:claims"
       },
       {
-        "id": "policy-fcbafad673e87ad6888aabf5fa6e26392e06600cd994f7df90f1debf126bb1fd",
+        "id": "policy-06882230f7b13f66fc8e59f481bd63b8afda279bfb4a2ac53cfb617b4a7817d0",
         "namespace": "statecivics.monitoring.capture",
         "record_type": "matter:projection",
         "revision": 1,
@@ -467,7 +508,7 @@
         "scope_id": "synthetic:claims"
       }
     ],
-    "evidence_packet_digest": "5ddea9dfe247e97e29c45d4211eac997b5b8bee8c4fa7413af7a5714e8c93e71",
+    "evidence_packet_digest": "f7ef956ac3c2d50463e0aa20ddc61d20e6782f4466f3c058debcd4f311ecc48c",
     "intent_revision_id": "intent-a-v1",
     "message_type": "monitoring_result",
     "outcome": "proposal",
@@ -479,7 +520,7 @@
       "material_change"
     ],
     "request_id": "audience-a-positive",
-    "result_id": "monitoring-32fbc90c5aae5c344c8d953d37fec68e92350c8c185009c5d8f65ab9891a7e5b",
+    "result_id": "monitoring-6834e7a0a0848d7f7baddcb6cd2d5e883692b785deee5e4b9f74a2b4ce50c329",
     "source_finding_reference": {
       "digest": "3ea9d2ebebcdbd51a8de8e3e7c303d02690b099fa375aa4bbcbfc9afdc9ad7f7",
       "id": "shared-monitoring-finding",

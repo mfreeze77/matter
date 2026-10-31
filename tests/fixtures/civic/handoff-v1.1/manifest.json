@@ -4,38 +4,57 @@
   "evidence_kind": "synthetic_recorded_runtime",
   "provider_calls_live": 0,
   "generators": {
-    "audience_vectors": "integration.test_monitoring_capture.SourceReadingCaptureTests.test_one_source_reading_two_audiences_positive_quiet_and_unknown; source-reuse-v11.log: 1 passed, 934.805s, one source and three explicit fresh authored audience trials",
-    "mixed_baseline": "integration.test_monitoring_capture.MixedCaptureBaselineTests; mixed-v8.log: 1 passed, 394.411s"
+    "audience_vectors": "Installed wheel: integration.test_monitoring_capture.SourceReadingCaptureTests; installed-source-reuse.log: 1 passed, 1055.619s; one source batch/four heads and three explicitly fresh audience batches/two heads each.",
+    "mixed_baseline": "Installed wheel: integration.test_monitoring_capture.MixedCaptureBaselineTests; installed-mixed.log: 1 passed, 476.917s.",
+    "study_baselines": "Installed wheel: integration.test_monitoring_capture.StudyCaptureHistoryTests; installed-history.log: 1 passed, 914.425s; actual isolated host capture table, duplicate quiet and linked correction despite abstention."
   },
   "limitations": [
     "These portable wires do not rehydrate grants, host rows, source records or execution authority.",
-    "Recorded runtime checkpoints precede the additive protected-root eligibility precheck, explicit capture-policy precision binding and runtime-version correction; final SDK bytes and checks are pinned separately.",
-    "Not a StateCivics SDK-image acceptance receipt, live interpretation study, qualification or production authority."
+    "Recorded from installed SDK source 1190d51. Later 18263cd/1f525c6 tighten cached-original authority, projection copying, bounded-attempt admission and host-read refusal handling. Their SDK checks are pinned separately; the schema/wire stays compatible.",
+    "Batch counts refer to recorded executors, not live JEV HTTP requests. No interpretation quality, StateCivics SDK-image acceptance, qualification or production authority is established."
   ],
   "vectors": [
     {
       "name": "audience-a-positive",
       "file": "audience-a-positive.json",
-      "sha256": "ce8c55cfdd7acc948b45f0a89a3d77c16097205cc1984f859fa4dd7651b3ab03",
+      "sha256": "429453da3a851fb43d48b0d3dc4a96ad2b89b93c3696444c8fd9676aa80642c7",
       "live_calls": 0
     },
     {
       "name": "audience-b-quiet",
       "file": "audience-b-quiet.json",
-      "sha256": "1600a9d3dc1c5e2061c94f1d4e8b535741c768f55f39681fe291ec277688e46d",
+      "sha256": "082ab84682be3c468340bb639c8e526928f52ff9a9946fa0a3d49ef827fa3835",
       "live_calls": 0
     },
     {
       "name": "audience-b-unknown",
       "file": "audience-b-unknown.json",
-      "sha256": "1079390946acb4ae28cf475316420129eda771733ac5940a725b33709fd883a7",
+      "sha256": "1849bf827d7e285f99f27c3d222b8cebc9176f543d72b3fe17b215e82e21dcc3",
       "live_calls": 0
     },
     {
       "name": "mixed-native-study-baseline",
       "file": "mixed-native-study-baseline.json",
-      "sha256": "ef6f520af4407c8e93ddae8fa34f00428742d9708634d0ce55a5c285cb4abb71",
+      "sha256": "2c40bc0cc9ac647781bc2bb0e3f717c793739371356ced0a89b244477f979d44",
+      "live_calls": 0
+    },
+    {
+      "name": "study-baseline-duplicate",
+      "file": "study-baseline-duplicate.json",
+      "sha256": "7f668cd56db84684179283280037ad5f9b631490fe6e88edabb41d534acb71ab",
+      "live_calls": 0
+    },
+    {
+      "name": "study-baseline-linked-correction",
+      "file": "study-baseline-linked-correction.json",
+      "sha256": "3e5368b844bceaba226434fbedff6e4521a363a479ed6ab7c531a8b43a233e2a",
       "live_calls": 0
     }
-  ]
+  ],
+  "recorded_sdk_commit": "1190d516233ab1148cdb3d0bb0680b8ae15cf12a",
+  "recorded_sdk_wheel_sha256": "8beb459f2bf8b171dac96a4f621672375fc6bd86d840ecb95894029ba1be827b",
+  "recorded_executor_batches": {
+    "source": 1,
+    "audience": 3
+  }
 }

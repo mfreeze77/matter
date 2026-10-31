@@ -1,6 +1,57 @@
 {
   "evidence_kind": "synthetic_recorded_runtime",
   "provider_calls_live": 0,
+  "capture_policy": {
+    "id": "illustrative-policy",
+    "material_paths": [
+      "/body/value/value/signal"
+    ],
+    "namespace": "synthetic.capture",
+    "native_baseline": {
+      "material_contract": {
+        "digest": "fdca46909282f4c64cc2388610671d8f91fec03974eaf7163dc415b2f8b530f9",
+        "id": "attention-material",
+        "namespace": "matter",
+        "version": "1.0"
+      },
+      "paths": {
+        "/body/value/value/signal": "/condition/value"
+      }
+    },
+    "precision": {
+      "id": "exact-decimal",
+      "probability_quantum": "0",
+      "rounding": "nearest",
+      "score_quantum": "0",
+      "version": "1.0"
+    },
+    "questions": {
+      "novelty": {
+        "digest": "4428747c3336e687a147345934ff25a6f86d3a89570eaf0e19f4f2addd37b534",
+        "id": "monitoring-novelty",
+        "namespace": "matter.statecivics",
+        "version": "1.0"
+      },
+      "objective": {
+        "digest": "339e1dfdf977956977ae1b5f271f5df711462a5aa037ac49fcbc95a3ed2391ce",
+        "id": "monitoring-objective",
+        "namespace": "matter.statecivics",
+        "version": "1.0"
+      }
+    },
+    "regions": {
+      "novelty": {
+        "negative_maximum": "0.2",
+        "positive_minimum": "0.8"
+      },
+      "objective": {
+        "negative_maximum": "0.2",
+        "positive_minimum": "0.8"
+      }
+    },
+    "schema_version": "1.1",
+    "semantic_version": "1.0"
+  },
   "request": {
     "baseline": {
       "status": "observed_capture",
@@ -9,7 +60,7 @@
         "namespace": "example:transport",
         "record_type": "receipt",
         "id": "host-milestone-2",
-        "digest": "c801507aca5cd5b47f0978cd69bc99c582418c0f3df117fef291551cef9b332a"
+        "digest": "4a27040cc05d6d3ddbf312b62148190a5d558be61fe34e9326e592f803054181"
       },
       "owner": {
         "user_id": "101",
@@ -23,7 +74,7 @@
         "namespace": "matter.assessments",
         "record_type": "assessment",
         "id": "assessment-assess-1",
-        "digest": "3f6b34268a8a149b811106a765af7f3882c270a7c079c47e6fd521387cb7dfde"
+        "digest": "9e10818a3857e7b86685eb57b6d86c02b317b32c35b64f68928af571f123bdb0"
       },
       "conveyed_material_digest": "069ee63376065fbdbdcba73bfefc34c857469b3fdfb55af432cc1edf2511c331",
       "decision_basis": "native_attention"
@@ -145,7 +196,7 @@
           "revision": 1
         }
       ],
-      "packet_digest": "5c2fb5c43eb86a045dfdc264a727495e0a6a7ef6edd9b94d2892b24d293e2a83",
+      "packet_digest": "8b26164a61b698e74da3a70f98378dd69069c593657a6711580a9149907cb94f",
       "sources": [
         {
           "artifact_sha256": "2f470c91109878b8e8a6c4b149ddd9deaf908a3c83effeae0bbad68329857900",
@@ -266,7 +317,7 @@
         "scope_id": "synthetic:claims",
         "namespace": "statecivics.monitoring.capture",
         "record_type": "matter:projection",
-        "id": "policy-f35e4af4ea396c5cae02762d4f7a2618f41bb222a545b4fce2f254ea1211b705",
+        "id": "policy-013ab4fb6545b3a9f1f2afee23664584fb16d3f86241f4ced7d20c511f0ad94e",
         "revision": 1
       },
       "source_reading": null
@@ -275,13 +326,13 @@
   "result": {
     "assessment_reference": null,
     "baseline_reference": {
-      "digest": "c801507aca5cd5b47f0978cd69bc99c582418c0f3df117fef291551cef9b332a",
+      "digest": "4a27040cc05d6d3ddbf312b62148190a5d558be61fe34e9326e592f803054181",
       "id": "host-milestone-2",
       "namespace": "example:transport",
       "record_type": "receipt",
       "scope_id": "synthetic:claims"
     },
-    "capture_key": "ed1af50ce275d69c54c06cb26e0010a989f75158a9bfa1895c48309ecc3d9c89",
+    "capture_key": "219b02843c089dcbe181e4edcee0fac4886d83de8af1cc1137f309a134fd3ddc",
     "citations": [
       {
         "locator": {
@@ -336,22 +387,22 @@
     "currentness": "guard_required_before_capture",
     "decision_basis": {
       "capture_admission_reference": {
-        "id": "admission-9dfb46b4c767d0c799c67c668794520ca988ac5083a2851573a5d0f640bdae78",
+        "id": "admission-ad9a6df2a869b8f2a846b7b38991db9d94a8bcd68713820e88fc3b95fbb22625",
         "namespace": "statecivics.monitoring.capture",
         "record_type": "matter:projection",
         "revision": 1,
         "scope_id": "synthetic:claims"
       },
       "capture_policy": {
-        "id": "policy-f35e4af4ea396c5cae02762d4f7a2618f41bb222a545b4fce2f254ea1211b705",
+        "id": "policy-013ab4fb6545b3a9f1f2afee23664584fb16d3f86241f4ced7d20c511f0ad94e",
         "namespace": "statecivics.monitoring.capture",
         "record_type": "matter:projection",
         "revision": 1,
         "scope_id": "synthetic:claims"
       },
       "execution_reference": {
-        "digest": "b1d47ab6bcd0081cd4443dff195ae2f238996c01e688f9d72fa808c1afcfe1c8",
-        "id": "669b6dfde0c55a3b05cd19344321af2dbb1653cb28fa20004a3eedfb67634a5e",
+        "digest": "ca7fd412bc9a840ae87b972418bc11e536f98c0cae4d2a1c7157559ad25e65b7",
+        "id": "55f33c82a54a79168d5610b40562f1dfe158662a442e9191fe75a5c0711cfb99",
         "namespace": "matter.semantic.executions",
         "record_type": "receipt",
         "scope_id": "synthetic:claims"
@@ -362,8 +413,8 @@
       },
       "kind": "unqualified_model_capture",
       "original_execution_reference": {
-        "digest": "b1d47ab6bcd0081cd4443dff195ae2f238996c01e688f9d72fa808c1afcfe1c8",
-        "id": "669b6dfde0c55a3b05cd19344321af2dbb1653cb28fa20004a3eedfb67634a5e",
+        "digest": "ca7fd412bc9a840ae87b972418bc11e536f98c0cae4d2a1c7157559ad25e65b7",
+        "id": "55f33c82a54a79168d5610b40562f1dfe158662a442e9191fe75a5c0711cfb99",
         "namespace": "matter.semantic.executions",
         "record_type": "receipt",
         "scope_id": "synthetic:claims"
@@ -378,29 +429,36 @@
         "scope_id": "synthetic:claims"
       },
       {
-        "digest": "4f14733c25c087373cbcaea249873fdf232e5c11e4ff67c4c32dfab23ded3fae",
+        "digest": "4c36b0f735334498ea947044ded81bcd8266e9f09daec471402d4290880dcfa4",
         "id": "command-93fbc2205e9c216069ea5bf9be02babf47d507d0e45899aa0fe0c649b643a1c4",
         "namespace": "matter.storage",
         "record_type": "receipt",
         "scope_id": "synthetic:claims"
       },
       {
-        "digest": "6346b8a48410fd532686676c158343942be95501f2fca05d11dd6184a1470440",
+        "digest": "4e0391eedffaa1af19e0517ea2c75fa6c9ee67b6e3292aa4bf4379545eff10fb",
         "id": "command-5f18b0b02a5d7d867592df01232bff22885015d3cc687bcb85955c6203aa6060",
         "namespace": "matter.storage",
         "record_type": "receipt",
         "scope_id": "synthetic:claims"
       },
       {
-        "digest": "b1d47ab6bcd0081cd4443dff195ae2f238996c01e688f9d72fa808c1afcfe1c8",
-        "id": "669b6dfde0c55a3b05cd19344321af2dbb1653cb28fa20004a3eedfb67634a5e",
+        "digest": "9c8889cafc25666a760ba9ad4ded1bbc5e163f9d274d3dd6de87ee5531b653f1",
+        "id": "command-9641cf566f103ee2cd5341b84bd5c5bb759fc00d8b4015f1acb749c98cb45745",
+        "namespace": "matter.storage",
+        "record_type": "receipt",
+        "scope_id": "synthetic:claims"
+      },
+      {
+        "digest": "ca7fd412bc9a840ae87b972418bc11e536f98c0cae4d2a1c7157559ad25e65b7",
+        "id": "55f33c82a54a79168d5610b40562f1dfe158662a442e9191fe75a5c0711cfb99",
         "namespace": "matter.semantic.executions",
         "record_type": "receipt",
         "scope_id": "synthetic:claims"
       },
       {
-        "digest": "d396462fabcd7d3e411ecefb22fae6167758f0a26237362460844e233e54e3cf",
-        "id": "command-9641cf566f103ee2cd5341b84bd5c5bb759fc00d8b4015f1acb749c98cb45745",
+        "digest": "e6eac51dda71b37cc1187e16d614b4d3b4f0eeb0ba8669028d74f2685f867f1a",
+        "id": "command-4f0a4c976166e30a66cc2a023fcbf9dce212c470219f86aed52ba4fb78120c96",
         "namespace": "matter.storage",
         "record_type": "receipt",
         "scope_id": "synthetic:claims"
@@ -410,13 +468,6 @@
         "id": "source-shared-monitoring-source",
         "namespace": "example",
         "record_type": "observation",
-        "scope_id": "synthetic:claims"
-      },
-      {
-        "digest": "f9eabbaa615a01742355f296d752e6c8abc8984e660b9ae32baa9e50b09c2919",
-        "id": "command-4f0a4c976166e30a66cc2a023fcbf9dce212c470219f86aed52ba4fb78120c96",
-        "namespace": "matter.storage",
-        "record_type": "receipt",
         "scope_id": "synthetic:claims"
       },
       {
@@ -462,7 +513,7 @@
         "scope_id": "synthetic:claims"
       },
       {
-        "id": "policy-f35e4af4ea396c5cae02762d4f7a2618f41bb222a545b4fce2f254ea1211b705",
+        "id": "policy-013ab4fb6545b3a9f1f2afee23664584fb16d3f86241f4ced7d20c511f0ad94e",
         "namespace": "statecivics.monitoring.capture",
         "record_type": "matter:projection",
         "revision": 1,
@@ -483,7 +534,7 @@
         "scope_id": "synthetic:claims"
       }
     ],
-    "evidence_packet_digest": "5c2fb5c43eb86a045dfdc264a727495e0a6a7ef6edd9b94d2892b24d293e2a83",
+    "evidence_packet_digest": "8b26164a61b698e74da3a70f98378dd69069c593657a6711580a9149907cb94f",
     "intent_revision_id": "intent-a-v1",
     "message_type": "monitoring_result",
     "outcome": "proposal",
@@ -492,11 +543,11 @@
     "qualification": "unqualified",
     "reasons": [
       "no_material_change",
-      "already_delivered",
+      "already_captured",
       "unqualified_model_positive"
     ],
     "request_id": "request-policy-a",
-    "result_id": "monitoring-ee6ae8d3a8525a2109d53c06b47f7281eee829a8b8c0d2a38fd3a28b85cc1e79",
+    "result_id": "monitoring-e577f362ed476052474572fe2409b25dfe6fa4da95f10a573b8399ed873649d7",
     "source_finding_reference": {
       "digest": "3ea9d2ebebcdbd51a8de8e3e7c303d02690b099fa375aa4bbcbfc9afdc9ad7f7",
       "id": "shared-monitoring-finding",
