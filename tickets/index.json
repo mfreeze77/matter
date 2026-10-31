@@ -15,7 +15,8 @@
   "counts_by_status": {
     "blocked": 1,
     "done": 41,
-    "planned": 38
+    "in_progress": 2,
+    "planned": 36
   },
   "tickets": [
     {
@@ -1080,7 +1081,7 @@
       "track": "civic",
       "phase": 3,
       "priority": "P1",
-      "status": "planned",
+      "status": "in_progress",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-001",
@@ -1102,7 +1103,7 @@
         "CIV-08",
         "CIV-09"
       ],
-      "readiness": "waiting",
+      "readiness": "in_progress",
       "path": "records/MAT-048.json"
     },
     {
@@ -1111,7 +1112,7 @@
       "track": "civic",
       "phase": 4,
       "priority": "P1",
-      "status": "planned",
+      "status": "in_progress",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-001",
@@ -1129,7 +1130,7 @@
         "CIV-06",
         "CIV-09"
       ],
-      "readiness": "waiting",
+      "readiness": "in_progress",
       "path": "records/MAT-049.json"
     },
     {
