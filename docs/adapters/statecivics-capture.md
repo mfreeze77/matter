@@ -75,6 +75,10 @@ represent new material. Missing selected material abstains. Material selection
 is a host/profile decision, not inferred by the model. Objective and novelty
 judgments remain separate; no multiplied importance score exists.
 
+Monitoring admission additionally checks the exact logical command/initial
+attempt, full stage binding, adapter/mode, actual committed allocation and original
+dispatch byte/call/time envelope. It does not extend an expired provider
+reservation or require a new model call just to inspect already recorded work.
 A study result records `decision_basis.kind: "unqualified_model_capture"`, real
 capture-admission, current/original execution and policy pins, and separate
 positive/negative/unknown judgments. `assessment_reference` is null,
@@ -87,12 +91,14 @@ human decision request, assessment or delivery milestone.
 
 ## One source reading, independent audience checks
 
-The source-reading receipt must be an actual completed/current whole-batch
+The source-reading receipt must be an actual durably completed or reused/current whole-batch
 execution of the existing four `civic_attention.source_questions()`, over the
 same source packet (apart from its access snapshot). It cannot contain monitoring
 or comparison context. Give this reader only common source material; an
 execution whose protected read closure includes client-private context is not a
-shareable source read.
+shareable source read. Post-hoc `record_stage_batch` observations do not prove
+durable authorization before I/O and cannot enter this path. Cached aliases
+retain the original execution and original token checks.
 
 `capture_source_reading_eligibility(admitted, receipts=..., execution=...)`
 returns a typed **unqualified, capture-only** eligibility after the recipient's
@@ -141,6 +147,8 @@ current approved objective clock.
 
 ## Receiving gate and evidence
 
+The pinned candidate package and receiving instructions are in the
+[SDK handoff](statecivics-capture-sdk-handoff.md).
 The recorded vectors and relevant checks are described in
 [MAT-084 validation](../validation/MAT-084.md). They are synthetic component
 conformance, not fresh JEV interpretation, a StateCivics receiving run, formal

@@ -141,6 +141,7 @@ class CaptureGuardRegressionTests(unittest.TestCase):
                     material_contract={}, captured_at=now)
                 admitted = object.__new__(AdmittedCaptureMonitoring)
                 admitted._request = request; admitted.output_context = object()
+                admitted.require_current = Mock(return_value=SimpleNamespace(candidate=reference))
                 admitted.host = SimpleNamespace(capture_service=service, binding=request["host_binding"],
                     access=Mock(), access_context=object(), clock=lambda: now,
                     current_state=lambda _: SimpleNamespace(candidate=reference))
@@ -246,3 +247,104 @@ class CaptureProjectionIsolationTests(unittest.TestCase):
         before = deepcopy(proposal)
         proposal["reasons"].append("host:display-annotation")
         self.assertEqual(admitted._projection[0], before)
+
+
+class CaptureDurableAttemptTests(unittest.TestCase):
+    def test_posthoc_stage_observation_cannot_supply_durable_capture_authority(self):
+        from unittest.mock import Mock
+        from matter.statecivics_capture import _execution
+        request = json.loads((ROOT / "tests/fixtures/civic/handoff/client-a-request.json").read_text())
+        reference = request["evidence"]["sources"][0]["reference"]
+        value = {"phase": "observed", "request": {}, "control_token": {}, "access_context": None,
+            "result": {"execution_status": "completed", "admission": {"primitive_status": "valid", "exact_numeric": True},
+                       "resolved_model": "synthetic-fixed"}}
+        receipts = Mock(); receipts._details.return_value = value
+        with self.assertRaises(ContractError) as denied:
+            _execution(Mock(), receipts, reference)
+        self.assertEqual(denied.exception.code, "E_EVIDENCE_UNAVAILABLE")
+
+    def test_attempt_adapter_allocation_and_dispatch_envelope_are_bound(self):
+        from types import SimpleNamespace
+        from matter.statecivics_capture import _require_monitoring_execution
+        from datetime import datetime, timedelta
+        request = json.loads((ROOT / "tests/fixtures/civic/handoff/client-a-request.json").read_text())
+        now = {"state": "known", "value": "2050-01-01T00:00:00Z", "precision": "second"}
+        later = {**now, "value": "2051-01-01T00:00:00Z"}
+        context = {"adapter_version": request["evaluation"]["adapter"]["version"], "mode": "recorded_replay",
+            "max_request_bytes": request["budgets"]["max_request_bytes"], "max_response_bytes": request["budgets"]["max_response_bytes"],
+            "deadline": {**now, "value": "2050-01-01T00:00:01Z"}}
+        metadata = {"phase": "completed", "logical_request_id": "exact-command", "attempt_id": "initial",
+            "control_token": {"synthetic": "original-token"}, "created_at": now,
+            "request": {"batch": {"context": context}}, "result": {"timing": {"started": now}}}
+        allocation = {"status": "committed", "token": {"value": metadata["control_token"]}, "expires_at": later,
+            "amounts": {"calls": request["budgets"]["max_calls"]}}
+        admitted = SimpleNamespace(_request=request, _logical_request_id=lambda: "exact-command")
+        _require_monitoring_execution(admitted, metadata, allocation)
+        for change in (lambda m: m.update(phase="observed"), lambda m: m.update(logical_request_id="foreign-command"),
+                       lambda m: m.update(attempt_id="other-attempt"),
+                       lambda m: m["request"]["batch"]["context"].update(adapter_version="foreign-adapter"),
+                       lambda m: m["request"]["batch"]["context"].update(mode="unapproved-mode")):
+            wrong = deepcopy(metadata); change(wrong)
+            with self.subTest(change=change), self.assertRaises(ContractError):
+                _require_monitoring_execution(admitted, wrong, allocation)
+        for change in (lambda a: a.update(status="released"), lambda a: a["token"].update(value={"synthetic": "renewed-token"}),
+                       lambda a: a["amounts"].update(calls=request["budgets"]["max_calls"]+1), lambda a: a.update(expires_at=now)):
+            wrong = deepcopy(allocation); change(wrong)
+            with self.subTest(allocation=wrong), self.assertRaises(ContractError):
+                _require_monitoring_execution(admitted, metadata, wrong)
+        wrong = deepcopy(metadata)
+        seconds = 1 + min(request["budgets"]["timeout_seconds"], request["budgets"]["wall_seconds"])
+        wrong["request"]["batch"]["context"]["deadline"]["value"] = (datetime(2050,1,1)+timedelta(seconds=seconds)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        with self.assertRaises(ContractError):
+            _require_monitoring_execution(admitted, wrong, allocation)
+
+    def test_reused_source_gate_follows_original_cancellation_and_exact_result(self):
+        from types import SimpleNamespace
+        from unittest.mock import Mock, patch
+        from integration.helpers import fixture
+        from matter.storage import pin
+        from matter.civic_attention import source_questions
+        from matter.statecivics_capture import _source_reading, _original_execution
+        alias, original = fixture("records/receipt.json"), fixture("records/receipt.json")
+        alias["id"] = "alias"; original["id"] = "original"
+        state = {"scope_id": alias["scope_id"], "evidence": ["shared synthetic source"]}
+        value = {"phase": "reused", "source_execution": pin(original), "execution_key": "1"*64, "normalized_digest": "2"*64,
+            "result": {"synthetic": "same whole result"}, "request": {"batch": {"state": state},
+                "rendered": [{"manifest": {"specification": s.reference}} for s in source_questions()]}}
+        admitted = SimpleNamespace(source_packet=SimpleNamespace(state=state), host=SimpleNamespace(access=Mock(), access_context=object()))
+        with patch("matter.statecivics_capture._execution", side_effect=[(alias,value),ContractError("E_CANCELLED")]), self.assertRaises(ContractError) as refused:
+            _source_reading(Mock(), admitted, Mock(), pin(alias))
+        self.assertEqual(refused.exception.code, "E_CANCELLED")
+        prior = {**deepcopy(value), "phase": "completed"}
+        with patch("matter.statecivics_capture._execution", return_value=(original,{**prior,"result":{"synthetic":"changed"}})), self.assertRaises(ContractError):
+            _original_execution(Mock(), Mock(), alias, value)
+        prior["request"]["precision"] = {**policy_value()["precision"], "probability_quantum": "0.01"}
+        with patch("matter.statecivics_capture._execution", return_value=(original,prior)), self.assertRaises(ContractError):
+            _original_execution(Mock(), Mock(), alias, value, policy=MonitoringCapturePolicy(policy_value()))
+
+
+class CaptureHostReadFailureTests(unittest.TestCase):
+    def test_history_read_failure_at_atomic_guard_is_known_refusal_not_unknown_capture(self):
+        from types import SimpleNamespace
+        from unittest.mock import Mock
+        from matter.statecivics_capture import AdmittedCaptureMonitoring
+        vector = json.loads((ROOT / "tests/fixtures/civic/handoff-v1.1/audience-a-positive.json").read_text())
+        result = vector["result"]
+        admitted = object.__new__(AdmittedCaptureMonitoring)
+        admitted._request = vector["request"]; admitted.digest = result["result_id"].removeprefix("monitoring-")
+        admitted._capture_unknown = False
+        admitted._projection = (deepcopy(result), {"capture_admission": result["decision_basis"]["capture_admission_reference"]}, result["capture_key"])
+        admitted.require_current = Mock(return_value=SimpleNamespace())
+        admitted._reproject = Mock(return_value=deepcopy(result))
+        admitted.host = SimpleNamespace(capture_service=Mock())
+        admitted.host.capture_service.current.side_effect = RuntimeError("synthetic history read unavailable")
+        writes = []
+        def sink(**args):
+            args["require_current"]()
+            writes.append(args["assessment_key"])
+        for _ in range(2):
+            with self.assertRaises(ContractError) as refused:
+                admitted.handoff(result, capture=sink)
+            self.assertEqual(refused.exception.code, "E_AUTHORITY_REQUIRED")
+            self.assertFalse(admitted._capture_unknown)
+        self.assertEqual(writes, [])

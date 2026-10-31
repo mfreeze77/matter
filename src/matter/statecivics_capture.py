@@ -15,7 +15,7 @@ from referencing import Registry
 from ._rule_values import FrozenValue, descriptor, fragment
 from .attention import select_attention_treatment
 from .access import _public
-from .budgets import _Reads
+from .budgets import _Reads, _value, milliseconds
 from .canonical import CanonicalError, canonical_bytes, canonical_digest, loads
 from .contexts import _active
 from .contracts import ContractError, _FORMAT_CHECKER
@@ -188,11 +188,32 @@ def _execution(view, receipts, reference):
     receipts._validate_result(value)
     receipts._current(view, value)
     result = value["result"]
-    if (value["phase"] not in {"completed", "reused", "observed"} or result is None or
+    if (value["phase"] not in {"completed", "reused"} or result is None or
             result["execution_status"] != "completed" or result["admission"]["primitive_status"] != "valid" or
             result["admission"]["exact_numeric"] is not True or result["resolved_model"] is None):
         _fail("E_EVIDENCE_UNAVAILABLE")
     return record, value
+
+
+def _require_monitoring_execution(admitted, metadata, allocation):
+    """Bind the durable attempt and original dispatch envelope, not a StageRun."""
+    req = admitted._request
+    context = metadata["request"]["batch"]["context"]
+    budget = req["budgets"]
+    if (metadata["phase"] not in {"completed", "reused"} or
+            metadata["logical_request_id"] != admitted._logical_request_id() or metadata["attempt_id"] != "initial" or
+            context["adapter_version"] != req["evaluation"]["adapter"]["version"] or
+            context["mode"] not in {"offline_fixture", "recorded_replay", "provider_shadow"}):
+        _fail("E_SCOPE_FORBIDDEN")
+    if allocation["status"] != "committed" or allocation["token"]["value"] != metadata["control_token"]:
+        _fail("E_AUTHORITY_REQUIRED")
+    started = metadata["created_at"] if metadata["phase"] == "reused" else metadata["result"]["timing"]["started"]
+    if (started is None or compare_times(started, allocation["expires_at"]) >= 0 or
+            allocation["amounts"].get("calls", 0) > budget["max_calls"] or
+            context["max_request_bytes"] > budget["max_request_bytes"] or
+            context["max_response_bytes"] > budget["max_response_bytes"] or
+            not 0 < milliseconds(context["deadline"], started) <= 1000 * min(budget["timeout_seconds"], budget["wall_seconds"])):
+        _fail("E_BUDGET_EXHAUSTED")
 
 
 def _original_execution(view, receipts, record, metadata, *, policy=None):
@@ -340,10 +361,12 @@ class CaptureAdmissionService:
         policy = self.policy(view, admitted)
         record, metadata = _execution(view, self.receipts, execution)
         request, req = metadata["request"], admitted._request
-        marker = descriptor("matter.statecivics", "monitoring-command", "1.0", {"digest": admitted.digest}, "matter.monitoring-binding.v1")
+        if metadata["allocation"] is None:
+            _fail("E_BUDGET_EXHAUSTED")
+        allocation = _value(view.get(metadata["allocation"]), "budget-reservation")
+        _require_monitoring_execution(admitted, metadata, allocation)
         if (request["packet"] != packet.value or request["batch"]["state"] != packet.state or
-                type(request["stage"]) is not dict or
-                request["stage"]["members"][0]["parent_traces"] != [marker] or
+                request["stage"] != admitted._execution_stage(packet) or
                 request["batch"]["context"]["requested_model"] != req["evaluation"]["model"]):
             _fail("E_DEPENDENCY_STALE")
         if metadata["parents"] != list(admitted._execution_parents()):
@@ -504,8 +527,14 @@ class AdmittedCaptureMonitoring(AdmittedMonitoring):
         service = self.host.capture_service
         if service is None or service.capture_history is None:
             _fail("E_AUTHORITY_REQUIRED")
-        observed = service.capture_history(receipt=deepcopy(baseline["receipt"]),
-            host_binding=deepcopy(self.host.binding), access_context=self.output_context)
+        current = self.require_current()
+        try:
+            observed = service.capture_history(receipt=deepcopy(baseline["receipt"]),
+                host_binding=deepcopy(self.host.binding), access_context=self.output_context)
+        except ContractError:
+            raise
+        except Exception:
+            _fail("E_AUTHORITY_REQUIRED", "host_controls_unavailable")
         if not isinstance(observed, ObservedMonitoringCapture):
             _fail("E_AUTHORITY_REQUIRED")
         with service.storage.snapshot() as view:
@@ -524,7 +553,7 @@ class AdmittedCaptureMonitoring(AdmittedMonitoring):
                 old["projection"]["treatment"] == "quiet" or observed.owner != expected_owner or
                 observed.receipt != baseline["receipt"] or observed.admission_reference != baseline["capture_admission_reference"] or
                 entity_ref(observed.candidate) != entity_ref(old["candidate"]) or
-                entity_ref(old["candidate"]) != entity_ref(self.host.current_state(expected_owner["intent_id"]).candidate)):
+                entity_ref(old["candidate"]) != entity_ref(current.candidate)):
             _fail("E_SCOPE_FORBIDDEN")
         if (observed.material != old["material"] or observed.material_contract != old["material_contract"] or
                 canonical_digest(observed.material, "matter.monitoring-conveyed-material.v1") != baseline["conveyed_material_digest"] or
@@ -539,7 +568,7 @@ class AdmittedCaptureMonitoring(AdmittedMonitoring):
         value = record["body"]["details"]["value"]
         result.update(decision_basis={"kind": "native_attention", "attention_reference": pin(record)}, consequential_use=False,
             capture_key=conveyed_capture_identity(host_binding=self.host.binding, intent_id=self._request["intent"]["id"],
-                candidate=self.host.current_state(self._request["intent"]["id"]).candidate,
+                candidate=self.require_current().candidate,
                 components=self._request["context_components"], material_digest=value["material_digest"],
                 material_contract=value["material_contract"], baseline_reference=self._request["baseline"].get("receipt")))
         return result
@@ -574,10 +603,15 @@ class AdmittedCaptureMonitoring(AdmittedMonitoring):
         return super()._reproject(arguments)
 
     def _capture_guard_current(self):
-        current = self.require_current()
-        if self._projection is not None and "capture_admission" in self._projection[1]:
-            self.host.capture_service.current(self, self._projection[1]["capture_admission"])
-        return current
+        try:
+            current = self.require_current()
+            if self._projection is not None and "capture_admission" in self._projection[1]:
+                self.host.capture_service.current(self, self._projection[1]["capture_admission"])
+            return current
+        except ContractError:
+            raise
+        except Exception:
+            _fail("E_AUTHORITY_REQUIRED", "host_controls_unavailable")
 
     def _proposal(self, view, policy, judgments, packet, current, execution, original_execution):
         req = self._request

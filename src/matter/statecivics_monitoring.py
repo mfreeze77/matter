@@ -486,7 +486,7 @@ class AdmittedMonitoring:
                 context["mode"] not in {"offline_fixture", "recorded_replay", "provider_shadow"} or
                 [q.manifest["specification"] for q in rendered_questions] != req["evaluation"]["questions"]):
             _fail()
-        logical = canonical_digest({"host": host.binding, "key": req["idempotency_key"]}, "matter.monitoring-logical.v1")
+        logical = self._logical_request_id()
         with receipts.storage.snapshot() as view:
             try:
                 view.get(attempt_ref(receipts.scope_id, logical, "initial"))
@@ -506,14 +506,9 @@ class AdmittedMonitoring:
                 reserved = receipts.budgets.require_committed(view, allocation)
                 if reserved["amounts"].get("calls", 0) > budget["max_calls"]:
                     _fail("E_BUDGET_EXHAUSTED")
-        marker = descriptor("matter.statecivics", "monitoring-command", "1.0", {"digest": self.digest}, "matter.monitoring-binding.v1")
         native = receipts.request(batch, packet=packet, rendered_questions=rendered_questions,
             token=host.access_context.value["token"], model_binding=model_binding, access_context=host.access_context,
-            precision=self._execution_precision(),
-            stage={"plan": descriptor("matter.statecivics", "monitoring-semantics", "1.0", {"contract": self._version,
-                "consumes": ["source", "purpose", "scope", "audience", "responsibility", "baseline", "dispositions"]},
-                "matter.monitoring-semantic-plan.v1"),
-                "members": [{"stage_id": "audience", "transform": packet.state["preparation"], "parent_traces": [marker]}]})
+            precision=self._execution_precision(), stage=self._execution_stage(packet))
         def dispatch(**args):
             try:
                 self.require_current()
@@ -548,6 +543,16 @@ class AdmittedMonitoring:
             # the wire vocabulary; persistence failure is not invalid input.
             _fail(code if type(code) is str and code in ERROR_CODES else "E_POLICY_INVALID")
         return result
+
+    def _logical_request_id(self):
+        return canonical_digest({"host": self.host.binding, "key": self._request["idempotency_key"]}, "matter.monitoring-logical.v1")
+
+    def _execution_stage(self, packet):
+        marker = descriptor("matter.statecivics", "monitoring-command", "1.0", {"digest": self.digest}, "matter.monitoring-binding.v1")
+        return {"plan": descriptor("matter.statecivics", "monitoring-semantics", "1.0", {"contract": self._version,
+            "consumes": ["source", "purpose", "scope", "audience", "responsibility", "baseline", "dispositions"]},
+            "matter.monitoring-semantic-plan.v1"),
+            "members": [{"stage_id": "audience", "transform": packet.state["preparation"], "parent_traces": [marker]}]}
 
     def _execution_precision(self):
         return None
