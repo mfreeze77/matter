@@ -1,5 +1,12 @@
 # Dashboard handoff: MAT-081 candidate receipt
 
+**Current SDK handoff:** see the [pinned package handoff](../adapters/statecivics-sdk-handoff.md)
+and the closeout below. Earlier checkpoint statements that the installed
+walkthrough-schema failure remained open were stale: the repair predates this
+stack, and fresh installed civic walkthrough checks of both SDK candidates pass.
+See [the original repair receipt](civic-followthrough.md#final-executed-package-and-core-checks).
+This correction is separate from current CI failures and host receiving acceptance.
+
 2026-10-29. Matter baseline `8528485` (planning PR #27, stacked on #26).
 StateCivics code inspected read-only at
 `e349713e62e35d65cbfb8585a76361f0230cf2b0`. No StateCivics checkout files were
@@ -296,3 +303,174 @@ shadow use. MAT-048/049 wider scope, MAT-040 qualification/human-reviewed labels
 production alerts, the custom writer, DIAT and PostgreSQL are not completed by
 this component evidence. StateCivics files, containers and deployment were not
 changed. No loose worktree was created; only the current Matter worktree remains.
+
+## SDK review and pinned handoff, 2026-10-30
+
+The owner authorized Matter-side review closeout, package verification and a
+pinned handoff, explicitly **without merging** or changing StateCivics. The
+[SDK handoff](../adapters/statecivics-sdk-handoff.md) and
+[candidate manifest](../adapters/statecivics-sdk-candidates.json) separate the
+#26-only KS-1121 package from the #29 saved-objective package needed by
+KS-1124/1126. StateCivics owns its image and receiving acceptance.
+
+### PR and review evidence
+
+The inspected heads were #26 `9cf444a`, #27 `8528485`, #28 `f95a57e`, and #29
+`284047a`, based on main `b5dfc27`. The base-to-head chain is linear and GitHub
+reported all four mergeable with `mergeable_state: unstable`, no submitted
+reviews or review comments. No merge was attempted. GitHub mergeability is not
+a clean validation verdict or owner authorization.
+
+The two-pass independent review of all 16 eligible files across #26–29 completed
+with no coverage warnings. It found three confirmed adapter issues: native
+pre-dispatch recording failures were clamped to invalid request before the wire
+mapper, a redundant selected-source subset check could never fail, and readable
+correction references were not checked against actual supersedes ancestry.
+The first correction is committed at `c32ea6374129cbbab074bab4546b485d72654457`;
+its extended recording-failure regression passed (one test, 254.384s).
+The existing post-dispatch unknown/no-resend assertions remain in that test.
+The correction-lineage fix is committed at
+`6ae021456207b3cb2ba56c13e2c62d456d250069`; its extended native baseline/correction
+regression passed (one test, 262.125s). It verifies an actual linked correction,
+then refuses an authorized unrelated claim, the current claim itself and a
+selected observation without a supersedes relationship before provider I/O.
+The check follows only persisted ancestor edges with current access, bounded
+reads, candidate/type compatibility and observation availability checks.
+Review of the initial failure-mapping delta found a real handoff preparation hazard: the preliminary
+manifest still named the earlier runtime. Candidate pins must be rebuilt after
+the final runtime fixes; the initial manifest was never a published SDK release.
+
+### Installed-schema investigation: stale warning corrected
+
+The warning in earlier checkpoints above was stale. Main `b5dfc27` already uses
+`importlib.resources.files("matter._schemas")` for the default walkthrough schema
+in `matter.demo._schema`. The repair and actual installed receipts were recorded
+in [live-roadmap](live-roadmap.md#installed-schema-follow-through-2026-10-28)
+and [civic follow-through](civic-followthrough.md#final-executed-package-and-core-checks).
+Fresh #26 and baseline #29 wheels both passed the default-schema civic walkthrough
+outside the checkout, under isolated Python with no local schema directory,
+with editable Matter import hooks removed and provider network denied. This is
+installed evidence, not a checkout-test inference. No schema/package code was
+changed in this closeout. The repository CLI still intentionally requires a
+checkout or explicit `--root`; broader MAT-077 scope remains planned.
+
+### Existing CI validation gap
+
+The Python 3.11/3.12 pull-request jobs on all four inspected heads failed at
+behavioral regression tests. The recurring failure is
+`integration.test_dispatch_races.DispatchRaces.test_distinct_equivalent_intents_compete_across_real_sqlite_handles`:
+the losing queue operation returns `E_STORAGE_UNAVAILABLE` rather than a withheld
+or stale result. The single-test local reproduction failed in 30.536s with the
+same result. The delivery implementation, SQLite implementation and this test
+are unchanged by #26–29; that does not establish the root cause or dismiss it.
+No neutral outbox/storage refactor or CI-only repair was added to this slice.
+
+Additional failures appear in #26/Python 3.12 and #27/Python 3.11:
+`test_cancelled_never_authorized_work_can_be_withdrawn_then_replaced_without_renewing_old_token`
+(withheld instead of ready) and
+`test_one_expired_member_does_not_abort_compatible_independent_member`
+(blocked instead of completed). Those were inspected in retained logs, not
+locally reproduced or cleared. The #28/#29 logs in both Python versions report
+the one recurring race failure. These failures block claiming an all-green
+merge gate; they are separate from the repaired walkthrough resource lookup.
+
+Raw receipts, immutable source inventories, wheels, installed targets and review
+JSON are retained in gitignored `data/validation/sdk-handoff-20261030/`.
+The existing environment is reused; this is not a fresh dependency environment
+or a new multi-version local suite. There are zero live JEV calls in these
+checks; authored responses and real software guards are component evidence,
+not JEV interpretation, host receiving acceptance or MAT-040 qualification.
+
+### Package and contract receipts
+
+Built #26 source `9cf444a` and final saved-objective runtime `59bfed9` without
+dependency downloads; both version strings are `0.1.0.dev15`, so the manifest
+pins separate source commits and wheel SHA-256 values. All 200/#26 and 202/#29
+runtime/SQL/schema files byte-match their immutable source commits. Imports
+of all 92/#26 and 93/#29 package modules came from the installed targets, with
+106/#26 and 107/#29 bundled schemas. Frozen monitoring schema, two question
+construction and native refusal mapping checks pass in the final saved-objective
+wheel. Civic default-schema walkthroughs pass for #26, baseline #29 and final
+#29 outside checkout with no schema directory or provider access.
+
+- Fresh installed #26 civic export/attention selection: **14 tests, 2.896s**,
+  zero failures/errors/skips, network denied.
+- Checkout contract suite: **179 tests, 9.411s**, zero failures/errors/skips.
+  All 60 frozen lock entries match; no specification/decision/schema bytes changed.
+- JavaScript portable canonical check: **26 canonical and eight exact-source
+  vectors** passed.
+
+No full repository/stress/qualification suite or new live call was run for this
+closeout. Harness preparation errors (wrong interpreter for the build backend,
+editable import leakage and a socket monkeypatch incompatible with SSL import)
+were corrected before the reported final checks; they are not successful checks
+or new product defects. Final isolated runs explicitly exclude the Matter
+editable finder, verify every Matter import path and deny provider network I/O.
+
+### Correction guard follow-through
+
+Review of `6ae0214` found over-broad history reads: a valid claim correction
+could be refused because an unrelated observation ancestor lacked permission
+or availability. `9745941` restricts roots to the declared correction types,
+prioritizes declared targets, stops once their paths are proved, and skips
+ungranted unused branches without retrieving their bodies. `59bfed9` also
+allows a separately verifiable path beside unavailable unused history, while
+never treating that unavailable history as a proving link. The search remains
+bounded at 128 visited references. Native intake and current access remain the
+owners of record validity and permission; these checks create no source authority.
+
+The two-pass review at `9745941` covered all three selected Python files;
+its only finding was a test taking the wrong rejection path. The two-pass
+availability-delta review covered both selected files; its only finding was a
+missing unavailable-intermediate negative control. Both were corrected in
+`aa2ab934a35f705d402062865cd291b1736e30dc`, with explicit read-trace assertions.
+The handoff/manifest/canonical-ticket two-pass review covered all three selected
+files with zero findings or warnings. These are separate review scopes, not a
+claim that the earlier full-stack review had no findings.
+
+The final test-only delta received a separate two-pass review of its one selected
+file, with zero findings or warnings. All confirmed findings in the review
+chain are addressed; this is not a green verdict on the unrelated failing CI tests.
+
+The current `59bfed9` wheel passes **10 focused boundary tests in 0.022s** under
+the installed, network-denied harness. They cover available source correction,
+unrelated references, subject/type refusal, required transitive paths,
+unused ungranted/unavailable history, unavailable or future targets and
+intermediates, and the search bound. Their trusted-view fragments are unit
+evidence; they do not impersonate persisted StateCivics records. The earlier
+`6ae0214` wheel passed the three native SQLite recording/correction/projection
+regressions in **639.412s**. The later runtime and full baseline installed runs
+have their own receipts below; no earlier wheel is relabelled as the current one.
+
+The final handoff wheel is built from `59bfed9`, SHA-256
+`13f6b3156bb33664300597aaa533a71764a700bda3a810d8a569989809b4ca37`.
+All 202 packaged files match that source. Later test/documentation commits do
+not alter the packaged runtime, README, license, schema or build configuration.
+
+The `9745941` installed wheel selection passed **11 tests in 617.705s**, with
+zero failures/errors/skips: eight ancestor-boundary units and three native
+SQLite recording/correction/projection regressions. Its final availability-only
+runtime delta is covered by the current `59bfed9` wheel's ten focused checks,
+including the new available-side-branch and unavailable-intermediate controls.
+The two later test-only changes strengthen branch/read-trace assertions. This
+is explicit change-specific evidence, not a full-suite rerun of the final wheel.
+The environment used Python 3.12.14, SQLite 3.53.1, Darwin/arm64 and the existing
+dependency environment. Host Linux/image acceptance still needs its own receipt.
+
+The complete **original-head installed adapter run passed 24 tests in
+2,402.718s**, with zero failures/errors/skips. It used the immutable `284047a`
+wheel and its original test module loaded before the closeout edits, outside
+the checkout with network denied. This replaces the earlier segmented-only
+baseline receipt, not the final wheel's change-specific receipts. Exact
+runtime/test-source hashes for the 24/11/10 selections are retained in
+`test-provenance.json`; individual summaries are `monitoring-tests.json`,
+`reviewed-installed-regressions.json` and `handoff-installed-boundary.json`.
+
+Final render/check, repository validation (82 tickets, 104 requirements, 107
+schemas, three walkthroughs), package/source hash comparison and diff whitespace
+checks pass. All four PRs remain open; no merge, StateCivics edit or image build
+was performed. Only this Matter task worktree exists. Disposable task build
+scratch was removed, with wheels/inventories/receipts preserved; local task
+artifacts occupy about 30 MiB, within the 100 MiB budget. Free disk remains
+below the standing 50 GiB reserve, so no full repository/stress/qualification
+or image build was attempted.

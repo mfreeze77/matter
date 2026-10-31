@@ -29,6 +29,11 @@ ORM/API mapping, host control service or production provider configuration.
    `AdmittedMonitoring(request, host=host, packet=packet)`. Draft/paused/revoked,
    missing/foreign/muted capture, mismatched current versions, unavailable source,
    wrong candidate and unresolved prior outcome refuse before provider I/O.
+   Declared correction references must be actual ancestors along persisted
+   `supersedes` edges from the bound claim, source finding or selected sources;
+   readable unrelated records and self-links do not establish correction.
+   Traversal is bounded at 128 ancestors, checks current access and subject/type
+   compatibility, and excludes observations unavailable at the source cutoff.
    Catch boundary errors with `monitoring_refusal(error, request_id=validated_id)`;
    it produces the frozen bounded refusal, maps missing/unavailable native reads,
    preserves cancellation/budget/currentness distinctions, and never copies raw
@@ -140,3 +145,8 @@ scope mapping (and KS-701 acceptance); KS-1124 owns actual dispatch/receipt mapp
 KS-1126 owns the two actual saved-objective receiving run; KS-1127 owns incoming
 live shadow use. PR #26 / SDK rebuild / KS-1121 gates still apply on that side.
 MAT-040 qualification, production alert rollout and the custom writer are separate.
+
+The [pinned SDK handoff](statecivics-sdk-handoff.md) distinguishes the #26-only
+KS-1121 package from the #29 saved-objective package, records exact source/wheel
+hashes, and lists host configuration and installed-check evidence. Neither
+candidate is a merged or deployed release without the separate owner/host steps.
