@@ -1,0 +1,137 @@
+{
+  "id": "MAT-084",
+  "title": "Admit unqualified monitoring judgments to guarded capture-only proposals",
+  "track": "civic",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "integration",
+  "owner_repo": "mfreeze77/matter",
+  "component": "adapters.statecivics.capture_admission",
+  "depends_on": [
+    "MAT-082",
+    "MAT-034",
+    "MAT-015",
+    "MAT-016",
+    "MAT-019",
+    "MAT-020",
+    "MAT-021",
+    "MAT-028",
+    "MAT-030",
+    "MAT-031",
+    "MAT-072"
+  ],
+  "requirements": [
+    "CORE-17",
+    "CORE-18",
+    "CORE-20",
+    "CORE-22",
+    "CIV-07",
+    "CIV-09",
+    "OPS-01"
+  ],
+  "summary": "Supply the missing Matter-owned study admission between durable unqualified monitoring answers and capture-only attention proposals. KS-1124 currently uses a genuinely deterministic approved-intent host rule while keeping model answers as unqualified notes. A new explicit path should let actual model judgments drive isolated study captures without fabricating a supported source claim, qualified method, native assessment or delivery authority.",
+  "in_scope": [
+    "An explicitly opted-in, versioned capture admission for the exact existing civic monitoring objective/novelty questions derived from MAT-034, consuming actual current MAT-030 receipts and retaining unqualified provenance.",
+    "Reuse of MAT-072 access/egress, actual committed budgets, exact attempts, current source/context/disposition dependencies, real observed capture history and the existing isolated capture callback.",
+    "A negotiated wire extension and pinned SDK handoff naming the request, result, baseline and HostMonitoringState differences needed by StateCivics KS-1124/1125/1126."
+  ],
+  "out_of_scope": [
+    "Production notification delivery, provider qualification/certificates, source-authority changes, automatic activation or replacing the actual deterministic host rule with a falsely not_required model method.",
+    "StateCivics implementation, image builds, dashboard lifecycle/pilot choices, county-place support, Workbench/state-intel activation, retrieval/storage/queue replacements and custom alert writing.",
+    "SQLite regression repair (MAT-083), DIAT, PostgreSQL and inventing another rehearsal or evaluation infrastructure."
+  ],
+  "implementation": [
+    "Resolve the proposed boundary in docs/plans/unqualified-monitoring-capture.md before freezing executable changes. Target package matter-foundation 0.1.0.dev16 and explicitly negotiated monitoring-handoff/1.1.0; these are planned, unreleased targets, not existing exports or artifacts. Preserve the frozen 1.0.0 schema, lock and legacy AttentionService project path.",
+    "Reuse actual durable semantic receipt validation, original/reused execution provenance, exact numeric and whole-batch admission, original control token and question/model/packet/intent bindings. A standalone probability, detached BatchResult, altered receipt, failed sibling or unresolved execution cannot acquire capture admission.",
+    "Reuse the existing ability to persist an explicitly unqualified semantic admission. Add only bounded capture policy/proposal composition where existing ports do not provide it. Do not change SemanticAdmission qualification to qualified/not_required, counterfeit an assessment, or map a model relevance answer to a supported source claim. Capture classification is a separate study decision.",
+    "Define a server-owned, immutable capture policy with explicit positive/negative/abstention regions and exact question/precision bindings. It is a study selection policy, not an accuracy target or certificate. Objective and novelty remain separate, with no multiplied importance score. Missing/uncertain/failed answers remain unknown and do not trigger a generic human question.",
+    "Reuse neutral mechanical constraints for ownership, current purpose/audience, coverage, feedback, baseline novelty, source corrections and deadlines without introducing a parallel attention engine or feeding counterfeit source assessments into the core. Any necessary neutral refactoring must preserve legacy behavior and keep civic/JEV vocabulary in the adapter.",
+    "Register the capture admission against actual original execution, source finding/packet, intent/context components, policy, dispositions and applicable observed baseline. Current pause/revoke, edits, grant withdrawal and relevant source changes withhold old results; preference-only refresh preserves authorized semantic reuse. Never renew original work tokens or resend unresolved provider/capture attempts.",
+    "Inspect the existing receipt/cache reuse gate before extending it. If qualified classification is currently required, use a separately typed capture-only reuse eligibility or withhold that reuse; never label an unqualified method qualified to obtain a cache hit. Exact-command recovery and the original execution identity remain separate from semantic reuse and empirical trials.",
+    "Add explicit 1.1.0 result provenance: native_attention retains a real assessment reference; unqualified_model_capture has assessment_reference null and exact capture-admission/execution/policy/question provenance. Extend observed-capture baseline provenance for this second kind without fabricating an assessment or delivered milestone. Keep qualification unqualified, permitted_use capture_only and consequential_use false.",
+    "Keep existing HostMonitoringState fields and source_finding meaning. The proposed optional capture_policy pin defaults to None; model capture also needs an explicitly configured trusted host admission service. Neither wire JSON nor a raw probability can supply that authority. Final callable names, shapes and policy details must be frozen and tested before KS-1124 switches.",
+    "Verify paired positive/quiet model judgments over the same authorized source and contrasting audiences, duplicates/provider jitter, observed baselines, linked corrections/new deadlines after handled feedback, unknown outcomes, partial coverage, in-flight edits/revocation, replay cuts and production-port refusal. Reuse existing synthetic fixtures and capture sinks; keep recorded conformance separate from fresh live interpretation and MAT-040 qualification.",
+    "Publish the exact implemented version, API/wire/HostMonitoringState diff, source/wheel hashes, imports and installed checks for KS-1124. Its replacement of the deterministic fallback and KS-1126 receiving acceptance remain StateCivics work; no feature availability is claimed by this ticket's plan."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Actual unqualified model judgments can select a study capture without a fabricated source claim, assessment or qualification.",
+      "verification": "With actual persisted semantic receipts, change the exact objective/novelty answers while holding source facts and approved contexts fixed; assert a justified positive versus quiet/unknown study proposal, exact unqualified provenance and unchanged source findings. Reject raw/detached/altered/cross-context answers and any claim that the method is qualified or not_required."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Capture-only admission retains the existing permission, budget, receipt, freshness and uncertainty boundaries.",
+      "verification": "Use real native access/control/budget/execution services and actual context/source/grant mutations before I/O, after I/O and at capture. Assert correct refusal/withholding, original token identity, no blind resend, preserved received/unknown outcomes and no foreign-client read or future-evidence capture."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Study captures preserve honest baselines, duplicate silence and correction/deadline semantics across replay and live-shaped inputs.",
+      "verification": "Compare deterministic traces for the same availability-ordered inputs with recorded answers in both serializations. Assert no duplicate capture for exact replay, reprint or provider-score jitter over unchanged material; unknown capture is not absent history; an actual linked correction or materially new deadline is not suppressed by old handled feedback. Baselines reference actual captures, not synthetic native assessments or delivery success."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Unqualified study admission cannot enter consequential assessment or production delivery through ordinary supported ports.",
+      "verification": "Attempt native assessment/publication, qualified semantic use and normal DeliveryService consumption with the study admission/proposal. Assert rejection with no source mutation, certificate, production send or baseline advancement. Only the explicitly installed isolated sink may capture after its atomic guard, with qualification unqualified and consequential_use false."
+    },
+    {
+      "id": "AC-5",
+      "criterion": "The released SDK provides an explicit, backward-compatible migration handoff rather than changing the frozen 1.0 path silently.",
+      "verification": "Freeze the negotiated new version with positive/negative compatibility vectors and actual exported callables. Run legacy 1.0 contract/adapter checks, new branch/admission checks and installed wheel imports/schema/provenance checks. Publish actual source/package hashes and receiving instructions; keep the target version marked unreleased until those receipts exist."
+    }
+  ],
+  "artifacts": [
+    "docs/plans/unqualified-monitoring-capture.md",
+    "src/matter/statecivics_monitoring.py",
+    "docs/adapters/statecivics-monitoring.md",
+    "tests/integration/test_monitoring_handoff.py",
+    "docs/validation/MAT-084.md"
+  ],
+  "tests": [
+    "Two contrasting audiences, same shared source, actual persisted model answers: positive, confident quiet and abstention/unknown remain distinct.",
+    "Whole-batch failure, detached/forged/reused/foreign receipts, changed questions/models/precision and exhausted or stale budget allocations.",
+    "Intent/context/preference/source/permission edits around provider completion and atomic capture, with original token preservation.",
+    "Observed native and study captures, missing/unknown outcome, provider jitter, duplicate/reprint, linked correction and new deadline after handled feedback.",
+    "Future-available evidence and historical source cut versus current approved intent and current authorization clocks.",
+    "Legacy 1.0 conformance, missing trusted study opt-in, and refusal by consequential admission/publication/delivery ports."
+  ],
+  "risks": [
+    "Using a supported claim or not_required label for an unqualified model interpretation launders uncertainty into source authority.",
+    "Existing 1.0 result and baseline fields require native assessments; reusing them dishonestly would fabricate provenance even in capture-only mode.",
+    "Score jitter or changed execution IDs must not become new material; real source corrections and deadlines must still survive duplicate/handled suppression.",
+    "A second policy engine would drift from core freshness and attention rules; reuse existing ports and share any necessary neutral mechanics.",
+    "A release target or draft field name is not an installed capability, owner-approved threshold, receiving acceptance or production authorization."
+  ],
+  "reuse": [
+    {
+      "source": "src/matter/statecivics_monitoring.py; tickets/MAT-082.md",
+      "application": "Reuse guarded intent/candidate binding, private audience packet, durable execution and isolated handoff; keep the existing project() path's native decision requirement."
+    },
+    {
+      "source": "src/matter/semantic/receipts.py; src/matter/semantic/qualification.py",
+      "application": "Consume real current execution provenance and existing explicitly unqualified admission rather than making a certificate or trusting detached probabilities."
+    },
+    {
+      "source": "src/matter/attention.py; src/matter/dispositions.py; src/matter/dependencies.py; src/matter/access.py",
+      "application": "Preserve mechanical attention, feedback, currentness/invalidation and real access controls without civic/provider vocabulary in the common core."
+    },
+    {
+      "source": "mfreeze77/state-civics-ai:KS-1124, KS-1125, KS-1126",
+      "application": "Host retains its deterministic approved-intent fallback until an implemented, pinned capture admission is available; it owns dispatch/capture mapping and receiving acceptance."
+    }
+  ],
+  "sources": [
+    "docs/contracts/monitoring-handoff.md",
+    "docs/decisions/0002-monitoring-handoff.md",
+    "docs/adapters/statecivics-monitoring.md",
+    "docs/semantic-qualification.md",
+    "docs/semantic-families.md",
+    "docs/plans/unqualified-monitoring-capture.md",
+    "Owner-relayed KS-1124 request, 2026-10-31: a Matter-owned capture-only path driven by unqualified monitoring judgments, with unchanged currentness/budget/receipt/access guards; name its ticket, version and wire/HostMonitoringState differences. Current host deterministic intent-field rule is not_required; model answers remain unqualified notes."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

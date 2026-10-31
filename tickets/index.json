@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "ticket_count": 83,
+  "ticket_count": 84,
   "counts_by_track": {
-    "civic": 7,
+    "civic": 8,
     "core": 18,
     "diat": 15,
     "evaluation": 10,
@@ -16,7 +16,7 @@
     "blocked": 1,
     "done": 43,
     "in_progress": 2,
-    "planned": 37
+    "planned": 38
   },
   "tickets": [
     {
@@ -2051,6 +2051,39 @@
       ],
       "readiness": "ready",
       "path": "records/MAT-083.json"
+    },
+    {
+      "id": "MAT-084",
+      "title": "Admit unqualified monitoring judgments to guarded capture-only proposals",
+      "track": "civic",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-082",
+        "MAT-034",
+        "MAT-015",
+        "MAT-016",
+        "MAT-019",
+        "MAT-020",
+        "MAT-021",
+        "MAT-028",
+        "MAT-030",
+        "MAT-031",
+        "MAT-072"
+      ],
+      "requirements": [
+        "CORE-17",
+        "CORE-18",
+        "CORE-20",
+        "CORE-22",
+        "CIV-07",
+        "CIV-09",
+        "OPS-01"
+      ],
+      "readiness": "ready",
+      "path": "records/MAT-084.json"
     }
   ]
 }
