@@ -106,7 +106,8 @@ fresh access check. Each audience runs its own objective/novelty questions under
 its own original token, intent and budget. The shared reading is included as
 explicit unqualified diagnostics and a real execution parent. It is checked at
 execution, admission, projection and capture; it is never reclassified as
-qualified to obtain reuse. Native durable exact-command recovery and semantic
+qualified to obtain reuse. The optional `source_reading: null` uses the authorized source packet directly;
+it does not force another source-only batch. Native durable exact-command recovery and semantic
 cache reuse remain distinct from another empirical trial.
 
 ## Actual captured baselines and consumer duties
@@ -140,8 +141,10 @@ contexts as in the existing adapter.
 The host owns durable atomic duplicate suppression, capture receipts and unknown
 outcomes across process restarts. An uncertain sink result must be reconciled
 through that history before a new command; it is not absent history or permission
-to resend. Exact admission retries recover the original record without calling
-the provider. Current pause/revoke, source/context/policy edits and withdrawn
+to resend. Exact admission retries recover the original recorded outcome without calling
+the provider. A definite failed control transaction can be retried with explicit
+fresh `command_id`/`idempotency_key` values against the same execution; see the
+SDK handoff. Actual invalidation still refuses, and unknown outcomes are reconciled. Current pause/revoke, source/context/policy edits and withdrawn
 access withhold old output. Replay keeps evidence availability separate from the
 current approved objective clock.
 

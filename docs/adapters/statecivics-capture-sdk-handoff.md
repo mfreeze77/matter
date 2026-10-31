@@ -9,7 +9,7 @@ notes must stay outside that rule.
 ## Exact package
 
 - Source/runtime commit: `1f525c6a66593573f2ae5d2af1eaf2bd00460a35` on PR #31.
-  Later receipt/vector-only commits may advance the PR without changing SDK bytes.
+  Later test/receipt/vector-only commits may advance the PR without changing SDK bytes.
 - Package and runtime version: `matter-foundation==0.1.0.dev16`.
 - Existing wire: `monitoring-handoff/1.0.0`, unchanged.
 - Optional candidate wire: `monitoring-handoff/1.1.0`.
@@ -61,6 +61,18 @@ Required host additions:
    results capture-only. A reused source reading is a real source-only receipt;
    each audience still needs current access to its transitive protected roots,
    its own objective/novelty execution, original token and budget.
+
+## Capture-control attempt recovery
+
+The host can supply `command_id` and `idempotency_key` to `admit_capture` and
+persist them with its control attempt. An exact retry preserves that attempt's
+recorded result, including a definite transaction conflict. After a **confirmed
+failed** control transaction with still-current inputs, choose a new control
+attempt ID/key and pass the **same execution pin**; the SDK rechecks all current
+source/context/access bindings. No new `execute()` call or provider attempt is
+needed. Do not change keys to hide an uncertain storage/sink result; reconcile
+it through the existing receipts/history. The installed conflict test verifies
+this path against an actual unrelated control inserted between prepare and commit.
 
 ## Consumer conformance before freeze
 
