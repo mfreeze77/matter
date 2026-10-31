@@ -149,3 +149,22 @@ JEV calls, writer calls, provider qualification, receiving-system acceptance and
 external alert delivery remain **not run in this slice**.
 Executed authoring checks and review limits are recorded in the
 [preparation receipt](../validation/statecivics-monitoring-scenarios.md).
+
+## Broader workflow examples
+
+The owner approved an owned watchlist/item capture target for the first broad
+objective slice, with refusal until it exists and is authorized. The frozen
+[MAT-081 contract](../contracts/monitoring-handoff.md) supplies the shared boundary;
+MAT-082 remains the bounded adapter implementation, with receiving acceptance
+owned by StateCivics.
+
+The [workflow-informed research catalog](../research/civic-monitoring-use-cases.md)
+and [structured invented examples](../../examples/civic/purpose-comparison/use-case-catalog.json)
+add sixteen potential user contexts: school governance and purchasing, land
+and real-estate projects, tech and broadband companies, housing/tribal grant
+teams, ratepayers/manufacturers, contractors, transit/environment advocates,
+university grants staff, local reporters and individual residents. The sources
+document real workflows, not demand for Matter. All clients/events/expected
+judgments are invented. These examples do not change the existing twelve-release
+replay pack or claim new feeds, live test results or qualification. The first
+executable handoff still uses two saved objectives and capture-only output.

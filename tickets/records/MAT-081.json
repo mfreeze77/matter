@@ -2,7 +2,7 @@
   "track": "civic",
   "phase": 4,
   "priority": "P1",
-  "status": "planned",
+  "status": "done",
   "type": "integration",
   "owner_repo": "mfreeze77/matter",
   "id": "MAT-081",
@@ -43,7 +43,8 @@
     "Specify attention treatment, structured reasons/citations/limitations, stale/error/denied/unknown results, permitted use, dependency/currentness guards and logical result/receipt keys. Preserve separate captured/delivered/consumed/acted outcomes and on-demand quiet inspection.",
     "Specify one contract for replay/live: event/publication/effective/available times remain separate; explicit evidence cutoff and context-selection policy; real authorization/provider budget uses the host clock. Include a positive for a future hearing/deadline whose notice is already available.",
     "Resolve D1-D7 jointly with named StateCivics owners before dependent code: broad scope, client-default inheritance, stance granularity, activation UX, replay context mode, baseline/feedback compatibility, cadence/privacy defaults. Record proposals as proposals until chosen; freeze synthetic compatibility examples and question/profile/qualification bindings.",
-    "Record local/external dependency gates: KS-1122 consumes this contract; MAT-082 and KS-1123 can proceed once it and host mapping are agreed; KS-1124 connects both; KS-1126 supplies the receiving capture receipt. Cross-repo readiness is not inferred from this repository graph."
+    "Record local/external dependency gates: KS-1122 consumes this contract; MAT-082 and KS-1123 can proceed once it and host mapping are agreed; KS-1124 connects both; KS-1126 supplies the receiving capture receipt. Cross-repo readiness is not inferred from this repository graph.",
+    "Pinned host review at StateCivics e349713e6 plus record correction e2dcb04cc: main ownership checks and create/revise/retire exist; current MAT-072 host controls, draft/pause/revoke, broad create scope, record-free capture provisioning and live assessment configuration remain StateCivics work. Freeze the specification with these requirements explicit, without claiming them implemented."
   ],
   "acceptance": [
     {
@@ -74,8 +75,13 @@
   ],
   "artifacts": [
     "docs/plans/dashboard-matter-handoff.md",
-    "docs/contracts/monitoring-handoff.md (planned specification)",
-    "tests/fixtures/civic/handoff/ (planned synthetic contract examples)"
+    "docs/contracts/monitoring-handoff.md",
+    "docs/contracts/monitoring-handoff.schema.json",
+    "tests/fixtures/civic/handoff/",
+    "tests/contract/test_monitoring_handoff.py",
+    "docs/validation/dashboard-matter-handoff.md",
+    "schemas/monitoring-handoff.schema.json",
+    "docs/decisions/0002-monitoring-handoff.md"
   ],
   "tests": [
     "Personal objective with no client and two objectives under one client.",
@@ -113,10 +119,17 @@
     "docs/attention.md",
     "docs/delivery.md",
     "docs/validation/civic-source-integration.md",
-    "Owner request, 2026-10-28: plan and ticket the saved-dashboard objectives -> JEV-powered Matter handoff for both availability-ordered timeline replay and incoming live data; planning only, DIAT excluded."
+    "Owner request, 2026-10-28: plan and ticket the saved-dashboard objectives -> JEV-powered Matter handoff for both availability-ordered timeline replay and incoming live data; planning only, DIAT excluded.",
+    "Owner clarification 2026-10-29: start MAT-081 against StateCivics main e349713e6; MAT-082 follows contract freeze and PR #26 merge or stacking; only KS-1124/1126 directly need KS-1121 after SDK image rebuild.",
+    "Owner approval: use an owned watchlist/item, refuse until it exists and is authorized; continue contract freeze then MAT-082. Broaden illustrative users through web research without widening immediate runtime acceptance."
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "Owner approved a real user-owned watchlist/item and refusal until the target exists and is authorized. Decision 0002 records that approval separately from bounded engineering dispositions D2-D7; no production permission is implied.",
+      "monitoring-handoff/1.0.0 specification, portable/installed schema and frozen contract-lock inventory; 16 authored synthetic request/response pairs and 20 invalid wire vectors. Ten contract tests passed; these are shape/compatibility examples, not runtime authority or provider-accuracy evidence.",
+      "Pinned StateCivics source mapping and main record correction e2dcb04cc are recorded in docs/contracts/monitoring-handoff.md; host controls, lifecycle, broad scope, capture provisioning and live provider remain explicitly unimplemented. Source-review/validation and independent-review dispositions are retained in docs/validation/dashboard-matter-handoff.md.",
+      "Two-pass freeze follow-up reviewed six files with one low availability-pair test finding and no warnings. Added paired source/cut assertions and distinct later illustrative packet identity; eleven contract tests passed. Contract 1.0.0 semantics unchanged; no host runtime or provider qualification claimed."
+    ]
   }
 }

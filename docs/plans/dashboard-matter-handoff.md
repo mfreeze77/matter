@@ -1,6 +1,6 @@
 # Dashboard objectives → Matter monitoring handoff
 
-Planning baseline: 2026-10-28. Owner asked for tickets and a coordinated plan,
+Planning baseline: 2026-10-28; host code rechecked 2026-10-29 at `e349713e6`. Owner asked for tickets and a coordinated plan,
 not implementation, migrations, deployment or provider execution. Proposed names
 and wire fields below are design inputs; MAT-081 freezes the contract before
 implementation. DIAT, replacement infrastructure, PostgreSQL backend changes,
@@ -16,7 +16,7 @@ broad dashboard redesign and the later custom alert writer are outside this plan
   experiment do not complete the broader civic contract. MAT-040 is blocked;
   MAT-042/050 remain later outcome/receiving qualification. None blocks bounded,
   authorized capture-only diagnostics solely for lack of held-out human labels.
-- StateCivics at `98928295d`: `WorkspaceClient`, `WatchIntent`, immutable
+- StateCivics at `e349713e6`: `WorkspaceClient`, `WatchIntent`, immutable
   `WatchIntentRevision`, shared `EvidencePacket`, private `IntentAssessment`,
   `/tracking/intents` and `WatchIntentService` already exist. KS-701 is still
   `in_review`; its applicable acceptance needs closeout, not another intent store.
@@ -27,8 +27,9 @@ broad dashboard redesign and the later custom alert writer are outside this plan
   UserActivityEvent, AlertPlanner and the in-app sink remain the owners. KS-997
   owns broader JEV/local suggestions and place choice; KS-1071 owns client-board
   local-record usability. This work does not redo or close those whole tickets.
-- KS-1118 is on StateCivics main. KS-1121 public-source rehearsal is committed on
-  its local branch; Matter PR #26 is open. These are tested foundations, not a
+- KS-1118 is on StateCivics main. KS-1121 public-source rehearsal code is on
+  the backed-up planning branch, not main; `e2dcb04cc` corrected its main ticket
+  status to blocked. Matter PR #26 is open. These are tested foundations, not a
   connection to real saved dashboard configuration or production alert readiness.
   The five-call public study found underconfident stance/positive relevance;
   retained limitations remain in `docs/validation/civic-source-integration.md`.
@@ -61,7 +62,7 @@ and candidate-scope watches; an exact-follow-only implementation is insufficient
    components. Say which selected client-default values were used and their
    versions. One client's several objectives stay separate.
 3. Purpose text; scoped subjects/places; changes of interest; issue/provision
-   positions and exclusions; assigned responsibility/already-handled status;
+   positions and exclusions; assigned responsibility and separately scoped dispositions;
    active dates; audience and delivery preferences. Missing stance is unknown,
    not neutral. Legacy `monitor` is a watching preference, not a source position.
 4. A separate authorized evidence manifest: exact source/version hashes and
@@ -81,42 +82,26 @@ and candidate-scope watches; an exact-follow-only implementation is insufficient
    Domain/replay time never substitutes for the actual authority/provider clock.
    Direct pause/retire/revoke/edit commands use the host control path immediately.
 
-### Draft envelope and validation boundary
+### Frozen envelope and validation boundary
 
-Proposed request name `MonitoringAssessmentRequest`, contract tag
-`monitoring-handoff/draft-1` (not accepted by any runtime yet):
+MAT-081 now has a [frozen specification](../contracts/monitoring-handoff.md),
+portable schema and synthetic compatibility examples, tagged
+`monitoring-handoff/1.0.0`. Decision 0002 records the owner-approved capture target
+and bounded engineering dispositions. This specification supersedes the earlier
+draft field names; freeze alone does not ship a host runtime API.
+The request projects approved intent, authenticated host-binding identifiers,
+context components, evidence, baseline, capture binding, evaluation and budgets.
+The actual trusted host controls and MAT-028 PreparedPacket are injected alongside
+it; JSON `access_context` is forbidden and cannot grant authority.
 
-- Required: `contract_version`, `request_id`, `idempotency_key`, `mode`,
-  `host_scope_binding`, `intent_version`, `context_components`, `evidence`,
-  `baseline`, `evaluation_config`, `access_context` and `budgets`.
-- `mode` first admits only `rehearsal_capture` or `live_shadow_capture`.
-  `intent_version` carries host intent/revision/hash/approval/effective-time pins;
-  `context_components` carries the exact independent purpose, scope, audience,
-  responsibility and preference versions, with approved positions/exclusions.
-  `client_id` is optional within the authenticated host binding.
-- `evidence` carries the authorized packet/source manifest, exact spans/hashes,
-  coverage/lineage and `knowledge_cut`; `context_selection` explicitly names the
-  agreed historical/retrospective mode and selected revisions. Existing Matter
-  reference/time/packet types should supply exact encodings where compatible.
-- `baseline.status` distinguishes observed capture/delivery, absent history and
-  outcome unknown; an observed baseline carries its receipt and exact conveyed
-  material. A caller may not substitute an undelivered assessment.
-- `evaluation_config` pins question/profile/policy/model/adapter and qualification;
-  `access_context` is backed by actual current host controls, not asserted JSON.
-  Input shape/version/hash/scope/cut/budget failures refuse before provider I/O.
-- Repeated logical requests reuse permitted results/receipts only while their
-  dependency and current-access guards still hold; an invalidated retry is stale,
-  not a silently fresh replacement under the old key.
-
-Proposed result name `MonitoringAssessmentResult`: `request_id`, contract and
-logical result identity, exact assessment/source-finding/context references,
-`treatment`, `reasons`, `citations`, `coverage`, `uncertainty`, `qualification`,
-`currentness`, `dependency_guards`, `baseline_reference`, `permitted_use` and
-`proposed_next_steps`. These proposals carry no delivery outcome; the host adds
-actual capture/delivery receipts afterward. The first modes permit capture only.
-Denied responses expose a bounded public error/correlation, never forbidden
-source/client IDs, citations, rationale or raw attempt journals. MAT-081 must
-freeze exact types, required/optional/null meanings and errors before code.
+Pinned StateCivics main has real ownership checks and create/revise/retire, but
+no production MAT-072 host-control adapter, draft/pause/revoke lifecycle, broad
+record-free create scope or live assessment provider (the seam returns 503).
+Current capture requires a real watchlist/item and ActivityEvent association.
+The owner selected a real owned watchlist/item target with refusal until it
+exists and is authorized. Broad-objective capture provisioning remains host work,
+not existing functionality. See the specification's host-build list and adopted
+D1–D7 decisions before connecting dependent host implementation.
 
 ### Output groups to specify
 
@@ -214,6 +199,16 @@ before code relying on it begins; unresolved choices do not become silent defaul
    dispatcher in bounded capture-only shadow mode. Compare replay/live with fixed
    recorded judgments; fresh-provider variability is separately reported.
 
+Dependency clarification, 2026-10-29: MAT-082 follows MAT-081 freeze and
+uses PR #26 civic_exports/civic_attention after merge or by stacking. Only
+KS-1124/1126 directly require the KS-1121 study code, after #26 and a rebuilt SDK
+image. KS-1122 does not wait for that code. StateCivics `e2dcb04cc`, verified
+on main through `8955f16d8`, corrected KS-1121's status and dependencies and
+restored `docs/plans/dashboard-matter-integration.md`. KS-701 remains in_review
+and gates KS-1122 acceptance, not this contract design. Those record corrections
+do not supply the missing host runtime capabilities. Matter has not edited that
+checkout in this slice.
+
 Both sides keep their own store/schema/authorization owners. Cross-repo gates
 are named explicitly in tickets; they are not encoded as pretend local ticket IDs
 or counted as completed because one repository's graph says ready. MAT-049 remains
@@ -258,8 +253,8 @@ Provider qualification and real receiving usefulness remain separate evidence.
 Matter canonical records: MAT-081 (shared contract), MAT-082 (bounded context /
 assessment adapter). StateCivics: KS-1122 (scope/backend), KS-1123 (minimal UI),
 KS-1124 (dispatcher), KS-1125 (explanations/feedback), KS-1126 (two-objective
-rehearsal), KS-1127 (incoming-live capture). All newly planned; none implemented
-or qualified by this document. StateCivics' local plan carries its exact paths and
+rehearsal), KS-1127 (incoming-live capture). MAT-081 is now in progress as a candidate specification; MAT-082 and the new
+host capabilities remain planned. None is implemented or qualified by this document. StateCivics' local plan carries its exact paths and
 local dependency edges; this is the proposed shared boundary's single owner.
 
 
@@ -267,7 +262,8 @@ local dependency edges; this is the proposed shared boundary's single owner.
 
 Canonical ticket generation/check and repository validation passed with 82
 tickets, 104 requirements, 106 existing runtime schemas and three walkthroughs.
-New MAT-081/082 remain planned/not_run. Cross-side planning checks found an
+At that planning receipt MAT-081/082 were planned/not_run; current MAT-081
+candidate progress is recorded in [the contract receipt](../validation/dashboard-matter-handoff.md). Cross-side planning checks found an
 acyclic new-ticket graph, existing source/local-doc paths, unique index rows and
 named external MAT-081/082 dependencies for each StateCivics consumer.
 StateCivics' existing Docker ticket metadata/contiguity check passed once at
@@ -289,3 +285,14 @@ existing KS-1121 work/current main. Matter's plan is stacked on the existing
 implementation or alter main. Ticket IDs KS-1122–1127 and MAT-081/082 are reserved
 by these committed records; inspect branches as well as main before allocating
 further IDs.
+
+## Version 1 contract freeze
+
+The owner approved an owned watchlist/item capture target and refusal until it
+exists and is authorized. [Decision 0002](../decisions/0002-monitoring-handoff.md)
+records bounded D1–D7 dispositions for `monitoring-handoff/1.0.0`; the shared
+specification and compatibility examples are frozen for MAT-082 component work.
+Host lifecycle/access/scope/provider implementation and KS-701 closeout remain
+host work. No production delivery or provider qualification follows from freeze.
+The [broader workflow catalog](../research/civic-monitoring-use-cases.md) informs
+future examples without expanding the first two-objective runtime slice.
