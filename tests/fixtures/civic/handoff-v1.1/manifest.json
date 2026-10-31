@@ -1,0 +1,60 @@
+{
+  "contract_version": "monitoring-handoff/1.1.0",
+  "status": "candidate_consumer_run_required",
+  "evidence_kind": "synthetic_recorded_runtime",
+  "provider_calls_live": 0,
+  "generators": {
+    "audience_vectors": "Installed wheel: integration.test_monitoring_capture.SourceReadingCaptureTests; installed-source-reuse.log: 1 passed, 1055.619s; one source batch/four heads and three explicitly fresh audience batches/two heads each.",
+    "mixed_baseline": "Installed wheel: integration.test_monitoring_capture.MixedCaptureBaselineTests; installed-mixed.log: 1 passed, 476.917s.",
+    "study_baselines": "Installed wheel: integration.test_monitoring_capture.StudyCaptureHistoryTests; installed-history.log: 1 passed, 914.425s; actual isolated host capture table, duplicate quiet and linked correction despite abstention."
+  },
+  "limitations": [
+    "These portable wires do not rehydrate grants, host rows, source records or execution authority.",
+    "Recorded from installed SDK source 1190d51. Later 18263cd/1f525c6 tighten cached-original authority, projection copying, bounded-attempt admission and host-read refusal handling. Their SDK checks are pinned separately; the schema/wire stays compatible.",
+    "Batch counts refer to recorded executors, not live JEV HTTP requests. No interpretation quality, StateCivics SDK-image acceptance, qualification or production authority is established."
+  ],
+  "vectors": [
+    {
+      "name": "audience-a-positive",
+      "file": "audience-a-positive.json",
+      "sha256": "429453da3a851fb43d48b0d3dc4a96ad2b89b93c3696444c8fd9676aa80642c7",
+      "live_calls": 0
+    },
+    {
+      "name": "audience-b-quiet",
+      "file": "audience-b-quiet.json",
+      "sha256": "082ab84682be3c468340bb639c8e526928f52ff9a9946fa0a3d49ef827fa3835",
+      "live_calls": 0
+    },
+    {
+      "name": "audience-b-unknown",
+      "file": "audience-b-unknown.json",
+      "sha256": "1849bf827d7e285f99f27c3d222b8cebc9176f543d72b3fe17b215e82e21dcc3",
+      "live_calls": 0
+    },
+    {
+      "name": "mixed-native-study-baseline",
+      "file": "mixed-native-study-baseline.json",
+      "sha256": "2c40bc0cc9ac647781bc2bb0e3f717c793739371356ced0a89b244477f979d44",
+      "live_calls": 0
+    },
+    {
+      "name": "study-baseline-duplicate",
+      "file": "study-baseline-duplicate.json",
+      "sha256": "7f668cd56db84684179283280037ad5f9b631490fe6e88edabb41d534acb71ab",
+      "live_calls": 0
+    },
+    {
+      "name": "study-baseline-linked-correction",
+      "file": "study-baseline-linked-correction.json",
+      "sha256": "3e5368b844bceaba226434fbedff6e4521a363a479ed6ab7c531a8b43a233e2a",
+      "live_calls": 0
+    }
+  ],
+  "recorded_sdk_commit": "1190d516233ab1148cdb3d0bb0680b8ae15cf12a",
+  "recorded_sdk_wheel_sha256": "8beb459f2bf8b171dac96a4f621672375fc6bd86d840ecb95894029ba1be827b",
+  "recorded_executor_batches": {
+    "source": 1,
+    "audience": 3
+  }
+}
