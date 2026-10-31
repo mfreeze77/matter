@@ -133,14 +133,65 @@ class MonitoringCaptureTests(unittest.TestCase):
         for detached in ({"probability": "0.99"}, {**execution["execution"], "digest": "0" * 64}):
             with self.subTest(detached=detached), self.assertRaises(ContractError):
                 admitted.admit_capture(execution=detached)
+        # A new exact host command can reuse the still-current semantic result
+        # without calling it qualified or counting a second physical trial.
+        h.req.update(request_id="study-semantic-reuse", idempotency_key="study-semantic-reuse")
+        h.sync()
+        reused_command = h.admit()
+        reused = h.execute(reused_command)
+        self.assertEqual(reused["status"], "reused")
+        self.assertFalse(reused["dispatched"])
+        reused_admission = reused_command.admit_capture(execution=reused["execution"])
+        reused_result = reused_command.project_capture(admission=reused_admission)
+        self.assertEqual(reused_result["decision_basis"]["original_execution_reference"], execution["execution"])
+        self.assertNotEqual(reused_result["decision_basis"]["execution_reference"], execution["execution"])
+        self.assertEqual(reused_result["capture_key"], proposal["capture_key"])
+        self.assertEqual(reused_result["qualification"], "unqualified")
+        self.assertEqual(len(h.calls), 1)
         # Ordinary native attention has a real assessment input, not a study
         # projection pin. Its supported prepare port rejects this substitution.
         with self.assertRaises(ContractError):
             h.a.service.prepare(h.f.request(), policy=h.a.policy, assessment=capture_admission.reference,
                 contexts=h.a.context_refs, token=h.token)
+        # Exercise the ordinary public delivery port with real owners. Study
+        # admission/proposal types must fail before a queue receipt or send.
         from matter.delivery import DeliveryService
-        with h.f.storage.snapshot() as view, self.assertRaises(ContractError):
-            DeliveryService._decision(h.a.service, view, capture_admission.reference)
+        from matter.budgets import BudgetDefinition, BudgetService, _lookup
+        from matter.attention import delivered_baseline_ref
+        from matter.outbox import DestinationDefinition
+        from integration.delivery_helpers import SyntheticTransport
+        from integration.helpers import _in_scope, fixture
+        start = {"state": "known", "value": "2049-01-01T00:00:00Z", "precision": "second"}
+        end = {"state": "known", "value": "2051-01-01T00:00:00Z", "precision": "second"}
+        budget = BudgetDefinition({"schema_version": "1.0", "namespace": "synthetic", "id": "refused-study-delivery",
+            "semantic_version": "1.0", "kind": "attention", "window": {"start": start, "end": end, "bounds": "closed_open"},
+            "limits": {"deliveries": 1}, "units": {"deliveries": "synthetic:deliveries"}, "description": "No study delivery allowed."})
+        budgets = BudgetService(h.f.storage, definitions=[budget], controls=h.f.controls, clock=h.host.clock)
+        transport = SyntheticTransport()
+        destination = DestinationDefinition({"namespace": "synthetic", "id": "ordinary-notification", "version": "1.0",
+            "audience": h.a.audience_ref, "permission_target": entity_ref(h.f.subject), "transport": transport.capabilities.reference})
+        delivery = DeliveryService(h.f.storage, payloads=h.f.payloads, attention=h.a.service, budgets=budgets,
+            controls=h.f.controls, destinations=[destination], transports=[transport], clock=h.host.clock)
+        token = h.f.controls.capture(actor=h.f.actor, authority=entity_ref(h.f.authority), capability="delivery",
+            targets=[entity_ref(h.f.subject), entity_ref(capture_admission.reference)])
+        command = _in_scope(fixture("commands/prepare_delivery.json"), h.f.storage.scope_id)
+        command.update(command_id="reject-model-delivery", idempotency_key="reject-model-delivery",
+            actor=h.f.actor, authority=entity_ref(h.f.authority), expected_revisions=[])
+        baseline_slot = delivered_baseline_ref(pin(h.f.subject), purpose=h.a.purpose_ref, audience=h.a.audience_ref)
+        with h.f.storage.snapshot() as view:
+            before_baseline = _lookup(view, baseline_slot)
+        for wrong in (capture_admission.reference, proposal):
+            with self.subTest(production_input=wrong), self.assertRaises(ContractError) as denied:
+                delivery.prepare(command, decision=wrong, attention_command=h.f.request(), token=token,
+                    destination=destination, content=b"Synthetic study is not a delivery decision.", budget=budget,
+                    amounts={"deliveries": 1}, expires_at=end)
+            self.assertEqual(denied.exception.code, "E_SCHEMA_INVALID")
+        self.assertEqual(transport.calls, [])
+        with h.f.storage.snapshot() as view:
+            self.assertEqual(_lookup(view, baseline_slot), before_baseline)
+            with self.assertRaises(ContractError) as missing_queue:
+                view.command_receipt(command["idempotency_key"])
+            self.assertEqual(missing_queue.exception.code, "E_NOT_FOUND")
         with self.assertRaises(ContractError):
             admitted.project()
         # The actual sink guard, not an earlier check, sees a pause that races

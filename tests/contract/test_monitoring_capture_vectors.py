@@ -12,6 +12,12 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class MonitoringCaptureVectorTests(unittest.TestCase):
+    def test_published_schema_matches_checkout_and_installed_resource(self):
+        from importlib.resources import files
+        published = (ROOT / "docs/contracts/monitoring-handoff-v1.1.schema.json").read_bytes()
+        self.assertEqual(published, (ROOT / "schemas/monitoring-handoff-v1.1.schema.json").read_bytes())
+        self.assertEqual(published, files("matter._schemas").joinpath("monitoring-handoff-v1.1.schema.json").read_bytes())
+
     def test_recorded_candidate_vectors_and_explicit_version_refusal(self):
         directory = ROOT / "tests/fixtures/civic/handoff-v1.1"
         manifest = json.loads((directory / "manifest.json").read_text())

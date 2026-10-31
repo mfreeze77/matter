@@ -99,7 +99,7 @@ class CaptureGuardRegressionTests(unittest.TestCase):
         source = request["evidence"]["sources"][0]["reference"]
         private = {**source, "id": "private-protected-dependency"}
         state = {"scope_id": source["scope_id"], "evidence": ["synthetic public text"]}
-        value = {"request": {"batch": {"state": state},
+        value = {"phase": "completed", "request": {"batch": {"state": state},
             "rendered": [{"manifest": {"specification": s.reference}} for s in source_questions()]}}
         access = Mock()
         def gate(view, context, *, references):
@@ -204,3 +204,45 @@ class CaptureMaterialRoutingTests(unittest.TestCase):
         partial = admitted._proposal(view, policy, positive, packet, current, source, source)["projection"]
         self.assertEqual(partial["treatment"], "quiet")
         self.assertIn("incomplete_coverage", partial["reasons"])
+
+
+class CaptureOriginalExecutionTests(unittest.TestCase):
+    def test_source_and_audience_cache_aliases_keep_original_currentness(self):
+        from unittest.mock import patch
+        from matter.statecivics_capture import _original_execution
+        from integration.helpers import fixture
+        from matter.storage import pin
+        record = fixture("records/receipt.json"); record["id"] = "synthetic-cache-alias"
+        original = fixture("records/receipt.json"); original["id"] = "synthetic-original"
+        state = {"phase": "reused", "source_execution": pin(original),
+            "execution_key": "1" * 64, "normalized_digest": "2" * 64, "result": {"synthetic": "same whole result"}}
+        prior = {**state, "phase": "completed"}
+        with patch("matter.statecivics_capture._execution", side_effect=ContractError("E_CANCELLED")) as read:
+            with self.assertRaises(ContractError) as refused:
+                _original_execution(object(), object(), record, state)
+            self.assertEqual(refused.exception.code, "E_CANCELLED")
+            self.assertEqual(read.call_args.args[-1], pin(original))
+        with patch("matter.statecivics_capture._execution", return_value=(original, prior)):
+            self.assertEqual(_original_execution(object(), object(), record, state), (original, prior))
+        with patch("matter.statecivics_capture._execution", return_value=(original, {**prior, "normalized_digest": "3" * 64})):
+            with self.assertRaises(ContractError):
+                _original_execution(object(), object(), record, state)
+
+
+class CaptureProjectionIsolationTests(unittest.TestCase):
+    def test_returned_projection_cannot_mutate_private_handoff_snapshot(self):
+        from types import SimpleNamespace
+        from unittest.mock import Mock
+        from matter.statecivics_capture import AdmittedCaptureMonitoring
+        result = json.loads((ROOT / "tests/fixtures/civic/handoff-v1.1/audience-a-positive.json").read_text())["result"]
+        reference = result["decision_basis"]["capture_admission_reference"]
+        actual = SimpleNamespace(value={"value": {"projection": deepcopy(result)}}, reference=reference)
+        admitted = object.__new__(AdmittedCaptureMonitoring)
+        admitted._request = {"proposal_basis": {"kind": "unqualified_model_capture"}}
+        admitted.require_current = Mock()
+        admitted.host = SimpleNamespace(capture_service=Mock())
+        admitted.host.capture_service.current.return_value = actual
+        proposal = admitted.project_capture(admission=reference)
+        before = deepcopy(proposal)
+        proposal["reasons"].append("host:display-annotation")
+        self.assertEqual(admitted._projection[0], before)

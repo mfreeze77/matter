@@ -195,6 +195,25 @@ def _execution(view, receipts, reference):
     return record, value
 
 
+def _original_execution(view, receipts, record, metadata, *, policy=None):
+    """Reused observations retain their original work token and whole result."""
+    seen = set()
+    while metadata["phase"] == "reused":
+        key = canonical_bytes(pin(record))
+        if key in seen or len(seen) >= 128:
+            _fail("E_BUDGET_EXHAUSTED")
+        seen.add(key)
+        prior, value = _execution(view, receipts, metadata["source_execution"])
+        if (value["execution_key"] != metadata["execution_key"] or
+                value["normalized_digest"] != metadata["normalized_digest"] or
+                value["result"] != metadata["result"]):
+            _fail("E_EVIDENCE_INVALID")
+        if policy is not None:
+            _require_capture_precision(policy, value["request"])
+        record, metadata = prior, value
+    return record, metadata
+
+
 def capture_source_reading_eligibility(admitted, *, receipts, execution):
     """One real source-only reading; a fresh, separate recipient access gate."""
     admitted.require_current()
@@ -212,6 +231,7 @@ def capture_source_reading_eligibility(admitted, *, receipts, execution):
 def _source_reading(view, admitted, receipts, execution):
     from .civic_attention import source_questions
     record, value = _execution(view, receipts, execution)
+    _original_execution(view, receipts, record, value)
     state = value["request"]["batch"]["state"]
     if "monitoring" in state or "comparison" in state or _source_identity(state) != _source_identity(admitted.source_packet.state):
         _fail("E_SCOPE_FORBIDDEN")
@@ -336,18 +356,7 @@ class CaptureAdmissionService:
         expected = [s.reference for s in monitoring_questions()]
         if [item["manifest"]["specification"] for item in request["rendered"]] != expected or req["evaluation"]["questions"] != expected:
             _fail()
-        original = record
-        seen = set()
-        while metadata["phase"] == "reused":
-            key = canonical_bytes(pin(original))
-            if key in seen or len(seen) >= 128:
-                _fail("E_BUDGET_EXHAUSTED")
-            seen.add(key)
-            prior, value = _execution(view, self.receipts, metadata["source_execution"])
-            _require_capture_precision(policy, value["request"])
-            if value["execution_key"] != metadata["execution_key"] or value["normalized_digest"] != metadata["normalized_digest"]:
-                _fail()
-            original, metadata = prior, value
+        original, metadata = _original_execution(view, self.receipts, record, metadata, policy=policy)
         answers = {item["id"]: item for item in metadata["result"]["diagnostics"]}
         judgments = {}
         for role, question in zip(("objective", "novelty"), request["batch"]["questions"]):
@@ -556,7 +565,7 @@ class AdmittedCaptureMonitoring(AdmittedMonitoring):
         result = deepcopy(actual.value["value"]["projection"])
         result["decision_basis"]["capture_admission_reference"] = actual.reference
         result = self._validate(result, "result")
-        self._projection = (result, {"capture_admission": actual.reference}, result["capture_key"])
+        self._projection = (deepcopy(result), {"capture_admission": actual.reference}, result["capture_key"])
         return result
 
     def _reproject(self, arguments):
