@@ -88,3 +88,4 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-080: Qualify the integrated Matter release across profiles](MAT-080.md) | operations | 5 | P1 | planned | waiting | MAT-025, MAT-045, MAT-050, MAT-071, MAT-074, MAT-077, MAT-078, MAT-079 |
 | [MAT-081: Specify the versioned dashboard intent, evidence and decision handoff](MAT-081.md) | civic | 4 | P1 | done | done | MAT-018, MAT-023, MAT-028, MAT-072 |
 | [MAT-082: Adapt approved monitoring objectives to bounded Matter audience decisions](MAT-082.md) | civic | 4 | P1 | done | done | MAT-081, MAT-015, MAT-016, MAT-018, MAT-019, MAT-021, MAT-023, MAT-024, MAT-028, MAT-031, MAT-032, MAT-072 |
+| [MAT-083: Resolve equivalent-intent SQLite contention and triage related intermittent failures](MAT-083.md) | core | 3 | P1 | planned | ready | MAT-003, MAT-011, MAT-019, MAT-020, MAT-021, MAT-029 |
