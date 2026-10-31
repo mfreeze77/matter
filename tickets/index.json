@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "ticket_count": 82,
+  "ticket_count": 83,
   "counts_by_track": {
     "civic": 7,
-    "core": 17,
+    "core": 18,
     "diat": 15,
     "evaluation": 10,
     "foundation": 1,
@@ -16,7 +16,7 @@
     "blocked": 1,
     "done": 43,
     "in_progress": 2,
-    "planned": 36
+    "planned": 37
   },
   "tickets": [
     {
@@ -2027,6 +2027,30 @@
       ],
       "readiness": "done",
       "path": "records/MAT-082.json"
+    },
+    {
+      "id": "MAT-083",
+      "title": "Resolve equivalent-intent SQLite contention and triage related intermittent failures",
+      "track": "core",
+      "phase": 3,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-003",
+        "MAT-011",
+        "MAT-019",
+        "MAT-020",
+        "MAT-021",
+        "MAT-029"
+      ],
+      "requirements": [
+        "CORE-02",
+        "CORE-19",
+        "CORE-20"
+      ],
+      "readiness": "ready",
+      "path": "records/MAT-083.json"
     }
   ]
 }
