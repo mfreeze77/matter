@@ -1,0 +1,138 @@
+{
+  "track": "civic",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "integration",
+  "owner_repo": "mfreeze77/matter",
+  "id": "MAT-082",
+  "title": "Adapt approved monitoring objectives to bounded Matter audience decisions",
+  "component": "adapters.statecivics.monitoring_intents",
+  "depends_on": [
+    "MAT-081",
+    "MAT-015",
+    "MAT-016",
+    "MAT-018",
+    "MAT-019",
+    "MAT-021",
+    "MAT-023",
+    "MAT-024",
+    "MAT-028",
+    "MAT-031",
+    "MAT-032",
+    "MAT-072"
+  ],
+  "requirements": [
+    "CORE-17",
+    "CORE-18",
+    "CORE-22",
+    "CIV-01",
+    "CIV-05",
+    "CIV-06",
+    "CIV-07",
+    "CIV-09",
+    "OPS-01"
+  ],
+  "summary": "Implement the approved monitoring handoff using existing Matter context, assessment, attention, explanation, replay and egress ports. The bounded adapter supports two saved-objective capture-only rehearsal and subsequent live-shadow inputs without claiming full civic acceptance or provider qualification.",
+  "in_scope": [
+    "Exact host intent/component bindings and authorized evidence, per-audience result projection and baseline semantics.",
+    "Shared source interpretation, explicit objective/novelty judgments, silence/duplicate/correction/feedback behavior.",
+    "Version edits, stale-pending invalidation, fresh authorization and recorded replay/live parity under the agreed contract."
+  ],
+  "out_of_scope": [
+    "StateCivics ORM/API/UI implementation, account/client ownership, event acquisition and actual delivery transport.",
+    "New JEV client, source retriever, database backend, dashboard service, custom writer or DIAT.",
+    "Issuing MAT-040 qualification or completing MAT-048/049/050 solely by passing this bounded adapter suite."
+  ],
+  "implementation": [
+    "Consume the frozen MAT-081 DTO only after its decisions are settled. Reuse ContextDefinition/ContextService and independent purpose/objective/audience/responsibility/preference versions; bind exact intent/source/profile/question and applicable scope versions in assessment dependencies. Semantic reuse binds only consumed context components; a preference-only edit can refresh the output/currentness binding without reclassifying unchanged source facts or rerunning unchanged objective meaning.",
+    "Resolve the MAT-081/KS-1122 broad-scope mapping: keep host intent identity independent of civic matter identity and bind actual authorized candidate subjects when evaluating. Reuse existing registered candidate/absence scopes for newly eligible records that did not exist at activation; do not require a prior exact follow or manufacture a placeholder civic matter.",
+    "Validate host authority and exact source/context/audience/provider grants through MAT-072 at protected reads, packet rendering and dispatch, after I/O and before the host capture handoff. Reject workspace/client mismatch, unauthorized explanation reads and stale/revoked selectors; approved input prose is never permission.",
+    "Reuse source-linked packet/civic adapters where applicable, preserving source origin, authority uncertainty, coverage and exact citations. Keep source-only judgments free of private context; reuse the same source result for multiple objectives only under compatible permissions.",
+    "Compose private audience consequences through current rules/families, not organization names or keyword thresholds. Preserve unknown versus neutral and scope positions to their provision. Missing intent still permits authorized neutral exact-follow facts under the existing host path.",
+    "Compare against the actual applicable communicated/captured baseline and its exact conveyed content. Exact command retries/redelivery do not create new attempts/captures; distinguish another report from another occurrence and a real source correction from an analyst-error control.",
+    "Project existing attention treatment and reasons/citations/coverage/qualification/currentness plus capture-only allowed use. Relevance uncertainty, incomplete coverage, provider failure and access denial must not become a confident irrelevant result or a generic question for the user.",
+    "Register host-approved intent edits and feedback/dispositions against actual consumers. Refresh or withhold obsolete queued/in-flight results after edits, retirement, changed sources/profiles or revocation; preserve unaffected objectives, valid source facts and historical captures. Direct user controls take the host lane without model approval.",
+    "Preserve a linked correction of actual previously communicated unsupported information even where current positive relevance is low, subject to current authorization; already-handled/unchanged feedback must not silence a materially new deadline or correction forever.",
+    "Use one adapter for replay/live. Accept explicit knowledge cuts/context policy while current authorization/provider clocks stay real; deterministic parity uses the same frozen inputs and recorded judgments. Fresh JEV variability and exploratory quality are separate receipts.",
+    "Verify with independent synthetic positive/negative controls and provide a pinned adapter/conformance handoff for StateCivics KS-1126 actual two-saved-objective rehearsal. KS-1126 receiving acceptance is external host work, not a completion prerequisite for MAT-082; later KS-1127 consumes the same contract for live-feed shadow work. Preserve MAT-048/049 full prerequisites and MAT-040/042/050 gates for consequential production use."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Two approved-objective fixture contexts share authorized source findings while retaining separate purpose/audience decisions and no cross-client leakage.",
+      "verification": "Run frozen synthetic contract fixtures: assert a shared finding digest, different justified positive/quiet treatments, personal/no-client support and denied foreign-client reads. This closes component conformance only; KS-1126 separately owns actual saved-objective and receiving/capture evidence and is not a completion prerequisite for MAT-082."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "The adapter consumes only exact approved/current context versions and refuses stale results before capture after a relevant edit or revocation.",
+      "verification": "Change intent/source/profile or permission while an attempt is queued/in flight and assert targeted invalidation/refresh/withholding, stable history and no effect on an unrelated objective."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Duplicates, actual output baselines, feedback and corrections produce an explainable sequence with no fabricated outcome.",
+      "verification": "Behaviorally assert exact retry creates no extra attempt/capture, repeated evidence stays quiet, a genuinely new deadline survives handled feedback, a linked correction reaches the permitted audience and outcome-unknown remains unknown."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Availability-ordered replay and incoming-live serialization use the same semantics without future-evidence or private-field leakage.",
+      "verification": "Replay the same approved revisions, available source sequence and recorded judgments through both modes; compare deterministic attention/capture traces, exercise a late source and currently known future deadline, and scan canary fields out of requests."
+    },
+    {
+      "id": "AC-5",
+      "criterion": "Software conformance, actual live interpretations and qualification/production readiness remain separate in every receipt.",
+      "verification": "Verify explicit mode/use/qualification fields, failure/coverage reasons and current authority checks; retain fake/recorded/live distinctions and refuse consequential admission without its actual certificate and host authority."
+    }
+  ],
+  "artifacts": [
+    "src/matter/adapters/statecivics_monitoring.py (planned optional adapter)",
+    "tests/integration/test_monitoring_handoff.py (planned)",
+    "docs/validation/dashboard-matter-handoff.md (future executed receipt)"
+  ],
+  "tests": [
+    "Two objectives under contrasting client contexts: useful positive plus justified silence, unchanged shared facts.",
+    "Personal objective and two intents for one client remain separate.",
+    "Unactivated draft, stale revision, queue/in-flight edit, source replacement, current permission revocation.",
+    "Duplicate/reprint, partial coverage, provider outage/budget exhaustion, missing or unknown prior outcome.",
+    "Already-handled feedback followed by a material deadline and correction of an actual prior capture.",
+    "Forbidden client rationale through explanation or semantic cache; future-available source withheld.",
+    "A new record/subject absent at intent activation becomes an eligible authorized candidate; an unrelated or ungranted new record stays out.",
+    "A cadence-only preference revision refreshes pending output guards without changing shared source facts; semantic reuse remains subject to current access and its consumed-component key."
+  ],
+  "risks": [
+    "An all-quiet suite could look safe while suppressing useful positives; paired positives and correction controls are mandatory.",
+    "Context edits can either leak stale output or resend all history; targeted dependencies and observed-baseline semantics are required.",
+    "Capture-only experiments must not silently bypass qualification for actual production alerts."
+  ],
+  "reuse": [
+    {
+      "source": "src/matter/contexts.py; src/matter/attention.py; src/matter/access.py; src/matter/delivery.py",
+      "application": "Compose existing ports; add no parallel context store, permission engine, outbox or scheduler."
+    },
+    {
+      "source": "src/matter/civic_exports.py; src/matter/civic_attention.py; docs/validation/civic-source-integration.md",
+      "application": "Reuse bounded source-first findings and limitations; do not relabel the earlier five-call experiment as saved-objective acceptance."
+    },
+    {
+      "source": "mfreeze77/state-civics-ai:KS-1122, KS-1124, KS-1125, KS-1126, KS-1127",
+      "application": "Host owns scope mapping, dispatcher, feedback transport and actual receiving/capture evidence. Synthetic adapter conformance can complete independently; connected receiving acceptance is explicitly required by the host ticket."
+    },
+    {
+      "source": "tickets/MAT-049.md; tickets/MAT-050.md; tickets/MAT-075.md",
+      "application": "This is a bounded contributor to civic audience attention; reuse existing explanations rather than requiring all future neutral inspection/distribution work. Full civic qualification remains separate."
+    }
+  ],
+  "sources": [
+    "docs/plans/dashboard-matter-handoff.md",
+    "docs/contexts.md",
+    "docs/access.md",
+    "docs/attention.md",
+    "docs/delivery.md",
+    "docs/validation/civic-source-integration.md",
+    "Owner request, 2026-10-28: plan and ticket the saved-dashboard objectives -> JEV-powered Matter handoff for both availability-ordered timeline replay and incoming live data; planning only, DIAT excluded."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}
