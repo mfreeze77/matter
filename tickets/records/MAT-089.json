@@ -1,0 +1,96 @@
+{
+  "id": "MAT-089",
+  "title": "Retain scoped assistant findings for subsequent JEV decisions",
+  "track": "civic",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "adapters.assistant_review_memory",
+  "depends_on": [
+    "MAT-088",
+    "MAT-016",
+    "MAT-023",
+    "MAT-028",
+    "MAT-030",
+    "MAT-072"
+  ],
+  "requirements": [
+    "CIV-12",
+    "CORE-17",
+    "CORE-20",
+    "CORE-21",
+    "CORE-22",
+    "CORE-23",
+    "OPS-01"
+  ],
+  "summary": "Preserve useful cited research even when the personal assistant decides not to interrupt. Give later JEV stages authorized context about that user/client/angle without converting prior model interpretations into source facts, independent corroboration, delivered knowledge or qualified judgments.",
+  "in_scope": [
+    "Minimal review-finding and quiet/revisit history using existing records, receipts, dependencies and host storage ownership.",
+    "Current-context selection of derived notes for later bounded JEV packets, including original evidence and uncertainty.",
+    "Targeted invalidation and unchanged-loop suppression without discarding genuine corrections or deadlines."
+  ],
+  "out_of_scope": [
+    "Implementation, provider/tool execution, client-data processing or deployment as part of this planning commit.",
+    "New assistant/model client, MCP server, tool wizard, source index, database, queue or general orchestration framework where existing owners supply the capability.",
+    "Changing frozen monitoring 1.0/1.1 semantics silently; production alerts, formal qualification, DIAT or unrelated Oil work."
+  ],
+  "implementation": [
+    "Map review findings to existing host records/Matter receipts rather than creating a new memory database or global client dossier. Separate exact source quotations/observations from assistant interpretations and suggested interests.",
+    "Bind each finding and review outcome to user/workspace/client-or-personal, approved objective revision and angle meaning, matter, source/citation revisions, availability, original method/attempt and actual access provenance. Angle identifier/granularity remains an open contract choice.",
+    "Retain why no alert was warranted and an optional reconsideration condition. Mark never communicated, report prepared, capture outcome unknown, actually conveyed, read and acted as separate states. An internal capture is not human delivery.",
+    "Include original citations and explicitly labelled derived context in subsequent authorized question packets. Do not count the note and its underlying source as separate corroboration; do not let the next model treat an earlier assumption as an established claim.",
+    "Recheck grants and original input/context bindings on reads/reuse. Source corrections, changed approved purpose/angle, pause or revocation invalidate or withhold pending results; shared source-only reads require each recipient access while private context stays isolated.",
+    "Suppress repeat requests for the unchanged gap/material/context using existing receipts and bounded investigation. New evidence, real corrections or deadlines can re-open review. Maintain replay availability order and original uncertainty."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Quiet review retains usable scoped context without advancing human communication.",
+      "verification": "Exercise a quiet early mention with citations, then a later material development; inspect retained findings, distinct receipt states and a justified new review without an invented prior send."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Derived findings cannot leak or become self-corroborating evidence.",
+      "verification": "Use two clients and two angles over one source; deny foreign-context reads, preserve original source/method labels, and verify repeated summary chains do not inflate independent evidence or create supported claims/certificates."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Reused findings remain current and bounded.",
+      "verification": "Verify edited objectives, source corrections, revoked grants, replay cuts, exact retries and unknown outcomes. An unchanged recheck does not produce another tool loop; a new deadline/correction is not suppressed by stale quiet feedback."
+    }
+  ],
+  "artifacts": [
+    "docs/plans/assistant-bubble-review.md",
+    "docs/contracts/assistant-review.md",
+    "tests/integration/test_assistant_review_memory.py"
+  ],
+  "tests": [
+    "Reviewed is not delivered, read or handled.",
+    "A note with an inference keeps uncertainty and its source citations in the next JEV packet.",
+    "Source-only sharing never shares another client private angle or review rationale."
+  ],
+  "risks": [
+    "Cascades can amplify an unsupported inference or count their own summaries as independent support.",
+    "Overbroad context identity can reuse another client angle or falsely mark old source material already communicated."
+  ],
+  "reuse": [
+    {
+      "source": "src/matter/dependencies.py; src/matter/contexts.py; src/matter/queries.py",
+      "application": "Reuse versioned contexts, dependency invalidation and inspectable history."
+    },
+    {
+      "source": "src/matter/semantic/packets.py; src/matter/semantic/receipts.py; src/matter/statecivics_capture.py",
+      "application": "Reuse bounded packet/provenance rules, exact attempts, per-recipient access and typed study reuse without false qualification."
+    }
+  ],
+  "sources": [
+    "docs/plans/assistant-bubble-review.md",
+    "Owner discussion, 2026-10-31: client onboarding research; bubble burst wakes the user-specific assistant; bounded existing MCP/wizard investigation; report/alert judgment; quiet findings retained per user/client/angle for cascading JEV. Ticket writing only; unresolved choices remain proposals."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

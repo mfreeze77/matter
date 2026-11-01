@@ -37,7 +37,8 @@
     "Use qualified relevance/gap judgments only to rank the permitted candidates; deterministic host controls select and execute the read.",
     "Record each returned observation and prepare a new packet through the same provenance and availability rules.",
     "Implement explicit stops for sufficient evidence, no eligible source, conflict, exhausted budget, stale purpose and a genuinely authorized decision.",
-    "Detect repeated equivalent read requests and require a changed gap or evidence revision before another cycle; preserve counterevidence requirements throughout."
+    "Detect repeated equivalent read requests and require a changed gap or evidence revision before another cycle; preserve counterevidence requirements throughout.",
+    "Planning clarification, 2026-10-31: MAT-088/089 and host-owned MAT-090 cover exploratory personal-assistant review and retained scoped notes using existing bounds. They do not complete this ticket or remove its MAT-040 prerequisite for qualified adaptive semantic investigation; capture-only exploratory review is not gated on missing held-out labels alone."
   ],
   "acceptance": [
     {
@@ -79,7 +80,8 @@
   "sources": [
     "matterjevmesh §4",
     "https://github.com/libingzheren/Jev-Mem/blob/7ab0c73c6d8f4f611ad252c1e6ba8083f8df0e44/memory/jev_questions.py",
-    "docs/jev.md — Bounded investigations"
+    "docs/jev.md — Bounded investigations",
+    "docs/plans/assistant-bubble-review.md"
   ],
   "completion": {
     "state": "not_run",

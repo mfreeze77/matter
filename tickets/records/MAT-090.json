@@ -1,0 +1,108 @@
+{
+  "id": "MAT-090",
+  "title": "Rehearse client briefing and personal-assistant review through existing tools",
+  "track": "civic",
+  "phase": 4,
+  "priority": "P1",
+  "status": "planned",
+  "type": "integration",
+  "owner_repo": "mfreeze77/state-civics-ai",
+  "component": "statecivics.assistant_review_receiving",
+  "depends_on": [
+    "MAT-088",
+    "MAT-089",
+    "MAT-082",
+    "MAT-084"
+  ],
+  "requirements": [
+    "CIV-10",
+    "CIV-11",
+    "CIV-12",
+    "CIV-05",
+    "CIV-06",
+    "CORE-17",
+    "CORE-20",
+    "CORE-23",
+    "OPS-01"
+  ],
+  "summary": "StateCivics-owned connected rehearsal: reuse client research and activation forms, the existing personal assistant/MCP wizard and no-login timeline to investigate a Matter trigger, decide whether to report or stay quiet, retain scoped findings and feed the next JEV decision. This Matter-roadmap record does not create a KS ticket, authorize host implementation or approve production use.",
+  "in_scope": [
+    "Reuse KS-1135 client relation research and KS-1123 reviewed activation; add a cited draft briefing and keep/edit/add/reject flow without duplicate profile infrastructure.",
+    "Reuse KS-705 exact assessment/evidence reads and existing wizard/session/tool registry; connect only confirmed missing assistant wake-up, review persistence and isolated outcome mapping.",
+    "Capture-only end-to-end evidence with two contrasting organizations/objectives, historical context, quiet findings and a later material development."
+  ],
+  "out_of_scope": [
+    "Implementation, provider/tool execution, client-data processing or deployment as part of this planning commit.",
+    "New assistant/model client, MCP server, tool wizard, source index, database, queue or general orchestration framework where existing owners supply the capability.",
+    "Changing frozen monitoring 1.0/1.1 semantics silently; production alerts, formal qualification, DIAT or unrelated Oil work."
+  ],
+  "implementation": [
+    "Before implementation, reconcile this roadmap with KS-1135, KS-705, KS-1123/1124/1125/1126 and KS-1145 in the StateCivics workflow. Pin existing WizardDispatchMixin, wizard_engine ToolExposure/session and workflow_registry/read contracts; locate the actual user-assistant runtime rather than building a replacement.",
+    "Use existing lobbyist/represented-organization records and authorized historical mentions as realistic sample audiences. Record actual identities, aliases and dated representation separately from invented example objectives; never call them StateCivics customers or infer current stance from representation alone.",
+    "Reuse the relation-profile work for a cited initial briefing: who said/wrote what, dated past involvement, active issues, uncertainty and suggested monitoring angles. User keeps/edits/adds/rejects, reviews the summary and explicitly activates versioned intent through the existing forms. Previously approved objectives can exercise assistant review before this bootstrap enhancement is complete.",
+    "Use the same authorized evidence and timeline for contrasting clients. Retrieval/indexed candidate discovery and topic/keyword/place packets are owned by KS-1145; verify its current implementation before claiming a remaining gap. An already supported bill-version path can supply a first run without requiring every source family.",
+    "Connect one bounded read-only assistant investigation pass through actual permitted MCP/wizard tools. Keep internal review requests/notes separate from human-visible AlertDelivery and communicated baselines; store proposed reports/alerts only in isolated capture sinks. No automatic MCP writes, messages, delivery or tool calls outside the user grant set.",
+    "Retain the quiet finding with citations and angle, then show a later meaningful change producing a different justified proposal. Test relevant material without literal keyword matches, irrelevant keyword hits, duplicate silence, linked correction/new deadline, missing source, source ambiguity, in-flight edits/revocation and source-availability cuts.",
+    "Record scenario authoring, synthetic/recorded conformance, actual assistant/MCP runtime, live JEV interpretation and formal qualification as different evidence. Freeze model/tools, explicit budgets and intended outcomes before any later authorized live exploratory run; do not claim live execution from injected responses."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Existing client and tool infrastructure is reused with reviewed context.",
+      "verification": "Name the actual host APIs and KS owners, show a cited draft briefing and keep/edit/reject activation, and verify unrelated notes/contacts are excluded unless separately authorized. Real representation facts remain distinct from illustrative interests."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "A connected quiet-then-material-change sequence uses the actual assistant/tool path.",
+      "verification": "Run the no-login rehearsal with two approved objectives, one bounded investigation pass, a saved quiet finding and subsequent re-evaluation. Retain exact tool/model requests/responses and isolated captures; authored expectations or mock probabilities alone cannot establish the connected runtime."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "Client isolation, chronology and communication baselines survive the full handoff.",
+      "verification": "Check foreign client/angle refusal, future-evidence exclusion, currentness after edit/revoke, duplicates, actual corrections/deadlines and unknown outcomes. Internal wake-up, reviewed evidence and unshown history must not become delivered/read/handled knowledge."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Exploratory acceptance does not imply production qualification or deployment.",
+      "verification": "Publish exact host/SDK/runtime/image/tool/source pins and passed/failed/unrun outcomes; keep MAT-040/042/050 and production activation separate. No missing independent labels block the capture-only test by themselves."
+    }
+  ],
+  "artifacts": [
+    "docs/plans/assistant-bubble-review.md",
+    "mfreeze77/state-civics-ai:KS-1135",
+    "mfreeze77/state-civics-ai:KS-705",
+    "mfreeze77/state-civics-ai:KS-1123",
+    "mfreeze77/state-civics-ai:KS-1145"
+  ],
+  "tests": [
+    "Two contrasting approved objectives see the same source facts and can yield different quiet/report decisions.",
+    "Historical search alone is not delivery or user acknowledgement.",
+    "New information can overturn the earlier quiet finding without relying on a copied model assumption."
+  ],
+  "risks": [
+    "Historical mentions and third-party claims can be mistaken for the client current position.",
+    "Silent profile updates, future-source leakage or a default human alert can make an apparently useful demo unsafe or misleading."
+  ],
+  "reuse": [
+    {
+      "source": "mfreeze77/state-civics-ai:KS-1135; KS-1123; etl/workspace/auto_match_engine.py; api/routers/lobbyist_workspace.py",
+      "application": "Reuse relation-profile research and actual approval forms; do not invent a second client profile store."
+    },
+    {
+      "source": "mfreeze77/state-civics-ai:KS-705; services/chat_service/wizard_dispatch.py; services/wizard_engine.py; services/workflow_registry.py",
+      "application": "Reuse existing sessions, tool exposure and exact-evidence readers; a tool list alone is not proof of the missing assessment read or background wake-up contract."
+    },
+    {
+      "source": "mfreeze77/state-civics-ai:KS-1124/1125/1126; KS-1145",
+      "application": "Reuse captured dispatch, review/feedback and replay stack; host owns all implementation and local ticket reconciliation."
+    }
+  ],
+  "sources": [
+    "docs/plans/assistant-bubble-review.md",
+    "Owner discussion, 2026-10-31: client onboarding research; bubble burst wakes the user-specific assistant; bounded existing MCP/wizard investigation; report/alert judgment; quiet findings retained per user/client/angle for cascading JEV. Ticket writing only; unresolved choices remain proposals."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

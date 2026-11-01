@@ -60,6 +60,24 @@
     "source": "Original repository inputs: matterbrainstormspec; matterjevmesh; jevinmatter (brainstorming, not implementation evidence)."
   },
   {
+    "id": "CIV-10",
+    "title": "Reviewed historical client briefing and objective suggestions",
+    "description": "Reuse existing organization/representation records and authorized historical mentions to draft a cited briefing and suggested monitoring objectives. Preserve attribution, dates and uncertainty; the user keeps, edits, adds or rejects suggestions before activation. Representation is not a current position or a StateCivics customer relationship.",
+    "source": "Owner discussion, 2026-10-31: client onboarding research; bubble burst wakes the user-specific assistant; bounded existing MCP/wizard investigation; report/alert judgment; quiet findings retained per user/client/angle for cascading JEV. Ticket writing only; unresolved choices remain proposals."
+  },
+  {
+    "id": "CIV-11",
+    "title": "Matter trigger requests personal assistant review",
+    "description": "A material-change trigger requests bounded internal review by the user-specific assistant through existing host/MCP/wizard surfaces. The assistant decides whether a report, digest or alert is warranted under approved context; waking/reviewing does not itself establish communication, source authority or production permission.",
+    "source": "Owner discussion, 2026-10-31: client onboarding research; bubble burst wakes the user-specific assistant; bounded existing MCP/wizard investigation; report/alert judgment; quiet findings retained per user/client/angle for cascading JEV. Ticket writing only; unresolved choices remain proposals."
+  },
+  {
+    "id": "CIV-12",
+    "title": "Scoped retained findings inform later semantic decisions",
+    "description": "Retain cited assistant findings and quiet/revisit decisions under exact user/workspace/client/objective/angle and source versions. Later JEV stages distinguish source evidence from derived interpretation, preserve current permissions and availability, prevent self-corroboration and repeated unchanged loops, and keep reviewed history separate from actual communicated content.",
+    "source": "Owner discussion, 2026-10-31: client onboarding research; bubble burst wakes the user-specific assistant; bounded existing MCP/wizard investigation; report/alert judgment; quiet findings retained per user/client/angle for cascading JEV. Ticket writing only; unresolved choices remain proposals."
+  },
+  {
     "id": "CORE-01",
     "title": "Portable information and operation contract",
     "description": "Versioned domain-neutral schemas define scoped references, canonical bytes, explicit result states, and stable semantic failures. Structural validation does not claim runtime qualification.",

@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "ticket_count": 87,
+  "ticket_count": 90,
   "counts_by_track": {
-    "civic": 8,
+    "civic": 11,
     "core": 21,
     "diat": 15,
     "evaluation": 10,
@@ -16,7 +16,7 @@
     "blocked": 1,
     "done": 47,
     "in_progress": 3,
-    "planned": 36
+    "planned": 39
   },
   "tickets": [
     {
@@ -2140,6 +2140,89 @@
       ],
       "readiness": "done",
       "path": "records/MAT-087.json"
+    },
+    {
+      "id": "MAT-088",
+      "title": "Specify the matter-trigger to personal-assistant review handoff",
+      "track": "civic",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-022",
+        "MAT-023",
+        "MAT-072",
+        "MAT-081",
+        "MAT-084"
+      ],
+      "requirements": [
+        "CIV-11",
+        "CORE-17",
+        "CORE-18",
+        "CORE-19",
+        "CORE-20",
+        "CORE-21",
+        "OPS-01"
+      ],
+      "readiness": "ready",
+      "path": "records/MAT-088.json"
+    },
+    {
+      "id": "MAT-089",
+      "title": "Retain scoped assistant findings for subsequent JEV decisions",
+      "track": "civic",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-088",
+        "MAT-016",
+        "MAT-023",
+        "MAT-028",
+        "MAT-030",
+        "MAT-072"
+      ],
+      "requirements": [
+        "CIV-12",
+        "CORE-17",
+        "CORE-20",
+        "CORE-21",
+        "CORE-22",
+        "CORE-23",
+        "OPS-01"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-089.json"
+    },
+    {
+      "id": "MAT-090",
+      "title": "Rehearse client briefing and personal-assistant review through existing tools",
+      "track": "civic",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/state-civics-ai",
+      "depends_on": [
+        "MAT-088",
+        "MAT-089",
+        "MAT-082",
+        "MAT-084"
+      ],
+      "requirements": [
+        "CIV-10",
+        "CIV-11",
+        "CIV-12",
+        "CIV-05",
+        "CIV-06",
+        "CORE-17",
+        "CORE-20",
+        "CORE-23",
+        "OPS-01"
+      ],
+      "readiness": "waiting",
+      "path": "records/MAT-090.json"
     }
   ]
 }
