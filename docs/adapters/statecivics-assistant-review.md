@@ -182,3 +182,9 @@ The owner reports slice-2a software checks; Matter inspected these entry points
 read-only. Matter has not run its assistant, migrated the shared rehearsal store,
 changed its image/flags or independently reproduced those host test counts.
 The real, unsent KS-1126 turn remains the receiving acceptance step.
+
+Pressure `command_id` is a persisted native registration-attempt ID, distinct
+from the stable semantic `wake_id`/host `wake_key`. After a known recorded
+backpressure refusal, draining the window permits a fresh local registration ID
+for the bounded batch; an exact retry preserves its immutable refusal. Keep the
+same semantic wake and never renew IDs to bypass an unknown assistant outcome.

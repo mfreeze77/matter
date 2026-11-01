@@ -966,3 +966,16 @@ class ReviewTests(unittest.TestCase):
         self.assertEqual(self.f.storage.get(pressure_ref(self.f.storage.scope_id,self.request)),before)
         self.assertEqual(len(self.pending()),45)
         self.assertEqual(self.calls,0)
+        self.assertEqual(self.execute(requests[0])['value']['value']['phase'],'completed')
+        self.assertEqual(self.pending(),[])
+        wake=requests[1].wake_id
+        # An exact retry preserves a durable refusal. Draining permits a fresh
+        # local registration attempt, never a new semantic wake/model trial.
+        with self.assertRaises(ContractError) as error:
+            self.service.record_pressure(requests[1],token=self.token,access_context=self.access_context,
+                command_id='review-pressure-2')
+        self.assertEqual(error.exception.code,'E_BUDGET_EXHAUSTED')
+        after=self.add(requests[1])
+        self.assertEqual(requests[1].wake_id,wake)
+        self.assertEqual(after['value']['value']['pending'],sorted(requests[1].value['contributions'],key=canonical_bytes))
+        self.assertEqual(self.calls,1)  # Only the draining review ran.

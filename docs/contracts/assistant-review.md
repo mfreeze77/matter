@@ -107,17 +107,23 @@ a claim of distributed serializability or production delivery permission.
    native `assessment` control token and MAT-072 access context covering the
    actual native matter/dependencies/audience/provider.
 2. Call `record_pressure(request, token=..., access_context=..., command_id=...)`.
-   IDs are stable per host command. Changed content under a reused command ID
-   conflicts. The store retains pointer history, pending source versions grouped by lineage,
+   The native `command_id` identifies one registration attempt; persist it for
+   exact/uncertain retries. Changed content under a reused ID conflicts. The store retains pointer history, pending source versions grouped by lineage,
    and consumed material-version identities. Pressure is separate per native matter
    and approved lens revision; a logical objective/lens lock spans revisions and
    matters so its existing assistant session never runs overlapping reviews. No
    score/decay/retention formula is added. A pressure window holds at most 128
    pending versions and its encoded state remains within the 256 KiB wire bound;
-   overflow is E_BUDGET_EXHAUSTED before writing, never a silent drop or an
-   accepted unreadable window. Keep the
-   unaccepted contribution in the host ledger and retry a bounded batch after
-   draining completed work.
+   overflow is E_BUDGET_EXHAUSTED without changing pressure, never a silent
+   drop or an accepted unreadable window. A commit-time refusal may still
+   produce its immutable failure receipt. Keep the
+   unaccepted contribution in the host ledger. After draining completed work,
+   retry a bounded batch with a **fresh native registration command ID** if the
+   earlier attempt has a recorded refusal. Exact retries of a durable refusal
+   keep returning that refusal; they never rewrite history. Keep the same
+   semantic request/wake identity. A fresh local ID is not permission to rerun
+   an assistant or bypass unknown work; uncertain attempts retain their IDs
+   until the existing receipt establishes what happened.
 3. Call `claim(request, token=..., access_context=...)`. It returns
    `(acquired, attempt_record)`. **Only acquired=True permits host execution.**
    A refused local transaction remains a recorded refusal; a caller may make a
