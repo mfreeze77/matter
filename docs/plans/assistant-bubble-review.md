@@ -176,12 +176,44 @@ calibrated JEV confidence probabilities and do not change the existing 1.1
 capture-policy regions. Record source facts, relevance/consequence and
 uncertainty separately rather than installing a universal importance score.
 
+## Confirmed completed-review lifecycle
+
+The owner decided, 2026-10-31: after the assistant completes its review it
+**clears the pressure, updates ongoing monitoring, and chooses alert or no alert**.
+In either outcome, **all evidence stays attached to that user/client/evidence
+context**, together with the approved objective/angle and its provenance.
+
+Resetting pressure does not erase evidence, quiet findings, counterevidence or
+previous research. It also does not by itself mean the matter is resolved,
+handled, communicated or read. Only actual delivered/captured-for-user material
+and its observed outcome advance the applicable communication baseline.
+
+Retain the review decision and reasons, citations, original and newly gathered
+evidence, actual reviewed source/context versions, and old/new authorized
+monitoring-rule versions and rationale. Later JEV stages can use that history
+under current permissions without counting prior interpretations as new facts.
+
+The assistant can adjust monitoring within approved intent and actual delegated
+host/tool authority. Changes to purpose, client/scope, positions, recipients,
+permissions or budget ceilings retain the existing host approval/versioning
+boundary. No new authority is implied by a model instruction. Exact writable
+rule fields and application/reconciliation semantics are still design work.
+The investigation pass remains read-only; any monitoring change is applied
+through the separate authorized host control path, not generic MCP write access.
+
+Clearing is scoped to evidence actually covered by a completed, current review.
+New or unreviewed material arriving during investigation and another client/angle
+must not be wiped out with that reset. A failed, unavailable, unknown or stale
+review is not a completed no-alert decision. Recovery must preserve those facts
+and avoid duplicate updates, repeated unchanged tool loops or blind retries.
+
 ## Still open for discussion
 
 1. **Burst policy details:** both immediate and cumulative paths are decided.
    The pressure meaning, exact boundary, correlation handling and decisive-event
-   policy are not yet specified. Decay, reset and carry-over after a quiet review
-   also remain open; no numeric formula or confidence arithmetic is approved.
+   policy are not yet specified. Completed review clears pressure in either
+   alert outcome; pre-review decay and the reviewed/unreviewed evidence boundary
+   remain to specify. No numeric formula or confidence arithmetic is approved.
 2. **Personal assistant boundary:** which existing session/runtime handles
    background reviews, which tools are exposed, and what approved current-work
    context can it read? Locate the real surfaces before adding adapters.
@@ -205,3 +237,5 @@ recorded at planning closeout. No runtime or provider/tool experiment ran.
 Planning closeout checks: `python -m matter render --check` and `python -m matter validate` pass (90 tickets, 107 requirements, 108 schemas and three walkthroughs); `git diff --check` passes. Independent two-round review covered all seven supported JSON files in 77.6s, with zero findings/warnings. Runtime source, package version and schemas are unchanged; no software/runtime tests or provider/tool experiment were claimed for this documentation-only work.
 
 Dual-trigger clarification closeout: the updated canonical records render and validate (90 tickets, 107 requirements). Final whole-branch two-round review covered four supported JSON files in 56.2s, with zero findings/warnings. Tickets remain planned/not_run; no runtime, schema, threshold configuration or provider execution changed.
+
+Completed-review clarification closeout: records render and validate (90 tickets, 107 requirements); the two-round review of four JSON files completed in 59.5s with no findings/warnings. All three tickets remain planned/not_run; no runtime, package, schema, live model/tool call or deployment changed.

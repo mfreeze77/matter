@@ -44,7 +44,8 @@
     "Connect one bounded read-only assistant investigation pass through actual permitted MCP/wizard tools. Keep internal review requests/notes separate from human-visible AlertDelivery and communicated baselines; store proposed reports/alerts only in isolated capture sinks. No automatic MCP writes, messages, delivery or tool calls outside the user grant set.",
     "Retain the quiet finding with citations and angle, then show a later meaningful change producing a different justified proposal. Test relevant material without literal keyword matches, irrelevant keyword hits, duplicate silence, linked correction/new deadline, missing source, source ambiguity, in-flight edits/revocation and source-availability cuts.",
     "Record scenario authoring, synthetic/recorded conformance, actual assistant/MCP runtime, live JEV interpretation and formal qualification as different evidence. Freeze model/tools, explicit budgets and intended outcomes before any later authorized live exploratory run; do not claim live execution from injected responses.",
-    "Include both owner-approved trigger patterns in the isolated rehearsal: a single highly relevant adverse development immediately requests review, and quiet smaller signals followed by a new material development request review through their combined context. Keep duplicate/correlated material from manufacturing pressure; a dual-route match still produces one assistant wake-up."
+    "Include both owner-approved trigger patterns in the isolated rehearsal: a single highly relevant adverse development immediately requests review, and quiet smaller signals followed by a new material development request review through their combined context. Keep duplicate/correlated material from manufacturing pressure; a dual-route match still produces one assistant wake-up.",
+    "Connect completed-review pressure reset and authorized ongoing monitoring updates in the existing host. Rehearse both alert and no-alert decisions, retain all user/client/evidence associations and versioned rule rationale, and keep new/unreviewed arrivals separate from the set being cleared. Do not silently rewrite approved objectives, permissions or delivery settings."
   ],
   "acceptance": [
     {
@@ -66,6 +67,11 @@
       "id": "AC-4",
       "criterion": "Exploratory acceptance does not imply production qualification or deployment.",
       "verification": "Publish exact host/SDK/runtime/image/tool/source pins and passed/failed/unrun outcomes; keep MAT-040/042/050 and production activation separate. No missing independent labels block the capture-only test by themselves."
+    },
+    {
+      "id": "AC-5",
+      "criterion": "Both completed outcomes reset pressure, improve monitoring and preserve the evidence trail.",
+      "verification": "Capture one alert proposal and one no-alert review, then inspect cleared reviewed pressure, retained full evidence/finding links and authorized old/new monitoring-rule versions. Verify no human communication baseline for silence, no reset for failed/unknown/stale review, and no lost concurrent arrival or other-client state."
     }
   ],
   "artifacts": [
@@ -103,7 +109,8 @@
   "sources": [
     "docs/plans/assistant-bubble-review.md",
     "Owner discussion, 2026-10-31: client onboarding research; bubble burst wakes the user-specific assistant; bounded existing MCP/wizard investigation; report/alert judgment; quiet findings retained per user/client/angle for cascading JEV. Ticket writing only; unresolved choices remain proposals.",
-    "Owner, 2026-10-31: both immediate and accumulated triggers; client-adverse pin-prick or distinct signals plus a tipping event. The 24% + 75% example is illustrative, not calibrated probability arithmetic."
+    "Owner, 2026-10-31: both immediate and accumulated triggers; client-adverse pin-prick or distinct signals plus a tipping event. The 24% + 75% example is illustrative, not calibrated probability arithmetic.",
+    "Owner, 2026-10-31: completed assistant review clears pressure, updates ongoing monitoring rules, decides alert or no alert, and keeps all evidence attached to the user/client/evidence context."
   ],
   "completion": {
     "state": "not_run",
