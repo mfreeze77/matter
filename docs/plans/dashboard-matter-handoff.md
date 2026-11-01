@@ -296,3 +296,7 @@ Host lifecycle/access/scope/provider implementation and KS-701 closeout remain
 host work. No production delivery or provider qualification follows from freeze.
 The [broader workflow catalog](../research/civic-monitoring-use-cases.md) informs
 future examples without expanding the first two-objective runtime slice.
+
+## Subsequent personal-assistant review clarification
+
+The original baseline above remains historical. The owner clarified that a Matter trigger should wake the user-specific assistant, which may investigate through existing MCP/wizard tools, decide whether reporting or interruption is warranted, and retain quiet findings for later JEV decisions. The separate [planning follow-up](assistant-bubble-review.md) maps existing client-research/approval work and new MAT-088/089/090 tickets, owners and unresolved choices. It does not revise frozen monitoring 1.0/1.1 or authorize implementation.
