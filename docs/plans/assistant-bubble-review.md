@@ -203,3 +203,5 @@ prerequisites are unchanged. Run receipts for render, validation and review are
 recorded at planning closeout. No runtime or provider/tool experiment ran.
 
 Planning closeout checks: `python -m matter render --check` and `python -m matter validate` pass (90 tickets, 107 requirements, 108 schemas and three walkthroughs); `git diff --check` passes. Independent two-round review covered all seven supported JSON files in 77.6s, with zero findings/warnings. Runtime source, package version and schemas are unchanged; no software/runtime tests or provider/tool experiment were claimed for this documentation-only work.
+
+Dual-trigger clarification closeout: the updated canonical records render and validate (90 tickets, 107 requirements). Final whole-branch two-round review covered four supported JSON files in 56.2s, with zero findings/warnings. Tickets remain planned/not_run; no runtime, schema, threshold configuration or provider execution changed.
