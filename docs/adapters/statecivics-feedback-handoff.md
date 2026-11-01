@@ -1,6 +1,10 @@
 # StateCivics KS-1125: explanations and scoped feedback
 
-Status: **Matter SDK seams verified; host wiring and receiving acceptance remain**.
+Status: **historical SDK seam handoff**. StateCivics KS-1125 has since merged;
+it records host feedback rather than committing native dispositions. The
+[current review/ledger handoff](statecivics-assistant-review.md) carries that
+feedback by reference. Earlier commands below describe the native SDK option,
+not what KS-1125 implemented.
 This handoff does not implement StateCivics, run its UI, change a frozen wire
 contract, or complete KS-1125/KS-1150.
 
