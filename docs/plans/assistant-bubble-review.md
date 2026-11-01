@@ -198,6 +198,8 @@ host/tool authority. Changes to purpose, client/scope, positions, recipients,
 permissions or budget ceilings retain the existing host approval/versioning
 boundary. No new authority is implied by a model instruction. Exact writable
 rule fields and application/reconciliation semantics are still design work.
+The investigation pass remains read-only; any monitoring change is applied
+through the separate authorized host control path, not generic MCP write access.
 
 Clearing is scoped to evidence actually covered by a completed, current review.
 New or unreviewed material arriving during investigation and another client/angle
@@ -235,3 +237,5 @@ recorded at planning closeout. No runtime or provider/tool experiment ran.
 Planning closeout checks: `python -m matter render --check` and `python -m matter validate` pass (90 tickets, 107 requirements, 108 schemas and three walkthroughs); `git diff --check` passes. Independent two-round review covered all seven supported JSON files in 77.6s, with zero findings/warnings. Runtime source, package version and schemas are unchanged; no software/runtime tests or provider/tool experiment were claimed for this documentation-only work.
 
 Dual-trigger clarification closeout: the updated canonical records render and validate (90 tickets, 107 requirements). Final whole-branch two-round review covered four supported JSON files in 56.2s, with zero findings/warnings. Tickets remain planned/not_run; no runtime, schema, threshold configuration or provider execution changed.
+
+Completed-review clarification closeout: records render and validate (90 tickets, 107 requirements); the two-round review of four JSON files completed in 59.5s with no findings/warnings. All three tickets remain planned/not_run; no runtime, package, schema, live model/tool call or deployment changed.
