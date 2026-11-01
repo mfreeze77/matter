@@ -42,8 +42,8 @@ A **request** contains:
 - native audience and actual assistant-provider component references, checked
   against MAT-072 egress; a grant for a different provider is insufficient;
 - host assessment/judgment pointer and the original `host_control` pointer;
-- host-selected contributions, each with evidence pointer, provenance `lineage`
-  and `material_digest`; use public `pressure_contribution(artifact, lineage=...)`;
+- host-selected contributions, each with evidence pointer, provenance `lineage`, stable source `material_version`
+  and `material_digest`; use public `pressure_contribution(artifact, lineage=..., material_version=...)`;
 - optional ledger pointer snapshot, source-availability `as_of`, explicit
   `limits.max_tool_calls`, `limits.timeout_ms`, `limits.max_reads` and
   `limits.max_bytes`, plus explicit `limits.cost_policy: host_managed`;
@@ -54,9 +54,12 @@ The host owns decisive/cumulative trigger selection and correlated-source
 lineage. Matter does not count keywords, add model probabilities, select a
 threshold, or certify that host-declared lineages are independently sourced.
 Source content is canonicalized before computing the contribution material
-identity. Reprints with the same lineage/material cannot rebuild cleared
-pressure; changed source material can request a fresh review even in the same
-lineage. A later fact may change the meaning of earlier quiet context.
+identity. Reprints retain the original material version and cannot rebuild cleared
+pressure. Genuine source revisions use new material versions, including a later
+reversion to earlier wording. Different versions remain pending together in one
+provenance lineage: a late reprint cannot evict an unreviewed correction. Same
+version with contradictory material is a source-identity conflict. The host uses
+its existing canonical source-version identity, never a delivery wrapper ID. A later fact may change the meaning of earlier quiet context.
 
 `ReviewRequest.wake_id` binds lens, native semantic inputs, assessment, selected
 contributions and exact ledger references. Array order for set-like inputs,
@@ -104,8 +107,14 @@ a claim of distributed serializability or production delivery permission.
    actual native matter/dependencies/audience/provider.
 2. Call `record_pressure(request, token=..., access_context=..., command_id=...)`.
    IDs are stable per host command. Changed content under a reused command ID
-   conflicts. The store retains pointer history, one pending slot per lineage,
-   and consumed material identities. No score/decay/retention formula is added.
+   conflicts. The store retains pointer history, pending source versions grouped by lineage,
+   and consumed material-version identities. Pressure is separate per native matter
+   and approved lens revision; a logical objective/lens lock spans revisions and
+   matters so its existing assistant session never runs overlapping reviews. No
+   score/decay/retention formula is added. A pressure window holds at most 128
+   pending versions; overflow is E_BUDGET_EXHAUSTED, never a silent drop. Keep the
+   unaccepted contribution in the host ledger and retry a bounded batch after
+   draining completed work.
 3. Call `claim(request, token=..., access_context=...)`. It returns
    `(acquired, attempt_record)`. **Only acquired=True permits host execution.**
    A refused local transaction remains a recorded refusal; a caller may make a
@@ -129,9 +138,14 @@ there is no automatic takeover or blind resend. Unknown work keeps the lens
 blocked for explicit reconciliation rather than launching another review in the
 same session. `inspect(...)` exposes that
 state honestly. A callback exception produces unknown without leaking exception
-text. An invalid result leaves the claim unresolved. Reconciliation/retry of
-unknown work requires a separate explicit host decision; quota renewal or a new
-wrapper must not bypass it.
+text. An invalid result leaves the claim unresolved. A new wrapper or quota never bypasses unknown work. The SDK
+`reconcile(request, witness, actor=..., authority=..., access_context=...,
+command_id=...)` is an explicit correction-authorized operator control: a
+verified host control projection must name the wake, attest `inflight: false`,
+and record `resolution` as observed_completion, not_started, stopped or failed.
+It releases the lens lock without clearing pressure, admitting a quiet proposal
+or calling the assistant. The original wake stays non-dispatchable. StateCivics
+owns the actual lookup/proof and operator UI; inventing a witness is forbidden.
 
 ## Completion and pressure
 
@@ -140,6 +154,11 @@ result has a proposal (`quiet`, `digest`, `report`, `alert`), exact review/sessi
 pointers, the actual subset of requested evidence reviewed, optional host ledger
 snapshot, and host-approved rule-change pointers. The host's canonical review
 projection must bind these fields and the wake ID to the actual stored review.
+Its content includes `wake_id`, `status`, `proposal`, `reviewed`, `rule_changes`,
+the exact `session` pointer, and `ledger_binding`. Compute the latter with
+`review_ledger_digest(ledger, review_reference)`: it excludes only that review
+identity from the review list to avoid a circular self-digest; every other
+selected reference, lens and availability cut remains bound.
 Do not hash a model-declared success and call it a host-verified result.
 
 A non-completed result has no proposal, reviewed-set reset, ledger update,
@@ -212,3 +231,22 @@ pilot policy remain with their recorded host/owner decisions. This SDK adds no
 threshold defaults, new spend ceiling, forced notification or production flag.
 The installed walkthrough-schema gap and MAT-083 concurrency investigation
 remain separate from this review boundary.
+
+## Bounded selections and metadata reads
+
+Each request has at most 64 contributions and binds at most 96 distinct root
+host pointers, also within its declared
+input artifact-read budget; the source/ledger closure is verified before host execution. Ledger
+snapshots are bounded selections, not a growing dump of all lens history. Results
+also have a 96-root bound. Result/witness integrity verification has a separate
+fixed 256-artifact / 1 MiB aggregate ceiling, not the assistant's tool-read budget.
+Individual wire/artifact values remain capped at 256 KiB. An unsupported/oversize
+result refuses without clearing pressure; use a valid bounded host projection
+or explicit reconciliation, never a second assistant call.
+
+`pressure()` is present-authorized pointer metadata/history for one lens/matter,
+not a fresh model packet. It permits superseded source history under current
+READ rights and uses the fixed verification ceiling/current host clock, so a
+small evaluation budget or stale contribution does not prevent inspection.
+Reusing any of those pointers still requires the request cut, current-use guards
+and declared packet budgets.

@@ -27,6 +27,7 @@
           {
             "lineage": "source-lineage-1",
             "material_digest": "37b2dd84601b7a8fa004a2a0459f4a414a007e644be61ed6d91144bc27a2b835",
+            "material_version": "source-1",
             "reference": {
               "digest": "f02eb22f2ce1bbaf2724aff0784f8482a7e8910b90191e72f2a5529cbc4579ac",
               "host": "synthetic-host",
@@ -60,11 +61,11 @@
           "workspace_id": "8"
         },
         "limits": {
-          "max_tool_calls": 12,
-          "timeout_ms": 180000,
-          "max_reads": 128,
+          "cost_policy": "host_managed",
           "max_bytes": 262144,
-          "cost_policy": "host_managed"
+          "max_reads": 128,
+          "max_tool_calls": 12,
+          "timeout_ms": 180000
         },
         "matter": {
           "id": "subject-a",
@@ -88,14 +89,14 @@
       "result": {
         "contract_version": "1.0",
         "message_type": "review_result",
-        "wake_id": "385a0de7993bb9a97a974a5d8baca8ab49f9b439aa5ab7545509c322a46dbf7d",
+        "wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
         "status": "completed",
         "proposal": "quiet",
         "review": {
           "host": "synthetic-host",
           "kind": "review",
-          "id": "review-385a0de7993bb9a97a974a5d8baca8ab49f9b439aa5ab7545509c322a46dbf7d",
-          "digest": "6e5560b534b944c2c3b1c759439a2e70df4e4a3d27f19f246721350f3a5d2a4b"
+          "id": "review-cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
+          "digest": "ecb17757256d0ccdb20d524f7b3208f1d61420a06130d10ff7b522095f9cc658"
         },
         "session": {
           "host": "synthetic-host",
@@ -115,7 +116,7 @@
         "rule_changes": [],
         "error_code": null
       },
-      "expected_wake_id": "385a0de7993bb9a97a974a5d8baca8ab49f9b439aa5ab7545509c322a46dbf7d"
+      "expected_wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7"
     },
     {
       "name": "decisive_adverse_alert_proposal",
@@ -142,6 +143,7 @@
           {
             "lineage": "source-lineage-1",
             "material_digest": "37b2dd84601b7a8fa004a2a0459f4a414a007e644be61ed6d91144bc27a2b835",
+            "material_version": "source-1",
             "reference": {
               "digest": "f02eb22f2ce1bbaf2724aff0784f8482a7e8910b90191e72f2a5529cbc4579ac",
               "host": "synthetic-host",
@@ -175,11 +177,11 @@
           "workspace_id": "8"
         },
         "limits": {
-          "max_tool_calls": 12,
-          "timeout_ms": 180000,
-          "max_reads": 128,
+          "cost_policy": "host_managed",
           "max_bytes": 262144,
-          "cost_policy": "host_managed"
+          "max_reads": 128,
+          "max_tool_calls": 12,
+          "timeout_ms": 180000
         },
         "matter": {
           "id": "subject-a",
@@ -203,14 +205,14 @@
       "result": {
         "contract_version": "1.0",
         "message_type": "review_result",
-        "wake_id": "385a0de7993bb9a97a974a5d8baca8ab49f9b439aa5ab7545509c322a46dbf7d",
+        "wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
         "status": "completed",
         "proposal": "alert",
         "review": {
           "host": "synthetic-host",
           "kind": "review",
-          "id": "review-385a0de7993bb9a97a974a5d8baca8ab49f9b439aa5ab7545509c322a46dbf7d",
-          "digest": "5c5991bafe6b69f2082db394a195b25c64b520208b8686b45113b274ab3dfdb6"
+          "id": "review-cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
+          "digest": "f1513b27aaaa310ce7c82f20012deea3da66512f8b249314e41df9caa8e4e55a"
         },
         "session": {
           "host": "synthetic-host",
@@ -230,7 +232,7 @@
         "rule_changes": [],
         "error_code": null
       },
-      "expected_wake_id": "385a0de7993bb9a97a974a5d8baca8ab49f9b439aa5ab7545509c322a46dbf7d"
+      "expected_wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7"
     },
     {
       "name": "dual_route_same_wake_identity",
@@ -257,6 +259,7 @@
           {
             "lineage": "source-lineage-1",
             "material_digest": "37b2dd84601b7a8fa004a2a0459f4a414a007e644be61ed6d91144bc27a2b835",
+            "material_version": "source-1",
             "reference": {
               "digest": "f02eb22f2ce1bbaf2724aff0784f8482a7e8910b90191e72f2a5529cbc4579ac",
               "host": "synthetic-host",
@@ -290,11 +293,11 @@
           "workspace_id": "8"
         },
         "limits": {
-          "max_tool_calls": 12,
-          "timeout_ms": 180000,
-          "max_reads": 128,
+          "cost_policy": "host_managed",
           "max_bytes": 262144,
-          "cost_policy": "host_managed"
+          "max_reads": 128,
+          "max_tool_calls": 12,
+          "timeout_ms": 180000
         },
         "matter": {
           "id": "subject-a",
@@ -319,14 +322,14 @@
       "result": {
         "contract_version": "1.0",
         "message_type": "review_result",
-        "wake_id": "385a0de7993bb9a97a974a5d8baca8ab49f9b439aa5ab7545509c322a46dbf7d",
+        "wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
         "status": "completed",
         "proposal": "digest",
         "review": {
           "host": "synthetic-host",
           "kind": "review",
-          "id": "review-385a0de7993bb9a97a974a5d8baca8ab49f9b439aa5ab7545509c322a46dbf7d",
-          "digest": "899afbcb3513f9672e704557bb65fb898c58c1ce6032b275ca7f1ec351c829e6"
+          "id": "review-cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
+          "digest": "f5c52d64dadfddf0e3c31f92dde28ebabaacf8f16f4aaf2b7cfb9e65d710afcd"
         },
         "session": {
           "host": "synthetic-host",
@@ -346,7 +349,7 @@
         "rule_changes": [],
         "error_code": null
       },
-      "expected_wake_id": "385a0de7993bb9a97a974a5d8baca8ab49f9b439aa5ab7545509c322a46dbf7d"
+      "expected_wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7"
     },
     {
       "name": "accumulation_report_proposal",
@@ -373,6 +376,7 @@
           {
             "lineage": "source-lineage-1",
             "material_digest": "37b2dd84601b7a8fa004a2a0459f4a414a007e644be61ed6d91144bc27a2b835",
+            "material_version": "source-1",
             "reference": {
               "digest": "f02eb22f2ce1bbaf2724aff0784f8482a7e8910b90191e72f2a5529cbc4579ac",
               "host": "synthetic-host",
@@ -406,11 +410,11 @@
           "workspace_id": "8"
         },
         "limits": {
-          "max_tool_calls": 12,
-          "timeout_ms": 180000,
-          "max_reads": 128,
+          "cost_policy": "host_managed",
           "max_bytes": 262144,
-          "cost_policy": "host_managed"
+          "max_reads": 128,
+          "max_tool_calls": 12,
+          "timeout_ms": 180000
         },
         "matter": {
           "id": "subject-a",
@@ -434,14 +438,14 @@
       "result": {
         "contract_version": "1.0",
         "message_type": "review_result",
-        "wake_id": "385a0de7993bb9a97a974a5d8baca8ab49f9b439aa5ab7545509c322a46dbf7d",
+        "wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
         "status": "completed",
         "proposal": "report",
         "review": {
           "host": "synthetic-host",
           "kind": "review",
-          "id": "review-385a0de7993bb9a97a974a5d8baca8ab49f9b439aa5ab7545509c322a46dbf7d",
-          "digest": "75aeccf4510143f19528bf1590422b67802685f28e2a7d083cb7db42e3145f60"
+          "id": "review-cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
+          "digest": "3990ecf0a5ad39d32b3da46bb2504adf9b24acd548bd9862be9fc147e50e8a71"
         },
         "session": {
           "host": "synthetic-host",
@@ -461,7 +465,7 @@
         "rule_changes": [],
         "error_code": null
       },
-      "expected_wake_id": "385a0de7993bb9a97a974a5d8baca8ab49f9b439aa5ab7545509c322a46dbf7d"
+      "expected_wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7"
     },
     {
       "name": "unknown_never_quiet",
@@ -488,6 +492,7 @@
           {
             "lineage": "source-lineage-1",
             "material_digest": "37b2dd84601b7a8fa004a2a0459f4a414a007e644be61ed6d91144bc27a2b835",
+            "material_version": "source-1",
             "reference": {
               "digest": "f02eb22f2ce1bbaf2724aff0784f8482a7e8910b90191e72f2a5529cbc4579ac",
               "host": "synthetic-host",
@@ -521,11 +526,11 @@
           "workspace_id": "8"
         },
         "limits": {
-          "max_tool_calls": 12,
-          "timeout_ms": 180000,
-          "max_reads": 128,
+          "cost_policy": "host_managed",
           "max_bytes": 262144,
-          "cost_policy": "host_managed"
+          "max_reads": 128,
+          "max_tool_calls": 12,
+          "timeout_ms": 180000
         },
         "matter": {
           "id": "subject-a",
@@ -549,7 +554,7 @@
       "result": {
         "contract_version": "1.0",
         "message_type": "review_result",
-        "wake_id": "385a0de7993bb9a97a974a5d8baca8ab49f9b439aa5ab7545509c322a46dbf7d",
+        "wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
         "status": "unknown",
         "proposal": null,
         "review": null,
@@ -559,7 +564,7 @@
         "rule_changes": [],
         "error_code": "stopped_for_test"
       },
-      "expected_wake_id": "385a0de7993bb9a97a974a5d8baca8ab49f9b439aa5ab7545509c322a46dbf7d"
+      "expected_wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7"
     },
     {
       "name": "contrasting_objective_quiet",
@@ -586,6 +591,7 @@
           {
             "lineage": "source-lineage-1",
             "material_digest": "37b2dd84601b7a8fa004a2a0459f4a414a007e644be61ed6d91144bc27a2b835",
+            "material_version": "source-1",
             "reference": {
               "digest": "53265f8b1883b1801f27791eef9357674c21ca1a6c0188112e634325e2b424b7",
               "host": "synthetic-host",
@@ -619,11 +625,11 @@
           "workspace_id": "8"
         },
         "limits": {
-          "max_tool_calls": 12,
-          "timeout_ms": 180000,
-          "max_reads": 128,
+          "cost_policy": "host_managed",
           "max_bytes": 262144,
-          "cost_policy": "host_managed"
+          "max_reads": 128,
+          "max_tool_calls": 12,
+          "timeout_ms": 180000
         },
         "matter": {
           "id": "subject-a",
@@ -647,14 +653,14 @@
       "result": {
         "contract_version": "1.0",
         "message_type": "review_result",
-        "wake_id": "b065e726472c067cd06540f0d076d9729602affa8e6c6e7636e352cbe51c81f3",
+        "wake_id": "a4d7ec14e041567030ce74cf9b65887cf09b8dea0037de25dcbbb2141b72cd1b",
         "status": "completed",
         "proposal": "quiet",
         "review": {
           "host": "synthetic-host",
           "kind": "review",
-          "id": "review-b065e726472c067cd06540f0d076d9729602affa8e6c6e7636e352cbe51c81f3",
-          "digest": "a4dd7e084d4875c39adbc2f075c15a3250f55c1a16355fc7dc1622ffc46f513f"
+          "id": "review-a4d7ec14e041567030ce74cf9b65887cf09b8dea0037de25dcbbb2141b72cd1b",
+          "digest": "999c85ea7c96726ed97dae4888ec44156b8351abb9f0484a26d13d9863f84a18"
         },
         "session": {
           "host": "synthetic-host",
@@ -674,7 +680,7 @@
         "rule_changes": [],
         "error_code": null
       },
-      "expected_wake_id": "b065e726472c067cd06540f0d076d9729602affa8e6c6e7636e352cbe51c81f3"
+      "expected_wake_id": "a4d7ec14e041567030ce74cf9b65887cf09b8dea0037de25dcbbb2141b72cd1b"
     }
   ]
 }

@@ -65,3 +65,18 @@ class ReviewContractTests(unittest.TestCase):
             request,result=ReviewRequest(case['request']),ReviewResult(case['result'])
             self.assertEqual(request.wake_id,case['expected_wake_id'])
             self.assertEqual(result.value['wake_id'],request.wake_id)
+
+
+    def test_wire_codes_and_digests_reject_trailing_newline(self):
+        for mutate in (lambda raw:raw.update(reason_code='quiet\n'),
+                       lambda raw:raw['assessment'].update(digest='a'*64+'\n')):
+            raw=self.request.value;mutate(raw)
+            with self.assertRaises(ContractError):ReviewRequest(raw)
+        raw=self.fixture.result(status='failed');raw['error_code']='failed\n'
+        with self.assertRaises(ContractError):ReviewResult(raw)
+
+
+    def test_noncanonical_numbers_raise_coded_contract_error(self):
+        raw=self.request.value;raw['limits']['timeout_ms']=1.5
+        with self.assertRaises(ContractError) as error:ReviewRequest(raw)
+        self.assertEqual(error.exception.code,'E_SCHEMA_INVALID')

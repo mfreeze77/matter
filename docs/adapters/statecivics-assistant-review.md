@@ -21,7 +21,7 @@ SDK. Review sessions/rows and recovery/deployment wiring stay StateCivics-owned.
 from matter.assistant_review import (
     AssistantReviewService as MatterReviews,
     ReviewHost, ReviewRequest, ReviewResult,
-    host_artifact_reference, pressure_contribution,
+    host_artifact_reference, pressure_contribution, review_ledger_digest,
     pressure_ref, review_ref,
 )
 ```
@@ -35,7 +35,9 @@ not merely match an objective ID. No permissive default guards are shipped.
 The host constructs canonical views of existing assessment/evidence,
 `assistant_reviews`, review sessions, feedback, report/delivery and
 `watch_intent_controls` records. IDs use strings at this wire boundary. Compute
-view digests with the public helper; do not substitute an ORM timestamp or a
+view digests with the public helper; contributions also carry the actual stable
+source material-version identity, shared by reprints and changed by a genuine
+revision/reversion; do not substitute an ORM timestamp or a
 model-supplied digest. No new client, memory or source database is needed.
 
 The host ledger has four primary inputs (judgments, reviews, conveyed output,
@@ -93,7 +95,9 @@ Postgres do not form one distributed transaction.
    wake per lens; while one is unresolved, queue new contributions and rebuild
    the next request from pending material plus authorized ledger context after
    completion. Unknown-outcome reconciliation remains an explicit host workflow,
-   not a new provider call or an implemented dashboard action in this SDK.
+   not a new provider call or an implemented dashboard action in this SDK. The SDK provides an explicit
+   correction-authorized `reconcile` method using a real host no-inflight witness;
+   the lookup and operator interaction remain host work.
 2. Bind the returned review to this exact wake and actual reviewed source pins,
    session pointer and any already-authorized rule updates. Existing ReviewResult
    IDs alone do not prove the reviewed-set contract. Exact tool read/citation
@@ -104,7 +108,8 @@ Postgres do not form one distributed transaction.
 4. Carry the request availability cut into the existing exact readers during
    replay. The four-argument review service alone does not establish that cut.
    Reuse the no-login rehearsal isolation and refuse unsupported cuts.
-5. KS-1126 receiving acceptance: both host flags on, actual assistant turn and
+5. KS-1126 receiving acceptance: `MONITORING_ASSISTANT_TOOLS_ENABLED` and
+   `ASSISTANT_REVIEW_ENABLED` on in isolated rehearsal only, actual assistant turn and
    exact image/source/SDK identities, contrasting objectives, duplicate/reprint,
    quiet then new material, correction, in-flight pause/resume/revoke, new arrival
    during review, unknown recovery and foreign-client refusal. All output stays
@@ -127,3 +132,11 @@ contrasting lens identities. They are authored synthetic wire/identity checks,
 not assistant execution, source interpretation, receiving acceptance or accuracy
 measurements. SDK integration tests separately use real SQLite/control/access
 with a synthetic host. A passing vector never qualifies JEV or enables delivery.
+
+The host should select bounded ledger slices before dispatch, not append all
+history to every request. Up to 96 request roots (within the selected read budget)
+and a 128-version pending window are admitted; overflow is explicit backpressure
+with upstream evidence retained. Completion verification has an independent SDK
+256-artifact/1 MiB ceiling. Pressure is per matter; the objective session lock
+spans matters and approved revisions. `pressure()` history is not an authorized
+source packet and must not be fed straight to a model.

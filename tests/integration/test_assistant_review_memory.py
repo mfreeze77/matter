@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 from matter.access import AccessService, HostAccessPolicy
 from matter.assistant_review import (AssistantReviewService, ReviewHost, ReviewRequest, ReviewResult,
-    host_artifact_reference, pressure_contribution, pressure_ref)
+    host_artifact_reference, pressure_contribution, pressure_ref, review_ledger_digest)
 from matter.canonical import canonical_bytes
 from matter.contracts import ContractError
 from matter.controls import ControlService
@@ -94,7 +94,7 @@ class ReviewTests(unittest.TestCase):
             ledger=ledger, trigger_routes=['immediate'], reason_code='adverse_development', as_of=deepcopy(self.f.now),
             limits={'max_tool_calls': 12, 'timeout_ms': 180000, 'max_reads': 128, 'max_bytes': 262144, 'cost_policy':'host_managed'})
         value.update(updates)
-        value['contributions'] = [pressure_contribution(self.artifacts[canonical_bytes(c['reference'])], lineage=c['lineage']) for c in value['contributions']]
+        value['contributions'] = [pressure_contribution(self.artifacts[canonical_bytes(c['reference'])], lineage=c['lineage'], material_version=c.get('material_version',c['reference']['id'])) for c in value['contributions']]
         return ReviewRequest(value)
 
     def ledger(self, **entries):
@@ -112,9 +112,11 @@ class ReviewTests(unittest.TestCase):
         if status != 'completed':
             return message('review_result', wake_id=request.wake_id, status=status, proposal=None, review=None, session=None,
                 reviewed=[], ledger=None, rule_changes=[], error_code='stopped_for_test')
-        content = {'wake_id': request.wake_id, 'status': status, 'proposal': proposal, 'reviewed': reviewed, 'rule_changes': list(rules)}
-        review = self.artifact('review', 'review-'+request.wake_id, 'review', content)
         session = self.artifact('session', 'session-a', 'session', {})
+        identity={'host':self.lens['host'],'kind':'review','id':'review-'+request.wake_id,'digest':'0'*64}
+        content = {'wake_id': request.wake_id, 'status': status, 'proposal': proposal, 'reviewed': reviewed, 'rule_changes': list(rules),
+                   'session':session,'ledger_binding':review_ledger_digest(ledger,identity)}
+        review = self.artifact('review', 'review-'+request.wake_id, 'review', content)
         return message('review_result', wake_id=request.wake_id, status=status, proposal=proposal, review=review, session=session,
                        reviewed=reviewed, ledger=ledger, rule_changes=list(rules), error_code=None)
 
@@ -265,12 +267,12 @@ class ReviewTests(unittest.TestCase):
 
     def test_reprints_share_one_lineage_and_old_versions_remain_in_history(self):
         first = self.add()
-        reprint = self.artifact('evidence', 'reprint', 'source_quote', {'text':'same'}, parents=[self.source])
-        request = self.req(contributions=[{'reference':reprint,'lineage':'source-lineage-1'}])
+        reprint = self.artifact('evidence', 'reprint', 'source_quote', {'text':'SYNTHETIC SOURCE BODY'}, parents=[self.source])
+        request = self.req(contributions=[{'reference':reprint,'lineage':'source-lineage-1','material_version':'source-1'}])
         self.add(request)
         self.assertEqual(len(self.pending(request)), 1)
         self.assertEqual(self.f.storage.get(pin(first)), first)
-        bad = request.value; bad['contributions'].append({'reference': self.source, 'lineage':'source-lineage-1'})
+        bad = request.value; bad['contributions'].append({**bad['contributions'][0],'reference':self.source})
         with self.assertRaises(ContractError): ReviewRequest(bad)
 
     def test_completion_must_match_persisted_host_review_and_exact_reviewed_set(self):
@@ -294,7 +296,7 @@ class ReviewTests(unittest.TestCase):
         self.add()
         self.assertEqual(self.pending(), [])
         source = self.artifact('evidence', 'same-source-reprinted', 'source_quote', {'text': 'SYNTHETIC SOURCE BODY'}, parents=[self.source])
-        request = self.req(contributions=[{'reference': source, 'lineage': 'source-lineage-1'}])
+        request = self.req(contributions=[{'reference': source, 'lineage': 'source-lineage-1','material_version':'source-1'}])
         self.add(request)
         self.assertEqual(self.pending(request), [])
         with self.assertRaises(ContractError): self.execute(request)
@@ -412,8 +414,8 @@ class ReviewTests(unittest.TestCase):
     def test_explicit_reader_byte_and_call_limits_refuse_instead_of_truncating(self):
         for name,value in (('max_reads',1),('max_bytes',10)):
             raw=self.request.value;raw['limits'][name]=value
-            request=ReviewRequest(raw)
             with self.assertRaises(ContractError):
+                request=ReviewRequest(raw)
                 self.service.resolve(request, [self.assessment], token=self.token, access_context=self.access_context)
         self.assertEqual(self.calls,0)
 
@@ -531,3 +533,184 @@ class ReviewTests(unittest.TestCase):
         self.assertTrue(state['outcome_unknown'])
         self.active=True
         self.assertEqual(self.pending(),self.request.value['contributions'])
+
+
+    def test_explicit_reconciliation_releases_unknown_without_clearing_pressure_or_rerunning(self):
+        self.add()
+        def failing(value,key):raise RuntimeError('unknown')
+        self.execute(reviewer=failing)
+        witness=self.artifact('control','operator-reconcile','host_control',{
+            'wake_id':self.request.wake_id,'inflight':False,'resolution':'failed'})
+        row=self.service.reconcile(self.request,witness,actor=self.f.actor,authority=entity_ref(self.f.authority),
+                                   access_context=self.access_context,command_id='reconcile-one')
+        self.assertEqual(row['value']['value']['phase'],'reconciled')
+        self.assertFalse(row['value']['value']['outcome_unknown'])
+        self.assertEqual(self.pending(),self.request.value['contributions'])
+        self.assertFalse(self.service.claim(self.request,token=self.token,access_context=self.access_context)[0])
+        source=self.artifact('evidence','after-reconcile','source_fact',{'new':'deadline'})
+        next_request=self.req(contributions=[{'reference':source,'lineage':'next'}]);self.add(next_request)
+        self.assertEqual(self.execute(next_request)['value']['value']['phase'],'completed')
+
+    def test_reconciliation_requires_real_no_inflight_host_witness(self):
+        self.add();self.service.claim(self.request,token=self.token,access_context=self.access_context)
+        for inflight in (True,None):
+            witness=self.artifact('control','bad-reconcile-'+str(inflight),'host_control',{
+                'wake_id':self.request.wake_id,'inflight':inflight,'resolution':'failed'})
+            with self.assertRaises(ContractError):
+                self.service.reconcile(self.request,witness,actor=self.f.actor,authority=entity_ref(self.f.authority),
+                                       access_context=self.access_context,command_id='bad-reconcile')
+        self.assertEqual(self.pending(),self.request.value['contributions'])
+
+    def test_late_reprint_cannot_evict_unreviewed_correction_and_reversion_is_new_version(self):
+        self.add()
+        correction=self.artifact('evidence','corrected-version','source_fact',{'text':'changed'})
+        corrected=self.req(contributions=[{'reference':correction,'lineage':'source-lineage-1'}]);self.add(corrected)
+        self.add()  # old source arrives after the correction; both remain in the one lineage
+        self.assertEqual({c['reference']['id'] for c in self.pending()},{'source-1','corrected-version'})
+        full=self.req(contributions=self.pending());self.execute(full)
+        reverted=self.artifact('evidence','reverted-version','source_quote',{'text':'SYNTHETIC SOURCE BODY'})
+        request=self.req(contributions=[{'reference':reverted,'lineage':'source-lineage-1'}]);self.add(request)
+        self.assertEqual([c['reference'] for c in self.pending(request)],[reverted])
+        self.assertEqual(self.execute(request)['value']['value']['phase'],'completed')
+
+    def test_result_verification_is_separate_from_assistant_read_budget(self):
+        raw=self.request.value;raw['limits']['max_reads']=3
+        request=ReviewRequest(raw);self.add(request)
+        def reviewer(value,key):
+            result=self.result(request)
+            old=self.artifacts[canonical_bytes(result['review'])]
+            result['review']=self.artifact('review','with-source-parents','review',old['content'],citations=[self.assessment,self.source],parents=[self.control])
+            return result
+        self.assertEqual(self.execute(request,reviewer=reviewer)['value']['value']['phase'],'completed')
+
+    def test_transient_host_guard_failure_does_not_discard_finished_review(self):
+        self.add();self.service.claim(self.request,token=self.token,access_context=self.access_context)
+        result=self.result()
+        with patch.object(self.service,'_host_guard',side_effect=RuntimeError('host unavailable')):
+            with self.assertRaises(Exception):
+                self.service.complete(self.request,result,token=self.token,access_context=self.access_context)
+        row=self.service.complete(self.request,result,token=self.token,access_context=self.access_context)
+        self.assertEqual(row['value']['value']['phase'],'completed')
+
+    def test_stale_completion_retry_returns_original_terminal_result(self):
+        self.add();self.service.claim(self.request,token=self.token,access_context=self.access_context)
+        result=self.result();self.active=False
+        first=self.service.complete(self.request,result,token=self.token,access_context=self.access_context)
+        again=self.service.complete(self.request,result,token=self.token,access_context=self.access_context)
+        self.assertEqual(first,again)
+
+    def test_kind_classification_mismatch_cannot_mint_approved_rule_or_communication(self):
+        self.add();self.service.claim(self.request,token=self.token,access_context=self.access_context)
+        wrong=self.artifact('rule','model-proposed','interpretation',{'text':'not a host rule'},citations=[self.source])
+        with self.assertRaises(ContractError):
+            self.service.complete(self.request,self.result(rules=[wrong]),token=self.token,access_context=self.access_context)
+
+    def test_quiet_review_findings_feed_later_context_without_communication(self):
+        self.add()
+        finding=self.artifact('finding','quiet-note','interpretation',{'text':'quiet but worth retaining'},citations=[self.source])
+        ledger=self.ledger(judgments=[self.assessment],findings=[finding])
+        row=self.execute(reviewer=lambda value,key:self.result(ledger=ledger))
+        self.assertEqual(row['value']['value']['result']['proposal'],'quiet')
+        later=self.artifact('evidence','later-event','source_fact',{'text':'new decision'})
+        request=self.req(contributions=[{'reference':later,'lineage':'later'}],ledger=ledger)
+        self.add(request)
+        context=self.service.resolve_ledger(request,token=self.token,access_context=self.access_context)
+        self.assertEqual(next(a for a in context if a['reference']==finding)['classification'],'interpretation')
+        self.assertEqual(request.value['ledger']['conveyed'],[])
+
+
+    def test_reconciliation_retry_is_idempotent_and_new_revision_cannot_bypass_unknown(self):
+        self.add();self.service.claim(self.request,token=self.token,access_context=self.access_context)
+        self.lens={**self.lens,'revision_id':'approved-2'}
+        source=self.artifact('evidence','new-revision-source','source_fact',{'new':'event'})
+        request=self.req(contributions=[{'reference':source,'lineage':'new'}]);self.add(request)
+        with self.assertRaises(ContractError):self.execute(request)
+        self.lens['revision_id']='approved-1'
+        witness=self.artifact('control','reconciled-stop','host_control',{'wake_id':self.request.wake_id,'inflight':False,'resolution':'stopped'})
+        first=self.service.reconcile(self.request,witness,actor=self.f.actor,authority=entity_ref(self.f.authority),
+            access_context=self.access_context,command_id='reconcile-stop')
+        again=self.service.reconcile(self.request,witness,actor=self.f.actor,authority=entity_ref(self.f.authority),
+            access_context=self.access_context,command_id='reconcile-stop')
+        self.assertEqual(first,again)
+        self.denied.add(canonical_bytes(witness))
+        with self.assertRaises(ContractError):
+            self.service.inspect(self.request,actor=self.f.actor,authority=entity_ref(self.f.authority),access_context=self.access_context)
+
+    def test_multiple_matters_have_separate_pressure_under_one_objective_session_lock(self):
+        self.add()
+        original=(self.f.subject,self.native,self.token,self.access_context,self.access,self.service)
+        from integration.helpers import create_command
+        command=create_command('another-matter','another-matter',scope_id=self.f.storage.scope_id)
+        outcome=self.f.storage.execute(command,lambda tx:tx.success('created',{'matter':pin(tx.insert(tx.command['body']['matter']))}))
+        self.assertEqual(outcome['status'],'success')
+        self.f.subject=self.f.storage.get(outcome['body']['matter'])
+        self.native=[pin(self.f.subject),pin(self.f.source)]
+        self.access=AccessService(policy=HostAccessPolicy(scope_id=self.f.storage.scope_id,audiences=[self.audience],
+            providers=[{'reference':self.provider,'provider':'synthetic','transport':'fixture'}],
+            grants=[{'reference':r,'audiences':[self.audience],'providers':[self.provider]} for r in self.native]),
+            controls=self.f.controls,current_read=self.f.storage.snapshot)
+        self.token=self.f.controls.capture(actor=self.f.actor,authority=entity_ref(self.f.authority),capability='assessment',targets=[entity_ref(r) for r in self.native])
+        with self.f.storage.snapshot() as view:
+            self.access_context=self.access.capture(view,token=self.token,audience=self.audience,provider=self.provider,references=self.native)
+        self.service=self.make_service(access=self.access)
+        other=self.req();self.add(other)
+        self.assertNotEqual(pressure_ref(self.f.storage.scope_id,other),pressure_ref(self.f.storage.scope_id,self.request))
+        self.execute(other)
+        self.f.subject,self.native,self.token,self.access_context,self.access,self.service=original
+        self.assertEqual(self.pending(),self.request.value['contributions'])
+        self.assertEqual(self.execute()['value']['value']['phase'],'completed')
+
+
+    def test_pending_pressure_cap_refuses_explicitly_without_dropping_accepted_versions(self):
+        for start in (0,60):
+            contributions=[]
+            for n in range(start,start+60):
+                source=self.artifact('evidence',f'bounded-{n}','source_fact',{'n':n})
+                contributions.append({'reference':source,'lineage':f'bounded-{n}'})
+            self.add(self.req(contributions=contributions))
+        self.assertEqual(len(self.pending()),120)
+        extra=[]
+        for n in range(120,129):
+            source=self.artifact('evidence',f'bounded-{n}','source_fact',{'n':n})
+            extra.append({'reference':source,'lineage':f'bounded-{n}'})
+        with self.assertRaises(ContractError) as error:self.add(self.req(contributions=extra))
+        self.assertEqual(error.exception.code,'E_BUDGET_EXHAUSTED')
+        self.assertEqual(len(self.pending()),120)
+
+    def test_stale_pending_pointer_is_readable_as_history_but_not_reusable(self):
+        self.add();self.stale.add(canonical_bytes(self.source))
+        self.assertEqual(self.pending(),self.request.value['contributions'])
+        with self.assertRaises(ContractError):self.execute()
+
+    def test_reconciliation_needs_correction_authority_not_just_read_access(self):
+        from matter.authority import AuthorityPolicy,CAPABILITIES
+        self.add();self.service.claim(self.request,token=self.token,access_context=self.access_context)
+        restricted=ControlService(self.f.storage,policy=AuthorityPolicy(self.f.storage.scope_id,
+            actors=[self.f.actor],authorities=[pin(self.f.authority)],capabilities=CAPABILITIES,control_kinds=['decision']),
+            clock=lambda:deepcopy(self.f.now))
+        access=AccessService(policy=self.access.policy,controls=restricted,current_read=self.f.storage.snapshot)
+        service=self.make_service(controls=restricted,access=access)
+        witness=self.artifact('control','privileged-reconcile','host_control',{'wake_id':self.request.wake_id,'inflight':False,'resolution':'failed'})
+        with self.assertRaises(ContractError):
+            service.reconcile(self.request,witness,actor=self.f.actor,authority=entity_ref(self.f.authority),
+                              access_context=self.access_context,command_id='not-authorized-reconcile')
+        self.assertTrue(self.service.inspect(self.request,actor=self.f.actor,authority=entity_ref(self.f.authority),
+                                            access_context=self.access_context)['outcome_unknown'])
+
+
+    def test_pre_dispatch_guard_refusal_is_known_not_called_not_transport_unknown(self):
+        self.add();claim=self.service.claim
+        def paused(*args,**kwargs):
+            result=claim(*args,**kwargs);self.active=False;return result
+        with patch.object(self.service,'claim',side_effect=paused):row=self.execute()
+        self.assertEqual(self.calls,0);self.assertFalse(row['value']['value']['outcome_unknown'])
+        self.assertEqual(row['value']['value']['phase'],'stopped')
+
+    def test_completion_binds_the_exact_session_and_ledger_selection(self):
+        self.add();self.service.claim(self.request,token=self.token,access_context=self.access_context)
+        result=self.result();result['session']=self.artifact('session','other-session','session',{})
+        with self.assertRaises(ContractError):
+            self.service.complete(self.request,result,token=self.token,access_context=self.access_context)
+        result=self.result();result['ledger']=self.ledger()
+        with self.assertRaises(ContractError):
+            self.service.complete(self.request,result,token=self.token,access_context=self.access_context)

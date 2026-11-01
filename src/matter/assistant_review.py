@@ -11,7 +11,7 @@ from uuid import uuid4
 
 from ._rule_values import FrozenValue, domain
 from .access import AccessService
-from .canonical import canonical_bytes, canonical_digest
+from .canonical import CanonicalError, canonical_bytes, canonical_digest
 from .contexts import _MutationService, _control_command
 from .contracts import ContractError
 from .identity_dependencies import _lookup
@@ -21,6 +21,8 @@ from .time import compare_times
 VERSION = "1.0"
 SCHEMA = "assistant-review"
 MAX_BYTES = 262144
+MAX_VERIFY_READS = 256
+MAX_VERIFY_BYTES = 1048576
 LEDGER_FIELDS = {"judgments": "judgment", "reviews": "review", "conveyed": "conveyed",
                  "feedback": "feedback", "findings": "finding"}
 
@@ -30,7 +32,11 @@ def _fail(code="E_EVIDENCE_INVALID"):
 
 
 def _wire(kind, value):
-    if len(canonical_bytes(value)) > MAX_BYTES:
+    try:
+        encoded=canonical_bytes(value)
+    except (CanonicalError,RecursionError,TypeError):
+        _fail("E_SCHEMA_INVALID")
+    if len(encoded) > MAX_BYTES:
         _fail("E_BUDGET_EXHAUSTED")
     value = domain(SCHEMA, value)["value"]
     if value["message_type"] != kind:
@@ -59,6 +65,13 @@ def _result_refs(result):
     refs = [result[name] for name in ("review", "session") if result[name] is not None] + result["rule_changes"]
     if result["ledger"] is not None:
         refs += [r for name in LEDGER_FIELDS for r in result["ledger"][name]]
+    return _unique(refs)
+
+
+def _attempt_refs(body):
+    refs=_result_refs(body["result"])
+    if body["reconciliation"] is not None:
+        refs.append(body["reconciliation"])
     return _unique(refs)
 
 
@@ -104,12 +117,15 @@ class ReviewRequest(FrozenValue):
         groups = []
         for contribution in value["contributions"]:
             _pointer(contribution["reference"], lens, "evidence")
-            groups.append(contribution["lineage"])
+            groups.append((contribution["lineage"], contribution["material_version"]))
         if len(set(groups)) != len(groups):
             _fail("E_EVIDENCE_INVALID")
         _ledger(value["ledger"], lens)
         if value["ledger"] is not None and compare_times(value["ledger"]["as_of"], value["as_of"]) > 0:
             _fail("E_EVIDENCE_UNAVAILABLE")
+        roots = _host_refs(value)
+        if len(roots) > min(96, value["limits"]["max_reads"]):
+            _fail("E_BUDGET_EXHAUSTED")
         self._freeze(value)
 
     @property
@@ -136,6 +152,8 @@ class ReviewResult(FrozenValue):
         elif (value["proposal"] is not None or value["review"] is not None or value["session"] is not None or value["reviewed"] or value["ledger"] is not None
               or value["rule_changes"]):
             _fail("E_EVIDENCE_INVALID")
+        if len(_result_refs(value)) > 96:
+            _fail("E_BUDGET_EXHAUSTED")
         self._freeze(value)
 
 
@@ -151,10 +169,24 @@ def host_artifact_reference(value):
     return {**reference, "digest": canonical_digest(body, "matter.host-artifact.v1")}
 
 
-def pressure_contribution(artifact, *, lineage):
+def review_ledger_digest(ledger, review_reference):
+    """Bind the exact selected ledger, excluding only the review's own pointer.
+
+    Excluding its own identity avoids a self-referential digest. Other roots,
+    context, versions and the knowledge cut remain part of the binding.
+    """
+    if ledger is None:
+        return None
+    value=_wire("ledger",ledger)
+    identity={k:review_reference[k] for k in ("host","kind","id")}
+    value["reviews"]=[ref for ref in value["reviews"] if {k:ref[k] for k in identity}!=identity]
+    return canonical_digest(value,"matter.assistant-review-ledger.v1")
+
+
+def pressure_contribution(artifact, *, lineage, material_version):
     """Host-selected provenance group plus exact source-material identity.
 
-    Reprints use the same canonical source content and lineage. A correction or
+    Reprints use the same canonical source content, lineage and material version. A correction or
     new deadline has changed material, even when it belongs to the same lineage.
     This does not infer independence or assign a relevance/importance weight.
     """
@@ -162,14 +194,15 @@ def pressure_contribution(artifact, *, lineage):
     if (artifact["reference"]["kind"] != "evidence" or host_artifact_reference(artifact) != artifact["reference"]
             or artifact["classification"] not in {"source_quote", "source_fact"}):
         _fail("E_EVIDENCE_INVALID")
-    return {"reference": artifact["reference"], "lineage": lineage,
+    return {"reference": artifact["reference"], "lineage": lineage, "material_version": material_version,
             "material_digest": canonical_digest(artifact["content"], "matter.review-source-material.v1")}
 
 
 def _consumed_ref(scope_id, request, contribution):
     return {"scope_id": scope_id, "namespace": "adapter:assistant-review", "record_type": PROJECTION_TYPE,
             "id": "consumed-" + canonical_digest({"lens": request.value["lens"],
-                "lineage": contribution["lineage"], "material_digest": contribution["material_digest"]},
+                "matter": entity_ref(request.value["matter"]), "lineage": contribution["lineage"],
+                "material_version": contribution["material_version"], "material_digest": contribution["material_digest"]},
                 "matter.review-consumed.v1")}
 
 
@@ -193,7 +226,12 @@ class ReviewHost:
 def pressure_ref(scope_id, request):
     value = request.value if isinstance(request, ReviewRequest) else request
     return {"scope_id": scope_id, "namespace": "adapter:assistant-review", "record_type": PROJECTION_TYPE,
-            "id": "lens-" + canonical_digest(value["lens"], "matter.assistant-lens.v1")}
+            "id": "pressure-" + canonical_digest({"lens":value["lens"], "matter":entity_ref(value["matter"])}, "matter.assistant-pressure.v1")}
+
+
+def _lens_lock_ref(scope_id, request):
+    return {"scope_id":scope_id,"namespace":"adapter:assistant-review","record_type":PROJECTION_TYPE,
+            "id":"lens-"+canonical_digest({k:v for k,v in request.value["lens"].items() if k!="revision_id"},"matter.assistant-lens.v1")}
 
 
 def review_ref(scope_id, wake_id):
@@ -231,13 +269,13 @@ class AssistantReviewService(_MutationService):
         except ContractError:
             raise
         except Exception:
-            _fail("E_AUTHORITY_REQUIRED")
+            _fail("E_STORAGE_UNAVAILABLE")
 
     def _guard(self, view, payload):
         request = ReviewRequest(payload["request"]).value
         self.controls._view(view, actor=payload["token"]["actor"], authority=entity_ref(payload["token"]["authority"]),
                             capability="assessment", targets=[pressure_ref(self.scope_id, request),
-                            review_ref(self.scope_id, ReviewRequest(request).wake_id)], now=self.clock())
+                            review_ref(self.scope_id, ReviewRequest(request).wake_id), _lens_lock_ref(self.scope_id, ReviewRequest(request))], now=self.clock())
         self.controls.require_current(view, payload["token"], capability="assessment",
                                       targets=[entity_ref(r) for r in _refs(request)])
         for reference in _refs(request):
@@ -248,21 +286,21 @@ class AssistantReviewService(_MutationService):
 
     def _read_targets(self, view, payload):
         request = ReviewRequest(payload["request"])
-        return [pressure_ref(self.scope_id, request), review_ref(self.scope_id, request.wake_id),
+        return [_lens_lock_ref(self.scope_id, request), pressure_ref(self.scope_id, request), review_ref(self.scope_id, request.wake_id),
                 *[entity_ref(r) for r in _refs(request.value)],
                 *[_consumed_ref(self.scope_id, request, c) for c in request.value["contributions"]]]
 
-    def _action(self, action, request, *, token, access_context, command_id, result=None):
+    def _action(self, action, request, *, token, access_context, command_id, result=None, witness=None, submitted_result_digest=None):
         target = pressure_ref(self.scope_id, request) if action == "pressure" else review_ref(self.scope_id, request.wake_id)
         with self.storage.snapshot() as view:
             old = _lookup(view, target)
-        payload = _message("mutation", action=action, request=request.value,
+        payload = _message("mutation", action=action, witness=witness, submitted_result_digest=submitted_result_digest, request=request.value,
             result=None if result is None else result.value, token=token,
             access_context=access_context.value if hasattr(access_context, "value") else access_context,
             previous=None if old is None else pin(old))
         command = self._prepare(_control_command(self.controls, payload=payload, schema=SCHEMA, target=target,
             command_id=command_id, idempotency_key=command_id, actor=token["actor"],
-            authority=entity_ref(token["authority"]), kind="decision"))
+            authority=entity_ref(token["authority"]), kind="correction" if action=="reconcile" else "decision"))
         ran = False
         def handler(tx):
             nonlocal ran
@@ -290,12 +328,16 @@ class AssistantReviewService(_MutationService):
         pressure = _lookup(view, pressure_ref(self.scope_id, request))
         pressure_body = None if pressure is None else _wire("pressure", pressure["value"]["value"])
         pending = [] if pressure_body is None else pressure_body["pending"]
-        active_wake = None if pressure_body is None else pressure_body["active_wake"]
+        lock = _lookup(view, _lens_lock_ref(self.scope_id, request))
+        active_wake = None if lock is None else _wire("lens_lock",lock["value"]["value"])["active_wake"]
         consumed = {canonical_bytes(c): _lookup(view, _consumed_ref(self.scope_id, request, c))
                     for c in request.value["contributions"]}
         fresh = True
         try:
-            self._guard(view, payload)
+            if action=="reconcile":
+                self.access.require_history(view,payload["access_context"],references=_refs(request.value))
+            else:
+                self._guard(view, payload)
         except ContractError:
             if action != "finish":
                 raise
@@ -304,12 +346,17 @@ class AssistantReviewService(_MutationService):
         if action == "pressure":
             if result is not None:
                 _fail()
-            merged = {c["lineage"]: c for c in pending}
+            merged = {(c["lineage"],c["material_version"]): c for c in pending}
             for contribution in request.value["contributions"]:
                 if consumed[canonical_bytes(contribution)] is None:
-                    merged[contribution["lineage"]] = contribution
+                    key=(contribution["lineage"],contribution["material_version"])
+                    if key in merged and merged[key]["material_digest"]!=contribution["material_digest"]:
+                        _fail("E_SOURCE_IDENTITY_CONFLICT")
+                    merged[key] = contribution
+            if len(merged)>128:
+                _fail("E_BUDGET_EXHAUSTED")
             value = _message("pressure", lens=request.value["lens"], matter=request.value["matter"],
-                dependencies=request.value["dependencies"], pending=sorted(merged.values(), key=canonical_bytes), active_wake=active_wake,
+                dependencies=request.value["dependencies"], pending=sorted(merged.values(), key=canonical_bytes),
                 ledger=request.value["ledger"], control=None)
         elif action == "start":
             if result is not None or prior is not None:
@@ -318,16 +365,24 @@ class AssistantReviewService(_MutationService):
                 _fail("E_DELIVERY_UNKNOWN")
             if any(c not in pending for c in request.value["contributions"]):
                 _fail("E_DEPENDENCY_STALE")
-            value = _message("attempt", request=request.value, outcome_unknown=True, started_at=self.clock(), finished_at=None, phase="started", result=None, control=None)
+            value = _message("attempt", request=request.value, submitted_result_digest=None, reconciliation=None, outcome_unknown=True, started_at=self.clock(), finished_at=None, phase="started", result=None, control=None)
+        elif action=="reconcile":
+            if (prior is None or not prior["outcome_unknown"] or active_wake!=request.wake_id
+                    or prior["request"]!=request.value or payload["witness"] is None or result is not None):
+                _fail("E_IDEMPOTENCY_CONFLICT")
+            _pointer(payload["witness"],request.value["lens"],"control")
+            value=_message("attempt",request=prior["request"],submitted_result_digest=prior["submitted_result_digest"],
+                reconciliation=payload["witness"],outcome_unknown=False,started_at=prior["started_at"],
+                finished_at=self.clock(),phase="reconciled",result=prior["result"],control=None)
         else:
             if prior is None or prior["phase"] != "started" or prior["request"] != request.value:
                 _fail("E_IDEMPOTENCY_CONFLICT")
             result = ReviewResult(result).value
             self._result_scope(request, result)
-            value = _message("attempt", request=prior["request"], outcome_unknown=result["status"] == "unknown", started_at=prior["started_at"], finished_at=self.clock(), phase=result["status"] if fresh else "stale",
+            value = _message("attempt", request=prior["request"], submitted_result_digest=payload["submitted_result_digest"], reconciliation=None, outcome_unknown=result["status"] == "unknown", started_at=prior["started_at"], finished_at=self.clock(), phase=result["status"] if fresh else "stale",
                              result=result if fresh else None, control=None)
         return {"old": old, "old_control": old_control, "targets": self._read_targets(view, payload),
-                "value": value, "pressure": pressure, "consumed": consumed, "fresh": fresh}
+                "value": value, "pressure": pressure, "consumed": consumed, "lock":lock, "fresh": fresh}
 
     def _write(self, tx, payload, state, control):
         request = ReviewRequest(payload["request"])
@@ -336,9 +391,8 @@ class AssistantReviewService(_MutationService):
         target = pressure_ref(self.scope_id, request) if payload["action"] == "pressure" else review_ref(self.scope_id, request.wake_id)
         tx.put_projection(target, domain(SCHEMA, value))
         if payload["action"] == "start":
-            pressure = deepcopy(state["pressure"]["value"]["value"])
-            pressure["active_wake"] = request.wake_id
-            tx.put_projection(pressure_ref(self.scope_id, request), domain(SCHEMA, pressure))
+            tx.put_projection(_lens_lock_ref(self.scope_id,request),domain(SCHEMA,_message("lens_lock",
+                lens=request.value["lens"],active_wake=request.wake_id,control=control)))
         if payload["action"] == "finish" and value["phase"] == "completed":
             # Exact source pins only: concurrent new/corrected contributions and
             # other lenses survive. The old projection/control journal retains
@@ -353,23 +407,19 @@ class AssistantReviewService(_MutationService):
                     _message("consumed", lens=request.value["lens"], contribution=contribution,
                              wake_id=request.wake_id, control=control)))
             pressure["pending"] = [c for c in pressure["pending"] if not any(
-                c["lineage"] == old["lineage"] and c["material_digest"] == old["material_digest"] for old in covered)]
+                c["lineage"] == old["lineage"] and c["material_version"]==old["material_version"] and c["material_digest"] == old["material_digest"] for old in covered)]
             pressure["ledger"] = value["result"]["ledger"] or pressure["ledger"]
-            pressure["active_wake"] = None
             tx.put_projection(pressure_ref(self.scope_id, request), domain(SCHEMA, pressure))
-        elif payload["action"] == "finish" and not value["outcome_unknown"]:
-            pressure = deepcopy(state["pressure"]["value"]["value"])
-            if pressure["active_wake"] != request.wake_id:
-                _fail("E_DEPENDENCY_STALE")
-            pressure["active_wake"] = None
-            tx.put_projection(pressure_ref(self.scope_id, request), domain(SCHEMA, pressure))
+        if payload["action"] in {"finish","reconcile"} and not value["outcome_unknown"]:
+            tx.put_projection(_lens_lock_ref(self.scope_id,request),domain(SCHEMA,_message("lens_lock",
+                lens=request.value["lens"],active_wake=None,control=control)))
 
     def record_pressure(self, request, *, token, access_context, command_id):
         """Host-selected distinct contributions; no numeric threshold is supplied.
 
-        A host-declared provenance lineage occupies one pending slot. Reprints
-        do not add slots; a changed exact reference can replace that slot while
-        the prior association remains in immutable storage history.
+        A lineage/material version has one pending entry. Reprints share that
+        version; different revisions stay pending together so late old wrappers
+        cannot evict corrections. The host owns provenance/correlation meaning.
         """
         request = self._request(request)
         self._host_guard(request)
@@ -378,7 +428,7 @@ class AssistantReviewService(_MutationService):
         by_ref = {canonical_bytes(a["reference"]): a for a in artifacts}
         for contribution in request.value["contributions"]:
             if pressure_contribution(by_ref[canonical_bytes(contribution["reference"])],
-                                     lineage=contribution["lineage"]) != contribution:
+                                     lineage=contribution["lineage"],material_version=contribution["material_version"]) != contribution:
                 _fail("E_EVIDENCE_INVALID")
         with self.storage.snapshot() as view:
             try:
@@ -395,8 +445,12 @@ class AssistantReviewService(_MutationService):
                 self._authorize(view, command, self._read_targets(view, payload))
                 if journal["result"]["status"] != "success":
                     _fail(journal["result"]["error"]["code"])
-                return view.get(pressure_ref(self.scope_id, request))
-        return self._action("pressure", request, token=token, access_context=access_context, command_id=command_id)[0]
+                row=view.get(pressure_ref(self.scope_id, request))
+                self._host_guard(request,_pressure_refs(row["value"]["value"]),historical=True,at=self.clock())
+                return row
+        row=self._action("pressure", request, token=token, access_context=access_context, command_id=command_id)[0]
+        self._host_guard(request,_pressure_refs(row["value"]["value"]),historical=True,at=self.clock())
+        return row
 
     def claim(self, request, *, token, access_context):
         """Commit once before the host calls its assistant, outside the write TX.
@@ -415,7 +469,7 @@ class AssistantReviewService(_MutationService):
             if (compare_times(body["request"]["as_of"], request.value["as_of"]) > 0 or
                     compare_times(body["finished_at"] or body["started_at"], self.clock()) > 0):
                 _fail("E_EVIDENCE_UNAVAILABLE")
-            self._host_guard(request, _result_refs(body["result"]), historical=True, at=self.clock())
+            self._host_guard(request, _attempt_refs(body), historical=True, at=self.clock())
             return False, prior
         identity = "assistant-start-" + uuid4().hex
         # The store's unique command/expected revisions arbitrate separate real
@@ -444,12 +498,13 @@ class AssistantReviewService(_MutationService):
         with self.storage.snapshot() as view:
             prior = view.get(review_ref(self.scope_id, request.wake_id))
         prior_body = prior["value"]["value"]
+        submitted_digest=canonical_digest(result.value,"matter.assistant-submitted-result.v1")
         if prior_body["phase"] != "started":
             # Completion replay is read guarded and cannot clear newly arrived
             # pressure or update a rule for a second time.
-            if prior_body["result"] != result.value:
+            if prior_body["submitted_result_digest"] != submitted_digest:
                 _fail("E_IDEMPOTENCY_CONFLICT")
-            self._host_guard(request, _result_refs(prior_body["result"]), historical=True, at=self.clock())
+            self._host_guard(request, _attempt_refs(prior_body), historical=True, at=self.clock())
             with self.storage.snapshot() as view:
                 self.access.require_history(view, access_context, references=_refs(request.value))
                 self.controls._audit(view, {"actor": token["actor"], "authority": entity_ref(token["authority"])},
@@ -457,8 +512,11 @@ class AssistantReviewService(_MutationService):
             return prior
         fresh = True
         try:
-            self._host_guard(request)
-        except ContractError:
+            if result.value["status"]=="completed":
+                self._host_guard(request)
+        except ContractError as error:
+            if error.code not in {"E_CANCELLED","E_DEPENDENCY_STALE","E_AUTHORITY_REQUIRED","E_SCOPE_FORBIDDEN"}:
+                raise
             fresh = False
         if fresh and result.value["status"] == "completed":
             references = [result.value["review"], result.value["session"], *result.value["rule_changes"]]
@@ -467,10 +525,13 @@ class AssistantReviewService(_MutationService):
                     _fail("E_EVIDENCE_UNAVAILABLE")
                 references += [r for name in LEDGER_FIELDS for r in result.value["ledger"][name]]
             self._host_guard(request, references, at=self.clock())
-            artifacts = self._resolve(request, references, at=self.clock())
+            artifacts = self._resolve(request, references, at=self.clock(), verification=True)
             persisted_review = next(a for a in artifacts if a["reference"] == result.value["review"])
             content = persisted_review["content"]
             if content.get("wake_id") != request.wake_id:
+                _fail("E_EVIDENCE_INVALID")
+            if (content.get("session")!=result.value["session"] or
+                    content.get("ledger_binding")!=review_ledger_digest(result.value["ledger"],result.value["review"])):
                 _fail("E_EVIDENCE_INVALID")
             for field in ("status", "proposal", "reviewed", "rule_changes"):
                 if content.get(field) != result.value[field]:
@@ -480,7 +541,7 @@ class AssistantReviewService(_MutationService):
             result = ReviewResult(_message("review_result", wake_id=request.wake_id, status="stopped", proposal=None,
                 review=None, session=None, reviewed=[], ledger=None, rule_changes=[], error_code="context_changed"))
         return self._action("finish", request, token=token, access_context=access_context,
-                            command_id="assistant-finish-" + uuid4().hex, result=result)[0]
+                            command_id="assistant-finish-" + uuid4().hex, result=result, submitted_result_digest=submitted_digest)[0]
 
     def execute(self, request, *, token, access_context, reviewer):
         """Synchronous convenience; async hosts use claim/complete around review().
@@ -495,14 +556,21 @@ class AssistantReviewService(_MutationService):
             return attempt
         try:
             self._host_guard(request)
+        except ContractError:
+            stopped=ReviewResult(_message("review_result",wake_id=request.wake_id,status="stopped",proposal=None,
+                review=None,session=None,reviewed=[],ledger=None,rule_changes=[],error_code="before_dispatch_refused"))
+            return self.complete(request,stopped,token=token,access_context=access_context)
+        try:
             result = reviewer(request.value, request.wake_id)
         except Exception:
             result = _message("review_result", wake_id=request.wake_id, status="unknown", proposal=None,
                 review=None, session=None, reviewed=[], ledger=None, rule_changes=[], error_code="review_outcome_unknown")
         return self.complete(request, result, token=token, access_context=access_context)
 
-    def _resolve(self, request, references, *, at):
-        if not isinstance(references, (tuple, list)) or len(references) > request.value["limits"]["max_reads"]:
+    def _resolve(self, request, references, *, at, historical=False, verification=False):
+        max_reads=MAX_VERIFY_READS if verification else request.value["limits"]["max_reads"]
+        max_bytes=MAX_VERIFY_BYTES if verification else request.value["limits"]["max_bytes"]
+        if not isinstance(references, (tuple, list)) or len(references) > max_reads:
             _fail("E_BUDGET_EXHAUSTED")
         result, visiting, seen = [], set(), set()
         total = 0
@@ -513,10 +581,10 @@ class AssistantReviewService(_MutationService):
                 _fail("E_EVIDENCE_INVALID")
             if key in seen:
                 return
-            if len(seen) + len(visiting) >= request.value["limits"]["max_reads"]:
+            if len(seen) + len(visiting) >= max_reads:
                 _fail("E_BUDGET_EXHAUSTED")
             _pointer(reference, request.value["lens"])
-            self._host_guard(request, [reference], at=at)
+            self._host_guard(request, [reference], at=at,historical=historical)
             try:
                 artifact = _wire("host_artifact", self.host.resolve(deepcopy(request.value["lens"]), deepcopy(reference), deepcopy(at)))
             except ContractError:
@@ -524,16 +592,18 @@ class AssistantReviewService(_MutationService):
             except Exception:
                 _fail("E_EVIDENCE_UNAVAILABLE")
             total += len(canonical_bytes(artifact))
-            if total > request.value["limits"]["max_bytes"]:
+            if total > max_bytes:
                 _fail("E_BUDGET_EXHAUSTED")
             if (artifact["reference"] != reference or host_artifact_reference(artifact) != reference
                     or artifact["lens"] != request.value["lens"]):
                 _fail("E_EVIDENCE_INVALID")
             if compare_times(artifact["available_at"], at) > 0:
                 _fail("E_EVIDENCE_UNAVAILABLE")
-            if (reference["kind"] == "finding" and artifact["classification"] not in {"source_quote", "jev_judgment", "interpretation"} or
-                    reference["kind"] == "judgment" and artifact["classification"] != "jev_judgment" or
-                    reference["kind"] == "evidence" and artifact["classification"] not in {"source_quote", "source_fact"}):
+            allowed={"finding":{"source_quote","jev_judgment","interpretation"},
+                "judgment":{"jev_judgment"},"evidence":{"source_quote","source_fact"},
+                "rule":{"rule"},"review":{"review"},"session":{"session"},"control":{"host_control"},
+                "feedback":{"user_feedback"},"conveyed":{"communication"},"report":{"communication"}}
+            if artifact["classification"] not in allowed[reference["kind"]]:
                 _fail("E_EVIDENCE_INVALID")
             if ((artifact["classification"] == "communication") != (artifact["communication_state"] is not None)):
                 _fail("E_EVIDENCE_INVALID")
@@ -547,7 +617,7 @@ class AssistantReviewService(_MutationService):
             result.append(artifact)
         for reference in _unique(references):
             visit(reference)
-        self._host_guard(request, [a["reference"] for a in result], at=at)
+        self._host_guard(request, [a["reference"] for a in result], at=at,historical=historical)
         return result
 
     def resolve(self, request, references, *, token, access_context):
@@ -578,14 +648,18 @@ class AssistantReviewService(_MutationService):
         return self.resolve(request, references, token=token, access_context=access_context)
 
     def pressure(self, request, *, token, access_context):
+        """Present-authorized metadata for this lens/matter, not model input."""
         request = self._request(request)
-        self._host_guard(request)
+        self._host_guard(request,historical=True,at=self.clock())
         with self.storage.snapshot() as view:
-            self._guard(view, {"request": request.value, "token": token,
-                              "access_context": access_context.value if hasattr(access_context, "value") else access_context})
-            body = deepcopy(view.get(pressure_ref(self.scope_id, request))["value"]["value"])
-        self._host_guard(request, _pressure_refs(body), historical=True)
-        self._resolve(request, _pressure_refs(body), at=request.value["as_of"])
+            self.controls._audit(view,{"actor":token["actor"],"authority":entity_ref(token["authority"])},
+                                 [entity_ref(r) for r in _refs(request.value)])
+            self.access.require_history(view,access_context,references=_refs(request.value))
+            body=deepcopy(view.get(pressure_ref(self.scope_id,request))["value"]["value"])
+            self.access.require_history(view,access_context,references=[body["matter"],*body["dependencies"]])
+            self.controls._audit(view,{"actor":token["actor"],"authority":entity_ref(token["authority"])},
+                                 [entity_ref(r) for r in [body["matter"],*body["dependencies"]]])
+        self._resolve(request,_pressure_refs(body),at=self.clock(),historical=True,verification=True)
         return body
 
 
@@ -603,7 +677,7 @@ class AssistantReviewService(_MutationService):
             self.access.require_history(view, access_context, references=_refs(request.value))
             row = view.get(review_ref(self.scope_id, request.wake_id))
             value = deepcopy(row["value"]["value"])
-        self._host_guard(request, _result_refs(value["result"]), historical=True, at=self.clock())
+        self._host_guard(request, _attempt_refs(value), historical=True, at=self.clock())
         if compare_times(value["finished_at"] or value["started_at"], self.clock()) > 0:
             _fail("E_EVIDENCE_UNAVAILABLE")
         value["human_communicated"] = False
@@ -617,6 +691,11 @@ class AssistantReviewService(_MutationService):
                                  [entity_ref(r) for r in _refs(request.value)])
             self.access.require_history(view, access_context, references=_refs(request.value))
             rows = view.history(pressure_ref(self.scope_id, request))
+            for row in rows:
+                body=row["value"]["value"]
+                self.access.require_history(view,access_context,references=[body["matter"],*body["dependencies"]])
+                self.controls._audit(view,{"actor":actor,"authority":authority},
+                                     [entity_ref(r) for r in [body["matter"],*body["dependencies"]]])
         for row in rows:
             body = _wire("pressure", row["value"]["value"])
             refs = [c["reference"] for c in body["pending"]]
@@ -624,3 +703,31 @@ class AssistantReviewService(_MutationService):
                 refs += [ref for name in LEDGER_FIELDS for ref in body["ledger"][name]]
             self._host_guard(request, refs, historical=True)
         return deepcopy(rows)
+
+
+    def reconcile(self, request, witness, *, actor, authority, access_context, command_id):
+        """Explicit operator control; lookup proof of no in-flight review only.
+
+        Never calls the assistant, clears pressure, or admits a quiet proposal.
+        A real host control must attest no review is still running; the original
+        wake remains non-dispatchable after reconciliation.
+        """
+        request=self._request(request)
+        self._host_guard(request,[witness],historical=True,at=self.clock())
+        artifacts=self._resolve(request,[witness],at=self.clock(),historical=True,verification=True)
+        proof=next(a for a in artifacts if a["reference"]==witness)
+        _pointer(witness,request.value["lens"],"control")
+        if (proof["content"].get("wake_id")!=request.wake_id or proof["content"].get("inflight") is not False
+                or proof["content"].get("resolution") not in {"observed_completion","not_started","stopped","failed"}):
+            _fail("E_EVIDENCE_INVALID")
+        with self.storage.snapshot() as view:
+            old=view.get(review_ref(self.scope_id,request.wake_id))
+            if old["value"]["value"]["phase"]=="reconciled":
+                if old["value"]["value"]["reconciliation"]!=witness:
+                    _fail("E_IDEMPOTENCY_CONFLICT")
+                self.controls._audit(view,{"actor":actor,"authority":authority},[entity_ref(r) for r in _refs(request.value)])
+                self.access.require_history(view,access_context,references=_refs(request.value))
+                return old
+        token=self.controls.capture(actor=actor,authority=authority,capability="read",targets=[entity_ref(r) for r in _refs(request.value)])
+        return self._action("reconcile",request,token=token,access_context=access_context,
+                            command_id=command_id,witness=witness)[0]

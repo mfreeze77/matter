@@ -25,6 +25,9 @@
       "$ref": "#/$defs/consumed"
     },
     {
+      "$ref": "#/$defs/lens_lock"
+    },
+    {
       "$ref": "#/$defs/mutation"
     }
   ],
@@ -115,8 +118,7 @@
           "maxLength": 256
         },
         "digest": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
         }
       }
     },
@@ -126,6 +128,7 @@
       "required": [
         "reference",
         "lineage",
+        "material_version",
         "material_digest"
       ],
       "properties": {
@@ -137,9 +140,13 @@
           "minLength": 1,
           "maxLength": 256
         },
-        "material_digest": {
+        "material_version": {
           "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "material_digest": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
         }
       }
     },
@@ -175,7 +182,7 @@
           "items": {
             "$ref": "#/$defs/pointer"
           },
-          "maxItems": 128,
+          "maxItems": 64,
           "minItems": 0,
           "uniqueItems": true
         },
@@ -184,7 +191,7 @@
           "items": {
             "$ref": "#/$defs/pointer"
           },
-          "maxItems": 128,
+          "maxItems": 64,
           "minItems": 0,
           "uniqueItems": true
         },
@@ -193,7 +200,7 @@
           "items": {
             "$ref": "#/$defs/pointer"
           },
-          "maxItems": 128,
+          "maxItems": 64,
           "minItems": 0,
           "uniqueItems": true
         },
@@ -202,7 +209,7 @@
           "items": {
             "$ref": "#/$defs/pointer"
           },
-          "maxItems": 128,
+          "maxItems": 64,
           "minItems": 0,
           "uniqueItems": true
         },
@@ -211,7 +218,7 @@
           "items": {
             "$ref": "#/$defs/pointer"
           },
-          "maxItems": 128,
+          "maxItems": 64,
           "minItems": 0,
           "uniqueItems": true
         }
@@ -276,7 +283,7 @@
           "items": {
             "$ref": "#/$defs/contribution"
           },
-          "maxItems": 128,
+          "maxItems": 64,
           "minItems": 1,
           "uniqueItems": true
         },
@@ -304,7 +311,7 @@
         },
         "reason_code": {
           "type": "string",
-          "pattern": "^[a-z][a-z0-9_]{0,127}$"
+          "pattern": "^[a-z][a-z0-9_]{0,127}(?![\\s\\S])"
         },
         "as_of": {
           "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
@@ -332,7 +339,7 @@
             },
             "max_reads": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 3,
               "maximum": 128
             },
             "max_bytes": {
@@ -371,8 +378,7 @@
           "const": "review_result"
         },
         "wake_id": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
         },
         "status": {
           "enum": [
@@ -416,7 +422,7 @@
           "items": {
             "$ref": "#/$defs/pointer"
           },
-          "maxItems": 128,
+          "maxItems": 64,
           "minItems": 0,
           "uniqueItems": true
         },
@@ -443,7 +449,7 @@
           "anyOf": [
             {
               "type": "string",
-              "pattern": "^[A-Za-z][A-Za-z0-9_]{0,127}$"
+              "pattern": "^[A-Za-z][A-Za-z0-9_]{0,127}(?![\\s\\S])"
             },
             {
               "type": "null"
@@ -542,7 +548,6 @@
         "matter",
         "dependencies",
         "pending",
-        "active_wake",
         "ledger",
         "control"
       ],
@@ -577,21 +582,45 @@
           "minItems": 0,
           "uniqueItems": true
         },
-        "active_wake": {
+        "ledger": {
           "anyOf": [
             {
-              "type": "string",
-              "pattern": "^[0-9a-f]{64}$"
+              "$ref": "#/$defs/ledger"
             },
             {
               "type": "null"
             }
           ]
         },
-        "ledger": {
+        "control": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
+        }
+      }
+    },
+    "lens_lock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "message_type",
+        "lens",
+        "active_wake",
+        "control"
+      ],
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "message_type": {
+          "const": "lens_lock"
+        },
+        "lens": {
+          "$ref": "#/$defs/lens"
+        },
+        "active_wake": {
           "anyOf": [
             {
-              "$ref": "#/$defs/ledger"
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
             },
             {
               "type": "null"
@@ -613,6 +642,8 @@
         "outcome_unknown",
         "started_at",
         "finished_at",
+        "submitted_result_digest",
+        "reconciliation",
         "phase",
         "result",
         "control"
@@ -643,6 +674,26 @@
             }
           ]
         },
+        "submitted_result_digest": {
+          "anyOf": [
+            {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reconciliation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/pointer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "phase": {
           "enum": [
             "started",
@@ -650,7 +701,8 @@
             "stopped",
             "failed",
             "unknown",
-            "stale"
+            "stale",
+            "reconciled"
           ]
         },
         "result": {
@@ -693,8 +745,7 @@
           "$ref": "#/$defs/contribution"
         },
         "wake_id": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
         },
         "control": {
           "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
@@ -708,6 +759,8 @@
         "contract_version",
         "message_type",
         "action",
+        "witness",
+        "submitted_result_digest",
         "request",
         "result",
         "token",
@@ -725,7 +778,28 @@
           "enum": [
             "pressure",
             "start",
-            "finish"
+            "finish",
+            "reconcile"
+          ]
+        },
+        "witness": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/pointer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "submitted_result_digest": {
+          "anyOf": [
+            {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
           ]
         },
         "request": {
