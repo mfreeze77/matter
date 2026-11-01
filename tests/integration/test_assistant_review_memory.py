@@ -714,3 +714,75 @@ class ReviewTests(unittest.TestCase):
         result=self.result();result['ledger']=self.ledger()
         with self.assertRaises(ContractError):
             self.service.complete(self.request,result,token=self.token,access_context=self.access_context)
+
+
+    def revise_native_matter(self):
+        from matter_helpers import metadata_command
+        old=self.f.subject
+        command=metadata_command('revise-native-matter',old,{'title':'Updated native metadata'})
+        command['actor']=self.f.actor;command['authority']=entity_ref(self.f.authority)
+        result=self.f.matters.update_metadata(self.f.matters.prepare(command))
+        self.assertEqual(result['status'],'success',result)
+        self.f.subject=self.f.storage.get(result['body']['matter'])
+        return old
+
+    def test_reconcile_under_native_cancellation_does_not_resume_monitoring(self):
+        from control_helpers import control_command
+        from integration.helpers import _in_scope
+        self.add();self.service.claim(self.request,token=self.token,access_context=self.access_context)
+        command=_in_scope(control_command('cancel-during-review',self.f.authority,
+            targets=[self.f.source],action='cancel',now=self.f.now),self.f.storage.scope_id)
+        command['actor']=self.f.actor;command['body']['control']['body']['actor']=self.f.actor
+        applied=self.f.controls.apply(self.f.controls.prepare(command));self.assertEqual(applied['status'],'success')
+        witness=self.artifact('control','cancelled-reconcile','host_control',{'wake_id':self.request.wake_id,'inflight':False,'resolution':'stopped'})
+        row=self.service.reconcile(self.request,witness,actor=self.f.actor,authority=entity_ref(self.f.authority),
+            access_context=self.access_context,command_id='reconcile-cancelled')
+        self.assertEqual(row['value']['value']['phase'],'reconciled')
+        self.assertEqual(self.pending(),self.request.value['contributions'])
+        with self.assertRaises(ContractError):self.f.controls.check(self.token)
+
+    def test_reconcile_survives_a_revised_native_pin_without_renewing_work(self):
+        self.add();self.service.claim(self.request,token=self.token,access_context=self.access_context)
+        old=self.revise_native_matter()
+        self.assertNotEqual(pin(old),pin(self.f.subject))
+        witness=self.artifact('control','revised-matter-reconcile','host_control',{'wake_id':self.request.wake_id,'inflight':False,'resolution':'stopped'})
+        row=self.service.reconcile(self.request,witness,actor=self.f.actor,authority=entity_ref(self.f.authority),
+            access_context=self.access_context,command_id='reconcile-revised-native')
+        self.assertEqual(row['value']['value']['phase'],'reconciled')
+        self.assertEqual(self.f.storage.get(pin(old)),old)
+
+    def test_consumed_material_version_cannot_be_rewritten_with_contradictory_content(self):
+        self.add();self.execute()
+        contradictory=self.artifact('evidence','rewritten-source','source_fact',{'text':'contradictory bytes'})
+        request=self.req(contributions=[{'reference':contradictory,'lineage':'source-lineage-1','material_version':'source-1'}])
+        with self.assertRaises(ContractError) as error:self.add(request)
+        self.assertEqual(error.exception.code,'E_SOURCE_IDENTITY_CONFLICT')
+        self.assertEqual(self.pending(),[])
+
+    def test_metadata_history_spans_native_revisions_with_present_snapshot_grants(self):
+        self.add();old=self.revise_native_matter()
+        self.native=[pin(self.f.subject),pin(self.f.source)]
+        self.access=AccessService(policy=HostAccessPolicy(scope_id=self.f.storage.scope_id,
+            audiences=[self.audience],providers=[{'reference':self.provider,'provider':'synthetic','transport':'fixture'}],
+            grants=[{'reference':r,'audiences':[self.audience],'providers':[self.provider]} for r in [pin(old),*self.native]]),
+            controls=self.f.controls,current_read=self.f.storage.snapshot)
+        self.token=self.f.controls.capture(actor=self.f.actor,authority=entity_ref(self.f.authority),
+            capability='assessment',targets=[entity_ref(r) for r in self.native])
+        with self.f.storage.snapshot() as view:
+            self.access_context=self.access.capture(view,token=self.token,audience=self.audience,provider=self.provider,references=self.native)
+        self.service=self.make_service(access=self.access)
+        request=self.req()
+        # Reading old pointer metadata is allowed before a new pressure write.
+        self.assertEqual(self.pending(request),self.request.value['contributions'])
+        self.add(request)
+        rows=self.service.history(request,actor=self.f.actor,authority=entity_ref(self.f.authority),access_context=self.access_context)
+        self.assertEqual({row['value']['value']['matter']['revision'] for row in rows},{old['revision'],self.f.subject['revision']})
+
+    def test_pressure_metadata_never_rereads_the_accepted_host_bodies(self):
+        self.add()
+        def unavailable(*args):raise RuntimeError('artifact bytes unavailable')
+        host=ReviewHost(binding=self.host.binding,require_current=self.current,require_read=self.read,resolve=unavailable)
+        service=AssistantReviewService(self.f.storage,controls=self.f.controls,access=self.access,host=host,clock=lambda:deepcopy(self.f.now))
+        pending=service.pressure(self.request,token=self.token,access_context=self.access_context)['pending']
+        self.assertEqual(pending,self.request.value['contributions'])
+        with self.assertRaises(ContractError):service.resolve(self.request,[self.source],token=self.token,access_context=self.access_context)

@@ -97,7 +97,9 @@ Postgres do not form one distributed transaction.
    completion. Unknown-outcome reconciliation remains an explicit host workflow,
    not a new provider call or an implemented dashboard action in this SDK. The SDK provides an explicit
    correction-authorized `reconcile` method using a real host no-inflight witness;
-   the lookup and operator interaction remain host work.
+   the lookup and operator interaction remain host work. This operator control
+   works after native cancellation or revision without renewing assessment
+   authority, clearing pressure or resuming monitoring.
 2. Bind the returned review to this exact wake and actual reviewed source pins,
    session pointer and any already-authorized rule updates. Existing ReviewResult
    IDs alone do not prove the reviewed-set contract. Exact tool read/citation
@@ -138,5 +140,9 @@ history to every request. Up to 96 request roots (within the selected read budge
 and a 128-version pending window are admitted; overflow is explicit backpressure
 with upstream evidence retained. Completion verification has an independent SDK
 256-artifact/1 MiB ceiling. Pressure is per matter; the objective session lock
-spans matters and approved revisions. `pressure()` history is not an authorized
-source packet and must not be fed straight to a model.
+spans matters and approved revisions. `pressure()` and `history()` return
+present-authorized pointer metadata without rereading the whole body backlog.
+They are not authorized source packets and must not be fed straight to a model;
+resolving/reusing their pointers still checks current access, availability,
+source integrity and input budgets. A consumed source version remains bound to
+its original material digest after reset; contradictory content is refused.

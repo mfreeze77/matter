@@ -202,7 +202,7 @@ def _consumed_ref(scope_id, request, contribution):
     return {"scope_id": scope_id, "namespace": "adapter:assistant-review", "record_type": PROJECTION_TYPE,
             "id": "consumed-" + canonical_digest({"lens": request.value["lens"],
                 "matter": entity_ref(request.value["matter"]), "lineage": contribution["lineage"],
-                "material_version": contribution["material_version"], "material_digest": contribution["material_digest"]},
+                "material_version": contribution["material_version"]},
                 "matter.review-consumed.v1")}
 
 
@@ -290,7 +290,7 @@ class AssistantReviewService(_MutationService):
                 *[entity_ref(r) for r in _refs(request.value)],
                 *[_consumed_ref(self.scope_id, request, c) for c in request.value["contributions"]]]
 
-    def _action(self, action, request, *, token, access_context, command_id, result=None, witness=None, submitted_result_digest=None):
+    def _action(self, action, request, *, token=None, access_context, command_id, result=None, witness=None, submitted_result_digest=None, actor=None, authority=None):
         target = pressure_ref(self.scope_id, request) if action == "pressure" else review_ref(self.scope_id, request.wake_id)
         with self.storage.snapshot() as view:
             old = _lookup(view, target)
@@ -299,8 +299,9 @@ class AssistantReviewService(_MutationService):
             access_context=access_context.value if hasattr(access_context, "value") else access_context,
             previous=None if old is None else pin(old))
         command = self._prepare(_control_command(self.controls, payload=payload, schema=SCHEMA, target=target,
-            command_id=command_id, idempotency_key=command_id, actor=token["actor"],
-            authority=entity_ref(token["authority"]), kind="correction" if action=="reconcile" else "decision"))
+            command_id=command_id, idempotency_key=command_id, actor=actor if token is None else token["actor"],
+            authority=entity_ref(authority if token is None else token["authority"]),
+            kind="correction" if action=="reconcile" else "decision"))
         ran = False
         def handler(tx):
             nonlocal ran
@@ -319,9 +320,15 @@ class AssistantReviewService(_MutationService):
         action = payload["action"]
         target = pressure_ref(self.scope_id, request) if action == "pressure" else review_ref(self.scope_id, request.wake_id)
         schema_kind = "pressure" if action == "pressure" else "attempt"
-        if (command["actor"] != payload["token"]["actor"] or
-                command["authority"] != entity_ref(payload["token"]["authority"]) or
-                command["body"]["control"]["body"]["scope"]["targets"] != [target]):
+        kind=command["body"]["control"]["body"]["control_kind"]
+        if command["body"]["control"]["body"]["scope"]["targets"] != [target]:
+            _fail("E_AUTHORITY_REQUIRED")
+        if action=="reconcile":
+            if payload["token"] is not None or kind!="correction":
+                _fail("E_AUTHORITY_REQUIRED")
+        elif (payload["token"] is None or kind!="decision" or
+              command["actor"]!=payload["token"].get("actor") or
+              command["authority"]!=entity_ref(payload["token"].get("authority"))):
             _fail("E_AUTHORITY_REQUIRED")
         old, old_control = self._prior(view, command, payload, target, SCHEMA, preparing=preparing)
         prior = None if old is None else _wire(schema_kind, old["value"]["value"])
@@ -334,9 +341,7 @@ class AssistantReviewService(_MutationService):
                     for c in request.value["contributions"]}
         fresh = True
         try:
-            if action=="reconcile":
-                self.access.require_history(view,payload["access_context"],references=_refs(request.value))
-            else:
+            if action!="reconcile":
                 self._guard(view, payload)
         except ContractError:
             if action != "finish":
@@ -348,7 +353,10 @@ class AssistantReviewService(_MutationService):
                 _fail()
             merged = {(c["lineage"],c["material_version"]): c for c in pending}
             for contribution in request.value["contributions"]:
-                if consumed[canonical_bytes(contribution)] is None:
+                used=consumed[canonical_bytes(contribution)]
+                if used is not None and used["value"]["value"]["contribution"]["material_digest"]!=contribution["material_digest"]:
+                    _fail("E_SOURCE_IDENTITY_CONFLICT")
+                if used is None:
                     key=(contribution["lineage"],contribution["material_version"])
                     if key in merged and merged[key]["material_digest"]!=contribution["material_digest"]:
                         _fail("E_SOURCE_IDENTITY_CONFLICT")
@@ -647,6 +655,15 @@ class AssistantReviewService(_MutationService):
         references = [] if ledger is None else [r for name in LEDGER_FIELDS for r in ledger[name]]
         return self.resolve(request, references, token=token, access_context=access_context)
 
+    def _historical_context(self, view, body):
+        control=view.get(body["control"])
+        wrapped=control["body"]["effect"]["value"]["payload"]
+        payload=_wire("mutation",wrapped["value"])
+        if (wrapped!=domain(SCHEMA,payload) or payload["action"]!="pressure" or
+                any(payload["request"][name]!=body[name] for name in ("lens","matter","dependencies"))):
+            _fail("E_EVIDENCE_INVALID")
+        return payload["access_context"]
+
     def pressure(self, request, *, token, access_context):
         """Present-authorized metadata for this lens/matter, not model input."""
         request = self._request(request)
@@ -656,10 +673,10 @@ class AssistantReviewService(_MutationService):
                                  [entity_ref(r) for r in _refs(request.value)])
             self.access.require_history(view,access_context,references=_refs(request.value))
             body=deepcopy(view.get(pressure_ref(self.scope_id,request))["value"]["value"])
-            self.access.require_history(view,access_context,references=[body["matter"],*body["dependencies"]])
+            self.access.require_history(view,self._historical_context(view,body),references=[body["matter"],*body["dependencies"]])
             self.controls._audit(view,{"actor":token["actor"],"authority":entity_ref(token["authority"])},
                                  [entity_ref(r) for r in [body["matter"],*body["dependencies"]]])
-        self._resolve(request,_pressure_refs(body),at=self.clock(),historical=True,verification=True)
+        self._host_guard(request,_pressure_refs(body),at=self.clock(),historical=True)
         return body
 
 
@@ -693,7 +710,7 @@ class AssistantReviewService(_MutationService):
             rows = view.history(pressure_ref(self.scope_id, request))
             for row in rows:
                 body=row["value"]["value"]
-                self.access.require_history(view,access_context,references=[body["matter"],*body["dependencies"]])
+                self.access.require_history(view,self._historical_context(view,body),references=[body["matter"],*body["dependencies"]])
                 self.controls._audit(view,{"actor":actor,"authority":authority},
                                      [entity_ref(r) for r in [body["matter"],*body["dependencies"]]])
         for row in rows:
@@ -728,6 +745,12 @@ class AssistantReviewService(_MutationService):
                 self.controls._audit(view,{"actor":actor,"authority":authority},[entity_ref(r) for r in _refs(request.value)])
                 self.access.require_history(view,access_context,references=_refs(request.value))
                 return old
-        token=self.controls.capture(actor=actor,authority=authority,capability="read",targets=[entity_ref(r) for r in _refs(request.value)])
-        return self._action("reconcile",request,token=token,access_context=access_context,
+        # Operator controls do not capture or renew a work token. Read source
+        # history on a plain snapshot; a collecting/write view would incorrectly
+        # require old version pins to be current. Present READ/correction rights
+        # are rechecked atomically by _authorize on the actual entity targets.
+        with self.storage.snapshot() as view:
+            self.access.require_history(view,access_context,references=_refs(request.value))
+            self.controls._audit(view,{"actor":actor,"authority":authority},[entity_ref(r) for r in _refs(request.value)])
+        return self._action("reconcile",request,access_context=access_context,actor=actor,authority=authority,
                             command_id=command_id,witness=witness)[0]

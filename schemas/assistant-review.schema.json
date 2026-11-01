@@ -816,7 +816,10 @@
           ]
         },
         "token": {
-          "type": "object"
+          "type": [
+            "object",
+            "null"
+          ]
         },
         "access_context": {
           "type": "object"

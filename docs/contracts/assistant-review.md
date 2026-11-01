@@ -58,7 +58,8 @@ identity. Reprints retain the original material version and cannot rebuild clear
 pressure. Genuine source revisions use new material versions, including a later
 reversion to earlier wording. Different versions remain pending together in one
 provenance lineage: a late reprint cannot evict an unreviewed correction. Same
-version with contradictory material is a source-identity conflict. The host uses
+version with contradictory material is a source-identity conflict, including
+a version already consumed by a completed review. The host uses
 its existing canonical source-version identity, never a delivery wrapper ID. A later fact may change the meaning of earlier quiet context.
 
 `ReviewRequest.wake_id` binds lens, native semantic inputs, assessment, selected
@@ -146,6 +147,9 @@ and record `resolution` as observed_completion, not_started, stopped or failed.
 It releases the lens lock without clearing pressure, admitting a quiet proposal
 or calling the assistant. The original wake stays non-dispatchable. StateCivics
 owns the actual lookup/proof and operator UI; inventing a witness is forbidden.
+Reconciliation uses the operator control lane, not a new assessment/work token.
+Current read and correction authority are checked; cancellation or a revised
+native pin does not prevent recording recovery, and recovery never resumes work.
 
 ## Completion and pressure
 
@@ -246,7 +250,11 @@ or explicit reconciliation, never a second assistant call.
 
 `pressure()` is present-authorized pointer metadata/history for one lens/matter,
 not a fresh model packet. It permits superseded source history under current
-READ rights and uses the fixed verification ceiling/current host clock, so a
-small evaluation budget or stale contribution does not prevent inspection.
+READ rights and checks host pointer-read permission at the current host clock,
+without rereading every accepted body. Historical rows retain their original
+native admission context and check its pins against present grants; one current
+request need not pretend multiple versions are one input snapshot. This keeps a
+large accepted backlog and superseded contributions inspectable without treating
+metadata as a source packet.
 Reusing any of those pointers still requires the request cut, current-use guards
 and declared packet budgets.
