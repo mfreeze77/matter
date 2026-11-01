@@ -1,9 +1,11 @@
 """Native milestone formatting remains separate from admission authority."""
 from copy import deepcopy
 import unittest
+from unittest.mock import patch
 
 from matter.attention import build_delivery_milestone_details
 from matter._rule_values import domain
+from matter.canonical import CanonicalError
 from matter.contracts import ContractError
 
 
@@ -39,3 +41,11 @@ class DeliveryMilestoneBuilderTests(unittest.TestCase):
         result["value"]["decision"]["id"] = "changed"
         self.assertEqual(args, original)
         self.assertNotEqual(build_delivery_milestone_details(**args), result)
+
+    def test_decoder_resource_exhaustion_returns_safe_contract_error(self):
+        args = arguments()
+        build_delivery_milestone_details(**args)
+        with patch("matter._validation.loads", side_effect=CanonicalError("JSON nesting exceeds implementation capacity")):
+            with self.assertRaises(ContractError) as refused:
+                build_delivery_milestone_details(**args)
+        self.assertEqual(refused.exception.code, "E_SCHEMA_INVALID")

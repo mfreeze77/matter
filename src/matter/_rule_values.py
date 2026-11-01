@@ -8,7 +8,7 @@ import json
 from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
-from .canonical import canonical_bytes, canonical_digest, loads, source_digest
+from .canonical import CanonicalError, canonical_bytes, canonical_digest, loads, source_digest
 from .contracts import ContractError, _FORMAT_CHECKER, schema_for
 from ._validation import InvalidValue, validated_bytes
 from .storage.base import _validate_fragment
@@ -78,7 +78,7 @@ def domain(name, value):
     ref, validator = runtime_schema(name)
     try:
         checked = validated_bytes(canonical_bytes(value), validator, ref["digest"])
-    except InvalidValue:
+    except (CanonicalError, InvalidValue, RecursionError):
         raise ContractError("E_SCHEMA_INVALID") from None
     return {"schema": deepcopy(ref), "value": checked}
 

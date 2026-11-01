@@ -140,7 +140,7 @@ def _validate(value: Any, kind: ContractKind) -> dict[str, Any]:
         raise ContractError("E_VERSION_UNSUPPORTED")
     try:
         value = validated_bytes(encoded, _validator(kind), SCHEMA_VERSION)
-    except InvalidValue:
+    except (CanonicalError, InvalidValue):
         raise ContractError("E_SCHEMA_INVALID") from None
     except RecursionError:
         raise ContractError(

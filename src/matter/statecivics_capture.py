@@ -13,6 +13,7 @@ from jsonschema import Draft202012Validator
 from referencing import Registry
 
 from ._rule_values import FrozenValue, descriptor, fragment
+from ._validation import InvalidValue, validated_bytes
 from .attention import select_attention_treatment
 from .access import _public
 from .budgets import _Reads, _value, milliseconds
@@ -40,7 +41,7 @@ ENGINE = descriptor("matter.statecivics", "capture-admission", "1.1", {
     "matter.monitoring-capture-engine.v1")
 
 
-@lru_cache(maxsize=16)
+@lru_cache(maxsize=64)
 def _validator(kind):
     schema = loads(files("matter._schemas").joinpath("monitoring-handoff-v1.1.schema.json").read_bytes())
     return Draft202012Validator({"$ref": "#/$defs/" + kind, "$defs": schema["$defs"]},
@@ -49,11 +50,12 @@ def _validator(kind):
 
 def _validate(value, kind):
     try:
-        if len(canonical_bytes(value)) > 1048576 or not _validator(kind).is_valid(value):
+        encoded = canonical_bytes(value)
+        if len(encoded) > 1048576:
             _fail("E_SCHEMA_INVALID")
-    except (CanonicalError, TypeError, RecursionError):
+        return validated_bytes(encoded, _validator(kind), VERSION)
+    except (CanonicalError, InvalidValue, TypeError, RecursionError):
         _fail("E_SCHEMA_INVALID")
-    return deepcopy(value)
 
 
 def validate_capture_handoff(value, kind="request"):

@@ -10,10 +10,10 @@ from types import SimpleNamespace
 from jsonschema import Draft202012Validator
 
 from matter._validation import InvalidValue, ValidationCache
-from matter.canonical import canonical_bytes
+from matter.canonical import CanonicalError, canonical_bytes
 from matter.contracts import ContractError, validate_record
 from matter.storage import SQLiteStore, StorageError
-from integration.helpers import SCOPE, create_command, create_matter, record_input
+from integration.helpers import SCOPE, create_command, create_matter
 
 
 def json_load_fixture():
@@ -77,6 +77,14 @@ class ValidationCacheTests(unittest.TestCase):
         with self.assertRaises(ContractError):
             validate_record(changed)
 
+    def test_strict_decode_resource_failure_stays_a_safe_contract_error_on_warm_input(self):
+        value = json_load_fixture()
+        validate_record(value)
+        with patch("matter._validation.loads", side_effect=CanonicalError("JSON nesting exceeds implementation capacity")):
+            with self.assertRaises(ContractError) as refused:
+                validate_record(value)
+        self.assertEqual(refused.exception.code, "E_SCHEMA_INVALID")
+
     def test_warm_storage_read_still_detects_changed_bytes_with_old_digest(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "store.sqlite"
@@ -87,8 +95,11 @@ class ValidationCacheTests(unittest.TestCase):
                 stored["body"]["title"] = "Tampered but schema-valid"
                 with sqlite3.connect(path) as db:
                     # Simulate external corruption, bypassing append-only SQL guards.
+                    trigger = db.execute("SELECT sql FROM sqlite_master WHERE name='versions_no_update'").fetchone()[0]
                     db.execute("DROP TRIGGER versions_no_update")
                     db.execute("UPDATE versions SET content=? WHERE id=?", (canonical_bytes(stored), stored["id"]))
+                    db.execute(trigger)
                 with self.assertRaises(StorageError) as refused:
                     store.get(ref)
                 self.assertEqual(refused.exception.code, "E_STORAGE_UNAVAILABLE")
+                self.assertIn("Stored snapshot integrity", refused.exception.detail)

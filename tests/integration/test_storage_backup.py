@@ -104,7 +104,7 @@ class StorageBackupTests(unittest.TestCase):
         rows = self._table_rows(self.source)
         with SQLiteStore(self.source, scope_id=SCOPE) as source_store:
             published = source_store.backup_to(self.destination)
-            self.assertEqual(published, self.destination)
+            self.assertEqual(published, self.destination.resolve())
             self.assertFalse(os.path.samefile(self.source, self.destination))
             later = create_command("after-backup", "later-subject")
             self.assertEqual(
