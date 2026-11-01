@@ -4,7 +4,7 @@
   "track": "core",
   "phase": 4,
   "priority": "P1",
-  "status": "in_progress",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "access.reference-classification",
@@ -74,7 +74,12 @@
     "docs/validation/dev17-receiving.md"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "Runtime 79e5e04bdd7bb18e14dae40750e6f4658401d22c, SDK dev18; 205 packaged files byte-match. Wheel SHA-256 afa21262fa9bfd4fa6b08b388ae6a1467f029d008e6da00425478d30ee2d4ce6. Frozen 1.0/1.1 wires and HostMonitoringState unchanged. Public matter.access.is_source_access_target is the identical callable to legacy _public; no policy or StateCivics implementation changes.",
+      "44 affected local checks and 44 final installed Python 3.11 wheel checks passed, no failures/errors/skips, provider network forbidden. Includes public classifier scope/bookkeeping boundaries, actual MAT-072 access/egress/READ/parent/revocation guards and frozen-wire checks. render --check, validate and git diff --check passed. No new full-suite claim, live calls, qualification or deployment.",
+      "Initial independent two-round review: eight supported files, no warnings, three low-severity wording/cross-reference findings verified and corrected. docs/validation/MAT-087.md and data/validation/MAT-087/ retain actual source/package/test/review evidence.",
+      "Dev17 receiving acceptance retained at docs/validation/dev17-receiving.md; Matter independently verified the existing image ID and all 205 runtime file hashes, plus StateCivics commit equivalence. Consumer run counts/timings remain reported. KS-1148 adopted the milestone builder; the classifier request had no StateCivics ticket ID in the handoff."
+    ]
   }
 }

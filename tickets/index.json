@@ -14,8 +14,8 @@
   },
   "counts_by_status": {
     "blocked": 1,
-    "done": 46,
-    "in_progress": 4,
+    "done": 47,
+    "in_progress": 3,
     "planned": 36
   },
   "tickets": [
@@ -2129,7 +2129,7 @@
       "track": "core",
       "phase": 4,
       "priority": "P1",
-      "status": "in_progress",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-072",
@@ -2138,7 +2138,7 @@
       "requirements": [
         "OPS-01"
       ],
-      "readiness": "in_progress",
+      "readiness": "done",
       "path": "records/MAT-087.json"
     }
   ]
