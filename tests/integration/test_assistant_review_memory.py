@@ -950,3 +950,19 @@ class ReviewTests(unittest.TestCase):
                 with self.subTest(restriction=restriction,read=read):
                     with self.assertRaises(ContractError) as error:read()
                     self.assertEqual(error.exception.code,'E_AUTHORITY_REQUIRED')
+
+
+    def test_pressure_byte_limit_refuses_atomically_before_the_window_becomes_unreadable(self):
+        requests=[]
+        for start in (0,45):
+            values=[]
+            for n in range(start,start+45):
+                source=self.artifact('evidence','source-'+('😀'*240)+str(n),'source_fact',{'n':n})
+                values.append({'reference':source,'lineage':('😀'*240)+str(n),'material_version':('😀'*240)+str(n)})
+            requests.append(self.req(contributions=values))
+        before=self.add(requests[0])
+        with self.assertRaises(ContractError) as error:self.add(requests[1])
+        self.assertEqual(error.exception.code,'E_BUDGET_EXHAUSTED')
+        self.assertEqual(self.f.storage.get(pressure_ref(self.f.storage.scope_id,self.request)),before)
+        self.assertEqual(len(self.pending()),45)
+        self.assertEqual(self.calls,0)

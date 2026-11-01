@@ -8,9 +8,9 @@ monitoring 1.0/1.1 and dev18 public helpers remain unchanged.
 ## Existing host entry point
 
 Source inspected read-only at StateCivics
-`b87c6027f4e85cd77d4a8d0e2d65e151caf1ac5f`:
+`f87d509c2ff2b132628f7c6e45c27f16559ad205`:
 `src/kansas_accountability/services/assistant_review.py`,
-`AssistantReviewService.review(user_id, intent_id, assessment_id, why)`.
+`AssistantReviewService.review(*, user_id, intent_id, assessment_id, why, wake_key=...)`.
 It supplies the assistant, own objective/lens session, read-only exposure,
 proposal, labelled findings and context-change checks. It is not replaced by the
 SDK. Review sessions/rows and recovery/deployment wiring stay StateCivics-owned.
@@ -64,6 +64,7 @@ if acquired:
     host_result = await host_reviews.review(
         user_id=owned_user_id, intent_id=owned_intent_id,
         assessment_id=owned_assessment_id, why=rendered_internal_reason,
+        wake_key=request.wake_id,  # 64 characters, within the host's 120-character bound
     )
     # Host receiving work: persist the wake/result binding and construct the
     # verified result from actual stored status, tool/evidence receipts and
@@ -112,7 +113,7 @@ Postgres do not form one distributed transaction.
    call `resolve_ledger`. Keep all source/derivation labels and egress guards;
    derived notes cannot become independent source claims or qualification.
 4. Carry the request availability cut into the existing exact readers during
-   replay. The four-argument review service alone does not establish that cut.
+   replay. The review service alone does not establish that cut.
    Reuse the no-login rehearsal isolation and refuse unsupported cuts.
 5. KS-1126 receiving acceptance: `MONITORING_ASSISTANT_TOOLS_ENABLED` and
    `ASSISTANT_REVIEW_ENABLED` on in isolated rehearsal only, actual assistant turn and
@@ -156,3 +157,28 @@ including pending material inherited from older writes. Revoked history refuses
 rather than returning the protected pointers under a narrower latest selection.
 Keep unaccepted evidence in the existing host ledger; do not interpret a refusal
 as quiet, delete pressure or renew the old work token to bypass it.
+
+## Slice 2a receiving update
+
+StateCivics `f87d509c2` adds per-account `assistant_reviews.wake_key`, bound to the
+objective and assessment. Pass the exact Matter `request.wake_id`; do not create
+a second retry key. The host returns `repeated=True` for an existing key and
+refuses cross-objective/outcome reuse. This is a second idempotency guard, not
+permission for a second assistant turn or a shortcut around current read guards.
+
+`GET /tracking/intents/{intent_id}/reviews` is the host-owned review ledger view,
+alongside `/outcomes` for judgments, conveyed output and feedback. It is private,
+owner-only and place-granted. Use these existing owners, retaining canonical
+version/citation/availability projections and exact actual read receipts. The
+list/row IDs alone do not supply every digest/binding in Matter's contract.
+
+A running or interrupted/transport-uncertain host attempt maps to SDK unknown,
+never quiet. A lease-expiry `failed/interrupted` label by itself is not proof
+that no process or provider call remains in flight. Use actual host lookup/proof
+for reconciliation. Definite stopped/failed completion also never clears pressure.
+Host `repeated` reads must still pass present grants and original-control checks.
+
+The owner reports slice-2a software checks; Matter inspected these entry points
+read-only. Matter has not run its assistant, migrated the shared rehearsal store,
+changed its image/flags or independently reproduced those host test counts.
+The real, unsent KS-1126 turn remains the receiving acceptance step.

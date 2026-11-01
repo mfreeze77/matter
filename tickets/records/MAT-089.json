@@ -120,7 +120,8 @@
     "mfreeze77/state-civics-ai:KS-1150",
     "StateCivics KS-1150 on e8c2ce70e: host-owned assistant/lens/session/memory/evidence; Matter pointers only; county-report delivery records; bounded lens sessions. KS-1125 feedback is next; five owner choices stay open.",
     "StateCivics KS-1150 slice 1 on b87c6027f: AssistantReviewService.review(user_id, intent_id, assessment_id, why) supplies the existing read-only review engine; slice 2 connects Matter requests and host references.",
-    "StateCivics KS-1150 on b87c6027f records owner study policy: existing per-review tool/time loop stop; review costs excluded from chat charge. This SDK labels host-managed cost policy rather than inventing a spend ceiling."
+    "StateCivics KS-1150 on b87c6027f records owner study policy: existing per-review tool/time loop stop; review costs excluded from chat charge. This SDK labels host-managed cost policy rather than inventing a spend ceiling.",
+    "StateCivics slice 2a f87d509c2: existing review entry now accepts wake_key, deduplicates per account/objective/outcome and exposes GET /tracking/intents/{intent_id}/reviews. Read-only source verified; actual assistant rehearsal remains not run."
   ],
   "completion": {
     "state": "not_run",

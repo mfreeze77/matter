@@ -403,6 +403,8 @@ class AssistantReviewService(_MutationService):
         request = ReviewRequest(payload["request"])
         value = state["value"]
         value["control"] = control
+        if payload["action"] == "pressure":
+            _wire("pressure", value)  # Refuse oversize before persisting an unreadable window.
         target = pressure_ref(self.scope_id, request) if payload["action"] == "pressure" else review_ref(self.scope_id, request.wake_id)
         tx.put_projection(target, domain(SCHEMA, value))
         if payload["action"] == "start":
@@ -424,7 +426,7 @@ class AssistantReviewService(_MutationService):
             pressure["pending"] = [c for c in pressure["pending"] if not any(
                 c["lineage"] == old["lineage"] and c["material_version"]==old["material_version"] and c["material_digest"] == old["material_digest"] for old in covered)]
             pressure["ledger"] = value["result"]["ledger"] or pressure["ledger"]
-            tx.put_projection(pressure_ref(self.scope_id, request), domain(SCHEMA, pressure))
+            tx.put_projection(pressure_ref(self.scope_id, request), domain(SCHEMA, _wire("pressure", pressure)))
         if payload["action"] in {"finish","reconcile"} and not value["outcome_unknown"]:
             tx.put_projection(_lens_lock_ref(self.scope_id,request),domain(SCHEMA,_message("lens_lock",
                 lens=request.value["lens"],active_wake=None,control=control)))

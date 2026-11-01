@@ -8,8 +8,8 @@ change. No numeric burst threshold or production activation is supplied here.
 ## Ownership and reuse
 
 The existing host assistant performs the review. StateCivics' receiving entry is
-`AssistantReviewService.review(user_id, intent_id, assessment_id, why)` on
-`b87c6027f4e85cd77d4a8d0e2d65e151caf1ac5f`. Matter's differently namespaced
+`AssistantReviewService.review(*, user_id, intent_id, assessment_id, why, wake_key=...)` on
+`f87d509c2ff2b132628f7c6e45c27f16559ad205`. Matter's differently namespaced
 `matter.assistant_review.AssistantReviewService` supplies durable wake-up claims,
 completion guards, pressure bookkeeping and pointer resolution around that call.
 It does not construct an assistant, MCP server, database, retriever, queue,
@@ -113,7 +113,9 @@ a claim of distributed serializability or production delivery permission.
    and approved lens revision; a logical objective/lens lock spans revisions and
    matters so its existing assistant session never runs overlapping reviews. No
    score/decay/retention formula is added. A pressure window holds at most 128
-   pending versions; overflow is E_BUDGET_EXHAUSTED, never a silent drop. Keep the
+   pending versions and its encoded state remains within the 256 KiB wire bound;
+   overflow is E_BUDGET_EXHAUSTED before writing, never a silent drop or an
+   accepted unreadable window. Keep the
    unaccepted contribution in the host ledger and retry a bounded batch after
    draining completed work.
 3. Call `claim(request, token=..., access_context=...)`. It returns
@@ -124,8 +126,9 @@ a claim of distributed serializability or production delivery permission.
    invitation to call the assistant. The existing store arbitrates real handles. One active review per lens
    serializes overlapping wakes; new contributions remain pending.
 4. Outside the Matter transaction, call the existing host review method once.
-   Pass the real user/intent/assessment mapping and rendered reason; bound it
-   to this `wake_id`. The host enforces the requested time/tool ceilings. Async
+   Pass the real user/intent/assessment mapping and rendered reason, with
+   `wake_key=request.wake_id`. The host returns the prior review on a repeated
+   key; this never authorizes a second turn or skips present read guards. The host enforces the requested time/tool ceilings. Async
    hosts can await the existing service between claim and complete. Synchronous
    hosts may use `execute(..., reviewer=callback)`; it cannot preempt arbitrary
    Python callbacks and is not a replacement for transport limits.
@@ -223,7 +226,7 @@ actual canonical ledger/artifact/control views, per-wake/result persistence,
 exact reviewed-set provenance from real reads, and host-transaction currentness.
 Its review engine alone does not yet supply every field of this SDK contract.
 A source-availability cut must also reach the exact readers used inside the
-review; the four-argument review entry point does not itself prove replay cuts.
+review; the review entry point does not itself prove replay cuts.
 Refuse a replay that cannot enforce them instead of reading future documents.
 
 Slice 3 owns evidence cards, Report Studio and prepared report/notice mapping.
