@@ -2170,7 +2170,7 @@
     },
     {
       "id": "MAT-089",
-      "title": "Retain scoped assistant findings for subsequent JEV decisions",
+      "title": "Reference scoped host findings for subsequent JEV decisions",
       "track": "civic",
       "phase": 4,
       "priority": "P1",
