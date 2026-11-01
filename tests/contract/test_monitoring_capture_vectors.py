@@ -12,6 +12,14 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class MonitoringCaptureVectorTests(unittest.TestCase):
+    def test_frozen_11_schema_and_recorded_vectors_match_accepted_inventory(self):
+        lock = json.loads((ROOT / "tests/fixtures/civic/handoff-v1.1/contract-lock.json").read_text())
+        self.assertEqual(lock["status"], "frozen")
+        self.assertEqual(lock["contract_version"], VERSION)
+        for item in lock["artifacts"]:
+            with self.subTest(path=item["path"]):
+                self.assertEqual(hashlib.sha256((ROOT / item["path"]).read_bytes()).hexdigest(), item["sha256"])
+
     def test_published_schema_matches_checkout_and_installed_resource(self):
         from importlib.resources import files
         published = (ROOT / "docs/contracts/monitoring-handoff-v1.1.schema.json").read_bytes()

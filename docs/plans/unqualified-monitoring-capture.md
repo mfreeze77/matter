@@ -1,7 +1,7 @@
 # Unqualified monitoring capture: MAT-084 proposal
 
-Status: **implementation candidate, not frozen**. Owner/KS-1124 approved
-implementation of PR #31 at `ffdb9a4` on 2026-10-31. The current candidate targets
+Status: **implemented; 1.1 frozen and receiving-accepted, 2026-10-31**. Owner/KS-1124 approved
+implementation of PR #31 at `ffdb9a4` on 2026-10-31. The accepted implementation uses
 `matter-foundation==0.1.0.dev16` and opt-in `monitoring-handoff/1.1.0`, beside
 unchanged frozen 1.0. Final API and validation evidence are maintained in the
 [implementation handoff](../adapters/statecivics-capture.md) and

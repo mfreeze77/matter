@@ -1,11 +1,11 @@
 # MAT-084: optional unqualified monitoring capture
 
-Status: implementation candidate, **not frozen or receiving-accepted**. SDK
-candidate `matter-foundation==0.1.0.dev16`; explicit wire
-`monitoring-handoff/1.1.0`. KS-1124 must run the supplied recorded vectors in
-its SDK image before the new contract is frozen. Keep the frozen 1.0 adapter
-available per objective. No production delivery or provider qualification is
-introduced. The consumer's deterministic 1.0 fallback uses approved objective
+Status: **frozen 1.1.0**, receiving-accepted by StateCivics KS-1146 on
+2026-10-31. SDK `matter-foundation==0.1.0.dev16` is unchanged from the tested
+runtime `1f525c6`. The [freeze record](../contracts/monitoring-handoff-v1.1.md)
+and [receiving receipt](../validation/MAT-084-receiving.md) define the closeout.
+Frozen 1.0 remains available per objective. This introduces no production delivery
+or provider qualification. The deterministic 1.0 fallback uses approved objective
 fields and the event only, never model-derived labels.
 
 ## Host installation and migration
@@ -51,7 +51,7 @@ Choose explicitly for each objective:
   (equal to `capture_key`) for idempotency. It must not send notifications.
 
 Wire JSON is validated against the installed, self-contained
-[1.1 candidate schema](../contracts/monitoring-handoff-v1.1.schema.json).
+[frozen 1.1 schema](../contracts/monitoring-handoff-v1.1.schema.json).
 Do not decode 1.1 with a 1.0 decoder or coerce a null assessment into a native
 reference. `admit_monitoring` selects the explicitly declared version; unknown
 versions refuse.
@@ -150,12 +150,12 @@ current approved objective clock.
 
 ## Receiving gate and evidence
 
-The pinned candidate package and receiving instructions are in the
+The pinned dev16 package and receiving instructions are in the
 [SDK handoff](statecivics-capture-sdk-handoff.md).
 The recorded vectors and relevant checks are described in
-[MAT-084 validation](../validation/MAT-084.md). They are synthetic component
-conformance, not fresh JEV interpretation, a StateCivics receiving run, formal
-MAT-040 qualification or production authorization. KS-1124 owns host mapping and
+[MAT-084 validation](../validation/MAT-084.md). The Matter vectors are synthetic component conformance. Separate StateCivics
+receiving acceptance is recorded in the final receipt; neither establishes fresh
+JEV interpretation, MAT-040 qualification or production authorization. KS-1124 owns host mapping and
 its image run; KS-1125 owns explanations/feedback; KS-1126 owns the two-objective
 receiving rehearsal. Existing KS-1121 public-source work needs #26, while this
 saved-objective path additionally needs #29 and the reviewed MAT-084 candidate.

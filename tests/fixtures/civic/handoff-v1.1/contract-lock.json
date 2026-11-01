@@ -1,0 +1,43 @@
+{
+  "contract_version": "monitoring-handoff/1.1.0",
+  "status": "frozen",
+  "accepted_runtime": "1f525c6a66593573f2ae5d2af1eaf2bd00460a35",
+  "artifacts": [
+    {
+      "path": "schemas/monitoring-handoff-v1.1.schema.json",
+      "sha256": "5bac99a805383a334914fd66f6bd2ca6e6c0a97d3cd5a054820f81bc282cd067"
+    },
+    {
+      "path": "docs/contracts/monitoring-handoff-v1.1.schema.json",
+      "sha256": "5bac99a805383a334914fd66f6bd2ca6e6c0a97d3cd5a054820f81bc282cd067"
+    },
+    {
+      "path": "tests/fixtures/civic/handoff-v1.1/audience-a-positive.json",
+      "sha256": "429453da3a851fb43d48b0d3dc4a96ad2b89b93c3696444c8fd9676aa80642c7"
+    },
+    {
+      "path": "tests/fixtures/civic/handoff-v1.1/audience-b-quiet.json",
+      "sha256": "082ab84682be3c468340bb639c8e526928f52ff9a9946fa0a3d49ef827fa3835"
+    },
+    {
+      "path": "tests/fixtures/civic/handoff-v1.1/audience-b-unknown.json",
+      "sha256": "1849bf827d7e285f99f27c3d222b8cebc9176f543d72b3fe17b215e82e21dcc3"
+    },
+    {
+      "path": "tests/fixtures/civic/handoff-v1.1/manifest.json",
+      "sha256": "fc530791a40beeed9d9e8196561e76f73408700c082fdd58c1beb0b758c2ee5c"
+    },
+    {
+      "path": "tests/fixtures/civic/handoff-v1.1/mixed-native-study-baseline.json",
+      "sha256": "2c40bc0cc9ac647781bc2bb0e3f717c793739371356ced0a89b244477f979d44"
+    },
+    {
+      "path": "tests/fixtures/civic/handoff-v1.1/study-baseline-duplicate.json",
+      "sha256": "7f668cd56db84684179283280037ad5f9b631490fe6e88edabb41d534acb71ab"
+    },
+    {
+      "path": "tests/fixtures/civic/handoff-v1.1/study-baseline-linked-correction.json",
+      "sha256": "3e5368b844bceaba226434fbedff6e4521a363a479ed6ab7c531a8b43a233e2a"
+    }
+  ]
+}

@@ -1,6 +1,8 @@
-# MAT-084 candidate SDK handoff to KS-1124
+# MAT-084 frozen 1.1 SDK handoff to StateCivics
 
-Status: **candidate, unmerged, 1.1 freeze pending KS-1124's image run**.
+Status: **1.1 frozen and receiving-accepted**, 2026-10-31.
+See the [freeze record](../contracts/monitoring-handoff-v1.1.md) and
+[final receiving receipt](../validation/MAT-084-receiving.md).
 This extends the merged MAT-082 adapter. It does not activate StateCivics,
 Workbench/state-intel, delivery, a production model or a qualification certificate.
 KS-1124's deterministic approved-fields-and-event fallback stays on 1.0; model
@@ -12,7 +14,7 @@ notes must stay outside that rule.
   Later test/receipt/vector-only commits may advance the PR without changing SDK bytes.
 - Package and runtime version: `matter-foundation==0.1.0.dev16`.
 - Existing wire: `monitoring-handoff/1.0.0`, unchanged.
-- Optional candidate wire: `monitoring-handoff/1.1.0`.
+- Optional frozen wire: `monitoring-handoff/1.1.0`.
 - Retained wheel on this shared checkout:
   `data/validation/MAT-084/wheel-bounded/matter_foundation-0.1.0.dev16-py3-none-any.whl`.
 - Full wheel SHA-256:
@@ -104,3 +106,25 @@ Actual Matter-side results and remaining gates are maintained in
 [the validation receipt](../validation/MAT-084.md). Passing these checks is not
 live JEV interpretation quality, StateCivics receiving acceptance or MAT-040
 qualification. No new live calls were made for this implementation.
+
+## Receiving closeout, 2026-10-31
+
+StateCivics KS-1146 accepted this exact runtime in image
+`ks-test-runner:matter-1f525c6`, ID
+`sha256:e6d1f7c98e5735e5dde8e74d121f4067391f40d18d65e8c1c4e5752eec72ef6e`.
+Its Python 3.11 rebuilt dev16 wheel SHA-256 is
+`19b1dfe6253d5912119436b623de9bf85cf848454186de35482a9a338e545aa2`;
+all 204 packaged runtime files match `1f525c6`. Reported receiving checks:
+29 Matter checks, four model-path checks, seven host-rule checks on each SDK,
+and 35 PostgreSQL proof cases. Final StateCivics code is `bccca8b17`, with
+closeout on main at `d34fcf291`. The statewide suite retains its known baseline
+failures. The receipt above supplies the complete attribution and limitations.
+
+The pre-freeze instructions above are retained as the conformance procedure;
+the receiving gate is now satisfied. The recorded vector manifest retains its
+historical candidate-generation status. New StateCivics features (corrections,
+shared source reading and indexed-candidate handoff) are not freeze blockers.
+After merge, rebuild from the merged commit and compare packaged files with
+`1f525c6`. This freeze changes docs, tickets and the compatibility check only;
+`src`, `schemas` and `pyproject.toml` remain byte-identical. Performance and public
+milestone API changes must ship in a separate SDK build without changing 1.1 wire.
