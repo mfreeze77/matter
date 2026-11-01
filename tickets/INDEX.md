@@ -93,6 +93,6 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-085: Cache repeated structural validation with bounded verified-content reuse](MAT-085.md) | core | 4 | P1 | done | done | MAT-003, MAT-072, MAT-084 |
 | [MAT-086: Expose a public observed delivery milestone details builder](MAT-086.md) | core | 4 | P1 | done | done | MAT-021, MAT-084 |
 | [MAT-087: Publish the source access-target classifier without changing permission policy](MAT-087.md) | core | 4 | P1 | done | done | MAT-072, MAT-086 |
-| [MAT-088: Implement the Matter trigger to personal-assistant review handoff](MAT-088.md) | civic | 4 | P1 | in_progress | in_progress | MAT-022, MAT-023, MAT-072, MAT-081, MAT-084 |
-| [MAT-089: Reference scoped host findings for subsequent JEV decisions](MAT-089.md) | civic | 4 | P1 | in_progress | in_progress | MAT-088, MAT-016, MAT-023, MAT-028, MAT-030, MAT-072 |
-| [MAT-090: Rehearse client briefing and personal-assistant review through existing tools](MAT-090.md) | civic | 4 | P1 | planned | waiting | MAT-088, MAT-089, MAT-082, MAT-084 |
+| [MAT-088: Implement the Matter trigger to personal-assistant review handoff](MAT-088.md) | civic | 4 | P1 | done | done | MAT-022, MAT-023, MAT-072, MAT-081, MAT-084 |
+| [MAT-089: Reference scoped host findings for subsequent JEV decisions](MAT-089.md) | civic | 4 | P1 | done | done | MAT-088, MAT-016, MAT-023, MAT-028, MAT-030, MAT-072 |
+| [MAT-090: Rehearse client briefing and personal-assistant review through existing tools](MAT-090.md) | civic | 4 | P1 | planned | ready | MAT-088, MAT-089, MAT-082, MAT-084 |

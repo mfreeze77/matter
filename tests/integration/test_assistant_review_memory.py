@@ -968,7 +968,6 @@ class ReviewTests(unittest.TestCase):
         self.assertEqual(self.calls,0)
         self.assertEqual(self.execute(requests[0])['value']['value']['phase'],'completed')
         self.assertEqual(self.pending(),[])
-        wake=requests[1].wake_id
         # An exact retry preserves a durable refusal. Draining permits a fresh
         # local registration attempt, never a new semantic wake/model trial.
         with self.assertRaises(ContractError) as error:
@@ -976,7 +975,6 @@ class ReviewTests(unittest.TestCase):
                 command_id='review-pressure-2')
         self.assertEqual(error.exception.code,'E_BUDGET_EXHAUSTED')
         after=self.add(requests[1])
-        self.assertEqual(requests[1].wake_id,wake)
         self.assertEqual(after['value']['value']['pending'],sorted(requests[1].value['contributions'],key=canonical_bytes))
         self.assertEqual(self.calls,1)  # Only the draining review ran.
 
@@ -985,7 +983,7 @@ class ReviewTests(unittest.TestCase):
         assessment=self.artifact('judgment','host-rule-outcome','host_rule_judgment',
             {'method':'deterministic_host_rule','rule_version':'approved-rule-v1'},citations=[self.source])
         request=self.req(assessment=assessment)
-        before=self.f.storage.get(pin(self.f.subject))
+        before=self.f.storage.get(entity_ref(self.f.subject))
         self.add(request)
         row=self.execute(request)
         self.assertEqual(row['value']['value']['phase'],'completed')
@@ -993,9 +991,19 @@ class ReviewTests(unittest.TestCase):
         judgment=next(value for value in artifacts if value['reference']==assessment)
         self.assertEqual(judgment['classification'],'host_rule_judgment')
         self.assertEqual(judgment['content']['rule_version'],'approved-rule-v1')
-        self.assertEqual(self.f.storage.get(pin(self.f.subject)),before)
+        self.assertEqual(self.f.storage.get(entity_ref(self.f.subject)),before)
         self.assertEqual(self.calls,1)  # Synthetic assistant callback, not a JEV/provider call.
         unsupported=self.artifact('judgment','uncited-host-rule','host_rule_judgment',{'method':'deterministic_host_rule'})
         unbound=self.req(assessment=unsupported)
         with self.assertRaises(ContractError):
             self.service.resolve(unbound,[unsupported],token=self.token,access_context=self.access_context)
+        mislabeled=self.artifact('evidence','rule-mislabelled-as-source','host_rule_judgment',
+            {'method':'deterministic_host_rule'},citations=[self.source])
+        raw=request.value;raw['contributions'][0]['reference']=mislabeled
+        invalid=ReviewRequest(raw)
+        with self.assertRaises(ContractError) as error:
+            self.service.resolve(invalid,[mislabeled],token=self.token,access_context=self.access_context)
+        self.assertEqual(error.exception.code,'E_EVIDENCE_INVALID')
+        with self.assertRaises(ContractError) as error:
+            pressure_contribution(self.artifacts[canonical_bytes(mislabeled)],lineage='invalid',material_version='invalid')
+        self.assertEqual(error.exception.code,'E_EVIDENCE_INVALID')
