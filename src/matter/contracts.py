@@ -18,6 +18,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 from referencing import Registry, Resource
 
 from .canonical import CanonicalError, canonical_bytes, canonical_digest, loads
+from ._validation import InvalidValue, validated_bytes
 
 
 SCHEMA_VERSION = "1.0"
@@ -129,7 +130,7 @@ def _validate(value: Any, kind: ContractKind) -> dict[str, Any]:
     # permissive decoder. Enforce the wire value domain before schema checks;
     # decode_* additionally validates the original token stream with loads().
     try:
-        canonical_bytes(value)
+        encoded = canonical_bytes(value)
     except CanonicalError:
         raise ContractError("E_SCHEMA_INVALID") from None
     if not isinstance(value, dict):
@@ -138,19 +139,19 @@ def _validate(value: Any, kind: ContractKind) -> dict[str, Any]:
     if isinstance(version, str) and version != SCHEMA_VERSION:
         raise ContractError("E_VERSION_UNSUPPORTED")
     try:
-        problem = next(_validator(kind).iter_errors(value), None)
+        value = validated_bytes(encoded, _validator(kind), SCHEMA_VERSION)
+    except InvalidValue:
+        raise ContractError("E_SCHEMA_INVALID") from None
     except RecursionError:
         raise ContractError(
             "E_SCHEMA_INVALID", "Contract nesting exceeds implementation capacity."
         ) from None
-    if problem is not None:
-        raise ContractError("E_SCHEMA_INVALID")
     if kind == "result" and value["status"] == "failure":
         if value["error"]["operation_id"] != value["operation_id"]:
             raise ContractError(
                 "E_SCHEMA_INVALID", "Failure operation identities must agree."
             )
-    return deepcopy(value)
+    return value
 
 
 def validate_record(value: Any) -> dict[str, Any]:

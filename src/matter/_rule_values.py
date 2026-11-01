@@ -10,6 +10,7 @@ from referencing import Registry, Resource
 
 from .canonical import canonical_bytes, canonical_digest, loads, source_digest
 from .contracts import ContractError, _FORMAT_CHECKER, schema_for
+from ._validation import InvalidValue, validated_bytes
 from .storage.base import _validate_fragment
 
 
@@ -62,7 +63,7 @@ def same(left, right):
     return canonical_bytes(left) == canonical_bytes(right)
 
 
-@lru_cache(maxsize=16)
+@lru_cache(maxsize=128)
 def runtime_schema(name):
     data = files("matter._schemas").joinpath(name + ".schema.json").read_bytes()
     schema = json.loads(data)
@@ -75,10 +76,11 @@ def runtime_schema(name):
 
 def domain(name, value):
     ref, validator = runtime_schema(name)
-    canonical_bytes(value)
-    if not validator.is_valid(value):
-        raise ContractError("E_SCHEMA_INVALID")
-    return {"schema": deepcopy(ref), "value": deepcopy(value)}
+    try:
+        checked = validated_bytes(canonical_bytes(value), validator, ref["digest"])
+    except InvalidValue:
+        raise ContractError("E_SCHEMA_INVALID") from None
+    return {"schema": deepcopy(ref), "value": checked}
 
 
 def descriptor(namespace, identity, version, value, kind):

@@ -30,6 +30,23 @@ _ENGINE = descriptor("matter", "attention", "1.0", {"comparison": "declared-admi
 _CORRECTIONS = {"evidence_correction", "association_correction"}
 
 
+def build_delivery_milestone_details(*, decision, assessment, matter, purpose,
+                                     audience, material_digest, delivered_at):
+    """Build detached native milestone details; grant no delivery authority.
+
+    The host must first observe delivery and persist its own truthful receipt.
+    AttentionService still verifies the receipt, current access, assessment and
+    source bindings before admitting it as delivered knowledge. Study captures
+    do not acquire native assessment authority through this structural builder.
+    """
+    return domain("attention-delivery-milestone", {
+        "schema_version": "1.0", "decision": decision, "assessment": assessment,
+        "matter": matter, "purpose": purpose, "audience": audience,
+        "material_digest": material_digest, "milestone": "delivered",
+        "delivered_at": delivered_at,
+    })
+
+
 def _fail(code="E_POLICY_INVALID"):
     raise StorageError(code, "The attention inputs do not satisfy their declared current scope.")
 

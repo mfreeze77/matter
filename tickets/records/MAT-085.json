@@ -1,0 +1,82 @@
+{
+  "id": "MAT-085",
+  "title": "Cache repeated structural validation with bounded verified-content reuse",
+  "track": "core",
+  "phase": 4,
+  "priority": "P1",
+  "status": "in_progress",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "contracts.validation-cache",
+  "depends_on": [
+    "MAT-003",
+    "MAT-072",
+    "MAT-084"
+  ],
+  "requirements": [
+    "CORE-02",
+    "OPS-01"
+  ],
+  "summary": "Reduce repeated immutable snapshot validation without caching authorization, revocation, currentness or dependency decisions. Ship separately after the dev16 freeze.",
+  "in_scope": [
+    "Cache successful checks by locally recomputed content digest plus exact bytes, schema version and validator/registry identity; bound process memory and return detached decoded values.",
+    "Retain strict canonical input, stored-row integrity, current head, access, revocation, dependency and capture guards.",
+    "Measure the unchanged consumer prototype without cProfile, cold and warm before/after; record the environments, phase times and workload limitations in a later SDK build."
+  ],
+  "out_of_scope": [
+    "Frozen monitoring 1.0/1.1 wire changes, provider calls or qualification, StateCivics implementation and deployment."
+  ],
+  "implementation": [
+    "Cache successful checks by locally recomputed content digest plus exact bytes, schema version and validator/registry identity; bound process memory and return detached decoded values.",
+    "Retain strict canonical input, stored-row integrity, current head, access, revocation, dependency and capture guards.",
+    "Measure the unchanged consumer prototype without cProfile, cold and warm before/after; record the environments, phase times and workload limitations in a later SDK build."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Repeated identical valid content avoids redundant schema work without accepting changed content.",
+      "verification": "Exercise mutation, same-ID changed content, invalid/floating types, hash collision, validator/schema separation and bounded eviction."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Storage integrity and live authorization remain enforced after warming.",
+      "verification": "Warm a valid row then alter bytes with its old digest and require E_STORAGE_UNAVAILABLE; run existing revocation, currentness, expiry and control checks."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "A separate SDK retains frozen wires and has measured runtime results.",
+      "verification": "Compare unprofiled cold/warm consumer prototype and behavior, installed wheel checks and 1.0/1.1 lock inventories; report actual timings, not inferred profiler speedup."
+    }
+  ],
+  "artifacts": [
+    "src/matter/_validation.py",
+    "src/matter/contracts.py",
+    "src/matter/storage/base.py",
+    "src/matter/_rule_values.py",
+    "tests/unit/test_validation_cache.py",
+    "docs/validation/sdk-performance.md"
+  ],
+  "tests": [
+    "Exercise mutation, same-ID changed content, invalid/floating types, hash collision, validator/schema separation and bounded eviction.",
+    "Warm a valid row then alter bytes with its old digest and require E_STORAGE_UNAVAILABLE; run existing revocation, currentness, expiry and control checks.",
+    "Compare unprofiled cold/warm consumer prototype and behavior, installed wheel checks and 1.0/1.1 lock inventories; report actual timings, not inferred profiler speedup."
+  ],
+  "risks": [
+    "Structural validity does not confer freshness, authority, integrity or delivery success."
+  ],
+  "reuse": [
+    {
+      "source": "src/matter/contracts.py; src/matter/storage/base.py; src/matter/_rule_values.py; src/matter/attention.py",
+      "application": "Reuse existing validators and native milestone consumer; no replacement storage or admission engine."
+    }
+  ],
+  "sources": [
+    "Owner-requested Matter-manager follow-up, 2026-10-31",
+    "docs/contracts/canonical.md",
+    "docs/contracts/monitoring-handoff-v1.1.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

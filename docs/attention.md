@@ -188,3 +188,15 @@ or stale computation successfully fired.
 No transport, private corpus, adaptive source discovery, new identity directory
 or qualification issuer is included. The [MAT-019 validation receipt](validation/MAT-019.md)
 separates synthetic interface evidence from provider accuracy and live usefulness.
+
+## Public host milestone details builder
+
+`matter.attention.build_delivery_milestone_details` accepts keyword-only
+`decision`, `assessment`, `matter`, `purpose`, `audience`, `material_digest` and
+`delivered_at`. It returns the existing schema-bound `details` wrapper for a
+native `attention-delivery-milestone`, with fixed `milestone: "delivered"`.
+Use it instead of importing `matter._rule_values.domain`. The host supplies real
+native pins and observed delivery time, then persists its own truthful receipt.
+The helper performs structural validation only: it does not write storage,
+verify delivery, admit unqualified study captures or bypass AttentionService's
+existing native baseline admission checks. Caller values and outputs are detached.

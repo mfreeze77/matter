@@ -90,3 +90,5 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-082: Adapt approved monitoring objectives to bounded Matter audience decisions](MAT-082.md) | civic | 4 | P1 | done | done | MAT-081, MAT-015, MAT-016, MAT-018, MAT-019, MAT-021, MAT-023, MAT-024, MAT-028, MAT-031, MAT-032, MAT-072 |
 | [MAT-083: Resolve equivalent-intent SQLite contention and triage related intermittent failures](MAT-083.md) | core | 3 | P1 | planned | ready | MAT-003, MAT-011, MAT-019, MAT-020, MAT-021, MAT-029 |
 | [MAT-084: Admit unqualified monitoring judgments to guarded capture-only proposals](MAT-084.md) | civic | 4 | P1 | done | done | MAT-082, MAT-034, MAT-015, MAT-016, MAT-019, MAT-020, MAT-021, MAT-028, MAT-030, MAT-031, MAT-072 |
+| [MAT-085: Cache repeated structural validation with bounded verified-content reuse](MAT-085.md) | core | 4 | P1 | in_progress | in_progress | MAT-003, MAT-072, MAT-084 |
+| [MAT-086: Expose a public observed delivery milestone details builder](MAT-086.md) | core | 4 | P1 | in_progress | in_progress | MAT-021, MAT-084 |

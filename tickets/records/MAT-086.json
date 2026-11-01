@@ -1,0 +1,75 @@
+{
+  "id": "MAT-086",
+  "title": "Expose a public observed delivery milestone details builder",
+  "track": "core",
+  "phase": 4,
+  "priority": "P1",
+  "status": "in_progress",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "attention.delivery-milestone",
+  "depends_on": [
+    "MAT-021",
+    "MAT-084"
+  ],
+  "requirements": [
+    "CORE-20"
+  ],
+  "summary": "Expose the existing schema-bound native delivery-milestone details wrapper so consumers do not import the private domain helper. Building details grants no permission or observed outcome.",
+  "in_scope": [
+    "Add a public keyword-only builder over the existing attention-delivery-milestone schema; return detached validated details with the exact existing descriptor.",
+    "Document the helper and retain the existing milestone admission checks; it must not synthesize native assessment authority from study captures."
+  ],
+  "out_of_scope": [
+    "Frozen monitoring 1.0/1.1 wire changes, provider calls or qualification, StateCivics implementation and deployment."
+  ],
+  "implementation": [
+    "Add a public keyword-only builder over the existing attention-delivery-milestone schema; return detached validated details with the exact existing descriptor.",
+    "Document the helper and retain the existing milestone admission checks; it must not synthesize native assessment authority from study captures."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "Consumers can build the same native milestone details through a public API.",
+      "verification": "Compare output against the existing descriptor/wrapper using explicit native decision, assessment, subject, audience, purpose, material and delivery-time values."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Invalid values and study output cannot gain native authority.",
+      "verification": "Reject null/non-native assessment shapes, invalid time/material; existing native admission must still reject a forged/study baseline."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "The public helper does not mutate caller values or store anything.",
+      "verification": "Mutate the returned mapping and verify inputs are detached; installed import check exposes the builder without private imports."
+    }
+  ],
+  "artifacts": [
+    "src/matter/attention.py",
+    "tests/unit/test_delivery_milestone_builder.py",
+    "docs/attention.md"
+  ],
+  "tests": [
+    "Compare output against the existing descriptor/wrapper using explicit native decision, assessment, subject, audience, purpose, material and delivery-time values.",
+    "Reject null/non-native assessment shapes, invalid time/material; existing native admission must still reject a forged/study baseline.",
+    "Mutate the returned mapping and verify inputs are detached; installed import check exposes the builder without private imports."
+  ],
+  "risks": [
+    "Structural validity does not confer freshness, authority, integrity or delivery success."
+  ],
+  "reuse": [
+    {
+      "source": "src/matter/contracts.py; src/matter/storage/base.py; src/matter/_rule_values.py; src/matter/attention.py",
+      "application": "Reuse existing validators and native milestone consumer; no replacement storage or admission engine."
+    }
+  ],
+  "sources": [
+    "Owner-requested Matter-manager follow-up, 2026-10-31",
+    "docs/contracts/canonical.md",
+    "docs/contracts/monitoring-handoff-v1.1.md"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}
