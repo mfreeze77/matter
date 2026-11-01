@@ -1,0 +1,79 @@
+{
+  "id": "MAT-087",
+  "title": "Publish the source access-target classifier without changing permission policy",
+  "track": "core",
+  "phase": 4,
+  "priority": "P1",
+  "status": "in_progress",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "access.reference-classification",
+  "depends_on": [
+    "MAT-072",
+    "MAT-086"
+  ],
+  "requirements": [
+    "OPS-01"
+  ],
+  "summary": "Expose the exact existing access-target classifier under a clear public name so StateCivics can replace six private imports/calls without copying policy. The predicate does not grant access or establish public disclosure.",
+  "in_scope": [
+    "Expose matter.access.is_source_access_target as the existing predicate and retain _public as the identical callable.",
+    "Document validated-reference preconditions, receipt/control/internal projection exclusions and the continuing grant/currentness/revocation boundary.",
+    "Record dev17 receiving acceptance and ship the API in a separately pinned dev18 SDK with frozen 1.0/1.1 wires unchanged."
+  ],
+  "out_of_scope": [
+    "Changes to access policy, source classification rules, schema/wire versions, authentication, provider calls, qualification, StateCivics code/image builds or deployment."
+  ],
+  "implementation": [
+    "Read the existing MAT-072 access contract and exact _public rule; do not add another policy implementation or new authorization inference.",
+    "Expose is_source_access_target(ref), preserving _public object identity and behavior for existing imports. Inputs are already validated record/entity/pinned references.",
+    "Verify type/namespace boundaries and unchanged actual scope/egress/READ/revocation checks; check the installed public import and old/new identity."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "The public callable preserves the exact existing classification and old import.",
+      "verification": "Assert old/new callable identity, expected booleans for supported record kinds, exact internal namespace prefix boundaries and nonmutation."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Classification cannot be mistaken for permission or broaden a grant.",
+      "verification": "A true candidate with a foreign scope still fails HostAccessPolicy; excluded bookkeeping cannot be added as a source grant. Run existing audience/provider, revoked grant, parent closure and READ guard tests unchanged."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "The installed SDK provides an explicit, compatible handoff.",
+      "verification": "Import the public name from the wheel outside checkout, verify alias identity and pinned byte inventory, pass frozen schema/vector checks and publish source/wheel version and receiving limitations."
+    }
+  ],
+  "artifacts": [
+    "src/matter/access.py",
+    "tests/unit/test_access_target_classifier.py",
+    "docs/access.md",
+    "docs/validation/MAT-087.md",
+    "docs/validation/dev17-receiving.md"
+  ],
+  "tests": [
+    "Assert old/new callable identity, expected booleans for supported record kinds, exact internal namespace prefix boundaries and nonmutation.",
+    "A true candidate with a foreign scope still fails HostAccessPolicy; excluded bookkeeping cannot be added as a source grant. Run existing audience/provider, revoked grant, parent closure and READ guard tests unchanged.",
+    "Import the public name from the wheel outside checkout, verify alias identity and pinned byte inventory, pass frozen schema/vector checks and publish source/wheel version and receiving limitations."
+  ],
+  "risks": [
+    "A true source-target classification is not public disclosure or authorization. False excludes bookkeeping from source grants; it does not grant unrestricted reads."
+  ],
+  "reuse": [
+    {
+      "source": "src/matter/access.py:_public; tests/security/test_scope_and_egress.py",
+      "application": "Use one callable for legacy/public callers; preserve the actual HostAccessPolicy and AccessService owners."
+    }
+  ],
+  "sources": [
+    "docs/access.md",
+    "docs/contracts/compatibility.md",
+    "Owner-relayed StateCivics dev17 receiving receipt and KS-1148 public classifier request, 2026-10-31"
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": []
+  }
+}

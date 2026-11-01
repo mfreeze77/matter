@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "ticket_count": 86,
+  "ticket_count": 87,
   "counts_by_track": {
     "civic": 8,
-    "core": 20,
+    "core": 21,
     "diat": 15,
     "evaluation": 10,
     "foundation": 1,
@@ -15,7 +15,7 @@
   "counts_by_status": {
     "blocked": 1,
     "done": 46,
-    "in_progress": 3,
+    "in_progress": 4,
     "planned": 36
   },
   "tickets": [
@@ -2122,6 +2122,24 @@
       ],
       "readiness": "done",
       "path": "records/MAT-086.json"
+    },
+    {
+      "id": "MAT-087",
+      "title": "Publish the source access-target classifier without changing permission policy",
+      "track": "core",
+      "phase": 4,
+      "priority": "P1",
+      "status": "in_progress",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-072",
+        "MAT-086"
+      ],
+      "requirements": [
+        "OPS-01"
+      ],
+      "readiness": "in_progress",
+      "path": "records/MAT-087.json"
     }
   ]
 }
