@@ -874,3 +874,79 @@ class ReviewTests(unittest.TestCase):
                 access_context=self.access_context,command_id='reconcile-while-denied')
         self.assertEqual(error.exception.code,'E_AUTHORITY_REQUIRED')
         self.assertEqual(self.pending(),self.request.value['contributions'])
+
+
+    def test_reconciliation_honors_correction_denial_on_undeclared_provenance_parent(self):
+        from integration.helpers import create_command,record_input,_in_scope
+        from control_helpers import control_command
+        derived=record_input('observation','review-derived-source',scope_id=self.f.storage.scope_id)
+        derived['provenance'].update(origin='derived',parents=[pin(self.f.source)])
+        command=create_command('insert-review-derived','derived-bootstrap-subject',scope_id=self.f.storage.scope_id,
+            expected_revisions=[pin(self.f.source)])
+        def insert(tx):
+            tx.insert(derived);subject=tx.insert(tx.command['body']['matter'])
+            return tx.success('created',{'matter':pin(subject)})
+        self.assertEqual(self.f.storage.execute(command,insert)['status'],'success')
+        derived=self.f.storage.get(entity_ref(derived));self.native=[pin(self.f.subject),pin(derived)]
+        self.access=AccessService(policy=HostAccessPolicy(scope_id=self.f.storage.scope_id,audiences=[self.audience],
+            providers=[{'reference':self.provider,'provider':'synthetic','transport':'fixture'}],
+            grants=[{'reference':r,'audiences':[self.audience],'providers':[self.provider]} for r in [*self.native,pin(self.f.source)]]),
+            controls=self.f.controls,current_read=self.f.storage.snapshot)
+        self.token=self.f.controls.capture(actor=self.f.actor,authority=entity_ref(self.f.authority),capability='assessment',
+            targets=[entity_ref(r) for r in [*self.native,pin(self.f.source)]])
+        with self.f.storage.snapshot() as view:
+            self.access_context=self.access.capture(view,token=self.token,audience=self.audience,provider=self.provider,references=self.native)
+        self.service=self.make_service(access=self.access);request=self.req(dependencies=[pin(derived)])
+        self.add(request);self.service.claim(request,token=self.token,access_context=self.access_context)
+        self.assertNotIn(pin(self.f.source),request.value['dependencies'])
+        self.assertIn(pin(self.f.source),self.access_context.value['dependencies'])
+        command=_in_scope(control_command('deny-parent-correction',self.f.authority,targets=[self.f.source],action='deny',
+            capabilities=['correction'],now=self.f.now),self.f.storage.scope_id)
+        command['actor']=self.f.actor;command['body']['control']['body']['actor']=self.f.actor
+        self.assertEqual(self.f.controls.apply(self.f.controls.prepare(command))['status'],'success')
+        witness=self.artifact('control','parent-denial-proof','host_control',{'wake_id':request.wake_id,'inflight':False,'resolution':'failed'})
+        with self.assertRaises(ContractError) as error:
+            self.service.reconcile(request,witness,actor=self.f.actor,authority=entity_ref(self.f.authority),
+                access_context=self.access_context,command_id='parent-denial-reconcile')
+        self.assertEqual(error.exception.code,'E_AUTHORITY_REQUIRED')
+        self.assertTrue(self.service.inspect(request,actor=self.f.actor,authority=entity_ref(self.f.authority),
+            access_context=self.access_context)['outcome_unknown'])
+
+    def test_new_pressure_write_cannot_hide_an_older_pending_native_selection(self):
+        from control_helpers import control_command
+        from integration.helpers import _in_scope
+        self.add();old=self.revise_native_matter()
+        policy=HostAccessPolicy(scope_id=self.f.storage.scope_id,audiences=[self.audience],
+            providers=[{'reference':self.provider,'provider':'synthetic','transport':'fixture'}],
+            grants=[{'reference':r,'audiences':[self.audience],'providers':[self.provider]} for r in [pin(old),pin(self.f.subject),pin(self.f.source)]])
+        self.native=[pin(self.f.subject)]
+        self.access=AccessService(policy=policy,controls=self.f.controls,current_read=self.f.storage.snapshot)
+        self.token=self.f.controls.capture(actor=self.f.actor,authority=entity_ref(self.f.authority),capability='assessment',
+            targets=[entity_ref(r) for r in self.native])
+        with self.f.storage.snapshot() as view:
+            self.access_context=self.access.capture(view,token=self.token,audience=self.audience,provider=self.provider,references=self.native)
+        self.service=self.make_service(access=self.access)
+        source=self.artifact('evidence','new-native-selection','source_fact',{'new':'distinct material'})
+        request=self.req(dependencies=[],contributions=[{'reference':source,'lineage':'new-native-selection'}])
+        row=self.add(request)
+        self.assertEqual(len(row['value']['value']['pending']),2)
+        for restriction in ('grant_removed','read_denied'):
+            if restriction=='grant_removed':
+                selected=HostAccessPolicy(scope_id=self.f.storage.scope_id,audiences=[self.audience],
+                    providers=[{'reference':self.provider,'provider':'synthetic','transport':'fixture'}],
+                    grants=[{'reference':pin(self.f.subject),'audiences':[self.audience],'providers':[self.provider]}])
+            else:
+                selected=policy
+                command=_in_scope(control_command('deny-older-pending-read',self.f.authority,targets=[self.f.source],
+                    action='deny',capabilities=['read'],now=self.f.now),self.f.storage.scope_id)
+                command['actor']=self.f.actor;command['body']['control']['body']['actor']=self.f.actor
+                self.assertEqual(self.f.controls.apply(self.f.controls.prepare(command))['status'],'success')
+            access=AccessService(policy=selected,controls=self.f.controls,current_read=self.f.storage.snapshot)
+            service=self.make_service(access=access)
+            reads=[lambda:service.pressure(request,token=self.token,access_context=self.access_context),
+                   lambda:service.history(request,actor=self.f.actor,authority=entity_ref(self.f.authority),access_context=self.access_context),
+                   lambda:service.record_pressure(request,token=self.token,access_context=self.access_context,command_id='review-pressure-2')]
+            for read in reads:
+                with self.subTest(restriction=restriction,read=read):
+                    with self.assertRaises(ContractError) as error:read()
+                    self.assertEqual(error.exception.code,'E_AUTHORITY_REQUIRED')

@@ -12,7 +12,7 @@ from uuid import uuid4
 from ._rule_values import FrozenValue, domain
 from .access import AccessContext, AccessService
 from .canonical import CanonicalError, canonical_bytes, canonical_digest
-from .contexts import _MutationService, _control_command
+from .contexts import _MutationService, _control_command, _mutation_targets
 from .contracts import ContractError
 from .identity_dependencies import _lookup
 from .storage import PROJECTION_TYPE, StorageError, entity_ref, pin
@@ -318,7 +318,7 @@ class AssistantReviewService(_MutationService):
         _, payload = self._payload(command)
         if payload["action"] == "reconcile":
             self.controls._view(view, actor=command["actor"], authority=command["authority"],
-                capability="correction", targets=targets, now=self.clock(), audit=True)
+                capability="correction", targets=_mutation_targets(command, targets), now=self.clock(), audit=True)
         return super()._authorize(view, command, targets)
 
     def _state(self, view, command, payload, *, preparing):
@@ -437,7 +437,12 @@ class AssistantReviewService(_MutationService):
         cannot evict corrections. The host owns provenance/correlation meaning.
         """
         request = self._request(request)
+        reader = self._reader_context(access_context, actor=token["actor"], authority=token["authority"])
         self._host_guard(request)
+        with self.storage.snapshot() as view:
+            prior = _lookup(view, pressure_ref(self.scope_id, request))
+        if prior is not None:
+            self.pressure(request, token=token, access_context=access_context)
         artifacts = self.resolve(request, [c["reference"] for c in request.value["contributions"]],
                                  token=token, access_context=access_context)
         by_ref = {canonical_bytes(a["reference"]): a for a in artifacts}
@@ -461,10 +466,12 @@ class AssistantReviewService(_MutationService):
                 if journal["result"]["status"] != "success":
                     _fail(journal["result"]["error"]["code"])
                 row=view.get(pressure_ref(self.scope_id, request))
+                self._authorize_history_rows(view, view.history(pressure_ref(self.scope_id,request)),
+                    reader, actor=token["actor"], authority=token["authority"])
                 self._host_guard(request,_pressure_refs(row["value"]["value"]),historical=True,at=self.clock())
                 return row
         row=self._action("pressure", request, token=token, access_context=access_context, command_id=command_id)[0]
-        self._host_guard(request,_pressure_refs(row["value"]["value"]),historical=True,at=self.clock())
+        self.pressure(request, token=token, access_context=access_context)
         return row
 
     def claim(self, request, *, token, access_context):
@@ -701,6 +708,23 @@ class AssistantReviewService(_MutationService):
         return {**reader, "references":original["references"],
                 "dependencies":original["dependencies"]}
 
+    def _authorize_history_rows(self, view, rows, reader, *, actor, authority):
+        # Pending entries survive newer writes. Authorize all retained native
+        # selections, not just the newest writer's pins. Equal selections can
+        # share a check within this one consistent read snapshot only.
+        seen = set()
+        for row in rows:
+            body = _wire("pressure", row["value"]["value"])
+            context = self._historical_context(view, body, reader)
+            references = [body["matter"], *body["dependencies"]]
+            key = canonical_bytes({"references":context["references"],
+                "dependencies":context["dependencies"], "targets":references})
+            if key not in seen:
+                self.access.require_history(view, context, references=references)
+                self.controls._audit(view, {"actor":actor,"authority":entity_ref(authority)},
+                    [entity_ref(r) for r in references])
+                seen.add(key)
+
     def pressure(self, request, *, token, access_context):
         """Present-authorized metadata for this lens/matter, not model input."""
         request = self._request(request)
@@ -711,9 +735,8 @@ class AssistantReviewService(_MutationService):
                                  [entity_ref(r) for r in _refs(request.value)])
             self.access.require_history(view,access_context,references=_refs(request.value))
             body=deepcopy(view.get(pressure_ref(self.scope_id,request))["value"]["value"])
-            self.access.require_history(view,self._historical_context(view,body,access_context),references=[body["matter"],*body["dependencies"]])
-            self.controls._audit(view,{"actor":token["actor"],"authority":entity_ref(token["authority"])},
-                                 [entity_ref(r) for r in [body["matter"],*body["dependencies"]]])
+            self._authorize_history_rows(view, view.history(pressure_ref(self.scope_id,request)),
+                access_context, actor=token["actor"], authority=token["authority"])
         self._host_guard(request,_pressure_refs(body),at=self.clock(),historical=True)
         return body
 
@@ -748,11 +771,7 @@ class AssistantReviewService(_MutationService):
                                  [entity_ref(r) for r in _refs(request.value)])
             self.access.require_history(view, access_context, references=_refs(request.value))
             rows = view.history(pressure_ref(self.scope_id, request))
-            for row in rows:
-                body=row["value"]["value"]
-                self.access.require_history(view,self._historical_context(view,body,access_context),references=[body["matter"],*body["dependencies"]])
-                self.controls._audit(view,{"actor":actor,"authority":authority},
-                                     [entity_ref(r) for r in [body["matter"],*body["dependencies"]]])
+            self._authorize_history_rows(view, rows, access_context, actor=actor, authority=authority)
         for row in rows:
             body = _wire("pressure", row["value"]["value"])
             refs = [c["reference"] for c in body["pending"]]

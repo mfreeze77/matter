@@ -149,7 +149,8 @@ or calling the assistant. The original wake stays non-dispatchable. StateCivics
 owns the actual lookup/proof and operator UI; inventing a witness is forbidden.
 Reconciliation uses the operator control lane, not a new assessment/work token.
 Current read and correction capability, including active correction denials,
-are checked; cancellation or a revised
+are checked over the full prepared command, including transitive source parents;
+cancellation or a revised
 native pin does not prevent recording recovery, and recovery never resumes work.
 
 ## Completion and pressure
@@ -271,3 +272,12 @@ to `inspect`, `history` or `reconcile` (and its read token to `pressure`). Each
 metadata call binds that context to the actual reader; a borrowed writer context
 is refused. The host still authenticates the actual caller/audience selection
 and enforces lens ownership in `require_read`.
+
+Accumulated pressure can span earlier native selections. `pressure`, `history`
+and pressure append/retry returns check all retained native selections under the
+current reader, not only the newest write's pins. These metadata reads fail
+closed if any retained selection is no longer readable; a new write never hides
+old protected contributions. Equivalent native selections share checks only
+within one consistent read snapshot, never across permission changes or calls.
+This conservative history authorization does not copy artifact bodies or make
+history eligible for model reuse.

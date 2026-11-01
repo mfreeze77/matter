@@ -150,3 +150,9 @@ They are not authorized source packets and must not be fed straight to a model;
 resolving/reusing their pointers still checks current access, availability,
 source integrity and input budgets. A consumed source version remains bound to
 its original material digest after reset; contradictory content is refused.
+
+Metadata reads and append/retry returns authorize all retained native selections,
+including pending material inherited from older writes. Revoked history refuses
+rather than returning the protected pointers under a narrower latest selection.
+Keep unaccepted evidence in the existing host ledger; do not interpret a refusal
+as quiet, delete pressure or renew the old work token to bypass it.
