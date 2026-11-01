@@ -452,3 +452,14 @@ example:
 ```bash
 python examples/trusted_controls.py
 ```
+
+## Wake an existing host assistant
+
+MAT-088/089 add an opt-in [assistant-review handoff](docs/contracts/assistant-review.md)
+over the existing control, access and storage ports. Durable wake-up claims
+prevent duplicate review execution; completed quiet or alert proposals clear
+only actually reviewed pressure. Host ledger findings remain host-owned and
+are resolved by exact pointers under current scope, provenance and availability.
+There is no new assistant, numeric trigger policy or production delivery. The
+[StateCivics receiving handoff](docs/adapters/statecivics-assistant-review.md)
+names the existing review engine and remaining host wiring/rehearsal evidence.

@@ -1,0 +1,686 @@
+{
+  "contract_version": "1.0",
+  "evidence_kind": "authored synthetic wire conformance; no JEV or host integration",
+  "cases": [
+    {
+      "name": "decisive_adverse_quiet_after_review",
+      "request": {
+        "as_of": {
+          "precision": "second",
+          "state": "known",
+          "value": "2050-01-01T00:00:00Z"
+        },
+        "assessment": {
+          "digest": "ecf00832e6f6688695e2892a399c901b75588951af40c8e651a60742fd73361d",
+          "host": "synthetic-host",
+          "id": "assessment-1",
+          "kind": "judgment"
+        },
+        "audience": {
+          "digest": "7a458848f187b550c8e68a3b88ec96324bf43e649246f2b2e7036bf73b1d844a",
+          "id": "review-audience",
+          "namespace": "example",
+          "version": "1.0"
+        },
+        "contract_version": "1.0",
+        "contributions": [
+          {
+            "lineage": "source-lineage-1",
+            "material_digest": "37b2dd84601b7a8fa004a2a0459f4a414a007e644be61ed6d91144bc27a2b835",
+            "material_version": "source-1",
+            "reference": {
+              "digest": "f02eb22f2ce1bbaf2724aff0784f8482a7e8910b90191e72f2a5529cbc4579ac",
+              "host": "synthetic-host",
+              "id": "source-1",
+              "kind": "evidence"
+            }
+          }
+        ],
+        "dependencies": [
+          {
+            "digest": "8af07653ee0f3e88b790eb04af5cbe1dbf8f45357ae51d3be0ff9a8693b3a84e",
+            "id": "source-a",
+            "namespace": "example",
+            "record_type": "observation",
+            "scope_id": "synthetic:claims"
+          }
+        ],
+        "host_control": {
+          "digest": "3d4c44e3c3c0255c74c04ab3cc5926989cbe746cee8b54a0004fd10b33de9b66",
+          "host": "synthetic-host",
+          "id": "control-1",
+          "kind": "control"
+        },
+        "ledger": null,
+        "lens": {
+          "client_id": "client-a",
+          "host": "synthetic-host",
+          "intent_id": "objective-a",
+          "revision_id": "approved-1",
+          "user_id": "7",
+          "workspace_id": "8"
+        },
+        "limits": {
+          "cost_policy": "host_managed",
+          "max_bytes": 262144,
+          "max_reads": 128,
+          "max_tool_calls": 12,
+          "timeout_ms": 180000
+        },
+        "matter": {
+          "id": "subject-a",
+          "namespace": "example",
+          "record_type": "matter",
+          "revision": 1,
+          "scope_id": "synthetic:claims"
+        },
+        "message_type": "review_request",
+        "provider": {
+          "digest": "5fa6328dd702f71790cfbdb34c6fa75403d39adb9fc0cbdc315d02f8f20ac65b",
+          "id": "review-provider",
+          "namespace": "example",
+          "version": "1.0"
+        },
+        "reason_code": "adverse_development",
+        "trigger_routes": [
+          "immediate"
+        ]
+      },
+      "result": {
+        "contract_version": "1.0",
+        "message_type": "review_result",
+        "wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
+        "status": "completed",
+        "proposal": "quiet",
+        "review": {
+          "host": "synthetic-host",
+          "kind": "review",
+          "id": "review-cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
+          "digest": "ecb17757256d0ccdb20d524f7b3208f1d61420a06130d10ff7b522095f9cc658"
+        },
+        "session": {
+          "host": "synthetic-host",
+          "kind": "session",
+          "id": "session-a",
+          "digest": "b939b4d91b3dbda45dd9491ec2a2035f67d36c27f906285c501b3dd23dd5fcda"
+        },
+        "reviewed": [
+          {
+            "digest": "f02eb22f2ce1bbaf2724aff0784f8482a7e8910b90191e72f2a5529cbc4579ac",
+            "host": "synthetic-host",
+            "id": "source-1",
+            "kind": "evidence"
+          }
+        ],
+        "ledger": null,
+        "rule_changes": [],
+        "error_code": null
+      },
+      "expected_wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7"
+    },
+    {
+      "name": "decisive_adverse_alert_proposal",
+      "request": {
+        "as_of": {
+          "precision": "second",
+          "state": "known",
+          "value": "2050-01-01T00:00:00Z"
+        },
+        "assessment": {
+          "digest": "ecf00832e6f6688695e2892a399c901b75588951af40c8e651a60742fd73361d",
+          "host": "synthetic-host",
+          "id": "assessment-1",
+          "kind": "judgment"
+        },
+        "audience": {
+          "digest": "7a458848f187b550c8e68a3b88ec96324bf43e649246f2b2e7036bf73b1d844a",
+          "id": "review-audience",
+          "namespace": "example",
+          "version": "1.0"
+        },
+        "contract_version": "1.0",
+        "contributions": [
+          {
+            "lineage": "source-lineage-1",
+            "material_digest": "37b2dd84601b7a8fa004a2a0459f4a414a007e644be61ed6d91144bc27a2b835",
+            "material_version": "source-1",
+            "reference": {
+              "digest": "f02eb22f2ce1bbaf2724aff0784f8482a7e8910b90191e72f2a5529cbc4579ac",
+              "host": "synthetic-host",
+              "id": "source-1",
+              "kind": "evidence"
+            }
+          }
+        ],
+        "dependencies": [
+          {
+            "digest": "8af07653ee0f3e88b790eb04af5cbe1dbf8f45357ae51d3be0ff9a8693b3a84e",
+            "id": "source-a",
+            "namespace": "example",
+            "record_type": "observation",
+            "scope_id": "synthetic:claims"
+          }
+        ],
+        "host_control": {
+          "digest": "3d4c44e3c3c0255c74c04ab3cc5926989cbe746cee8b54a0004fd10b33de9b66",
+          "host": "synthetic-host",
+          "id": "control-1",
+          "kind": "control"
+        },
+        "ledger": null,
+        "lens": {
+          "client_id": "client-a",
+          "host": "synthetic-host",
+          "intent_id": "objective-a",
+          "revision_id": "approved-1",
+          "user_id": "7",
+          "workspace_id": "8"
+        },
+        "limits": {
+          "cost_policy": "host_managed",
+          "max_bytes": 262144,
+          "max_reads": 128,
+          "max_tool_calls": 12,
+          "timeout_ms": 180000
+        },
+        "matter": {
+          "id": "subject-a",
+          "namespace": "example",
+          "record_type": "matter",
+          "revision": 1,
+          "scope_id": "synthetic:claims"
+        },
+        "message_type": "review_request",
+        "provider": {
+          "digest": "5fa6328dd702f71790cfbdb34c6fa75403d39adb9fc0cbdc315d02f8f20ac65b",
+          "id": "review-provider",
+          "namespace": "example",
+          "version": "1.0"
+        },
+        "reason_code": "adverse_development",
+        "trigger_routes": [
+          "immediate"
+        ]
+      },
+      "result": {
+        "contract_version": "1.0",
+        "message_type": "review_result",
+        "wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
+        "status": "completed",
+        "proposal": "alert",
+        "review": {
+          "host": "synthetic-host",
+          "kind": "review",
+          "id": "review-cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
+          "digest": "f1513b27aaaa310ce7c82f20012deea3da66512f8b249314e41df9caa8e4e55a"
+        },
+        "session": {
+          "host": "synthetic-host",
+          "kind": "session",
+          "id": "session-a",
+          "digest": "b939b4d91b3dbda45dd9491ec2a2035f67d36c27f906285c501b3dd23dd5fcda"
+        },
+        "reviewed": [
+          {
+            "digest": "f02eb22f2ce1bbaf2724aff0784f8482a7e8910b90191e72f2a5529cbc4579ac",
+            "host": "synthetic-host",
+            "id": "source-1",
+            "kind": "evidence"
+          }
+        ],
+        "ledger": null,
+        "rule_changes": [],
+        "error_code": null
+      },
+      "expected_wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7"
+    },
+    {
+      "name": "dual_route_same_wake_identity",
+      "request": {
+        "as_of": {
+          "precision": "second",
+          "state": "known",
+          "value": "2050-01-01T00:00:00Z"
+        },
+        "assessment": {
+          "digest": "ecf00832e6f6688695e2892a399c901b75588951af40c8e651a60742fd73361d",
+          "host": "synthetic-host",
+          "id": "assessment-1",
+          "kind": "judgment"
+        },
+        "audience": {
+          "digest": "7a458848f187b550c8e68a3b88ec96324bf43e649246f2b2e7036bf73b1d844a",
+          "id": "review-audience",
+          "namespace": "example",
+          "version": "1.0"
+        },
+        "contract_version": "1.0",
+        "contributions": [
+          {
+            "lineage": "source-lineage-1",
+            "material_digest": "37b2dd84601b7a8fa004a2a0459f4a414a007e644be61ed6d91144bc27a2b835",
+            "material_version": "source-1",
+            "reference": {
+              "digest": "f02eb22f2ce1bbaf2724aff0784f8482a7e8910b90191e72f2a5529cbc4579ac",
+              "host": "synthetic-host",
+              "id": "source-1",
+              "kind": "evidence"
+            }
+          }
+        ],
+        "dependencies": [
+          {
+            "digest": "8af07653ee0f3e88b790eb04af5cbe1dbf8f45357ae51d3be0ff9a8693b3a84e",
+            "id": "source-a",
+            "namespace": "example",
+            "record_type": "observation",
+            "scope_id": "synthetic:claims"
+          }
+        ],
+        "host_control": {
+          "digest": "3d4c44e3c3c0255c74c04ab3cc5926989cbe746cee8b54a0004fd10b33de9b66",
+          "host": "synthetic-host",
+          "id": "control-1",
+          "kind": "control"
+        },
+        "ledger": null,
+        "lens": {
+          "client_id": "client-a",
+          "host": "synthetic-host",
+          "intent_id": "objective-a",
+          "revision_id": "approved-1",
+          "user_id": "7",
+          "workspace_id": "8"
+        },
+        "limits": {
+          "cost_policy": "host_managed",
+          "max_bytes": 262144,
+          "max_reads": 128,
+          "max_tool_calls": 12,
+          "timeout_ms": 180000
+        },
+        "matter": {
+          "id": "subject-a",
+          "namespace": "example",
+          "record_type": "matter",
+          "revision": 1,
+          "scope_id": "synthetic:claims"
+        },
+        "message_type": "review_request",
+        "provider": {
+          "digest": "5fa6328dd702f71790cfbdb34c6fa75403d39adb9fc0cbdc315d02f8f20ac65b",
+          "id": "review-provider",
+          "namespace": "example",
+          "version": "1.0"
+        },
+        "reason_code": "adverse_development",
+        "trigger_routes": [
+          "immediate",
+          "accumulation"
+        ]
+      },
+      "result": {
+        "contract_version": "1.0",
+        "message_type": "review_result",
+        "wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
+        "status": "completed",
+        "proposal": "digest",
+        "review": {
+          "host": "synthetic-host",
+          "kind": "review",
+          "id": "review-cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
+          "digest": "f5c52d64dadfddf0e3c31f92dde28ebabaacf8f16f4aaf2b7cfb9e65d710afcd"
+        },
+        "session": {
+          "host": "synthetic-host",
+          "kind": "session",
+          "id": "session-a",
+          "digest": "b939b4d91b3dbda45dd9491ec2a2035f67d36c27f906285c501b3dd23dd5fcda"
+        },
+        "reviewed": [
+          {
+            "digest": "f02eb22f2ce1bbaf2724aff0784f8482a7e8910b90191e72f2a5529cbc4579ac",
+            "host": "synthetic-host",
+            "id": "source-1",
+            "kind": "evidence"
+          }
+        ],
+        "ledger": null,
+        "rule_changes": [],
+        "error_code": null
+      },
+      "expected_wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7"
+    },
+    {
+      "name": "accumulation_report_proposal",
+      "request": {
+        "as_of": {
+          "precision": "second",
+          "state": "known",
+          "value": "2050-01-01T00:00:00Z"
+        },
+        "assessment": {
+          "digest": "ecf00832e6f6688695e2892a399c901b75588951af40c8e651a60742fd73361d",
+          "host": "synthetic-host",
+          "id": "assessment-1",
+          "kind": "judgment"
+        },
+        "audience": {
+          "digest": "7a458848f187b550c8e68a3b88ec96324bf43e649246f2b2e7036bf73b1d844a",
+          "id": "review-audience",
+          "namespace": "example",
+          "version": "1.0"
+        },
+        "contract_version": "1.0",
+        "contributions": [
+          {
+            "lineage": "source-lineage-1",
+            "material_digest": "37b2dd84601b7a8fa004a2a0459f4a414a007e644be61ed6d91144bc27a2b835",
+            "material_version": "source-1",
+            "reference": {
+              "digest": "f02eb22f2ce1bbaf2724aff0784f8482a7e8910b90191e72f2a5529cbc4579ac",
+              "host": "synthetic-host",
+              "id": "source-1",
+              "kind": "evidence"
+            }
+          }
+        ],
+        "dependencies": [
+          {
+            "digest": "8af07653ee0f3e88b790eb04af5cbe1dbf8f45357ae51d3be0ff9a8693b3a84e",
+            "id": "source-a",
+            "namespace": "example",
+            "record_type": "observation",
+            "scope_id": "synthetic:claims"
+          }
+        ],
+        "host_control": {
+          "digest": "3d4c44e3c3c0255c74c04ab3cc5926989cbe746cee8b54a0004fd10b33de9b66",
+          "host": "synthetic-host",
+          "id": "control-1",
+          "kind": "control"
+        },
+        "ledger": null,
+        "lens": {
+          "client_id": "client-a",
+          "host": "synthetic-host",
+          "intent_id": "objective-a",
+          "revision_id": "approved-1",
+          "user_id": "7",
+          "workspace_id": "8"
+        },
+        "limits": {
+          "cost_policy": "host_managed",
+          "max_bytes": 262144,
+          "max_reads": 128,
+          "max_tool_calls": 12,
+          "timeout_ms": 180000
+        },
+        "matter": {
+          "id": "subject-a",
+          "namespace": "example",
+          "record_type": "matter",
+          "revision": 1,
+          "scope_id": "synthetic:claims"
+        },
+        "message_type": "review_request",
+        "provider": {
+          "digest": "5fa6328dd702f71790cfbdb34c6fa75403d39adb9fc0cbdc315d02f8f20ac65b",
+          "id": "review-provider",
+          "namespace": "example",
+          "version": "1.0"
+        },
+        "reason_code": "adverse_development",
+        "trigger_routes": [
+          "accumulation"
+        ]
+      },
+      "result": {
+        "contract_version": "1.0",
+        "message_type": "review_result",
+        "wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
+        "status": "completed",
+        "proposal": "report",
+        "review": {
+          "host": "synthetic-host",
+          "kind": "review",
+          "id": "review-cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
+          "digest": "3990ecf0a5ad39d32b3da46bb2504adf9b24acd548bd9862be9fc147e50e8a71"
+        },
+        "session": {
+          "host": "synthetic-host",
+          "kind": "session",
+          "id": "session-a",
+          "digest": "b939b4d91b3dbda45dd9491ec2a2035f67d36c27f906285c501b3dd23dd5fcda"
+        },
+        "reviewed": [
+          {
+            "digest": "f02eb22f2ce1bbaf2724aff0784f8482a7e8910b90191e72f2a5529cbc4579ac",
+            "host": "synthetic-host",
+            "id": "source-1",
+            "kind": "evidence"
+          }
+        ],
+        "ledger": null,
+        "rule_changes": [],
+        "error_code": null
+      },
+      "expected_wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7"
+    },
+    {
+      "name": "unknown_never_quiet",
+      "request": {
+        "as_of": {
+          "precision": "second",
+          "state": "known",
+          "value": "2050-01-01T00:00:00Z"
+        },
+        "assessment": {
+          "digest": "ecf00832e6f6688695e2892a399c901b75588951af40c8e651a60742fd73361d",
+          "host": "synthetic-host",
+          "id": "assessment-1",
+          "kind": "judgment"
+        },
+        "audience": {
+          "digest": "7a458848f187b550c8e68a3b88ec96324bf43e649246f2b2e7036bf73b1d844a",
+          "id": "review-audience",
+          "namespace": "example",
+          "version": "1.0"
+        },
+        "contract_version": "1.0",
+        "contributions": [
+          {
+            "lineage": "source-lineage-1",
+            "material_digest": "37b2dd84601b7a8fa004a2a0459f4a414a007e644be61ed6d91144bc27a2b835",
+            "material_version": "source-1",
+            "reference": {
+              "digest": "f02eb22f2ce1bbaf2724aff0784f8482a7e8910b90191e72f2a5529cbc4579ac",
+              "host": "synthetic-host",
+              "id": "source-1",
+              "kind": "evidence"
+            }
+          }
+        ],
+        "dependencies": [
+          {
+            "digest": "8af07653ee0f3e88b790eb04af5cbe1dbf8f45357ae51d3be0ff9a8693b3a84e",
+            "id": "source-a",
+            "namespace": "example",
+            "record_type": "observation",
+            "scope_id": "synthetic:claims"
+          }
+        ],
+        "host_control": {
+          "digest": "3d4c44e3c3c0255c74c04ab3cc5926989cbe746cee8b54a0004fd10b33de9b66",
+          "host": "synthetic-host",
+          "id": "control-1",
+          "kind": "control"
+        },
+        "ledger": null,
+        "lens": {
+          "client_id": "client-a",
+          "host": "synthetic-host",
+          "intent_id": "objective-a",
+          "revision_id": "approved-1",
+          "user_id": "7",
+          "workspace_id": "8"
+        },
+        "limits": {
+          "cost_policy": "host_managed",
+          "max_bytes": 262144,
+          "max_reads": 128,
+          "max_tool_calls": 12,
+          "timeout_ms": 180000
+        },
+        "matter": {
+          "id": "subject-a",
+          "namespace": "example",
+          "record_type": "matter",
+          "revision": 1,
+          "scope_id": "synthetic:claims"
+        },
+        "message_type": "review_request",
+        "provider": {
+          "digest": "5fa6328dd702f71790cfbdb34c6fa75403d39adb9fc0cbdc315d02f8f20ac65b",
+          "id": "review-provider",
+          "namespace": "example",
+          "version": "1.0"
+        },
+        "reason_code": "adverse_development",
+        "trigger_routes": [
+          "immediate"
+        ]
+      },
+      "result": {
+        "contract_version": "1.0",
+        "message_type": "review_result",
+        "wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7",
+        "status": "unknown",
+        "proposal": null,
+        "review": null,
+        "session": null,
+        "reviewed": [],
+        "ledger": null,
+        "rule_changes": [],
+        "error_code": "stopped_for_test"
+      },
+      "expected_wake_id": "cb81911bcf99aecb5a15caec6a5fd102aff4c40ebda1e40f60c7cd4d0781e2a7"
+    },
+    {
+      "name": "contrasting_objective_quiet",
+      "request": {
+        "as_of": {
+          "precision": "second",
+          "state": "known",
+          "value": "2050-01-01T00:00:00Z"
+        },
+        "assessment": {
+          "digest": "3151dbf1aa7448585c86f9405e7327c0c9f61924b65ac719f06c367edd49c90c",
+          "host": "synthetic-host",
+          "id": "assessment-b",
+          "kind": "judgment"
+        },
+        "audience": {
+          "digest": "7a458848f187b550c8e68a3b88ec96324bf43e649246f2b2e7036bf73b1d844a",
+          "id": "review-audience",
+          "namespace": "example",
+          "version": "1.0"
+        },
+        "contract_version": "1.0",
+        "contributions": [
+          {
+            "lineage": "source-lineage-1",
+            "material_digest": "37b2dd84601b7a8fa004a2a0459f4a414a007e644be61ed6d91144bc27a2b835",
+            "material_version": "source-1",
+            "reference": {
+              "digest": "53265f8b1883b1801f27791eef9357674c21ca1a6c0188112e634325e2b424b7",
+              "host": "synthetic-host",
+              "id": "source-1",
+              "kind": "evidence"
+            }
+          }
+        ],
+        "dependencies": [
+          {
+            "digest": "8af07653ee0f3e88b790eb04af5cbe1dbf8f45357ae51d3be0ff9a8693b3a84e",
+            "id": "source-a",
+            "namespace": "example",
+            "record_type": "observation",
+            "scope_id": "synthetic:claims"
+          }
+        ],
+        "host_control": {
+          "digest": "c9baff2c7fb5b1f3782be03578d2d755f2b06e4cda96883730a836c923d53d66",
+          "host": "synthetic-host",
+          "id": "control-b",
+          "kind": "control"
+        },
+        "ledger": null,
+        "lens": {
+          "client_id": "client-b",
+          "host": "synthetic-host",
+          "intent_id": "objective-b",
+          "revision_id": "approved-1",
+          "user_id": "7",
+          "workspace_id": "8"
+        },
+        "limits": {
+          "cost_policy": "host_managed",
+          "max_bytes": 262144,
+          "max_reads": 128,
+          "max_tool_calls": 12,
+          "timeout_ms": 180000
+        },
+        "matter": {
+          "id": "subject-a",
+          "namespace": "example",
+          "record_type": "matter",
+          "revision": 1,
+          "scope_id": "synthetic:claims"
+        },
+        "message_type": "review_request",
+        "provider": {
+          "digest": "5fa6328dd702f71790cfbdb34c6fa75403d39adb9fc0cbdc315d02f8f20ac65b",
+          "id": "review-provider",
+          "namespace": "example",
+          "version": "1.0"
+        },
+        "reason_code": "adverse_development",
+        "trigger_routes": [
+          "immediate"
+        ]
+      },
+      "result": {
+        "contract_version": "1.0",
+        "message_type": "review_result",
+        "wake_id": "a4d7ec14e041567030ce74cf9b65887cf09b8dea0037de25dcbbb2141b72cd1b",
+        "status": "completed",
+        "proposal": "quiet",
+        "review": {
+          "host": "synthetic-host",
+          "kind": "review",
+          "id": "review-a4d7ec14e041567030ce74cf9b65887cf09b8dea0037de25dcbbb2141b72cd1b",
+          "digest": "999c85ea7c96726ed97dae4888ec44156b8351abb9f0484a26d13d9863f84a18"
+        },
+        "session": {
+          "host": "synthetic-host",
+          "kind": "session",
+          "id": "session-a",
+          "digest": "3faa1c6b8c406df16dfe73acd24cd82e035c14c58de923702bdd3e94c10e1813"
+        },
+        "reviewed": [
+          {
+            "digest": "53265f8b1883b1801f27791eef9357674c21ca1a6c0188112e634325e2b424b7",
+            "host": "synthetic-host",
+            "id": "source-1",
+            "kind": "evidence"
+          }
+        ],
+        "ledger": null,
+        "rule_changes": [],
+        "error_code": null
+      },
+      "expected_wake_id": "a4d7ec14e041567030ce74cf9b65887cf09b8dea0037de25dcbbb2141b72cd1b"
+    }
+  ]
+}

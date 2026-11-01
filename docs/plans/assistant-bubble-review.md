@@ -1,10 +1,10 @@
 # Client research, Matter triggers and personal-assistant review
 
-Status: **discussion captured; implementation planned, not authorized by this
-record**. Owner requested tickets and continued discussion, 2026-10-31.
-No runtime, schema, provider/tool execution, data-processing or deployment change
-is included. Proposed wire fields and thresholds are not frozen. KS-1150 now
-pins the host ownership and existing assistant routing described below.
+Status: **Matter-side implementation authorized, 2026-11-01**. MAT-088/089 now
+provide the additive review SDK candidate; see the [current contract](../contracts/assistant-review.md)
+and [receiving handoff](../adapters/statecivics-assistant-review.md). StateCivics
+receiving acceptance remains separate. Earlier planning receipts below are
+historical; this document does not approve a threshold or production activation.
 
 ## What the owner clarified
 
@@ -306,3 +306,18 @@ or warnings under its configured JSON rules; those rules are limited to key
 spelling, not semantic verification. Markdown is excluded from that tool and was
 checked directly against the pinned host source and Matter SDK. The receiving
 host tests and actual assistant runtime remain unrun by this change.
+
+## Implementation transition, 2026-11-01
+
+PR #37 merged as `6aeb0f0`; it was planning/SDK handoff documentation only.
+The owner subsequently authorized MAT-088/089 implementation and Matter PR
+closeout. StateCivics `b87c6027f` now supplies the existing review engine; KS-705
+and KS-1125 source code are present. Earlier unresolved-runtime and proposed-reader
+statements above describe their older inspected snapshots, not current blockers.
+
+The current contract labels tool/time/read/byte limits and host-managed cost
+policy. StateCivics' recorded owner decisions now place review sessions under
+objectives, outside personal chat charge, and select host-managed study costs;
+this SDK neither overrides them nor silently selects unset thresholds, findings
+retention/admission or pilot policy. The host's actual session/recovery/report
+implementation and receiving acceptance remain its responsibility.

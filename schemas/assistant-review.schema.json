@@ -1,0 +1,841 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/assistant-review.schema.json",
+  "title": "Matter assistant review adapter 1.0",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/result"
+    },
+    {
+      "$ref": "#/$defs/ledger"
+    },
+    {
+      "$ref": "#/$defs/artifact"
+    },
+    {
+      "$ref": "#/$defs/pressure"
+    },
+    {
+      "$ref": "#/$defs/attempt"
+    },
+    {
+      "$ref": "#/$defs/consumed"
+    },
+    {
+      "$ref": "#/$defs/lens_lock"
+    },
+    {
+      "$ref": "#/$defs/mutation"
+    }
+  ],
+  "$defs": {
+    "lens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "host",
+        "user_id",
+        "workspace_id",
+        "intent_id",
+        "revision_id",
+        "client_id"
+      ],
+      "properties": {
+        "host": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "user_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "workspace_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "intent_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "revision_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "client_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "pointer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "host",
+        "kind",
+        "id",
+        "digest"
+      ],
+      "properties": {
+        "host": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "kind": {
+          "enum": [
+            "evidence",
+            "judgment",
+            "review",
+            "session",
+            "finding",
+            "report",
+            "conveyed",
+            "feedback",
+            "rule",
+            "control"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "digest": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+        }
+      }
+    },
+    "contribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference",
+        "lineage",
+        "material_version",
+        "material_digest"
+      ],
+      "properties": {
+        "reference": {
+          "$ref": "#/$defs/pointer"
+        },
+        "lineage": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "material_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "material_digest": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+        }
+      }
+    },
+    "ledger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "message_type",
+        "lens",
+        "as_of",
+        "judgments",
+        "reviews",
+        "conveyed",
+        "feedback",
+        "findings"
+      ],
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "message_type": {
+          "const": "ledger"
+        },
+        "lens": {
+          "$ref": "#/$defs/lens"
+        },
+        "as_of": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+        },
+        "judgments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pointer"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "reviews": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pointer"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "conveyed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pointer"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "feedback": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pointer"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pointer"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "message_type",
+        "lens",
+        "matter",
+        "dependencies",
+        "audience",
+        "provider",
+        "host_control",
+        "assessment",
+        "contributions",
+        "ledger",
+        "trigger_routes",
+        "reason_code",
+        "as_of",
+        "limits"
+      ],
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "message_type": {
+          "const": "review_request"
+        },
+        "lens": {
+          "$ref": "#/$defs/lens"
+        },
+        "matter": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_dependency"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+          },
+          "maxItems": 128,
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "audience": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+        },
+        "provider": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/component_ref"
+        },
+        "host_control": {
+          "$ref": "#/$defs/pointer"
+        },
+        "assessment": {
+          "$ref": "#/$defs/pointer"
+        },
+        "contributions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/contribution"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "ledger": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ledger"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trigger_routes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "immediate",
+              "accumulation"
+            ]
+          },
+          "maxItems": 2,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "reason_code": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,127}(?![\\s\\S])"
+        },
+        "as_of": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max_tool_calls",
+            "timeout_ms",
+            "max_reads",
+            "max_bytes",
+            "cost_policy"
+          ],
+          "properties": {
+            "max_tool_calls": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 128
+            },
+            "timeout_ms": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 600000
+            },
+            "max_reads": {
+              "type": "integer",
+              "minimum": 3,
+              "maximum": 128
+            },
+            "max_bytes": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 262144
+            },
+            "cost_policy": {
+              "const": "host_managed"
+            }
+          }
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "message_type",
+        "wake_id",
+        "status",
+        "proposal",
+        "review",
+        "session",
+        "reviewed",
+        "ledger",
+        "rule_changes",
+        "error_code"
+      ],
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "message_type": {
+          "const": "review_result"
+        },
+        "wake_id": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "stopped",
+            "failed",
+            "unknown"
+          ]
+        },
+        "proposal": {
+          "enum": [
+            null,
+            "quiet",
+            "digest",
+            "report",
+            "alert"
+          ]
+        },
+        "review": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/pointer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/pointer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reviewed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pointer"
+          },
+          "maxItems": 64,
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "ledger": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ledger"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rule_changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pointer"
+          },
+          "maxItems": 32,
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]{0,127}(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "message_type",
+        "reference",
+        "lens",
+        "available_at",
+        "classification",
+        "citations",
+        "derived_from",
+        "communication_state",
+        "content"
+      ],
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "message_type": {
+          "const": "host_artifact"
+        },
+        "reference": {
+          "$ref": "#/$defs/pointer"
+        },
+        "lens": {
+          "$ref": "#/$defs/lens"
+        },
+        "available_at": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+        },
+        "classification": {
+          "enum": [
+            "source_quote",
+            "source_fact",
+            "host_rule_judgment",
+            "jev_judgment",
+            "interpretation",
+            "user_feedback",
+            "communication",
+            "review",
+            "session",
+            "rule",
+            "host_control"
+          ]
+        },
+        "citations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pointer"
+          },
+          "maxItems": 128,
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "derived_from": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pointer"
+          },
+          "maxItems": 128,
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "communication_state": {
+          "enum": [
+            null,
+            "never_communicated",
+            "report_prepared",
+            "capture_unknown",
+            "observed_capture",
+            "actually_conveyed",
+            "read",
+            "acted"
+          ]
+        },
+        "content": {
+          "type": "object"
+        }
+      }
+    },
+    "pressure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "message_type",
+        "lens",
+        "matter",
+        "dependencies",
+        "pending",
+        "ledger",
+        "control"
+      ],
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "message_type": {
+          "const": "pressure"
+        },
+        "lens": {
+          "$ref": "#/$defs/lens"
+        },
+        "matter": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/matter_dependency"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/pinned_ref"
+          },
+          "maxItems": 128,
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "pending": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/contribution"
+          },
+          "maxItems": 128,
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "ledger": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ledger"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "control": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
+        }
+      }
+    },
+    "lens_lock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "message_type",
+        "lens",
+        "active_wake",
+        "control"
+      ],
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "message_type": {
+          "const": "lens_lock"
+        },
+        "lens": {
+          "$ref": "#/$defs/lens"
+        },
+        "active_wake": {
+          "anyOf": [
+            {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "control": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
+        }
+      }
+    },
+    "attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "message_type",
+        "request",
+        "outcome_unknown",
+        "started_at",
+        "finished_at",
+        "submitted_result_digest",
+        "reconciliation",
+        "phase",
+        "result",
+        "control"
+      ],
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "message_type": {
+          "const": "attempt"
+        },
+        "request": {
+          "$ref": "#/$defs/request"
+        },
+        "outcome_unknown": {
+          "type": "boolean"
+        },
+        "started_at": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+        },
+        "finished_at": {
+          "anyOf": [
+            {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/known_time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "submitted_result_digest": {
+          "anyOf": [
+            {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reconciliation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/pointer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "phase": {
+          "enum": [
+            "started",
+            "completed",
+            "stopped",
+            "failed",
+            "unknown",
+            "stale",
+            "reconciled"
+          ]
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/result"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "control": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
+        }
+      }
+    },
+    "consumed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "message_type",
+        "lens",
+        "contribution",
+        "wake_id",
+        "control"
+      ],
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "message_type": {
+          "const": "consumed"
+        },
+        "lens": {
+          "$ref": "#/$defs/lens"
+        },
+        "contribution": {
+          "$ref": "#/$defs/contribution"
+        },
+        "wake_id": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+        },
+        "control": {
+          "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/control_dependency"
+        }
+      }
+    },
+    "mutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "message_type",
+        "action",
+        "witness",
+        "submitted_result_digest",
+        "request",
+        "result",
+        "token",
+        "access_context",
+        "previous"
+      ],
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "message_type": {
+          "const": "mutation"
+        },
+        "action": {
+          "enum": [
+            "pressure",
+            "start",
+            "finish",
+            "reconcile"
+          ]
+        },
+        "witness": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/pointer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "submitted_result_digest": {
+          "anyOf": [
+            {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "request": {
+          "$ref": "#/$defs/request"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/result"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "token": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "access_context": {
+          "type": "object"
+        },
+        "previous": {
+          "anyOf": [
+            {
+              "$ref": "https://github.com/mfreeze77/matter/schemas/core-record.schema.json#/$defs/projection_dependency"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

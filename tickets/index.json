@@ -14,9 +14,9 @@
   },
   "counts_by_status": {
     "blocked": 1,
-    "done": 47,
+    "done": 49,
     "in_progress": 3,
-    "planned": 39
+    "planned": 37
   },
   "tickets": [
     {
@@ -2143,11 +2143,11 @@
     },
     {
       "id": "MAT-088",
-      "title": "Specify the matter-trigger to personal-assistant review handoff",
+      "title": "Implement the Matter trigger to personal-assistant review handoff",
       "track": "civic",
       "phase": 4,
       "priority": "P1",
-      "status": "planned",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-022",
@@ -2165,7 +2165,7 @@
         "CORE-21",
         "OPS-01"
       ],
-      "readiness": "ready",
+      "readiness": "done",
       "path": "records/MAT-088.json"
     },
     {
@@ -2174,7 +2174,7 @@
       "track": "civic",
       "phase": 4,
       "priority": "P1",
-      "status": "planned",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-088",
@@ -2193,7 +2193,7 @@
         "CORE-23",
         "OPS-01"
       ],
-      "readiness": "waiting",
+      "readiness": "done",
       "path": "records/MAT-089.json"
     },
     {
@@ -2221,7 +2221,7 @@
         "CORE-23",
         "OPS-01"
       ],
-      "readiness": "waiting",
+      "readiness": "ready",
       "path": "records/MAT-090.json"
     }
   ]

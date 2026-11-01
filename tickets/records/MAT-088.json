@@ -1,10 +1,10 @@
 {
   "id": "MAT-088",
-  "title": "Specify the matter-trigger to personal-assistant review handoff",
+  "title": "Implement the Matter trigger to personal-assistant review handoff",
   "track": "civic",
   "phase": 4,
   "priority": "P1",
-  "status": "planned",
+  "status": "done",
   "type": "integration",
   "owner_repo": "mfreeze77/matter",
   "component": "adapters.assistant_review",
@@ -24,38 +24,38 @@
     "CORE-21",
     "OPS-01"
   ],
-  "summary": "Define a small versioned adapter contract where a Matter/JEV material-change trigger wakes the user-specific assistant for optional deeper investigation and a decision about reporting or interruption. This internal review is distinct from an end-user alert and from the existing capture/delivery baseline. The discussion has not frozen fields, thresholds or an assistant runtime.",
+  "summary": "Add an opt-in versioned wake-up/result boundary around the existing host review entry point, durable retry identity, current controls/access, bounded pointer reads and explicit unknown outcomes. No assistant replacement, trigger threshold or production delivery is supplied.",
   "in_scope": [
     "Internal review request and typed review result semantics, with exact source/context/access and outcome provenance.",
     "A bounded single assistant pass using existing host tools, separate from consequential publication or production delivery.",
-    "Both immediate decisive-event and accumulated-context review triggers are required. Scoring semantics, thresholds and exact result fields remain to specify; KS-1150 selects the existing host assistant/inbound session path, not a replacement runtime.",
+    "Both immediate decisive-event and accumulated-context route declarations are implemented; the authenticated host selects when to trigger. Numerical scoring, thresholds and decay remain host/owner policy, separate from the versioned review result wire.",
     "KS-1150 host boundary: StateCivics owns the assistant, lens, memory, evidence, reports and review sessions; Matter stores host references plus its own pressure/disposition/baseline/receipt state."
   ],
   "out_of_scope": [
-    "Implementation, provider/tool execution, client-data processing or deployment as part of this planning commit.",
+    "StateCivics assistant/UI/database/report implementation, host deployment, real-client data processing and production delivery.",
     "New assistant/model client, MCP server, tool wizard, source index, database, queue or general orchestration framework where existing owners supply the capability.",
     "Changing frozen monitoring 1.0/1.1 semantics silently; production alerts, formal qualification, DIAT or unrelated Oil work."
   ],
   "implementation": [
     "Inspect MAT-022 investigation, MAT-023 queries, MAT-028 packets, MAT-030 receipts, MAT-072 egress and the existing MAT-082/084 adapters before defining the smallest missing handoff. Locate existing host assistant/wizard entry points with its owner; do not invent an endpoint or service.",
-    "Bind a review request to user/workspace/optional-client, approved intent and angle/context versions, continuing matter/material change, authorized citations and availability cut, actual prior communication, why flagged, uncertainty and explicit read/call/time/byte/cost limits. Proposed field names remain draft.",
-    "Specify internal wake-up, assistant review/quiet notes, report preparation, user delivery, consumption and action as distinct receipts. Define exact duplicate handling, cancellation and unknown model/tool outcomes without blind retry or baseline advancement.",
+    "Bind a review request to user/workspace/optional-client, approved intent and angle/context versions, continuing matter/material change, authorized citations and availability cut, actual prior communication, why flagged, uncertainty and explicit read/call/time/byte/cost limits. The additive review/ledger 1.0 wire is defined in docs/contracts/assistant-review.md; receiving acceptance remains host work.",
+    "Require explicit tool/read/time/byte ceilings and host-managed cost policy. Respect the actual owner-approved study policy, including the host review charge exemption; do not invent a new monetary cap or bypass applicable host grants. Reuse existing investigation/receipt patterns and keep unknown outcomes unresolved instead of blind retry.",
     "Let JEV supply source/change interpretations and let the personal assistant assess current user work and whether to report or interrupt. Avoid repeating the same full analysis; decide what model-derived outputs remain unqualified in capture-only rehearsal.",
     "Retain current access, original tokens and fresh source/context/control checks before and after tool/model work and at any eventual host capture. Direct pause/revoke/edit uses host controls immediately.",
     "Negotiate any new adapter contract explicitly beside frozen 1.0/1.1. Record open choices instead of reinterpreting existing AlertDelivery/capture records as internal work or assuming production permission.",
     "Support two trigger paths under the approved client/objective/angle: a decisive development can immediately wake the assistant even with no prior accumulation (owner example: highly relevant and directly adverse to the client interests); distinct smaller developments can accumulate or become materially significant together when a later event arrives. Both request assistant review, not an automatic human alert.",
     "Retain the owner 24 percent accumulated plus 75 percent new-action illustration without treating the numbers as calibrated JEV probabilities, a fixed additive importance score, or a selected boundary. Define policy meaning and boundary behavior explicitly before implementation; do not reinterpret the existing 1.1 capture-policy decision regions.",
     "A completed assistant review clears the pressure covered by that review regardless of alert/no-alert choice, records versioned ongoing-monitoring adjustments through authorized host controls, and retains all source/finding associations. Failed, unavailable or outcome-unknown review is not completed quiet review.",
-    "Treat monitoring adjustments within approved intent and actual delegated host authority as distinct from changing user purpose, client/scope, stance, recipients, permissions or budget ceilings. Preserve existing approval/versioning for those changes; a model recommendation alone grants no authority. Exact writable rule fields and apply/reconcile semantics remain to be specified.",
-    "Align with KS-1150: the lens uses existing StateCivics client-or-personal and objective identifiers; review enters the existing inbound path as a distinct matter_review channel, with one logical session chain per lens. Bind host record IDs/digests rather than copying assistant findings, transcripts, reports or memory into Matter. No actual wire/channel field name is frozen by planning.",
+    "Treat monitoring adjustments within approved intent and actual delegated host authority as distinct from changing user purpose, client/scope, stance, recipients, permissions or budget ceilings. Preserve existing approval/versioning for those changes; a model recommendation alone grants no authority. The SDK references actual host-approved rule changes and never executes model-directed writes. Host writable fields remain with the host controls; unknown SDK attempts use explicit witnessed reconciliation.",
+    "Align with KS-1150: the lens uses existing StateCivics client-or-personal and objective identifiers; review enters the existing inbound path as a distinct matter_review channel, with one logical session chain per lens. Bind host record IDs/digests rather than copying assistant findings, transcripts, reports or memory into Matter. The actual entry takes wake_key=request.wake_id; the SDK wire is versioned separately from host UI/channel implementation.",
     "The final structured review proposal is distinct from the conversational reply. Human-facing output is a host-owned stored report plus rendered alert/notice, using the county meeting report AlertDelivery claim-before-send pattern, not the hearing broadcast ledger. A model reply must never be forwarded as the alert; existing delivery uncertainty and authorization guards remain.",
-    "Require bounded per-review execution and lens-session rollover or a documented limits policy that respects existing host caps (configured 300 messages or 3000000 tokens per session), existing monthly stops and owner-approved study budgets. Rollover preserves lens/history pointers and cannot bypass budgets or turn stopped work into quiet completion."
+    "Require explicit per-review tool/time/read/byte ceilings and host lens-session rollover or documented limits. The host owns its existing session caps and study cost/charge policy. This SDK labels host-managed cost policy, grants no extra spend authority and never converts stopped work into quiet."
   ],
   "acceptance": [
     {
       "id": "AC-1",
       "criterion": "A trigger can wake review without claiming the user was informed.",
-      "verification": "Write compatibility examples for internal wake-up, reviewed-quiet, report proposed, alert proposed and unavailable/unknown; show separate baseline and outcome receipts. The result vocabulary is proposed until reviewed."
+      "verification": "Write compatibility examples for internal wake-up, reviewed-quiet, report proposed, alert proposed and unavailable/unknown; show separate baseline and outcome receipts. The implemented result vocabulary is specified in the additive review 1.0 contract; software conformance and host receiving acceptance are separate."
     },
     {
       "id": "AC-2",
@@ -80,14 +80,20 @@
     {
       "id": "AC-6",
       "criterion": "The host-owned session and report channels are explicit and bounded.",
-      "verification": "Specify same-lens continuation and session-cap/rollover cases, isolation from other lenses, structured proposal and raw-reply suppression, and county-style report claim/outcome references. Unknown sends/reviews remain unknown with no blind resend; UI visibility, report-without-notification policy, retention, thresholds and pilot/budget remain unselected."
+      "verification": "Specify bounded session/rollover references, lens isolation, structured proposal and raw-reply suppression, county report claim/outcome references and honest unknowns. Respect actual host/owner decisions without selecting unset thresholds, findings-retention or pilot policy."
     }
   ],
   "artifacts": [
     "docs/plans/assistant-bubble-review.md",
     "docs/contracts/assistant-review.md",
+    "docs/adapters/statecivics-feedback-handoff.md",
+    "src/matter/assistant_review.py",
+    "schemas/assistant-review.schema.json",
+    "docs/adapters/statecivics-assistant-review.md",
+    "docs/validation/MAT-088-089.md",
     "tests/contract/test_assistant_review.py",
-    "docs/adapters/statecivics-feedback-handoff.md"
+    "tests/integration/test_assistant_review_memory.py",
+    "tests/fixtures/assistant-review/vectors.json"
   ],
   "tests": [
     "Wake-up alone does not advance communicated/captured-for-user knowledge.",
@@ -117,10 +123,20 @@
     "Owner, 2026-10-31: both immediate and accumulated triggers; client-adverse pin-prick or distinct signals plus a tipping event. The 24% + 75% example is illustrative, not calibrated probability arithmetic.",
     "Owner, 2026-10-31: completed assistant review clears pressure, updates ongoing monitoring rules, decides alert or no alert, and keeps all evidence attached to the user/client/evidence context.",
     "mfreeze77/state-civics-ai:KS-1150",
-    "StateCivics KS-1150 on e8c2ce70e: host-owned assistant/lens/session/memory/evidence; Matter pointers only; county-report delivery records; bounded lens sessions. KS-1125 feedback is next; five owner choices stay open."
+    "StateCivics KS-1150 on e8c2ce70e: host-owned assistant/lens/session/memory/evidence; Matter pointers only; county-report delivery records; bounded lens sessions. KS-1125 feedback is next; five owner choices stay open.",
+    "StateCivics KS-1150 slice 1 on b87c6027f: AssistantReviewService.review(user_id, intent_id, assessment_id, why) supplies the existing read-only review engine; slice 2 connects Matter requests and host references.",
+    "StateCivics KS-1150 on b87c6027f records owner study policy: existing per-review tool/time loop stop; review costs excluded from chat charge. This SDK labels host-managed cost policy rather than inventing a spend ceiling.",
+    "StateCivics slice 2a f87d509c2: existing review entry now accepts wake_key, deduplicates per account/objective/outcome and exposes GET /tracking/intents/{intent_id}/reviews. Read-only source verified; actual assistant rehearsal remains not run."
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "Matter SDK scope completed in dev19, runtime 0ce70c60f1341a0a1068c73b54af84fc928b8336. Both monitor wires and HostMonitoringState unchanged. Host slice 2b/KS-1126 receiving acceptance is separate; no assistant/JEV call, delivery, deployment or qualification claimed.",
+      "207 packaged runtime/schema files byte-match source; wheel SHA-256 e82bcc164e4c9c6baad4864b24da71cdec2a88b5786563bb44786fcb95e515f0. 82 installed checks passed on Python 3.12.14 and network-isolated Python 3.11.17; final strengthened negative checks passed on both. docs/validation/MAT-088-089.md retains actual receipts.",
+      "Final affected selection: 100 checks passed (82 review/capture/version cases plus 18 repository-integrity checks). Full prior run: 1543 tests, one temporary draft-link failure; draft moved outside repo and affected checks passed. No final-head full-suite pass claimed.",
+      "Completed independent two-round release review: 3/3 supported files, no warnings; two low test-quality findings corrected and verified. Earlier retry-guidance finding resolved with actual drain/retry evidence, unchanged semantic wake and no extra review. Raw receipts: data/validation/MAT-088-089/.",
+      "Synthetic real-SQLite/control/access checks cover durable wake claims, unknown recovery under cancellation/revision, current-reader grants and parent correction denials, reviewed-subset reset, concurrent material, material-version conflicts, pointer-only ledger reuse and honest host-rule/JEV provenance. No numerical burst policy or findings-retention policy selected.",
+      "StateCivics f87d509c2 review entry/wake_key and private reviews ledger inspected read-only. SDK handoff: docs/adapters/statecivics-assistant-review.md. Host owns projections, actual read receipts, replay cuts, transactional linking and unsent real assistant rehearsal. MAT-083 and installed walkthrough-schema gap remain separate."
+    ]
   }
 }
