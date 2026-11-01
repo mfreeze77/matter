@@ -4,7 +4,7 @@
   "track": "core",
   "phase": 4,
   "priority": "P1",
-  "status": "in_progress",
+  "status": "done",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "contracts.validation-cache",
@@ -29,7 +29,8 @@
   "implementation": [
     "Cache successful checks by locally recomputed content digest plus exact bytes, schema version and validator/registry identity; bound process memory and return detached decoded values.",
     "Retain strict canonical input, stored-row integrity, current head, access, revocation, dependency and capture guards.",
-    "Measure the unchanged consumer prototype without cProfile, cold and warm before/after; record the environments, phase times and workload limitations in a later SDK build."
+    "Measure the unchanged consumer prototype without cProfile, cold and warm before/after; record the environments, phase times and workload limitations in a later SDK build.",
+    "Apply the same successful structural cache to stored opt-in 1.1 capture records; retain the full atomic capture/currentness path and unchanged frozen schema."
   ],
   "acceptance": [
     {
@@ -54,7 +55,8 @@
     "src/matter/storage/base.py",
     "src/matter/_rule_values.py",
     "tests/unit/test_validation_cache.py",
-    "docs/validation/sdk-performance.md"
+    "docs/validation/sdk-performance.md",
+    "src/matter/statecivics_capture.py"
   ],
   "tests": [
     "Exercise mutation, same-ID changed content, invalid/floating types, hash collision, validator/schema separation and bounded eviction.",
@@ -76,7 +78,12 @@
     "docs/contracts/monitoring-handoff-v1.1.md"
   ],
   "completion": {
-    "state": "not_run",
-    "evidence": []
+    "state": "passed",
+    "evidence": [
+      "Runtime eb6f563a6ce064e76eea50e5f864cf0353c1bb01, SDK 0.1.0.dev17, wheel SHA-256 1919681566fe261a537984f06d80a5df69a85cfeaf7dd4c16e81d4ef30c00194. All 205 packaged files match the source pin. Wire 1.0/1.1 inventories unchanged; separate from frozen dev16 main 35f330ae44657db46bc443aff6823a088501c693.",
+      "Final source: 1474 tests passed in 1060.025s, no failures/errors/skips. Final installed Python 3.11 wheel: 41 checks passed in 340.323s, no failures/errors/skips, with all Matter imports outside checkout and provider network forbidden. Three synthetic walkthroughs, 26 canonical and eight exact-source JavaScript vectors, render --check and validate pass. Initial Mac backup-path assertion fixed to compare resolved paths; all 12 backup regressions pass.",
+      "Initial two-round review covered 12 supported files and found three issues, all addressed. Two follow-up code reviews covered four then five changed files in two rounds each, with zero findings/warnings. Raw receipts in data/validation/manager-closeout-20261031 and docs/validation/sdk-performance.md. No live JEV calls, formal qualification or production activation.",
+      "Unchanged consumer prototype, unprofiled and no network, Python 3.11.17: dev16 289.127s cold / 295.160s warm; final dev17 32.763s cold / 30.411s warm for two audiences (8.82x / 9.71x). Recorded execution 5.01\u20135.30s per audience. Exact script, harness definitions, ordinary workstation load and wheel digest retained; no extrapolated provider latency or throughput claim. Pure schema cache bounds 2048 entries/8MiB; integrity/currentness/access/revocation remain fresh."
+    ]
   }
 }
