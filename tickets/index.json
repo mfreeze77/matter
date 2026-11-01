@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "ticket_count": 82,
+  "ticket_count": 84,
   "counts_by_track": {
-    "civic": 7,
-    "core": 17,
+    "civic": 8,
+    "core": 18,
     "diat": 15,
     "evaluation": 10,
     "foundation": 1,
@@ -14,9 +14,9 @@
   },
   "counts_by_status": {
     "blocked": 1,
-    "done": 43,
+    "done": 44,
     "in_progress": 2,
-    "planned": 36
+    "planned": 37
   },
   "tickets": [
     {
@@ -2027,6 +2027,63 @@
       ],
       "readiness": "done",
       "path": "records/MAT-082.json"
+    },
+    {
+      "id": "MAT-083",
+      "title": "Resolve equivalent-intent SQLite contention and triage related intermittent failures",
+      "track": "core",
+      "phase": 3,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-003",
+        "MAT-011",
+        "MAT-019",
+        "MAT-020",
+        "MAT-021",
+        "MAT-029"
+      ],
+      "requirements": [
+        "CORE-02",
+        "CORE-19",
+        "CORE-20"
+      ],
+      "readiness": "ready",
+      "path": "records/MAT-083.json"
+    },
+    {
+      "id": "MAT-084",
+      "title": "Admit unqualified monitoring judgments to guarded capture-only proposals",
+      "track": "civic",
+      "phase": 4,
+      "priority": "P1",
+      "status": "done",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-082",
+        "MAT-034",
+        "MAT-015",
+        "MAT-016",
+        "MAT-019",
+        "MAT-020",
+        "MAT-021",
+        "MAT-028",
+        "MAT-030",
+        "MAT-031",
+        "MAT-072"
+      ],
+      "requirements": [
+        "CORE-17",
+        "CORE-18",
+        "CORE-20",
+        "CORE-22",
+        "CIV-07",
+        "CIV-09",
+        "OPS-01"
+      ],
+      "readiness": "done",
+      "path": "records/MAT-084.json"
     }
   ]
 }
