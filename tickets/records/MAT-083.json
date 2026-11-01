@@ -4,12 +4,23 @@
   "track": "core",
   "phase": 3,
   "priority": "P1",
-  "status": "planned",
+  "status": "in_progress",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "delivery/sqlite-contention",
-  "depends_on": ["MAT-003", "MAT-011", "MAT-019", "MAT-020", "MAT-021", "MAT-029"],
-  "requirements": ["CORE-02", "CORE-19", "CORE-20"],
+  "depends_on": [
+    "MAT-003",
+    "MAT-011",
+    "MAT-019",
+    "MAT-020",
+    "MAT-021",
+    "MAT-029"
+  ],
+  "requirements": [
+    "CORE-02",
+    "CORE-19",
+    "CORE-20"
+  ],
   "summary": "Investigate and fix the retained equivalent-intent delivery race: two real SQLite handles produce one ready intent but the losing prepare_delivery returns E_STORAGE_UNAVAILABLE rather than withheld or E_DEPENDENCY_STALE. Separately triage the retained cancelled-work replacement and independent-stage failures without assuming a common cause. Ticket intake does not implement a fix or clear the failed validation.",
   "in_scope": [
     "Bounded deterministic reproduction and narrow repair of the SQLite competing-equivalent-intent failure, preserving transaction, freshness, authority, budget and duplicate-suppression contracts.",
@@ -58,7 +69,8 @@
     "src/matter/delivery.py",
     "tests/integration/test_dispatch_races.py",
     "tests/semantic/test_stages.py",
-    "docs/validation/MAT-083-intake.md"
+    "docs/validation/MAT-083-intake.md",
+    "docs/validation/MAT-083-followup.md"
   ],
   "tests": [
     "integration.test_dispatch_races.DispatchRaces.test_distinct_equivalent_intents_compete_across_real_sqlite_handles",
@@ -70,13 +82,25 @@
     "Treating all E_STORAGE_UNAVAILABLE as duplicate suppression hides genuine durable-outcome uncertainty.",
     "Blind retries, longer sleeps or a permissive assertion can hide a defect or bypass cancellation, budget and command identity.",
     "The two intermittent findings have no demonstrated common cause and have not been locally reproduced in the retained intake evidence.",
-    "The external wheel digest is only the prefix 3d19879b…; the image and 219-test results are reported receiving evidence, not independent Matter verification or qualification."
+    "The external wheel digest is only the prefix 3d19879b\u2026; the image and 219-test results are reported receiving evidence, not independent Matter verification or qualification."
   ],
   "reuse": [
-    {"source": "docs/storage.md; docs/delivery.md; tickets/MAT-021.md", "application": "Preserve the existing neutral transaction, outbox, fencing, failure and milestone contracts."},
-    {"source": "tests/integration/test_dispatch_races.py; tests/integration/delivery_helpers.py; tests/semantic/test_stages.py", "application": "Reuse the existing real-handle race, cancellation fixture and independent-stage scenario; add only controls needed to reproduce demonstrated behavior."},
-    {"source": "docs/validation/dashboard-matter-handoff.md#existing-ci-validation-gap", "application": "Carry forward actual failing receipts without changing historical passes into a claim that the gap is cleared."},
-    {"source": "tickets/MAT-043.md; tickets/MAT-077.md", "application": "Keep later timing qualification and broad distribution hardening separate; neither is a prerequisite for this bounded neutral regression repair."}
+    {
+      "source": "docs/storage.md; docs/delivery.md; tickets/MAT-021.md",
+      "application": "Preserve the existing neutral transaction, outbox, fencing, failure and milestone contracts."
+    },
+    {
+      "source": "tests/integration/test_dispatch_races.py; tests/integration/delivery_helpers.py; tests/semantic/test_stages.py",
+      "application": "Reuse the existing real-handle race, cancellation fixture and independent-stage scenario; add only controls needed to reproduce demonstrated behavior."
+    },
+    {
+      "source": "docs/validation/dashboard-matter-handoff.md#existing-ci-validation-gap",
+      "application": "Carry forward actual failing receipts without changing historical passes into a claim that the gap is cleared."
+    },
+    {
+      "source": "tickets/MAT-043.md; tickets/MAT-077.md",
+      "application": "Keep later timing qualification and broad distribution hardening separate; neither is a prerequisite for this bounded neutral regression repair."
+    }
   ],
   "sources": [
     "docs/contracts/core.md",
@@ -86,7 +110,12 @@
     "docs/validation/dashboard-matter-handoff.md",
     "docs/validation/MAT-083-intake.md",
     "Retained gitignored receipts: data/validation/sdk-handoff-20261030/race-reproduction.log, ci-pr26-py312.log and ci-pr27.log.",
-    "Owner-supplied StateCivics handoff, 2026-10-31: merged Matter stack, image ks-test-runner:matter-10a7d9a, 202 source-matching packaged files, both adapter interfaces, 219 historical-replay passes/no skips; statewide suite/review pending. External wheel SHA-256 supplied only as 3d19879b…; Python 3.11 build is the reported explanation for differing wheel bytes."
+    "Owner-supplied StateCivics handoff, 2026-10-31: merged Matter stack, image ks-test-runner:matter-10a7d9a, 202 source-matching packaged files, both adapter interfaces, 219 historical-replay passes/no skips; statewide suite/review pending. External wheel SHA-256 supplied only as 3d19879b\u2026; Python 3.11 build is the reported explanation for differing wheel bytes."
   ],
-  "completion": {"state": "not_run", "evidence": []}
+  "completion": {
+    "state": "not_run",
+    "evidence": [
+      "2026-10-31 bounded investigation, not repair: docs/validation/MAT-083-followup.md retains two passing unchanged-dev16 race runs (one with transaction trace), a passing dev17 trace, a three-case candidate run and nine passing checks in three repeat trials. Writer lock time was 3.901s on the traced dev16 run and 0.552s on dev17; both produced exactly one ready winner and stale loser. No original failure or common cause for the two intermittents was reproduced. Keep MAT-083 open; no blind retries, assertion weakening, speculative storage fix or provider qualification. The named main dispatch-race failure is already this ticket; no duplicate ticket filed."
+    ]
+  }
 }

@@ -17,6 +17,7 @@ from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
 from ..canonical import CanonicalError, canonical_bytes, canonical_digest
+from .._validation import InvalidValue, validated_bytes
 from ..contracts import ContractError, _FORMAT_CHECKER, error_result, record_digest, schema_for
 
 
@@ -52,7 +53,7 @@ class StorageError(ContractError):
         )
 
 
-@lru_cache(maxsize=8)
+@lru_cache(maxsize=128)
 def _fragment_validator(name: str) -> Draft202012Validator:
     core = schema_for("record")
     registry = Registry().with_resource(core["$id"], Resource.from_contents(core))
@@ -63,13 +64,9 @@ def _fragment_validator(name: str) -> Draft202012Validator:
 
 def _validate_fragment(value: Any, name: str) -> Any:
     try:
-        canonical_bytes(value)
-        valid = _fragment_validator(name).is_valid(value)
-    except (CanonicalError, RecursionError):
-        valid = False
-    if not valid:
-        raise StorageError("E_SCHEMA_INVALID")
-    return deepcopy(value)
+        return validated_bytes(canonical_bytes(value), _fragment_validator(name), "core-fragment.1.0")
+    except (CanonicalError, InvalidValue, RecursionError):
+        raise StorageError("E_SCHEMA_INVALID") from None
 
 
 def _reference(value: Any, *, pinned: bool = False) -> dict[str, Any]:

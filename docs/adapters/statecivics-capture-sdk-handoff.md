@@ -128,3 +128,19 @@ After merge, rebuild from the merged commit and compare packaged files with
 `1f525c6`. This freeze changes docs, tickets and the compatibility check only;
 `src`, `schemas` and `pyproject.toml` remain byte-identical. Performance and public
 milestone API changes must ship in a separate SDK build without changing 1.1 wire.
+
+## Separate dev17 performance and public API follow-up
+
+The later `matter-foundation==0.1.0.dev17` build leaves frozen 1.0/1.1 wires and
+HostMonitoringState unchanged. Its source pin is `eb6f563a6ce064e76eea50e5f864cf0353c1bb01`; the
+[SDK performance handoff](../validation/sdk-performance.md) records its full
+wheel digest, 205-file inventory, unprofiled timings, final tests and public
+`matter.attention.build_delivery_milestone_details` API.
+
+For the dev16 freeze comparison, use merged commit
+`35f330ae44657db46bc443aff6823a088501c693`: its 204 runtime files match `1f525c6`.
+For dev17, compare the rebuilt image with the later source pin, not `1f525c6`;
+the performance/API file differences are deliberate. The consumer owns its
+image rebuild and dev17 receiving checks. Existing dev16 acceptance does not
+imply those later checks have run. No deployment/activation or qualification is
+introduced by either build.
