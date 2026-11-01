@@ -979,3 +979,23 @@ class ReviewTests(unittest.TestCase):
         self.assertEqual(requests[1].wake_id,wake)
         self.assertEqual(after['value']['value']['pending'],sorted(requests[1].value['contributions'],key=canonical_bytes))
         self.assertEqual(self.calls,1)  # Only the draining review ran.
+
+
+    def test_host_rule_assessment_can_wake_review_without_becoming_a_jev_judgment_or_source_fact(self):
+        assessment=self.artifact('judgment','host-rule-outcome','host_rule_judgment',
+            {'method':'deterministic_host_rule','rule_version':'approved-rule-v1'},citations=[self.source])
+        request=self.req(assessment=assessment)
+        before=self.f.storage.get(pin(self.f.subject))
+        self.add(request)
+        row=self.execute(request)
+        self.assertEqual(row['value']['value']['phase'],'completed')
+        artifacts=self.service.resolve(request,[assessment],token=self.token,access_context=self.access_context)
+        judgment=next(value for value in artifacts if value['reference']==assessment)
+        self.assertEqual(judgment['classification'],'host_rule_judgment')
+        self.assertEqual(judgment['content']['rule_version'],'approved-rule-v1')
+        self.assertEqual(self.f.storage.get(pin(self.f.subject)),before)
+        self.assertEqual(self.calls,1)  # Synthetic assistant callback, not a JEV/provider call.
+        unsupported=self.artifact('judgment','uncited-host-rule','host_rule_judgment',{'method':'deterministic_host_rule'})
+        unbound=self.req(assessment=unsupported)
+        with self.assertRaises(ContractError):
+            self.service.resolve(unbound,[unsupported],token=self.token,access_context=self.access_context)

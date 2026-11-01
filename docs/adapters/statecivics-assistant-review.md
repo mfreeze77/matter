@@ -188,3 +188,9 @@ from the stable semantic `wake_id`/host `wake_key`. After a known recorded
 backpressure refusal, draining the window permits a fresh local registration ID
 for the bounded batch; an exact retry preserves its immutable refusal. Keep the
 same semantic wake and never renew IDs to bypass an unknown assistant outcome.
+
+Project actual deterministic host-rule outcomes as judgment-kind
+`host_rule_judgment`, with their real rule/version and original citations.
+Project JEV answers as `jev_judgment` with their actual unqualified/qualified
+status. The adapter accepts both for review; do not relabel a host rule as model
+interpretation or promote either to a source fact or delivery permission.

@@ -205,7 +205,8 @@ host-owned `content`. Use `host_artifact_reference(artifact)` to compute its exa
 projection reference. The digest covers identity, lens and all provenance, not
 just its text. No process-local cache can override current read authorization.
 
-Classifications distinguish source quote/fact, JEV judgment, interpretation,
+Classifications distinguish source quote/fact, deterministic host-rule judgment,
+JEV judgment, interpretation,
 user feedback, communication, review, session, rule and host control. Cited
 findings and judgments retain original sources; interpretations do not become
 supported claims or independent corroboration. A source and five summaries
@@ -290,3 +291,10 @@ old protected contributions. Equivalent native selections share checks only
 within one consistent read snapshot, never across permission changes or calls.
 This conservative history authorization does not copy artifact bodies or make
 history eligible for model reuse.
+
+`host_rule_judgment` labels an actual deterministic host-rule assessment;
+`jev_judgment` labels a model judgment. Both require original citations and keep
+their actual method/version in the host projection. Neither label creates a
+source fact, a qualified provider result or authority to deliver. This lets the
+existing host-rule and model paths wake the same bounded review service without
+claiming a deterministic rule was a JEV interpretation.

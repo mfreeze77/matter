@@ -493,6 +493,7 @@
           "enum": [
             "source_quote",
             "source_fact",
+            "host_rule_judgment",
             "jev_judgment",
             "interpretation",
             "user_feedback",

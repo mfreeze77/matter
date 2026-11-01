@@ -624,14 +624,14 @@ class AssistantReviewService(_MutationService):
             if compare_times(artifact["available_at"], at) > 0:
                 _fail("E_EVIDENCE_UNAVAILABLE")
             allowed={"finding":{"source_quote","jev_judgment","interpretation"},
-                "judgment":{"jev_judgment"},"evidence":{"source_quote","source_fact"},
+                "judgment":{"jev_judgment","host_rule_judgment"},"evidence":{"source_quote","source_fact"},
                 "rule":{"rule"},"review":{"review"},"session":{"session"},"control":{"host_control"},
                 "feedback":{"user_feedback"},"conveyed":{"communication"},"report":{"communication"}}
             if artifact["classification"] not in allowed[reference["kind"]]:
                 _fail("E_EVIDENCE_INVALID")
             if ((artifact["classification"] == "communication") != (artifact["communication_state"] is not None)):
                 _fail("E_EVIDENCE_INVALID")
-            if (reference["kind"] == "finding" or artifact["classification"] in {"interpretation", "jev_judgment"}) and not artifact["citations"]:
+            if (reference["kind"] == "finding" or artifact["classification"] in {"interpretation", "jev_judgment", "host_rule_judgment"}) and not artifact["citations"]:
                 _fail("E_EVIDENCE_INVALID")
             visiting.add(key)
             for parent in _unique(artifact["citations"] + artifact["derived_from"]):
