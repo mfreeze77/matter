@@ -42,7 +42,7 @@ def is_source_access_target(ref):
         ref["record_type"] == PROJECTION_TYPE and ref["namespace"].startswith("matter."))
 
 
-# Compatibility for existing SDK/host imports; there is one policy predicate.
+# Preserve existing imports as an alias of the public classifier.
 _public = is_source_access_target
 
 

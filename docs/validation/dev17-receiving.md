@@ -1,6 +1,6 @@
 # StateCivics dev17 receiving acceptance
 
-Owner-relayed receipt, retained verbatim below; SHA-256 `2fceabad128335f2e3e584bfa89b1593087127761cd4e5cc28cbdfccca46d179`. Matter independently checked the accessible StateCivics main commit `eb8195320` and image ID, and the six private predicate call sites. The test results, file comparison and elapsed times below are reported by StateCivics, not rerun here. Concurrent-load receiving timings are not directly comparable to Matter's standalone prototype. No live interpretation, qualification or deployment is established.
+Owner-relayed receipt, retained verbatim below; SHA-256 `2fceabad128335f2e3e584bfa89b1593087127761cd4e5cc28cbdfccca46d179`. Matter independently checked StateCivics main `eb8195320`, its byte-equal src/tests against receiving-test commit `314daf0a6`, the exact image ID and all 205 installed runtime file hashes against the pinned Matter source, plus the six private predicate call sites. Test results, rebuilt-wheel digest and elapsed times below remain reported by StateCivics, not rerun here. Concurrent-load receiving timings are not directly comparable to Matter's standalone prototype. No live interpretation, qualification or deployment is established.
 
 StateCivics receiving check for Matter dev17 (PR #32, main `f2ce051`, runtime `eb6f563`), 2026-10-31.
 
