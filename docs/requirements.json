@@ -74,7 +74,7 @@
   {
     "id": "CIV-12",
     "title": "Scoped retained findings inform later semantic decisions",
-    "description": "Retain cited assistant findings and quiet/revisit decisions under exact user/workspace/client/objective/angle and source versions. Later JEV stages distinguish source evidence from derived interpretation, preserve current permissions and availability, prevent self-corroboration and repeated unchanged loops, and keep reviewed history separate from actual communicated content.",
+    "description": "Retain cited assistant findings and quiet/revisit decisions under exact user/workspace/client/objective/angle and source versions. Later JEV stages distinguish source evidence from derived interpretation, preserve current permissions and availability, prevent self-corroboration and repeated unchanged loops, and keep reviewed history separate from actual communicated content. Completed review clears reviewed pressure for both alert and no-alert, records authorized versioned ongoing-monitoring updates, and preserves all scoped evidence/finding associations without clearing unreviewed arrivals or fabricating communication.",
     "source": "Owner discussion, 2026-10-31: client onboarding research; bubble burst wakes the user-specific assistant; bounded existing MCP/wizard investigation; report/alert judgment; quiet findings retained per user/client/angle for cascading JEV. Ticket writing only; unresolved choices remain proposals."
   },
   {

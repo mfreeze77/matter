@@ -43,7 +43,9 @@
     "Include original citations and explicitly labelled derived context in subsequent authorized question packets. Do not count the note and its underlying source as separate corroboration; do not let the next model treat an earlier assumption as an established claim.",
     "Recheck grants and original input/context bindings on reads/reuse. Source corrections, changed approved purpose/angle, pause or revocation invalidate or withhold pending results; shared source-only reads require each recipient access while private context stays isolated.",
     "Suppress repeat requests for the unchanged gap/material/context using existing receipts and bounded investigation. New evidence, real corrections or deadlines can re-open review. Maintain replay availability order and original uncertainty.",
-    "Retain the distinct cited contributions and contextual rationale behind accumulated review pressure. Reprints, exact duplicates, correlated copies and repeated model summaries must not inflate it as independent evidence. A later fact may change the interpretation of earlier quiet evidence. Preserve current source/context invalidation; decay, reset and carry-over after review remain open choices."
+    "Retain the distinct cited contributions and contextual rationale behind accumulated review pressure. Reprints, exact duplicates, correlated copies and repeated model summaries must not inflate it as independent evidence. A later fact may change the interpretation of earlier quiet evidence. Preserve current source/context invalidation; completed review clears reviewed pressure while evidence remains attached; decay before review and the exact reviewed-set boundary remain open implementation details.",
+    "Keep every scoped evidence/finding association, including quiet and contradictory research, after pressure reset. Record the completed review, alert/no-alert decision, actually reviewed source versions and ongoing monitoring-rule revisions/rationale. Retained or reviewed evidence is not automatically communicated, read, handled or resolved.",
+    "Reset only contributions covered by the completed review and current user/client/objective/angle. New or unreviewed material arriving during investigation, other client angles and later corrections remain eligible for their own pressure/review. Exact reset recovery is idempotent; failed/unknown/stale work cannot erase pending state or justify a blind retry."
   ],
   "acceptance": [
     {
@@ -65,6 +67,11 @@
       "id": "AC-4",
       "criterion": "Accumulation reflects scoped distinct evidence rather than duplicate volume.",
       "verification": "Replay weak distinct observations, repeated copies and derived summaries, then a material new event under two client angles. Preserve original citations and uncertainty, prevent duplicate inflation and cross-angle pressure leakage, and record which new evidence changed the review rationale. No decay/reset formula is invented."
+    },
+    {
+      "id": "AC-5",
+      "criterion": "Pressure reset never discards scoped evidence, unreviewed arrivals or monitoring-rule provenance.",
+      "verification": "For both alert and no-alert, assert reviewed pressure clears and all original/newly gathered source and finding associations remain inspectable under current access. Inject a concurrent unreviewed arrival and another client angle, verify neither is cleared, and preserve old/new authorized rule versions, unknown outcomes and communication receipts separately."
     }
   ],
   "artifacts": [
@@ -94,7 +101,8 @@
   "sources": [
     "docs/plans/assistant-bubble-review.md",
     "Owner discussion, 2026-10-31: client onboarding research; bubble burst wakes the user-specific assistant; bounded existing MCP/wizard investigation; report/alert judgment; quiet findings retained per user/client/angle for cascading JEV. Ticket writing only; unresolved choices remain proposals.",
-    "Owner, 2026-10-31: both immediate and accumulated triggers; client-adverse pin-prick or distinct signals plus a tipping event. The 24% + 75% example is illustrative, not calibrated probability arithmetic."
+    "Owner, 2026-10-31: both immediate and accumulated triggers; client-adverse pin-prick or distinct signals plus a tipping event. The 24% + 75% example is illustrative, not calibrated probability arithmetic.",
+    "Owner, 2026-10-31: completed assistant review clears pressure, updates ongoing monitoring rules, decides alert or no alert, and keeps all evidence attached to the user/client/evidence context."
   ],
   "completion": {
     "state": "not_run",

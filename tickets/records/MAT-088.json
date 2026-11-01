@@ -43,7 +43,9 @@
     "Retain current access, original tokens and fresh source/context/control checks before and after tool/model work and at any eventual host capture. Direct pause/revoke/edit uses host controls immediately.",
     "Negotiate any new adapter contract explicitly beside frozen 1.0/1.1. Record open choices instead of reinterpreting existing AlertDelivery/capture records as internal work or assuming production permission.",
     "Support two trigger paths under the approved client/objective/angle: a decisive development can immediately wake the assistant even with no prior accumulation (owner example: highly relevant and directly adverse to the client interests); distinct smaller developments can accumulate or become materially significant together when a later event arrives. Both request assistant review, not an automatic human alert.",
-    "Retain the owner 24 percent accumulated plus 75 percent new-action illustration without treating the numbers as calibrated JEV probabilities, a fixed additive importance score, or a selected boundary. Define policy meaning and boundary behavior explicitly before implementation; do not reinterpret the existing 1.1 capture-policy decision regions."
+    "Retain the owner 24 percent accumulated plus 75 percent new-action illustration without treating the numbers as calibrated JEV probabilities, a fixed additive importance score, or a selected boundary. Define policy meaning and boundary behavior explicitly before implementation; do not reinterpret the existing 1.1 capture-policy decision regions.",
+    "A completed assistant review clears the pressure covered by that review regardless of alert/no-alert choice, records versioned ongoing-monitoring adjustments through authorized host controls, and retains all source/finding associations. Failed, unavailable or outcome-unknown review is not completed quiet review.",
+    "Treat monitoring adjustments within approved intent and actual delegated host authority as distinct from changing user purpose, client/scope, stance, recipients, permissions or budget ceilings. Preserve existing approval/versioning for those changes; a model recommendation alone grants no authority. Exact writable rule fields and apply/reconcile semantics remain to be specified."
   ],
   "acceptance": [
     {
@@ -65,6 +67,11 @@
       "id": "AC-4",
       "criterion": "Both decisive and cumulative developments can request review with an explainable trigger route.",
       "verification": "Specify cases for immediate review from zero prior pressure, smaller distinct developments below a proposed boundary, a later development making the combination review-worthy, and an event eligible for both routes producing one review request. Fixture thresholds are explicitly illustrative until approved; waking the assistant never fabricates delivery."
+    },
+    {
+      "id": "AC-5",
+      "criterion": "Completed review clears pressure independently of alerting while preserving evidence and authorized rule history.",
+      "verification": "Specify alert and no-alert completions, each with a pressure reset scoped to the actually reviewed evidence/context, all evidence links retained and monitoring-change provenance. Show no fabricated human delivery for no-alert, no reset on failed/unknown/stale completion and no loss of material arriving outside the reviewed set."
     }
   ],
   "artifacts": [
@@ -77,7 +84,8 @@
     "A decisive new source correction or deadline can request fresh review despite an earlier quiet/handled decision.",
     "A failed or unavailable review is unknown, not an irrelevance judgment.",
     "A decisive client-adverse development does not wait for accumulation.",
-    "One later fact can change the interpretation of earlier quiet findings; do not require keyword counts to reach a universal threshold."
+    "One later fact can change the interpretation of earlier quiet findings; do not require keyword counts to reach a universal threshold.",
+    "Alert and no-alert review both clear reviewed pressure; neither deletes evidence, resolves the matter automatically or implies the user read the research."
   ],
   "risks": [
     "Treating a bubble burst as delivery can fabricate the user baseline.",
@@ -96,7 +104,8 @@
   "sources": [
     "docs/plans/assistant-bubble-review.md",
     "Owner discussion, 2026-10-31: client onboarding research; bubble burst wakes the user-specific assistant; bounded existing MCP/wizard investigation; report/alert judgment; quiet findings retained per user/client/angle for cascading JEV. Ticket writing only; unresolved choices remain proposals.",
-    "Owner, 2026-10-31: both immediate and accumulated triggers; client-adverse pin-prick or distinct signals plus a tipping event. The 24% + 75% example is illustrative, not calibrated probability arithmetic."
+    "Owner, 2026-10-31: both immediate and accumulated triggers; client-adverse pin-prick or distinct signals plus a tipping event. The 24% + 75% example is illustrative, not calibrated probability arithmetic.",
+    "Owner, 2026-10-31: completed assistant review clears pressure, updates ongoing monitoring rules, decides alert or no alert, and keeps all evidence attached to the user/client/evidence context."
   ],
   "completion": {
     "state": "not_run",
