@@ -1,13 +1,13 @@
 {
   "id": "MAT-089",
-  "title": "Retain scoped assistant findings for subsequent JEV decisions",
+  "title": "Reference scoped host findings for subsequent JEV decisions",
   "track": "civic",
   "phase": 4,
   "priority": "P1",
   "status": "planned",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
-  "component": "adapters.assistant_review_memory",
+  "component": "adapters.assistant_review_references",
   "depends_on": [
     "MAT-088",
     "MAT-016",
@@ -25,9 +25,9 @@
     "CORE-23",
     "OPS-01"
   ],
-  "summary": "Preserve useful cited research even when the personal assistant decides not to interrupt. Give later JEV stages authorized context about that user/client/angle without converting prior model interpretations into source facts, independent corroboration, delivered knowledge or qualified judgments.",
+  "summary": "Reference useful host-owned research even after a quiet review. StateCivics owns lens memory, sessions, findings, evidence and reports; Matter stores IDs/digests and scoped decision-state pointers, plus its own pressure, disposition, baseline and receipt state. Later JEV stages resolve authorized current host context without duplicating findings or treating model interpretations as independent facts.",
   "in_scope": [
-    "Minimal review-finding and quiet/revisit history using existing records, receipts, dependencies and host storage ownership.",
+    "A minimal versioned pointer contract to host-owned findings, sessions, quiet/revisit history and ledger records; no assistant-memory/evidence/report copy in Matter.",
     "Current-context selection of derived notes for later bounded JEV packets, including original evidence and uncertainty.",
     "Targeted invalidation and unchanged-loop suppression without discarding genuine corrections or deadlines."
   ],
@@ -37,15 +37,17 @@
     "Changing frozen monitoring 1.0/1.1 semantics silently; production alerts, formal qualification, DIAT or unrelated Oil work."
   ],
   "implementation": [
-    "Map review findings to existing host records/Matter receipts rather than creating a new memory database or global client dossier. Separate exact source quotations/observations from assistant interpretations and suggested interests.",
-    "Bind each finding and review outcome to user/workspace/client-or-personal, approved objective revision and angle meaning, matter, source/citation revisions, availability, original method/attempt and actual access provenance. Angle identifier/granularity remains an open contract choice.",
+    "Define exact ID/digest references to StateCivics-owned findings and original citations, through authorized host readers. StateCivics retains all source quotations, review transcripts, memory and reports; Matter retains pointers and its own decision/control state. This future assistant handoff does not authorize migrating/deleting existing core records or changing frozen contracts.",
+    "Bind each finding and review outcome to user/workspace/client-or-personal, approved objective revision and angle meaning, matter, source/citation revisions, availability, original method/attempt and actual access provenance. The lens is the existing StateCivics client-or-personal and objective identity; do not create a competing Matter angle/lens store.",
     "Retain why no alert was warranted and an optional reconsideration condition. Mark never communicated, report prepared, capture outcome unknown, actually conveyed, read and acted as separate states. An internal capture is not human delivery.",
     "Include original citations and explicitly labelled derived context in subsequent authorized question packets. Do not count the note and its underlying source as separate corroboration; do not let the next model treat an earlier assumption as an established claim.",
     "Recheck grants and original input/context bindings on reads/reuse. Source corrections, changed approved purpose/angle, pause or revocation invalidate or withhold pending results; shared source-only reads require each recipient access while private context stays isolated.",
     "Suppress repeat requests for the unchanged gap/material/context using existing receipts and bounded investigation. New evidence, real corrections or deadlines can re-open review. Maintain replay availability order and original uncertainty.",
     "Retain the distinct cited contributions and contextual rationale behind accumulated review pressure. Reprints, exact duplicates, correlated copies and repeated model summaries must not inflate it as independent evidence. A later fact may change the interpretation of earlier quiet evidence. Preserve current source/context invalidation; completed review clears reviewed pressure while evidence remains attached; decay before review and the exact reviewed-set boundary remain open implementation details.",
     "Keep every scoped evidence/finding association, including quiet and contradictory research, after pressure reset. Record the completed review, alert/no-alert decision, actually reviewed source versions and ongoing monitoring-rule revisions/rationale. Retained or reviewed evidence is not automatically communicated, read, handled or resolved.",
-    "Reset only contributions covered by the completed review and current user/client/objective/angle. New or unreviewed material arriving during investigation, other client angles and later corrections remain eligible for their own pressure/review. Exact reset recovery is idempotent; failed/unknown/stale work cannot erase pending state or justify a blind retry."
+    "Reset only contributions covered by the completed review and current user/client/objective/angle. New or unreviewed material arriving during investigation, other client angles and later corrections remain eligible for their own pressure/review. Exact reset recovery is idempotent; failed/unknown/stale work cannot erase pending state or justify a blind retry.",
+    "KS-1150 owns the four-input per-lens ledger: JEV judgments, assistant reviews, actually conveyed output and user feedback. Reference those host records using exact identity/digest and scope/version metadata, resolve them only under current access, and keep source facts, derived interpretations and decision/communication outcomes distinct. Missing, changed or revoked host records are unavailable/stale, not copied, guessed or publicly exposed.",
+    "Lens session rollover keeps host history/evidence associations and logical continuity; Matter references the appropriate host session/review records rather than importing chat turns. Findings retention remains an owner decision, not an indefinite-retention default or a pressure-reset side effect."
   ],
   "acceptance": [
     {
@@ -72,12 +74,18 @@
       "id": "AC-5",
       "criterion": "Pressure reset never discards scoped evidence, unreviewed arrivals or monitoring-rule provenance.",
       "verification": "For both alert and no-alert, assert reviewed pressure clears and all original/newly gathered source and finding associations remain inspectable under current access. Inject a concurrent unreviewed arrival and another client angle, verify neither is cleared, and preserve old/new authorized rule versions, unknown outcomes and communication receipts separately."
+    },
+    {
+      "id": "AC-6",
+      "criterion": "Matter stores verifiable host pointers without duplicating lens findings.",
+      "verification": "Inspect persisted Matter state for ID/digest/scope/receipt metadata only for assistant artifacts; assert no findings, transcript, report or memory body copies. Resolve current authorized pointers, refuse stale digest/foreign lens/revoked access, and preserve references across host session rollover without claiming unavailable history is present."
     }
   ],
   "artifacts": [
     "docs/plans/assistant-bubble-review.md",
     "docs/contracts/assistant-review.md",
-    "tests/integration/test_assistant_review_memory.py"
+    "tests/integration/test_assistant_review_memory.py",
+    "docs/adapters/statecivics-feedback-handoff.md"
   ],
   "tests": [
     "Reviewed is not delivered, read or handled.",
@@ -102,7 +110,9 @@
     "docs/plans/assistant-bubble-review.md",
     "Owner discussion, 2026-10-31: client onboarding research; bubble burst wakes the user-specific assistant; bounded existing MCP/wizard investigation; report/alert judgment; quiet findings retained per user/client/angle for cascading JEV. Ticket writing only; unresolved choices remain proposals.",
     "Owner, 2026-10-31: both immediate and accumulated triggers; client-adverse pin-prick or distinct signals plus a tipping event. The 24% + 75% example is illustrative, not calibrated probability arithmetic.",
-    "Owner, 2026-10-31: completed assistant review clears pressure, updates ongoing monitoring rules, decides alert or no alert, and keeps all evidence attached to the user/client/evidence context."
+    "Owner, 2026-10-31: completed assistant review clears pressure, updates ongoing monitoring rules, decides alert or no alert, and keeps all evidence attached to the user/client/evidence context.",
+    "mfreeze77/state-civics-ai:KS-1150",
+    "StateCivics KS-1150 on e8c2ce70e: host-owned assistant/lens/session/memory/evidence; Matter pointers only; county-report delivery records; bounded lens sessions. KS-1125 feedback is next; five owner choices stay open."
   ],
   "completion": {
     "state": "not_run",

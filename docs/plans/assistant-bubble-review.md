@@ -3,7 +3,8 @@
 Status: **discussion captured; implementation planned, not authorized by this
 record**. Owner requested tickets and continued discussion, 2026-10-31.
 No runtime, schema, provider/tool execution, data-processing or deployment change
-is included. Proposed fields, thresholds and assistant routing are not frozen.
+is included. Proposed wire fields and thresholds are not frozen. KS-1150 now
+pins the host ownership and existing assistant routing described below.
 
 ## What the owner clarified
 
@@ -26,13 +27,16 @@ fact, not proof of a current stance, a StateCivics customer, or user authorizati
 - [MAT-088](../../tickets/MAT-088.md), **Matter**: specify the small versioned
   internal assistant-review request/result boundary, with current authority,
   citations, budgets, outcomes and honest communication-baseline semantics.
-- [MAT-089](../../tickets/MAT-089.md), **Matter**: retain scoped derived findings
-  and quiet/revisit history for later packets, with permission/version checks,
-  source attribution, invalidation and prevention of self-corroboration.
+- [MAT-089](../../tickets/MAT-089.md), **Matter**: reference host-owned findings
+  and quiet/revisit history through scoped IDs/digests, with permission/version
+  checks, source attribution, invalidation and prevention of self-corroboration.
+  StateCivics keeps the findings, evidence, sessions, reports and memory bodies.
 - [MAT-090](../../tickets/MAT-090.md), **StateCivics-owned roadmap entry**:
   reuse onboarding, the user's assistant and MCP/wizard, persistence and existing
   no-login replay/capture stack for the connected receiving demonstration.
-  This Matter record neither creates a KS ticket nor authorizes host changes.
+  StateCivics **KS-1150** is now its host implementation ticket; this Matter
+  roadmap entry must not become a duplicate implementation or authorize host
+  changes by itself.
 
 MAT-088's contract is ready to design against the existing foundations; MAT-089
 follows it. MAT-090 requires those actual interfaces before connected acceptance.
@@ -128,10 +132,11 @@ context versions; it is not an independent corroborating source, an accepted
 claim, a qualification certificate or a permission grant. Current policy/source
 changes can invalidate its use. Original documents stay separately addressable.
 
-Scope findings by user/workspace/client-or-personal/approved-objective/angle,
-subject and evidence versions. Whether angle is simply one objective or a finer
-label is still open. Do not create a globally shared client dossier or share
-private review rationale through a source-reading cache.
+Scope findings by user/workspace/client-or-personal/approved-objective, subject
+and evidence versions. KS-1150 selects the existing client-or-personal and
+objective identities for the lens; no competing Matter angle store is needed.
+Do not create a globally shared client dossier or share private review rationale
+through a source-reading cache.
 
 ## Verification to implement later
 
@@ -207,25 +212,73 @@ must not be wiped out with that reset. A failed, unavailable, unknown or stale
 review is not a completed no-alert decision. Recovery must preserve those facts
 and avoid duplicate updates, repeated unchanged tool loops or blind retries.
 
-## Still open for discussion
+## KS-1150 host boundary and next handoff
 
-1. **Burst policy details:** both immediate and cumulative paths are decided.
-   The pressure meaning, exact boundary, correlation handling and decisive-event
-   policy are not yet specified. Completed review clears pressure in either
-   alert outcome; pre-review decay and the reviewed/unreviewed evidence boundary
-   remain to specify. No numeric formula or confidence arithmetic is approved.
-2. **Personal assistant boundary:** which existing session/runtime handles
-   background reviews, which tools are exposed, and what approved current-work
-   context can it read? Locate the real surfaces before adding adapters.
-3. **Outcome vocabulary:** how quiet, digest, prepared report and interruption
-   relate; whether a useful report can be saved without notifying; what requires
-   user approval beyond the initial capture-only slice.
-4. **Memory/angle lifecycle:** objective versus finer angle identifiers, who can
-   edit/undo findings, retention, revisit scheduling and compatibility after
-   purpose edits. Reuse existing dispositions/retention owners where applicable.
-5. **Pilot and budgets:** actual organization records, place/workspace, two
-   objectives, explicit model and bounded tool/model envelope. These are not
-   approved merely by an illustrative scenario or this ticket-writing request.
+Read-only source snapshot: StateCivics main
+`e8c2ce70ee548af475e1354416b6fbd3b9e7eb58`, including
+`tickets/KS-1150-wake-the-users-own-assistant-for-a-bounded-review-when-matter-flags-a-development.md`.
+This supersedes the earlier runtime/lens alternatives in this plan:
+
+- **Host ownership:** StateCivics owns the existing assistant, client lens,
+  sessions, memory, source evidence, findings and reports. Matter retains exact
+  host IDs/digests and decision-state pointers, plus its own pressure,
+  dispositions, baselines and receipts. The future pointer boundary does not
+  migrate or delete existing core records or alter frozen monitoring 1.0/1.1.
+- **Inbound routing:** wake-ups use the existing host message router as another
+  inbound channel, with the objective's actual user identity and a bounded
+  read-only tool exposure. They do not create another assistant runtime. Exact
+  wire fields, permitted readers and per-review limits still need MAT-088 and
+  KS-705; choosing the existing router is not evidence those pieces exist.
+- **Sessions:** one logical review session per client lens, with rollover or
+  explicit limits before exhausting configured chat capacity (currently 300
+  messages or 3,000,000 tokens). Host history retains continuity; Matter stores
+  session/review references, not chat turns. Per-review call/time/byte/cost limits
+  and applicable account/monthly limits must also be enforced. No pilot budget
+  or session-visibility policy has been chosen.
+- **Output:** the user's output is a stored report with its alert/notice, never
+  a forwarded conversational model reply. Reuse the **county meeting report**
+  `alert_deliveries` claim-and-commit-before-send pattern and report notice
+  rendering. The state hearing broadcast's separate log is not the record model
+  to copy. Preserve honest failed/unknown delivery and reconciliation; an
+  internal wake-up or prepared report is not human communication. Initial
+  rehearsal notices remain isolated/unsent until joint activation; the general
+  report-without-notifying option remains open.
+- **Four-input ledger:** JEV judgments, assistant reviews, actually conveyed
+  output, and scoped user feedback. These inputs remain distinguishable; a
+  conversational assertion is not a source fact or an observed delivery.
+
+**KS-1125 is the next host piece**: explain shown, quiet and corrected outcomes,
+then commit reversible scoped feedback through existing Matter dispositions and
+pass its real current pins on subsequent evaluation. The present host request
+has an empty `dispositions` list; the SDK already supplies the guarded control
+and explanation primitives. See the [verified SDK handoff](../adapters/statecivics-feedback-handoff.md)
+for exact APIs, restrictions, checks and remaining host acceptance. It is not a
+claim that KS-1125's UI/persistence wiring has been implemented here.
+
+Crawler ZIP delivery remains pending per the host handoff; this pass neither
+receives a ZIP nor establishes broader source coverage. Existing replay,
+assistant, memory and report infrastructure should be extended only where these
+specific contracts are missing.
+
+## Five owner decisions remain open
+
+1. **Burst thresholds:** immediate and accumulated paths are agreed; pressure
+   meaning, boundaries and correlation policy remain to specify. The numeric
+   example is not a calibrated probability formula.
+2. **Session visibility:** whether the per-lens review session is visible from
+   its start.
+3. **Prepared report without notification:** whether a completed report can be
+   kept without sending a notice, and how that option appears to the user.
+4. **Findings retention:** what is retained and for how long. Clearing pressure
+   does not silently erase findings, and this plan does not choose indefinite
+   retention.
+5. **Pilot and budget:** actual client, place/workspace, two approved objectives,
+   model and bounded tool/model budget. Example organizations are not approval.
+
+Technical contract work still includes exact reference/result fields, rollover
+behavior, tool limits and reviewed-set reset/reconciliation semantics. Those
+are implementation design tasks under the selected ownership, not additional
+owner choices silently settled by this document.
 
 ## Planning receipt
 
@@ -239,3 +292,17 @@ Planning closeout checks: `python -m matter render --check` and `python -m matte
 Dual-trigger clarification closeout: the updated canonical records render and validate (90 tickets, 107 requirements). Final whole-branch two-round review covered four supported JSON files in 56.2s, with zero findings/warnings. Tickets remain planned/not_run; no runtime, schema, threshold configuration or provider execution changed.
 
 Completed-review clarification closeout: records render and validate (90 tickets, 107 requirements); the two-round review of four JSON files completed in 59.5s with no findings/warnings. All three tickets remain planned/not_run; no runtime, package, schema, live model/tool call or deployment changed.
+
+KS-1150 alignment: the canonical roadmap now names host-owned assistant/lens
+artifacts, pointer-only Matter reuse, county report delivery records and bounded
+session continuity. KS-1125's SDK handoff records 26 existing synthetic checks
+passed in 47.015s; it does not establish host implementation or receiving
+acceptance. The five owner decisions remain open. Runtime, package and schemas
+are unchanged.
+
+Alignment closeout: render/check, validation and diff whitespace checks pass.
+The two-round bridge review covered five JSON files in 70.2s with zero findings
+or warnings under its configured JSON rules; those rules are limited to key
+spelling, not semantic verification. Markdown is excluded from that tool and was
+checked directly against the pinned host source and Matter SDK. The receiving
+host tests and actual assistant runtime remain unrun by this change.
