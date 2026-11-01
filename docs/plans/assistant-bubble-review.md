@@ -150,11 +150,38 @@ private review rationale through a source-reading cache.
   not actual JEV interpretation or usefulness. Formal MAT-040/042/050 and
   production delivery remain separate; labels do not block exploratory captures.
 
+## Confirmed dual trigger paths
+
+The owner confirmed **both**, 2026-10-31:
+
+- **Pin-prick path:** a single highly relevant development directly against the
+  client's approved interests can immediately burst the bubble, even with no
+  prior accumulated pressure. This is an example of a decisive development,
+  not a restriction that only adverse events can ever be important.
+- **Accumulation path:** smaller distinct developments build context/pressure;
+  a later event can tip the combination into review-worthy significance. JEV
+  should consider the combined meaning, including a new fact that changes how
+  earlier quiet evidence is understood.
+
+Both wake the personal assistant for investigation/judgment. Neither directly
+means the user receives an alert. A dual-route match requests one review.
+Pressure remains scoped to the approved user/client/objective/angle; repeated
+copies and model summaries do not create additional independent evidence.
+
+The owner's “24 percent” accumulated plus “75 percent” new-action example is a
+near-boundary illustration. Read literally as addition it totals 99 percent;
+no exact threshold, rounding rule or additive formula was chosen. The new event
+could also qualify through the immediate path. These percentages are not
+calibrated JEV confidence probabilities and do not change the existing 1.1
+capture-policy regions. Record source facts, relevance/consequence and
+uncertainty separately rather than installing a universal importance score.
+
 ## Still open for discussion
 
-1. **Burst mechanics:** can several small signals accumulate toward waking the
-   assistant? Which decisive events bypass accumulation? No universal importance
-   score, pressure formula, weights or thresholds have been selected.
+1. **Burst policy details:** both immediate and cumulative paths are decided.
+   The pressure meaning, exact boundary, correlation handling and decisive-event
+   policy are not yet specified. Decay, reset and carry-over after a quiet review
+   also remain open; no numeric formula or confidence arithmetic is approved.
 2. **Personal assistant boundary:** which existing session/runtime handles
    background reviews, which tools are exposed, and what approved current-work
    context can it read? Locate the real surfaces before adding adapters.
@@ -176,3 +203,5 @@ prerequisites are unchanged. Run receipts for render, validation and review are
 recorded at planning closeout. No runtime or provider/tool experiment ran.
 
 Planning closeout checks: `python -m matter render --check` and `python -m matter validate` pass (90 tickets, 107 requirements, 108 schemas and three walkthroughs); `git diff --check` passes. Independent two-round review covered all seven supported JSON files in 77.6s, with zero findings/warnings. Runtime source, package version and schemas are unchanged; no software/runtime tests or provider/tool experiment were claimed for this documentation-only work.
+
+Dual-trigger clarification closeout: the updated canonical records render and validate (90 tickets, 107 requirements). Final whole-branch two-round review covered four supported JSON files in 56.2s, with zero findings/warnings. Tickets remain planned/not_run; no runtime, schema, threshold configuration or provider execution changed.
