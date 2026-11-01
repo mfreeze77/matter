@@ -69,4 +69,8 @@ synthetic benchmark databases are deleted. No new Docker image was built. The
 host had about 37GiB free before and 36GiB at the intermediate check; this is a
 bounded small-output task, not a bulk storage/research run.
 
-Final closeout: `render --check`, `validate` (86 tickets, 104 requirements, 108 schemas and three walkthroughs), `git diff --check`, all 1,474 final broad checks and 41 final installed checks pass. Canonical ticket/index review is recorded separately. StateCivics must perform its own dev17 receiving/image check; its accepted dev16 receipt does not automatically qualify this later build.
+Final closeout: `render --check`, `validate` (86 tickets, 104 requirements, 108 schemas and three walkthroughs), `git diff --check`, all 1,474 final broad checks and 41 final installed checks pass. Canonical ticket/index review is recorded separately. StateCivics subsequently completed its dev17 receiving/image check, recorded below. The dev16 receipt alone did not establish acceptance of that later build.
+
+## Dev17 receiving acceptance recorded
+
+StateCivics completed its dev17 rebuild and receiving checks; see the [retained receipt](dev17-receiving.md). Matter independently checked the image ID and all 205 runtime file hashes. The reported 30 Matter/11 dispatch/35 PostgreSQL results and concurrent-load speed measurements are separate from the standalone benchmark above. KS-1148 adopted the public milestone builder. This closes the earlier receiving action for dev17, with no deployment, live-interpretation or qualification claim. The later [dev18 public classifier handoff](MAT-087.md) is an optional additive API migration.

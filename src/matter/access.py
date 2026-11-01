@@ -28,9 +28,22 @@ def _key(value):
     return canonical_bytes(value)
 
 
-def _public(ref):
+def is_source_access_target(ref):
+    """Classify an already validated reference for source-access handling.
+
+    False excludes receipts, controls and internal ``matter.*`` projections
+    from source grants. It does not permit their disclosure. True establishes
+    neither public availability nor a grant: HostAccessPolicy, READ authority,
+    transitive parent access, currentness and revocation still apply.
+    Accepts validated record, entity or pinned references; performs no schema
+    validation, storage read, permission lookup or mutation.
+    """
     return ref["record_type"] not in {"receipt", "control"} and not (
         ref["record_type"] == PROJECTION_TYPE and ref["namespace"].startswith("matter."))
+
+
+# Preserve existing imports as an alias of the public classifier.
+_public = is_source_access_target
 
 
 def _pins(values):

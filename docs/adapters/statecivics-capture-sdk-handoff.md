@@ -144,3 +144,7 @@ the performance/API file differences are deliberate. The consumer owns its
 image rebuild and dev17 receiving checks. Existing dev16 acceptance does not
 imply those later checks have run. No deployment/activation or qualification is
 introduced by either build.
+
+## Later receiving and public API closeout
+
+StateCivics' dev17 receiving check is now recorded in the [dev17 receipt](../validation/dev17-receiving.md); the earlier instruction to obtain that receipt is satisfied. Matter verified the exact image ID and all 205 runtime file hashes. SDK dev18 adds the public source-target classifier without changing either frozen wire or HostMonitoringState; its exact migration and package pins are in [MAT-087](../validation/MAT-087.md). Neither receiving acceptance nor this additive API releases production delivery or qualifies JEV.

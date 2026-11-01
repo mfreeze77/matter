@@ -170,3 +170,21 @@ output remains a judgment and grants neither source authority nor action rights.
 
 The [validation receipt](validation/MAT-072.md) records synthetic local evidence
 separately from authentication, live provider behavior and production assurance.
+
+## Public source-access target classifier (SDK dev18)
+
+`matter.access.is_source_access_target(ref)` exposes the existing predicate used
+by HostAccessPolicy and AccessService. Pass an already validated record/entity
+or pinned reference. Receipts and controls return false. A `matter:projection`
+returns false only when its namespace starts with `matter.`; host projections
+outside that exact prefix remain source-access targets requiring their own grants.
+Other valid record kinds return true, including a source record in a `matter.*`
+namespace. The old `matter.access._public` name remains the identical callable.
+
+This classifies which references enter source-access handling. It performs no
+validation, storage access, grant creation, permission check or mutation. True
+does not mean publicly available or authorized. False does not authorize reading
+bookkeeping records. Continue using the real HostAccessPolicy and AccessService
+with current scope, READ, audience/provider, parent closure and revocation checks.
+Consumers can replace the old import and calls without copying the predicate.
+Frozen monitoring 1.0/1.1 wires and HostMonitoringState are unchanged.
