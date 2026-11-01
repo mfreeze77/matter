@@ -96,7 +96,7 @@
   "sources": [
     "docs/plans/assistant-bubble-review.md",
     "Owner discussion, 2026-10-31: client onboarding research; bubble burst wakes the user-specific assistant; bounded existing MCP/wizard investigation; report/alert judgment; quiet findings retained per user/client/angle for cascading JEV. Ticket writing only; unresolved choices remain proposals.",
-    "Owner clarification, 2026-10-31: both trigger paths are required. A highly relevant development directly against the client interests can burst the bubble like a pin prick, independent of prior accumulation; smaller signals can build pressure until a later event tips it over. The 24 percent plus 75 percent example is illustrative; no scoring formula, threshold or probability addition was approved."
+    "Owner, 2026-10-31: both immediate and accumulated triggers; client-adverse pin-prick or distinct signals plus a tipping event. The 24% + 75% example is illustrative, not calibrated probability arithmetic."
   ],
   "completion": {
     "state": "not_run",
