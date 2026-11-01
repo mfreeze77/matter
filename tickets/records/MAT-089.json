@@ -42,7 +42,8 @@
     "Retain why no alert was warranted and an optional reconsideration condition. Mark never communicated, report prepared, capture outcome unknown, actually conveyed, read and acted as separate states. An internal capture is not human delivery.",
     "Include original citations and explicitly labelled derived context in subsequent authorized question packets. Do not count the note and its underlying source as separate corroboration; do not let the next model treat an earlier assumption as an established claim.",
     "Recheck grants and original input/context bindings on reads/reuse. Source corrections, changed approved purpose/angle, pause or revocation invalidate or withhold pending results; shared source-only reads require each recipient access while private context stays isolated.",
-    "Suppress repeat requests for the unchanged gap/material/context using existing receipts and bounded investigation. New evidence, real corrections or deadlines can re-open review. Maintain replay availability order and original uncertainty."
+    "Suppress repeat requests for the unchanged gap/material/context using existing receipts and bounded investigation. New evidence, real corrections or deadlines can re-open review. Maintain replay availability order and original uncertainty.",
+    "Retain the distinct cited contributions and contextual rationale behind accumulated review pressure. Reprints, exact duplicates, correlated copies and repeated model summaries must not inflate it as independent evidence. A later fact may change the interpretation of earlier quiet evidence. Preserve current source/context invalidation; decay, reset and carry-over after review remain open choices."
   ],
   "acceptance": [
     {
@@ -59,6 +60,11 @@
       "id": "AC-3",
       "criterion": "Reused findings remain current and bounded.",
       "verification": "Verify edited objectives, source corrections, revoked grants, replay cuts, exact retries and unknown outcomes. An unchanged recheck does not produce another tool loop; a new deadline/correction is not suppressed by stale quiet feedback."
+    },
+    {
+      "id": "AC-4",
+      "criterion": "Accumulation reflects scoped distinct evidence rather than duplicate volume.",
+      "verification": "Replay weak distinct observations, repeated copies and derived summaries, then a material new event under two client angles. Preserve original citations and uncertainty, prevent duplicate inflation and cross-angle pressure leakage, and record which new evidence changed the review rationale. No decay/reset formula is invented."
     }
   ],
   "artifacts": [
@@ -87,7 +93,8 @@
   ],
   "sources": [
     "docs/plans/assistant-bubble-review.md",
-    "Owner discussion, 2026-10-31: client onboarding research; bubble burst wakes the user-specific assistant; bounded existing MCP/wizard investigation; report/alert judgment; quiet findings retained per user/client/angle for cascading JEV. Ticket writing only; unresolved choices remain proposals."
+    "Owner discussion, 2026-10-31: client onboarding research; bubble burst wakes the user-specific assistant; bounded existing MCP/wizard investigation; report/alert judgment; quiet findings retained per user/client/angle for cascading JEV. Ticket writing only; unresolved choices remain proposals.",
+    "Owner clarification, 2026-10-31: both trigger paths are required. A highly relevant development directly against the client interests can burst the bubble like a pin prick, independent of prior accumulation; smaller signals can build pressure until a later event tips it over. The 24 percent plus 75 percent example is illustrative; no scoring formula, threshold or probability addition was approved."
   ],
   "completion": {
     "state": "not_run",

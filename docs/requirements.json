@@ -68,7 +68,7 @@
   {
     "id": "CIV-11",
     "title": "Matter trigger requests personal assistant review",
-    "description": "A material-change trigger requests bounded internal review by the user-specific assistant through existing host/MCP/wizard surfaces. The assistant decides whether a report, digest or alert is warranted under approved context; waking/reviewing does not itself establish communication, source authority or production permission.",
+    "description": "A material-change trigger requests bounded internal review by the user-specific assistant through existing host/MCP/wizard surfaces. The assistant decides whether a report, digest or alert is warranted under approved context; waking/reviewing does not itself establish communication, source authority or production permission. Both a single decisive development and the combined significance of accumulated distinct signals can request review under the approved client/objective/angle; the scoring formula remains undecided.",
     "source": "Owner discussion, 2026-10-31: client onboarding research; bubble burst wakes the user-specific assistant; bounded existing MCP/wizard investigation; report/alert judgment; quiet findings retained per user/client/angle for cascading JEV. Ticket writing only; unresolved choices remain proposals."
   },
   {
