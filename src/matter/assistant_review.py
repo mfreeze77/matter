@@ -10,7 +10,7 @@ from typing import Callable
 from uuid import uuid4
 
 from ._rule_values import FrozenValue, domain
-from .access import AccessService
+from .access import AccessContext, AccessService
 from .canonical import CanonicalError, canonical_bytes, canonical_digest
 from .contexts import _MutationService, _control_command
 from .contracts import ContractError
@@ -313,6 +313,13 @@ class AssistantReviewService(_MutationService):
         if outcome["status"] != "success":
             _fail(outcome["error"]["code"])
         return self.storage.get(target), ran
+
+    def _authorize(self, view, command, targets):
+        _, payload = self._payload(command)
+        if payload["action"] == "reconcile":
+            self.controls._view(view, actor=command["actor"], authority=command["authority"],
+                capability="correction", targets=targets, now=self.clock(), audit=True)
+        return super()._authorize(view, command, targets)
 
     def _state(self, view, command, payload, *, preparing):
         payload = _wire("mutation", payload)
@@ -655,25 +662,56 @@ class AssistantReviewService(_MutationService):
         references = [] if ledger is None else [r for name in LEDGER_FIELDS for r in ledger[name]]
         return self.resolve(request, references, token=token, access_context=access_context)
 
-    def _historical_context(self, view, body):
+    def history_context(self, request, *, actor, authority, audience):
+        """Present local READ on exact historical pins, including under cancel.
+
+        This is not an assessment token or provider-egress grant. It lets a
+        current operator inspect/reconcile after worker/provider rotation.
+        """
+        request = self._request(request)
+        self._host_guard(request, historical=True, at=self.clock())
+        with self.storage.snapshot() as view:
+            token = self.controls._view(view, actor=actor, authority=authority,
+                capability="read", targets=[entity_ref(r) for r in _refs(request.value)],
+                now=self.clock(), audit=True)
+            dependencies = self.access._closure(view, _refs(request.value), audience,
+                None, token, historical=True)
+        return AccessContext({"schema_version":"1.0", "scope_id":self.scope_id,
+            "policy":self.access.policy.reference, "audience":audience, "provider":None,
+            "token":token, "references":_unique(_refs(request.value)), "dependencies":dependencies})
+
+    def _reader_context(self, context, *, actor, authority):
+        data = context.value if isinstance(context, AccessContext) else AccessContext(context).value
+        if (data["scope_id"] != self.scope_id or data["token"]["actor"] != actor or
+                entity_ref(data["token"]["authority"]) != entity_ref(authority)):
+            _fail("E_AUTHORITY_REQUIRED")
+        # Metadata inspection never sends a source to the former provider. Its
+        # retired egress grant need not survive solely to permit a local read.
+        data["provider"] = None
+        return data
+
+    def _historical_context(self, view, body, reader):
         control=view.get(body["control"])
         wrapped=control["body"]["effect"]["value"]["payload"]
         payload=_wire("mutation",wrapped["value"])
         if (wrapped!=domain(SCHEMA,payload) or payload["action"]!="pressure" or
                 any(payload["request"][name]!=body[name] for name in ("lens","matter","dependencies"))):
             _fail("E_EVIDENCE_INVALID")
-        return payload["access_context"]
+        original = payload["access_context"]
+        return {**reader, "references":original["references"],
+                "dependencies":original["dependencies"]}
 
     def pressure(self, request, *, token, access_context):
         """Present-authorized metadata for this lens/matter, not model input."""
         request = self._request(request)
+        access_context = self._reader_context(access_context, actor=token["actor"], authority=token["authority"])
         self._host_guard(request,historical=True,at=self.clock())
         with self.storage.snapshot() as view:
             self.controls._audit(view,{"actor":token["actor"],"authority":entity_ref(token["authority"])},
                                  [entity_ref(r) for r in _refs(request.value)])
             self.access.require_history(view,access_context,references=_refs(request.value))
             body=deepcopy(view.get(pressure_ref(self.scope_id,request))["value"]["value"])
-            self.access.require_history(view,self._historical_context(view,body),references=[body["matter"],*body["dependencies"]])
+            self.access.require_history(view,self._historical_context(view,body,access_context),references=[body["matter"],*body["dependencies"]])
             self.controls._audit(view,{"actor":token["actor"],"authority":entity_ref(token["authority"])},
                                  [entity_ref(r) for r in [body["matter"],*body["dependencies"]]])
         self._host_guard(request,_pressure_refs(body),at=self.clock(),historical=True)
@@ -687,6 +725,7 @@ class AssistantReviewService(_MutationService):
         results are not fresh proposals and cannot perform another reset.
         """
         request = self._request(request)
+        access_context = self._reader_context(access_context, actor=actor, authority=authority)
         self._host_guard(request, historical=True)
         with self.storage.snapshot() as view:
             self.controls._audit(view, {"actor": actor, "authority": authority},
@@ -703,6 +742,7 @@ class AssistantReviewService(_MutationService):
     def history(self, request, *, actor, authority, access_context):
         """Authorized pointer-only pressure history; reset never deletes it."""
         request = self._request(request)
+        access_context = self._reader_context(access_context, actor=actor, authority=authority)
         with self.storage.snapshot() as view:
             self.controls._audit(view, {"actor": actor, "authority": authority},
                                  [entity_ref(r) for r in _refs(request.value)])
@@ -710,7 +750,7 @@ class AssistantReviewService(_MutationService):
             rows = view.history(pressure_ref(self.scope_id, request))
             for row in rows:
                 body=row["value"]["value"]
-                self.access.require_history(view,self._historical_context(view,body),references=[body["matter"],*body["dependencies"]])
+                self.access.require_history(view,self._historical_context(view,body,access_context),references=[body["matter"],*body["dependencies"]])
                 self.controls._audit(view,{"actor":actor,"authority":authority},
                                      [entity_ref(r) for r in [body["matter"],*body["dependencies"]]])
         for row in rows:
@@ -718,7 +758,7 @@ class AssistantReviewService(_MutationService):
             refs = [c["reference"] for c in body["pending"]]
             if body["ledger"] is not None:
                 refs += [ref for name in LEDGER_FIELDS for ref in body["ledger"][name]]
-            self._host_guard(request, refs, historical=True)
+            self._host_guard(request, refs, historical=True, at=self.clock())
         return deepcopy(rows)
 
 
@@ -730,6 +770,7 @@ class AssistantReviewService(_MutationService):
         wake remains non-dispatchable after reconciliation.
         """
         request=self._request(request)
+        access_context = self._reader_context(access_context, actor=actor, authority=authority)
         self._host_guard(request,[witness],historical=True,at=self.clock())
         artifacts=self._resolve(request,[witness],at=self.clock(),historical=True,verification=True)
         proof=next(a for a in artifacts if a["reference"]==witness)

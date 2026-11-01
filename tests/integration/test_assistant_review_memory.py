@@ -786,3 +786,91 @@ class ReviewTests(unittest.TestCase):
         pending=service.pressure(self.request,token=self.token,access_context=self.access_context)['pending']
         self.assertEqual(pending,self.request.value['contributions'])
         with self.assertRaises(ContractError):service.resolve(self.request,[self.source],token=self.token,access_context=self.access_context)
+
+
+    def test_history_uses_reader_grants_not_the_writer_for_omitted_dependencies(self):
+        self.add()
+        policy=HostAccessPolicy(scope_id=self.f.storage.scope_id,
+            audiences=[self.audience,self.other_audience],
+            providers=[{'reference':self.provider,'provider':'synthetic','transport':'fixture'}],
+            grants=[{'reference':pin(self.f.subject),'audiences':[self.audience,self.other_audience],'providers':[self.provider]},
+                    {'reference':pin(self.f.source),'audiences':[self.audience],'providers':[self.provider]}])
+        access=AccessService(policy=policy,controls=self.f.controls,current_read=self.f.storage.snapshot)
+        service=self.make_service(access=access)
+        request=self.req(audience=self.other_audience,dependencies=[])
+        context=service.history_context(request,actor=self.f.actor,authority=entity_ref(self.f.authority),audience=self.other_audience)
+        for read in (lambda:service.pressure(request,token=context.value['token'],access_context=context),
+                     lambda:service.history(request,actor=self.f.actor,authority=entity_ref(self.f.authority),access_context=context)):
+            with self.subTest(read=read):
+                with self.assertRaises(ContractError) as error:read()
+                self.assertEqual(error.exception.code,'E_AUTHORITY_REQUIRED')
+
+    def test_current_operator_can_reconcile_and_read_after_worker_provider_rotation_cancel_and_revision(self):
+        from matter.authority import AuthorityPolicy,CAPABILITIES,CONTROL_KINDS
+        from control_helpers import control_command
+        from integration.helpers import _in_scope
+        self.add();self.service.claim(self.request,token=self.token,access_context=self.access_context)
+        old=self.revise_native_matter()
+        command=_in_scope(control_command('cancel-before-operator-recovery',self.f.authority,
+            targets=[self.f.source],action='cancel',now=self.f.now),self.f.storage.scope_id)
+        command['actor']=self.f.actor;command['body']['control']['body']['actor']=self.f.actor
+        self.assertEqual(self.f.controls.apply(self.f.controls.prepare(command))['status'],'success')
+        operator={**self.f.actor,'id':'current-review-operator'}
+        provider=component('retired-provider-replacement')
+        controls=ControlService(self.f.storage,policy=AuthorityPolicy(self.f.storage.scope_id,
+            actors=[operator],authorities=[pin(self.f.authority)],capabilities=CAPABILITIES,control_kinds=CONTROL_KINDS),
+            clock=lambda:deepcopy(self.f.now))
+        access=AccessService(policy=HostAccessPolicy(scope_id=self.f.storage.scope_id,
+            audiences=[self.other_audience],providers=[{'reference':provider,'provider':'synthetic','transport':'fixture'}],
+            grants=[{'reference':r,'audiences':[self.other_audience],'providers':[provider]} for r in [pin(old),pin(self.f.source)]]),
+            controls=controls,current_read=self.f.storage.snapshot)
+        service=self.make_service(controls=controls,access=access)
+        context=service.history_context(self.request,actor=operator,authority=entity_ref(self.f.authority),audience=self.other_audience)
+        self.assertIsNone(context.value['provider'])
+        self.assertEqual(context.value['token']['capability'],'read')
+        witness=self.artifact('control','rotated-operator-proof','host_control',{'wake_id':self.request.wake_id,'inflight':False,'resolution':'failed'})
+        row=service.reconcile(self.request,witness,actor=operator,authority=entity_ref(self.f.authority),
+            access_context=context,command_id='rotated-operator-reconcile')
+        self.assertEqual(row['value']['value']['phase'],'reconciled')
+        self.assertEqual(service.pressure(self.request,token=context.value['token'],access_context=context)['pending'],self.request.value['contributions'])
+        self.assertTrue(service.history(self.request,actor=operator,authority=entity_ref(self.f.authority),access_context=context))
+        self.assertEqual(self.calls,0)
+        with self.assertRaises(ContractError):
+            controls.capture(actor=operator,authority=entity_ref(self.f.authority),capability='assessment',targets=[entity_ref(r) for r in self.native])
+
+    def test_metadata_reader_cannot_borrow_another_actors_context(self):
+        self.add()
+        actor={**self.f.actor,'id':'different-operator'}
+        with self.assertRaises(ContractError) as error:
+            self.service.history(self.request,actor=actor,authority=entity_ref(self.f.authority),access_context=self.access_context)
+        self.assertEqual(error.exception.code,'E_AUTHORITY_REQUIRED')
+
+    def test_reconciliation_requires_correction_capability_not_only_control_kind(self):
+        from matter.authority import AuthorityPolicy,CAPABILITIES,CONTROL_KINDS
+        self.add();self.service.claim(self.request,token=self.token,access_context=self.access_context)
+        controls=ControlService(self.f.storage,policy=AuthorityPolicy(self.f.storage.scope_id,
+            actors=[self.f.actor],authorities=[pin(self.f.authority)],capabilities=CAPABILITIES-{'correction'},control_kinds=CONTROL_KINDS),
+            clock=lambda:deepcopy(self.f.now))
+        access=AccessService(policy=self.access.policy,controls=controls,current_read=self.f.storage.snapshot)
+        service=self.make_service(controls=controls,access=access)
+        witness=self.artifact('control','no-correction-capability','host_control',{'wake_id':self.request.wake_id,'inflight':False,'resolution':'failed'})
+        with self.assertRaises(ContractError) as error:
+            service.reconcile(self.request,witness,actor=self.f.actor,authority=entity_ref(self.f.authority),
+                access_context=self.access_context,command_id='reconcile-without-capability')
+        self.assertEqual(error.exception.code,'E_AUTHORITY_REQUIRED')
+        self.assertTrue(self.service.inspect(self.request,actor=self.f.actor,authority=entity_ref(self.f.authority),access_context=self.access_context)['outcome_unknown'])
+
+    def test_reconciliation_honors_active_correction_denial(self):
+        from control_helpers import control_command
+        from integration.helpers import _in_scope
+        self.add();self.service.claim(self.request,token=self.token,access_context=self.access_context)
+        command=_in_scope(control_command('deny-reconcile',self.f.authority,targets=[self.f.source],action='deny',
+            capabilities=['correction'],now=self.f.now),self.f.storage.scope_id)
+        command['actor']=self.f.actor;command['body']['control']['body']['actor']=self.f.actor
+        self.assertEqual(self.f.controls.apply(self.f.controls.prepare(command))['status'],'success')
+        witness=self.artifact('control','denied-correction-proof','host_control',{'wake_id':self.request.wake_id,'inflight':False,'resolution':'failed'})
+        with self.assertRaises(ContractError) as error:
+            self.service.reconcile(self.request,witness,actor=self.f.actor,authority=entity_ref(self.f.authority),
+                access_context=self.access_context,command_id='reconcile-while-denied')
+        self.assertEqual(error.exception.code,'E_AUTHORITY_REQUIRED')
+        self.assertEqual(self.pending(),self.request.value['contributions'])

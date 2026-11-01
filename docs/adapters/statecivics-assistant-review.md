@@ -99,7 +99,11 @@ Postgres do not form one distributed transaction.
    correction-authorized `reconcile` method using a real host no-inflight witness;
    the lookup and operator interaction remain host work. This operator control
    works after native cancellation or revision without renewing assessment
-   authority, clearing pressure or resuming monitoring.
+   authority, clearing pressure or resuming monitoring. For a rotated operator
+   or retired provider, use `history_context` with the current authenticated
+   operator and read audience. This admits exact old pins for local READ under
+   present grants; no retired provider egress grant or old worker identity is
+   needed. Correction capability and active denials are still enforced.
 2. Bind the returned review to this exact wake and actual reviewed source pins,
    session pointer and any already-authorized rule updates. Existing ReviewResult
    IDs alone do not prove the reviewed-set contract. Exact tool read/citation

@@ -148,7 +148,8 @@ It releases the lens lock without clearing pressure, admitting a quiet proposal
 or calling the assistant. The original wake stays non-dispatchable. StateCivics
 owns the actual lookup/proof and operator UI; inventing a witness is forbidden.
 Reconciliation uses the operator control lane, not a new assessment/work token.
-Current read and correction authority are checked; cancellation or a revised
+Current read and correction capability, including active correction denials,
+are checked; cancellation or a revised
 native pin does not prevent recording recovery, and recovery never resumes work.
 
 ## Completion and pressure
@@ -252,9 +253,21 @@ or explicit reconciliation, never a second assistant call.
 not a fresh model packet. It permits superseded source history under current
 READ rights and checks host pointer-read permission at the current host clock,
 without rereading every accepted body. Historical rows retain their original
-native admission context and check its pins against present grants; one current
+native pin selection and check its pins against the present reader's grants,
+actor and authority, never the writer's grants. Metadata uses local READ
+(`provider=None`), so a retired assistant provider need not retain egress
+permission just for inspection. One current
 request need not pretend multiple versions are one input snapshot. This keeps a
 large accepted backlog and superseded contributions inspectable without treating
 metadata as a source packet.
 Reusing any of those pointers still requires the request cut, current-use guards
 and declared packet budgets.
+
+For operator/identity rotation, `history_context(request, actor=..., authority=...,
+audience=...)` admits the exact historical native pins under present local READ.
+It works under cancellation and after native revision, does not renew assessment
+work and cannot be used as a provider packet. Pass the resulting access context
+to `inspect`, `history` or `reconcile` (and its read token to `pressure`). Each
+metadata call binds that context to the actual reader; a borrowed writer context
+is refused. The host still authenticates the actual caller/audience selection
+and enforces lens ownership in `require_read`.
