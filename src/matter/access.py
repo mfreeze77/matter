@@ -46,19 +46,79 @@ def is_source_access_target(ref):
 _public = is_source_access_target
 
 
-def _pins(values):
+def _pins(values, *, historical_metadata=False):
     result = {}
     for index, raw in enumerate(values):
         if index >= MAX_REFERENCE_OCCURRENCES:
             _fail("reference_budget", "E_BUDGET_EXHAUSTED")
         ref = fragment(raw, "pinned_ref")
-        identity = _key(entity_ref(ref))
+        identity = _key(ref) if historical_metadata else _key(entity_ref(ref))
         if identity in result and result[identity] != ref:
             _fail("unavailable", "E_EVIDENCE_UNAVAILABLE")
         result[identity] = ref
         if len(result) > MAX_SOURCES:
             _fail("source_budget", "E_BUDGET_EXHAUSTED")
     return sorted(result.values(), key=_key)
+
+
+def _context_metadata(record):
+    """An exact native context pointer, not a source or arbitrary projection."""
+    if record["record_type"] != PROJECTION_TYPE:
+        return False
+    wrapped = record["value"]
+    if wrapped.get("schema", {}).get("id") != "context-current":
+        return False
+    return wrapped == domain("context-current", wrapped["value"]) and wrapped["value"]["scope_id"] == record["scope_id"]
+
+
+def _provenance_record(view, ref, *, parent=False, historical=False):
+    if parent:
+        head = view.get(entity_ref(ref))
+        if pin(head) != ref and _context_metadata(head):
+            original = view.get_historical(ref)
+            if not _context_metadata(original):
+                _fail("unavailable", "E_EVIDENCE_UNAVAILABLE")
+            return original, head
+    record = view.get(ref if historical else entity_ref(ref))
+    if pin(record) != ref:
+        _fail("stale_source_context", "E_DEPENDENCY_STALE")
+    return record, None
+
+
+def source_access_provenance(view, roots):
+    """Bounded exact grant candidates for an already host-authorized history.
+
+    This privileged storage helper grants nothing. The host must authorize each
+    returned pin before building its policy. Context provenance keeps the old
+    snapshot plus today's head; other current sources never silently rebind.
+    """
+    found, active = {}, set()
+    def visit(ref, parent=False):
+        ref = fragment(ref, "pinned_ref")
+        if not _public(ref):
+            return
+        key = _key(ref)
+        if key in active:
+            _fail("unavailable", "E_EVIDENCE_UNAVAILABLE")
+        if key in found:
+            return
+        if len(found) + len(active) >= MAX_SOURCES:
+            _fail("source_budget", "E_BUDGET_EXHAUSTED")
+        record, head = _provenance_record(view, ref, parent=parent)
+        active.add(key)
+        if head is not None:
+            visit(pin(head))
+        for p in record.get("provenance", {}).get("parents", []):
+            visit(p, True)
+        active.remove(key)
+        found[key] = ref
+    roots = _pins(roots)
+    for root in roots:
+        if _public(root) and root["record_type"] == PROJECTION_TYPE:
+            _provenance_record(view, root)
+    for root in roots:
+        visit(root)
+    return sorted(found.values(), key=_key)
 
 
 class HostAccessPolicy(FrozenValue):
@@ -111,7 +171,7 @@ class AccessContext(FrozenValue):
 
     def __init__(self, value):
         data = checked(value, required=("schema_version", "scope_id", "policy", "audience", "provider", "token", "references", "dependencies"))
-        if data["schema_version"] != "1.0":
+        if data["schema_version"] not in {"1.0", "1.1"}:
             _fail("invalid_context", "E_SCHEMA_INVALID")
         fragment(data["scope_id"], "identifier")
         fragment(data["policy"], "component_ref")
@@ -119,13 +179,14 @@ class AccessContext(FrozenValue):
         if data["provider"] is not None:
             fragment(data["provider"], "component_ref")
         domain("control-token", data["token"])
-        if data["references"] != _pins(data["references"]) or data["dependencies"] != _pins(data["dependencies"]):
+        if data["references"] != _pins(data["references"]) or data["dependencies"] != _pins(
+                data["dependencies"], historical_metadata=data["schema_version"] == "1.1"):
             _fail("invalid_context", "E_SCHEMA_INVALID")
         self._freeze(data)
 
     @property
     def reference(self):
-        return descriptor("matter", "access-context", "1.0", self.value, "matter.access-context.v1")
+        return descriptor("matter", "access-context", self.value["schema_version"], self.value, "matter.access-context.v1")
 
     @property
     def eligibility_reference(self):
@@ -155,7 +216,7 @@ class AccessService:
             _fail()
         grants = {_key(item["reference"]): item for item in definition["grants"]}
         visited, active = {}, set()
-        def visit(raw):
+        def visit(raw, parent=False):
             ref = fragment(raw, "pinned_ref")
             if ref["scope_id"] != self.scope_id:
                 _fail("scope_forbidden", "E_SCOPE_FORBIDDEN")
@@ -172,15 +233,13 @@ class AccessService:
             # Verify READ before retrieving a possibly protected body.
             self.controls._audit(view, {"actor": token["actor"], "authority": entity_ref(token["authority"])}, [entity_ref(ref)])
             try:
-                record = view.get(ref if historical else entity_ref(ref))
+                record, head = _provenance_record(view, ref, parent=parent, historical=historical)
             except StorageError as error:
                 if error.code == "E_NOT_FOUND":
                     if grant is None:
                         _fail()
                     _fail("unavailable", "E_EVIDENCE_UNAVAILABLE")
                 raise
-            if pin(record) != ref:
-                _fail("stale_source_context", "E_DEPENDENCY_STALE")
             # Host metadata projections have no source provenance. They need
             # their own exact grant and cannot implicitly inherit a source ACL.
             provenance = record.get("provenance", {})
@@ -189,10 +248,21 @@ class AccessService:
             if grant is None and not (derived and parents):
                 _fail()
             active.add(key)
+            if head is not None:
+                # Both exact snapshots need real present grants. The old pin
+                # remains provenance, while the current head fences changes.
+                visit(pin(head))
             for parent in parents:
-                visit(parent)
+                visit(parent, True)
             active.remove(key)
             visited[key] = ref
+        if not historical:
+            # Root currentness cannot depend on whether an earlier traversal
+            # happened to visit this same pin as historical provenance.
+            for ref in references:
+                if _public(ref) and ref["record_type"] == PROJECTION_TYPE:
+                    self.controls._audit(view, {"actor": token["actor"], "authority": entity_ref(token["authority"])}, [entity_ref(ref)])
+                    _provenance_record(view, ref)
         for ref in references:
             visit(ref)
         return sorted(visited.values(), key=_key)
@@ -205,7 +275,7 @@ class AccessService:
             if token["scope_id"] != self.scope_id:
                 _fail("scope_forbidden", "E_SCOPE_FORBIDDEN")
             dependencies = self._closure(view, refs, audience, provider, token)
-            targets = [entity_ref(ref) for ref in dependencies]
+            targets = list({_key(entity_ref(ref)): entity_ref(ref) for ref in dependencies}.values())
             self.controls.require_current(view, token, capability=token["capability"], targets=targets or token["targets"])
         except StorageError as error:
             if error.code == "E_REVISION_CONFLICT":
@@ -216,7 +286,9 @@ class AccessService:
                 _fail(reasons[error.code], error.code)
             _fail("unavailable" if error.code in {"E_NOT_FOUND", "E_STORAGE_UNAVAILABLE"} else "forbidden",
                   "E_EVIDENCE_UNAVAILABLE" if error.code in {"E_NOT_FOUND", "E_STORAGE_UNAVAILABLE"} else "E_AUTHORITY_REQUIRED")
-        return AccessContext({"schema_version": "1.0", "scope_id": self.scope_id, "policy": self.policy.reference,
+        identities = [_key(entity_ref(ref)) for ref in dependencies]
+        version = "1.1" if len(set(identities)) != len(identities) else "1.0"
+        return AccessContext({"schema_version": version, "scope_id": self.scope_id, "policy": self.policy.reference,
             "audience": audience, "provider": provider, "token": deepcopy(token), "references": refs, "dependencies": dependencies})
 
     def require_current(self, view, context, *, references=(), audience=None, provider=None, _fresh=False):

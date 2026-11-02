@@ -1,0 +1,94 @@
+{
+  "id": "MAT-091",
+  "title": "Preserve captured baselines across objective edits and bound assessment history",
+  "track": "core",
+  "phase": 4,
+  "priority": "P1",
+  "status": "in_progress",
+  "type": "implementation",
+  "owner_repo": "mfreeze77/matter",
+  "component": "assessment/monitoring-history",
+  "depends_on": [
+    "MAT-015",
+    "MAT-019",
+    "MAT-072",
+    "MAT-082",
+    "MAT-084"
+  ],
+  "requirements": [
+    "CORE-14",
+    "CORE-17",
+    "CORE-18",
+    "CORE-22",
+    "OPS-01"
+  ],
+  "summary": "Repair the two KS-1126 receiving failures: historical captured context must not become a current evaluation requirement after a benign objective revision, and repeated assessments must not recursively embed their ancestors until the normal input budget fails.",
+  "in_scope": [
+    "Reproduce capture, objective revision and subsequent same-subject capture under present access and source controls. Preserve actual conveyed history and current edit/revocation guards.",
+    "Bound assessment record size by referencing the durable original captured input rather than recursively embedding full publication in every derived record. Preserve exact journal replay, input-artifact reconstruction and old record readability.",
+    "Ten successive synthetic same-subject developments under one lens with prepared sizes retained; real-world source bodies remain outside this repository."
+  ],
+  "out_of_scope": [
+    "StateCivics authentication, stack changes, host implementation, production reads/deployment, accumulation cadence and encrypted-backup decisions.",
+    "Raising the 2 MiB host limit, dropping baselines, weakening source ACLs, stale-work admission, new retrieval/storage infrastructure, live calls or provider qualification."
+  ],
+  "implementation": [
+    "Reuse existing assessment journals/current lanes and the existing native attention and optional study paths. Keep monitoring 1.0/1.1 available.",
+    "Separate present action/egress guards from historical conveyed-material inspection; old context pins must not be rebound or treated as current. Document any receiving-host change explicitly.",
+    "Retain pre-fix failures, post-fix behavioral evidence, source/package pins and review before release."
+  ],
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "criterion": "A prior capture remains an honest baseline after an approved objective revision.",
+      "verification": "Capture, revise objective, then capture a new same-subject development; verify old evidence/history remains exact, duplicate silence still applies, and in-flight edit, revoke, foreign scope and forbidden baseline reads still refuse."
+    },
+    {
+      "id": "AC-2",
+      "criterion": "Ten successive same-subject captures stay within the unchanged 2 MiB input budget.",
+      "verification": "Record prepared input size per step with explicitly authored synthetic changes; every step completes; assert non-recursive assessment representation, exact input-artifact digest/reconstruction, truthful budget refusal and command recovery."
+    },
+    {
+      "id": "AC-3",
+      "criterion": "A versioned receiving handoff distinguishes SDK repair from host acceptance.",
+      "verification": "Run affected currentness/access/attention/publication/study regressions, independent review and installed SDK checks. Document exact required host changes and package identity; StateCivics owns the repeated timeline and real-form acceptance."
+    }
+  ],
+  "artifacts": [
+    "src/matter/assessments.py",
+    "src/matter/access.py",
+    "src/matter/storage/base.py",
+    "src/matter/storage/sqlite.py",
+    "tests/integration/test_assessment_history_growth.py",
+    "tests/integration/test_monitoring_history_revision.py",
+    "docs/validation/MAT-091.md"
+  ],
+  "tests": [
+    "Capture, revise objective, then new same-subject capture.",
+    "Ten successive same-subject developments with unchanged budget and per-step input sizes.",
+    "Exact journal/input-artifact recovery; currentness, revocation, foreign access, duplicate suppression and old record compatibility."
+  ],
+  "risks": [
+    "Historical access is not current evaluation authority; a fix must not admit stale current inputs or skip present READ/egress restrictions.",
+    "Removing duplicated publication bytes must preserve durable exact reconstruction and old assessment readability."
+  ],
+  "reuse": [
+    {
+      "source": "docs/assessments.md; docs/attention.md; docs/access.md",
+      "application": "Reuse the existing journal, authority and access owners; add no replacement storage."
+    }
+  ],
+  "sources": [
+    "docs/contracts/core.md",
+    "docs/contracts/lifecycle.md",
+    "docs/assessments.md",
+    "docs/contracts/monitoring-handoff.md",
+    "StateCivics KS-1126 receiving record at 73732c7e3; authored timeline and API half are distinct from real-form acceptance."
+  ],
+  "completion": {
+    "state": "not_run",
+    "evidence": [
+      "Candidate implementation: docs/validation/MAT-091.md records pre-fix exponential preparation growth and the old closure refusal, a ten-assessment exact-reconstruction check, a passing revision/baseline check, ten guarded synthetic captures with 76,221\u2013197,004-byte inputs, and the earlier 76-test affected pass. Final review, complete verification and versioned package handoff are pending. No receiving-stack changes, provider calls or qualification."
+    ]
+  }
+}

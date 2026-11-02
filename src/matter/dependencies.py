@@ -148,6 +148,11 @@ class _Reads:
         _scoped(self.scope, reference, "pinned_ref" if "digest" in reference or "revision" in reference else "entity_ref")
         return self.remember(self.view.get(reference))
 
+    def get_historical(self, reference):
+        _scoped(self.scope, reference, "pinned_ref")
+        self.get(entity_ref(reference))
+        return self.view.get_historical(reference)
+
     def lookup_identity(self, reference):
         self.tick()
         _scoped(self.scope, reference, "entity_ref")

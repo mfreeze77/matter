@@ -137,6 +137,10 @@ class Snapshot(Protocol):
         """Read current state, or a historical snapshot when a pin is supplied."""
         ...
 
+    def get_historical(self, reference: dict[str, Any]) -> dict[str, Any]:
+        """Read one exact pinned snapshot, without claiming it is current."""
+        ...
+
     def lookup_identity(self, reference: dict[str, Any]) -> dict[str, Any]:
         """Read the current occupant of a bare scoped identity, regardless of kind.
 
@@ -174,6 +178,10 @@ class Transaction(Protocol):
 
     def get(self, reference: dict[str, Any]) -> dict[str, Any]:
         """Read current state; preexisting reads must have declared pins."""
+        ...
+
+    def get_historical(self, reference: dict[str, Any]) -> dict[str, Any]:
+        """Read an exact old snapshot only under its declared current-head pin."""
         ...
 
     def lookup_identity(self, reference: dict[str, Any]) -> dict[str, Any]:

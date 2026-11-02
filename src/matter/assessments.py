@@ -99,6 +99,7 @@ def assessment_current_ref(scope_id, matter, *, profile, purpose, audience=None)
 class _Tracked:
     def __init__(self, view, scope):
         self.view, self.scope, self.records, self.absent, self.queries = view, scope, {}, {}, {}
+        self.historical_records = {}
 
     def _remember(self, value):
         if value["scope_id"] != self.scope:
@@ -127,6 +128,15 @@ class _Tracked:
                 self.absent[_identity(reference)] = entity_ref(reference)
             raise
 
+    def get_historical(self, reference):
+        fragment(reference, "pinned_ref")
+        self.get(entity_ref(reference))
+        record = self.view.get_historical(reference)
+        if record["scope_id"] != self.scope:
+            _fail(code="E_SCOPE_FORBIDDEN")
+        self.historical_records[canonical_bytes(pin(record))] = record
+        return deepcopy(record)
+
     def watchers(self, key):
         rows = [self._remember(value) for value in self.view.watchers(key)]
         self.queries[key] = [entity_ref(value) for value in rows]
@@ -150,6 +160,14 @@ class FrozenAssessmentView:
 
     def lookup_identity(self, reference):
         return self.get(entity_ref(reference))
+
+    def get_historical(self, reference):
+        fragment(reference, "pinned_ref")
+        self.get(entity_ref(reference))  # Require the captured current head too.
+        for record in self._data.get("historical_records", []) + self._data["records"]:
+            if pin(record) == reference:
+                return deepcopy(record)
+        _fail("The historical proof was not captured by the original snapshot.", "E_EVIDENCE_UNAVAILABLE")
 
     def watchers(self, key):
         if key not in self._data["watch_queries"]:
@@ -258,7 +276,7 @@ class AssessmentService:
     def _preparation(self, value):
         data = checked(value, required=("schema_version", "request", "plan", "token", "control_contexts", "captured_at",
             "records", "reads", "absent", "watch_queries", "current_dependencies", "lane", "previous", "prior_assessment", "prior_request", "prior_basis",
-            "cache_inputs", "staged_snapshots", "proof_reads"), optional=("access_context",),
+            "cache_inputs", "staged_snapshots", "proof_reads"), optional=("access_context", "historical_records"),
             code="E_EVIDENCE_INVALID")
         if data["schema_version"] != "1.0" or len(canonical_bytes(data)) > 8388608:
             _fail("The retained assessment preparation exceeds its supported contract.", "E_EVIDENCE_INVALID")
@@ -278,6 +296,20 @@ class AssessmentService:
             records.append(record)
         if len({_identity(record) for record in records}) != len(records):
             _fail("Duplicate retained record identities are ambiguous.", "E_EVIDENCE_INVALID")
+        history = data.get("historical_records", [])
+        if type(history) is not list or len(history) > 256:
+            _fail(code="E_EVIDENCE_INVALID")
+        historical_pins = set()
+        for raw in history:
+            if type(raw) is not dict:
+                _fail(code="E_EVIDENCE_INVALID")
+            record = _validate_projection(raw) if raw.get("record_type") == PROJECTION_TYPE else validate_record(raw)
+            key = canonical_bytes(pin(record))
+            if record["scope_id"] != self.scope_id or key in historical_pins:
+                _fail(code="E_EVIDENCE_INVALID")
+            historical_pins.add(key)
+            if not any(entity_ref(head) == entity_ref(record) for head in records):
+                _fail("A historical proof needs its captured current head.", "E_EVIDENCE_INVALID")
         reads = _unique_refs([*[pin(record) for record in records], *([data["previous"]] if data["previous"] is not None else [])])
         if reads != data["reads"]:
             _fail("Retained snapshots do not bind the complete original read set.", "E_EVIDENCE_INVALID")
@@ -405,6 +437,8 @@ class AssessmentService:
             if admitted_access is not None:
                 data["access_context"] = admitted_access.value
             self.controls.require_current(view, token, capability="assessment", targets=self._read_targets(data), as_of=now)
+            if view.historical_records:
+                data["historical_records"] = _sorted(view.historical_records.values())
         if len(canonical_bytes(data)) > body["budget"]["max_bytes"]:
             _fail("The captured assessment input exceeds its byte budget.", "E_BUDGET_EXHAUSTED")
         return PreparedAssessment(data, _admission=_PREPARED)
@@ -449,6 +483,10 @@ class AssessmentService:
             data["records"] = _sorted(data["records"])
             data["absent"] = _sorted({canonical_bytes(ref): ref for ref in [*data["absent"], *view.absent.values()]}.values())
             data["staged_snapshots"].append({"captured_at": now, "references": _unique_refs(references)})
+            history = {canonical_bytes(pin(r)): r for r in data.get("historical_records", [])}
+            history.update(view.historical_records)
+            if history:
+                data["historical_records"] = _sorted(history.values())
         return PreparedAssessment(data, _admission=_PREPARED)
 
     def _token_resolver(self, view, preparation, packet, now):
@@ -678,7 +716,8 @@ class AssessmentService:
                 _fail("Unchanged assessment inputs require an explicit changed policy, evidence, context or temporal boundary.")
         return causes
 
-    def _proposal(self, preparation, graph, interpretations, assessment_id, built_at, cache_entries, *, view, admission=None):
+    def _proposal(self, preparation, graph, interpretations, assessment_id, built_at, cache_entries, *, view, admission=None,
+                  inline_publication=False):
         profile, bundles, usable = self._graph(view, preparation, graph, built_at) if admission is None else admission
         body = preparation["request"]["body"]
         reservations = graph["resource_reservations"]
@@ -766,8 +805,14 @@ class AssessmentService:
         record = {"schema_version": "1.0", "record_type": "assessment", "scope_id": self.scope_id,
             "namespace": ASSESSMENT_NAMESPACE, "id": assessment_id,
             "provenance": {"origin": "system", "producer": _ENGINE, "recorded_at": built_at,
-                           "parents": manifest["positive"]}, "extensions": {PUBLICATION_EXTENSION: publication},
+                           "parents": manifest["positive"]},
             "body": assessment_body}
+        # Exact input bytes already live in the atomic command journal and
+        # current lane, addressed by body.input_artifact and creation_receipt.
+        # Embedding them in every immutable assessment recursively copies all
+        # prior assessments when a later preparation reads that history.
+        if inline_publication:
+            record["extensions"] = {PUBLICATION_EXTENSION: publication}
         fragment(record, "assessment_input")
         return record, publication
 
@@ -801,6 +846,9 @@ class AssessmentService:
 
     def _guards(self, view, preparation, graph, now):
         body = preparation["request"]["body"]
+        for historical in preparation.get("historical_records", []):
+            if canonical_bytes(view.get_historical(pin(historical))) != canonical_bytes(historical):
+                _fail("A retained historical proof differs from its stored snapshot.", "E_EVIDENCE_INVALID")
         if self.access is not None:
             if "access_context" not in preparation:
                 _fail("The installed access boundary requires its original context.", "E_AUTHORITY_REQUIRED")
@@ -852,7 +900,8 @@ class AssessmentService:
         # Rebuild from retained exact bytes; callers cannot prefill arbitrary
         # generated child pins, edited conclusions, causes or qualification.
         expected, wrapped = self._proposal(preparation, graph, publication["interpretations"], publication["assessment_id"],
-            publication["built_at"], publication["cache_entries"], view=FrozenAssessmentView(preparation))
+            publication["built_at"], publication["cache_entries"], view=FrozenAssessmentView(preparation),
+            inline_publication=PUBLICATION_EXTENSION in command["body"]["assessment"].get("extensions", {}))
         if command["body"]["assessment"] != expected or command["extensions"][PUBLICATION_EXTENSION] != wrapped:
             _fail("The proposed assessment differs from its declared staged inputs.", "E_EVIDENCE_INVALID")
         expected_reads = _unique_refs([*preparation["reads"], *[entry["stored"] for entry in publication["cache_entries"] if entry["stored"] is not None]])

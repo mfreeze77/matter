@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "ticket_count": 90,
+  "ticket_count": 91,
   "counts_by_track": {
     "civic": 11,
-    "core": 21,
+    "core": 22,
     "diat": 15,
     "evaluation": 10,
     "foundation": 1,
@@ -15,7 +15,7 @@
   "counts_by_status": {
     "blocked": 1,
     "done": 49,
-    "in_progress": 3,
+    "in_progress": 4,
     "planned": 37
   },
   "tickets": [
@@ -2223,6 +2223,31 @@
       ],
       "readiness": "ready",
       "path": "records/MAT-090.json"
+    },
+    {
+      "id": "MAT-091",
+      "title": "Preserve captured baselines across objective edits and bound assessment history",
+      "track": "core",
+      "phase": 4,
+      "priority": "P1",
+      "status": "in_progress",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-015",
+        "MAT-019",
+        "MAT-072",
+        "MAT-082",
+        "MAT-084"
+      ],
+      "requirements": [
+        "CORE-14",
+        "CORE-17",
+        "CORE-18",
+        "CORE-22",
+        "OPS-01"
+      ],
+      "readiness": "in_progress",
+      "path": "records/MAT-091.json"
     }
   ]
 }
