@@ -1,6 +1,6 @@
 # StateCivics slice 2: receiving the Matter assistant-review SDK
 
-Candidate package: `matter-foundation==0.1.0.dev19`. The runtime/wheel hashes and
+SDK package: `matter-foundation==0.1.0.dev19`. The runtime/wheel hashes and
 actual checks are recorded in [MAT-088/089 validation](../validation/MAT-088-089.md).
 The [1.0 review contract](../contracts/assistant-review.md) is additive; frozen
 monitoring 1.0/1.1 and dev18 public helpers remain unchanged.
@@ -87,10 +87,15 @@ client/account/grants, original control history and source state inside the host
 transaction. A pause followed by resume must not revive an old call. Matter and
 Postgres do not form one distributed transaction.
 
-## What remains on the StateCivics side
+## Receiving responsibilities and verification
 
-1. Build the actual canonical host views/guards and wire this claim/call/complete
-   sequence around the existing review engine (KS-1150 slice 2). Claim identity
+StateCivics slice 2b now implements the narrow live-origin path below. Its
+[retained receiving run](../validation/dev19-receiving.md) demonstrates two wakes
+and prior-ledger reuse; reuse that implementation. These responsibilities still
+apply, while broader KS-1126 and slice 2c remain open.
+
+1. Reuse the actual canonical host views/guards and the claim/call/complete
+   sequence around the existing review engine (KS-1150 slice 2b). Claim identity
    must survive restart. A host exception/crash may have reached the assistant:
    preserve unknown, do not automatically rerun it. The SDK keeps one active
    wake per lens; while one is unresolved, queue new contributions and rebuild
@@ -194,3 +199,12 @@ Project actual deterministic host-rule outcomes as judgment-kind
 Project JEV answers as `jev_judgment` with their actual unqualified/qualified
 status. The adapter accepts both for review; do not relabel a host rule as model
 interpretation or promote either to a source fact or delivery permission.
+
+## Receiving status after slice 2b
+
+StateCivics main `f1e6cb4256486aa57ff1ec6cb5c4f7c3183653f0` contains the wired
+adapter and receiving fixes. Run 5 provides narrow live-origin assistant-review
+receiving evidence. The full UI/API/timeline contrasts of KS-1126, accumulation,
+operator reconciliation and production activation are separate; see the
+[receiving receipt](../validation/dev19-receiving.md). Matter made no new assistant/JEV application
+calls or shared-stack changes to inspect those records.

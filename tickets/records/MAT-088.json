@@ -93,7 +93,8 @@
     "docs/validation/MAT-088-089.md",
     "tests/contract/test_assistant_review.py",
     "tests/integration/test_assistant_review_memory.py",
-    "tests/fixtures/assistant-review/vectors.json"
+    "tests/fixtures/assistant-review/vectors.json",
+    "docs/validation/dev19-receiving.md"
   ],
   "tests": [
     "Wake-up alone does not advance communicated/captured-for-user knowledge.",
@@ -126,17 +127,19 @@
     "StateCivics KS-1150 on e8c2ce70e: host-owned assistant/lens/session/memory/evidence; Matter pointers only; county-report delivery records; bounded lens sessions. KS-1125 feedback is next; five owner choices stay open.",
     "StateCivics KS-1150 slice 1 on b87c6027f: AssistantReviewService.review(user_id, intent_id, assessment_id, why) supplies the existing read-only review engine; slice 2 connects Matter requests and host references.",
     "StateCivics KS-1150 on b87c6027f records owner study policy: existing per-review tool/time loop stop; review costs excluded from chat charge. This SDK labels host-managed cost policy rather than inventing a spend ceiling.",
-    "StateCivics slice 2a f87d509c2: existing review entry now accepts wake_key, deduplicates per account/objective/outcome and exposes GET /tracking/intents/{intent_id}/reviews. Read-only source verified; actual assistant rehearsal remains not run."
+    "StateCivics f87d509c2: wake_key and private review ledger source-inspected at SDK handoff. Later receiving evidence is recorded in docs/validation/dev19-receiving.md.",
+    "StateCivics f1e6cb425: slice 2b receiving fixes and retained .release/ks1126-wired/run5.txt. Matter checked receipt metadata and 207 SDK image files; see docs/validation/dev19-receiving.md."
   ],
   "completion": {
     "state": "passed",
     "evidence": [
-      "Matter SDK scope completed in dev19, runtime 0ce70c60f1341a0a1068c73b54af84fc928b8336. Both monitor wires and HostMonitoringState unchanged. Host slice 2b/KS-1126 receiving acceptance is separate; no assistant/JEV call, delivery, deployment or qualification claimed.",
+      "At SDK implementation closeout: Matter SDK scope completed in dev19, runtime 0ce70c60f1341a0a1068c73b54af84fc928b8336. Both monitor wires and HostMonitoringState unchanged. Host slice 2b/KS-1126 receiving acceptance is separate; no assistant/JEV call, delivery, deployment or qualification claimed.",
       "207 packaged runtime/schema files byte-match source; wheel SHA-256 e82bcc164e4c9c6baad4864b24da71cdec2a88b5786563bb44786fcb95e515f0. 82 installed checks passed on Python 3.12.14 and network-isolated Python 3.11.17; final strengthened negative checks passed on both. docs/validation/MAT-088-089.md retains actual receipts.",
       "Final affected selection: 100 checks passed (82 review/capture/version cases plus 18 repository-integrity checks). Full prior run: 1543 tests, one temporary draft-link failure; draft moved outside repo and affected checks passed. No final-head full-suite pass claimed.",
       "Completed independent two-round release review: 3/3 supported files, no warnings; two low test-quality findings corrected and verified. Earlier retry-guidance finding resolved with actual drain/retry evidence, unchanged semantic wake and no extra review. Raw receipts: data/validation/MAT-088-089/.",
       "Synthetic real-SQLite/control/access checks cover durable wake claims, unknown recovery under cancellation/revision, current-reader grants and parent correction denials, reviewed-subset reset, concurrent material, material-version conflicts, pointer-only ledger reuse and honest host-rule/JEV provenance. No numerical burst policy or findings-retention policy selected.",
-      "StateCivics f87d509c2 review entry/wake_key and private reviews ledger inspected read-only. SDK handoff: docs/adapters/statecivics-assistant-review.md. Host owns projections, actual read receipts, replay cuts, transactional linking and unsent real assistant rehearsal. MAT-083 and installed walkthrough-schema gap remain separate."
+      "At SDK handoff: StateCivics f87d509c2 review entry/wake_key and private reviews ledger inspected read-only. SDK handoff: docs/adapters/statecivics-assistant-review.md. Host owns projections, actual read receipts, replay cuts, transactional linking and unsent real assistant rehearsal. MAT-083 and installed walkthrough-schema gap remain separate.",
+      "Subsequent narrow receiving evidence: StateCivics f1e6cb425 retained run 5 shows two completed live-origin wakes, no extra review on exact/direct retry, empty pending after the first and prior-review ledger reuse. The available receiving-test image has all 207 dev19 SDK files byte-equal. No new Matter provider call, full KS-1126 acceptance, JEV qualification or production activation claimed. External receipts and limits: docs/validation/dev19-receiving.md."
     ]
   }
 }
