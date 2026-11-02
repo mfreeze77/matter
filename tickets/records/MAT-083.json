@@ -70,7 +70,8 @@
     "tests/integration/test_dispatch_races.py",
     "tests/semantic/test_stages.py",
     "docs/validation/MAT-083-intake.md",
-    "docs/validation/MAT-083-followup.md"
+    "docs/validation/MAT-083-followup.md",
+    "tests/integration/test_dispatch_contention.py"
   ],
   "tests": [
     "integration.test_dispatch_races.DispatchRaces.test_distinct_equivalent_intents_compete_across_real_sqlite_handles",
@@ -115,7 +116,8 @@
   "completion": {
     "state": "not_run",
     "evidence": [
-      "2026-10-31 bounded investigation, not repair: docs/validation/MAT-083-followup.md retains two passing unchanged-dev16 race runs (one with transaction trace), a passing dev17 trace, a three-case candidate run and nine passing checks in three repeat trials. Writer lock time was 3.901s on the traced dev16 run and 0.552s on dev17; both produced exactly one ready winner and stale loser. No original failure or common cause for the two intermittents was reproduced. Keep MAT-083 open; no blind retries, assertion weakening, speculative storage fix or provider qualification. The named main dispatch-race failure is already this ticket; no duplicate ticket filed."
+      "2026-10-31 bounded investigation, not repair: docs/validation/MAT-083-followup.md retains two passing unchanged-dev16 race runs (one with transaction trace), a passing dev17 trace, a three-case candidate run and nine passing checks in three repeat trials. Writer lock time was 3.901s on the traced dev16 run and 0.552s on dev17; both produced exactly one ready winner and stale loser. No original failure or common cause for the two intermittents was reproduced. Keep MAT-083 open; no blind retries, assertion weakening, speculative storage fix or provider qualification. The named main dispatch-race failure is already this ticket; no duplicate ticket filed.",
+      "2026-11-02 controlled dev19 investigation: the three unchanged retained tests passed in 20.417s; two event-controlled real-handle schedules passed in 14.618s and again in a 24-test affected run (104.439s). Ordinary contention returned stale; deliberate test-only lock expiry stayed E_STORAGE_UNAVAILABLE, with no losing journal, then recovered the exact original command as stale, one send, one charged delivery and no held quota. An initial draft quota-lookup error was corrected before these passing runs. No runtime change or original-failure reproduction: MAT-083 remains in_progress/not_run; neither intermittent cause is established. Receipts: docs/validation/MAT-083-followup.md and ignored data/validation/MAT-083-current/."
     ]
   }
 }

@@ -47,3 +47,45 @@ Small raw receipts, trace harness and stdout are retained under
 transaction verbs, synthetic command IDs, outcomes and durations, not SQL values.
 Live JEV interpretation, empirical qualification and production activation are
 outside this follow-up.
+
+## Controlled current-runtime checks, 2026-11-02
+
+Starting main was `d1f311b42ddf2ec24919e6f74cb4b0de515f7a27`
+(dev19). The three exact retained tests passed unchanged in **20.417s** on
+Python 3.12.14, SQLite 3.53.1, macOS 26.6.2/arm64. Neither the original race
+failure nor either intermittent semantic failure was reproduced.
+
+New [controlled contention tests](../../tests/integration/test_dispatch_contention.py)
+use independent real SQLite handles and events at the existing transaction
+fault seam and the waiter's `BEGIN IMMEDIATE` entry. They do not use sleeps,
+change runtime code, extend the normal timeout or relax the original assertion:
+
+- Release the writer after the contender reaches its transaction entry: one
+  ready winner, one `E_DEPENDENCY_STALE` loser.
+- Keep the writer locked while a deliberately short **test-only 0.05s** waiter
+  timeout expires: honest retriable `E_STORAGE_UNAVAILABLE`, no losing command
+  journal. After releasing the writer, retry the exact original losing command:
+  stale, then an identical journal replay. This is an intentionally induced real
+  timeout, **not reproduction or repair of the historical unexplained failure**.
+- Both schedules verify one winner send, exact send retry without another
+  transport call, a delivered baseline, one charged delivery and no held quota.
+
+The pair passed in **14.618s**, then passed again in the affected **24-test**
+run (**104.439s**, no failures/errors/skips). That run includes the complete
+dispatch-race file, storage interruption/fault tests, crash-after-external-send
+and timeout-without-transport-recovery checks, and the named independent-stage
+expiry case. The original three-test baseline and this affected run both cover
+the cancelled-work replacement. No whole-repository suite or provider call ran.
+
+An initial draft of the new tests reached their final quota assertion and
+errored twice because it read `attention_budget` from the delivered result
+instead of the authorization's reservation. That test error was corrected
+before the passing runs; it is not a runtime storage failure.
+
+Raw receipts are retained in `data/validation/MAT-083-current/`:
+`baseline.log`, `controlled.log` (the draft errors), `controlled-final.log` and
+`affected.log`. MAT-083 remains **in progress**, completion `not_run`:
+controlled ordinary contention and genuine timeout now have executable evidence,
+but the old failing interleaving and the two intermittent causes remain unknown.
+No speculative persistence repair, automatic retry or failure reclassification
+is justified by these results.
