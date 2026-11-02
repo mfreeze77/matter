@@ -20,6 +20,25 @@ not live JEV; it has no quiet outcome. The broader production activation and
 non-admin form walk remain separate. Earlier sections below retain their named
 historical checkpoints and ownership boundaries.
 
+## Permanent storage before production activation
+
+The owner adopted [Decision 0003](../decisions/0003-permanent-host-storage.md)
+on 2026-11-02; the StateCivics storage handoff is merged at `5b38eab72`.
+[MAT-092](../../tickets/MAT-092.md) now owns the planned Matter PostgreSQL
+backend and host payload conformance work. Production activation requires both
+PostgreSQL ledger storage and host-backed payload persistence, plus connected
+receiving/recovery acceptance. There is no interim production mount or temporary
+deployment/file-backup work. Retain the existing SQLite rehearsal for comparison.
+
+StateCivics KS-1158 owns its payload adapter and deployment/recovery integration.
+The host resolves a packet by `packet_hash`, reconstructs `exact_material` using
+Matter's `canonical_bytes`, and derives/verifies `source_digest` and byte length
+against the content reference. `evidence_hash` hashes the packet identity object,
+not the payload bytes. Raw model responses need host-owned exact-byte artifact
+persistence. The decision also preserves database coordination, unknown-wake
+reconciliation and compatible SDK/ledger/payload recovery pins. This intake
+does not change StateCivics' reported dev20 pin at `401f1a4`.
+
 ## Existing host entry point
 
 Source inspected read-only at StateCivics
@@ -99,8 +118,9 @@ this handoff does not reintroduce a per-user chat charge or a new spend ceiling.
 Do not create a wrapper endpoint with a browser-supplied actor or a shortcut
 around current host grants. Before linking a proposal, recheck current objective,
 client/account/grants, original control history and source state inside the host
-transaction. A pause followed by resume must not revive an old call. Matter and
-Postgres do not form one distributed transaction.
+transaction. A pause followed by resume must not revive an old call. The
+claim/call/complete workflow spans separate commits; moving the Matter ledger
+to PostgreSQL does not by itself make those steps atomic.
 
 ## Receiving responsibilities and verification
 

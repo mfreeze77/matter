@@ -6,6 +6,15 @@ and [receiving handoff](../adapters/statecivics-assistant-review.md). StateCivic
 receiving acceptance remains separate. Earlier planning receipts below are
 historical; this document does not approve a threshold or production activation.
 
+The owner's 2026-11-02 [permanent-storage decision](../decisions/0003-permanent-host-storage.md)
+requires PostgreSQL ledger storage and host-backed payload persistence before
+StateCivics production activation. [MAT-092](../../tickets/MAT-092.md) scopes
+the Matter work. No interim production mount or temporary deployment/file-backup
+plumbing will be built; retain the existing SQLite rehearsal for comparison and
+verification. StateCivics owns storage integration and associated receiving/
+recovery acceptance under KS-1158. Encryption remains KS-637/KS-1152 work;
+the production dispatcher and activation remain separate StateCivics/owner work.
+
 ## What the owner clarified
 
 The bubble is the trigger that wakes the user's specific assistant. Matter/JEV

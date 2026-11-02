@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "ticket_count": 91,
+  "ticket_count": 92,
   "counts_by_track": {
     "civic": 11,
     "core": 22,
@@ -9,14 +9,14 @@
     "foundation": 1,
     "jev": 10,
     "oil": 6,
-    "operations": 9,
+    "operations": 10,
     "rules": 7
   },
   "counts_by_status": {
     "blocked": 1,
     "done": 52,
     "in_progress": 2,
-    "planned": 36
+    "planned": 37
   },
   "tickets": [
     {
@@ -2248,6 +2248,33 @@
       ],
       "readiness": "done",
       "path": "records/MAT-091.json"
+    },
+    {
+      "id": "MAT-092",
+      "title": "Implement permanent PostgreSQL ledger storage and host payload conformance",
+      "track": "operations",
+      "phase": 4,
+      "priority": "P1",
+      "status": "planned",
+      "owner_repo": "mfreeze77/matter",
+      "depends_on": [
+        "MAT-003",
+        "MAT-004",
+        "MAT-011",
+        "MAT-016",
+        "MAT-030",
+        "MAT-072",
+        "MAT-074",
+        "MAT-089",
+        "MAT-091"
+      ],
+      "requirements": [
+        "CORE-02",
+        "OPS-01",
+        "OPS-03"
+      ],
+      "readiness": "ready",
+      "path": "records/MAT-092.json"
     }
   ]
 }
