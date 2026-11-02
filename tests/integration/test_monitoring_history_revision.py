@@ -10,6 +10,7 @@ from matter.canonical import canonical_bytes, canonical_digest
 from matter.contexts import ContextDefinition, _binding
 from matter.contracts import ContractError
 from matter.attention import RESULT_EXTENSION
+from matter.queries import QueryService, _ReadView
 from matter.storage import pin, entity_ref
 from integration.test_monitoring_handoff import MonitoringFixture, HOST_FIELDS
 from rule_helpers import component
@@ -138,6 +139,20 @@ class MonitoringHistoryRevision(unittest.TestCase):
         self.assertEqual(h.req["baseline"]["intent_revision_id"], "intent-a-v2")
         self.assertNotEqual(h.req["baseline"]["receipt"], baseline["receipt"])
 
+        no_future_grant_policy = h.access.policy
+        with h.f.storage.snapshot() as view:
+            no_future_grant_context = h.access.capture(view, token=h.token, audience=h.a.audience_ref,
+                provider=h.provider, references=[baseline["assessment_reference"]])
+        future_ref = {**pin(revised), "revision": revised["revision"] + 1}
+        policy = no_future_grant_policy.value
+        h.access.policy = HostAccessPolicy(scope_id=h.f.storage.scope_id,
+            audiences=policy["audiences"], providers=policy["providers"],
+            grants=[*policy["grants"], {"reference": future_ref, "audiences": [h.a.audience_ref], "providers": [h.provider]}])
+        future_grant_policy = h.access.policy
+        with h.f.storage.snapshot() as view:
+            future_grant_context = h.access.capture(view, token=h.token, audience=h.a.audience_ref,
+                provider=h.provider, references=[baseline["assessment_reference"]])
+
         # A later revision cannot rewrite either the 1.0 or 1.1 historical
         # selection, even when the latter retained an implicit head anchor.
         definition["semantic_version"] = "3.0"
@@ -151,8 +166,24 @@ class MonitoringHistoryRevision(unittest.TestCase):
             self.assertEqual(h.a.service.evaluate(journal["command"]), journal["result"])
         with h.f.storage.snapshot() as view:
             h.access.require_history(view, minimal_history, references=[baseline["assessment_reference"]])
-        with self.assertRaises(ContractError):
+            query = QueryService(h.f.storage, controls=h.f.controls, access=h.access)
+            reader = _ReadView(view, query, h.f.actor, entity_ref(h.f.authority), h.f.now, h.access_context)
+            self.assertEqual(pin(reader.get_historical(old_context)), old_context)
+            self.assertEqual(pin(reader.get_historical(pin(revised))), pin(revised))
+            early = {"state": "known", "value": "2020-01-01T00:00:00Z", "precision": "second"}
+            early_reader = _ReadView(view, query, h.f.actor, entity_ref(h.f.authority), early, h.access_context)
+            with self.assertRaises(ContractError) as not_known:
+                early_reader.get_historical(old_context)
+            self.assertEqual(not_known.exception.code, "E_EVIDENCE_UNAVAILABLE")
+        for policy, context in ((no_future_grant_policy, no_future_grant_context), (future_grant_policy, future_grant_context)):
+            h.access.policy = policy
+            with h.f.storage.snapshot() as view, self.assertRaises(ContractError) as changed:
+                h.access.require_current(view, context)
+            self.assertEqual(changed.exception.code, "E_DEPENDENCY_STALE")
+        h.access.policy = no_future_grant_policy
+        with self.assertRaises(ContractError) as changed:
             h.admit()  # The unrefreshed current context remains stale.
+        self.assertEqual(changed.exception.code, "E_DEPENDENCY_STALE")
 
     def test_ten_successive_developments_capture_with_bounded_prepared_inputs(self):
         h = MonitoringFixture(self)

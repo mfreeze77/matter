@@ -214,11 +214,17 @@ class AccessService:
         self.policy, self.controls, self.scope_id = policy, controls, controls.scope_id
         self.current_read = current_read
 
-    def _closure(self, view, references, audience, provider, token, *, historical=False, historical_dependencies=()):
+    def _closure(self, view, references, audience, provider, token, *, historical=False, historical_dependencies=(), expected_dependencies=None):
         definition = self.policy.value
         if audience not in definition["audiences"] or (provider is not None and provider not in [item["reference"] for item in definition["providers"]]):
             _fail()
         grants = {_key(item["reference"]): item for item in definition["grants"]}
+        expected_heads = {}
+        for ref in expected_dependencies or ():
+            if ref["record_type"] == PROJECTION_TYPE and "revision" in ref:
+                key = _key(entity_ref(ref))
+                if key not in expected_heads or expected_heads[key]["revision"] < ref["revision"]:
+                    expected_heads[key] = ref
         visited, active = {}, set()
         def visit(raw, parent=False):
             ref = fragment(raw, "pinned_ref")
@@ -255,6 +261,8 @@ class AccessService:
                 _fail()
             active.add(key)
             if head is not None:
+                if expected_dependencies is not None and expected_heads.get(_key(entity_ref(head))) != pin(head):
+                    _fail("stale_source_context", "E_DEPENDENCY_STALE")
                 # Both exact snapshots need real present grants. The old pin
                 # remains provenance, while the current head fences changes.
                 visit(pin(head))
@@ -291,14 +299,14 @@ class AccessService:
             visit(ref)
         return sorted(visited.values(), key=_key)
 
-    def capture(self, view, *, token, audience, references, provider=None):
+    def capture(self, view, *, token, audience, references, provider=None, _expected_dependencies=None):
         """Use the original token; never capture or renew a ControlService token."""
         refs = _pins(references)
         try:
             domain("control-token", token)
             if token["scope_id"] != self.scope_id:
                 _fail("scope_forbidden", "E_SCOPE_FORBIDDEN")
-            dependencies = self._closure(view, refs, audience, provider, token)
+            dependencies = self._closure(view, refs, audience, provider, token, expected_dependencies=_expected_dependencies)
             targets = list({_key(entity_ref(ref)): entity_ref(ref) for ref in dependencies}.values())
             self.controls.require_current(view, token, capability=token["capability"], targets=targets or token["targets"])
         except StorageError as error:
@@ -331,7 +339,8 @@ class AccessService:
             _fail("scope_forbidden", "E_SCOPE_FORBIDDEN")
         if any(ref not in data["dependencies"] for ref in refs if _public(ref)):
             _fail()
-        fresh = self.capture(view, token=data["token"], audience=data["audience"], provider=data["provider"], references=data["references"])
+        fresh = self.capture(view, token=data["token"], audience=data["audience"], provider=data["provider"], references=data["references"],
+            _expected_dependencies=data["dependencies"])
         if fresh.value != data:
             _fail()
         # A real current transaction is already the atomic guard. Detached
@@ -342,7 +351,7 @@ class AccessService:
                 _fail("fresh_read_required")
             with self.current_read() as live:
                 current = self.capture(live, token=data["token"], audience=data["audience"],
-                    provider=data["provider"], references=data["references"])
+                    provider=data["provider"], references=data["references"], _expected_dependencies=data["dependencies"])
             if current.value != data:
                 _fail()
         return context

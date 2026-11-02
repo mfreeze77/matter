@@ -62,7 +62,8 @@
     "tests/integration/test_assessment_history_growth.py",
     "tests/integration/test_monitoring_history_revision.py",
     "docs/validation/MAT-091.md",
-    "src/matter/statecivics_monitoring.py"
+    "src/matter/statecivics_monitoring.py",
+    "src/matter/queries.py"
   ],
   "tests": [
     "Capture, revise objective, then new same-subject capture.",
@@ -90,7 +91,8 @@
     "state": "not_run",
     "evidence": [
       "Candidate implementation: docs/validation/MAT-091.md records pre-fix exponential preparation growth and the old closure refusal, a ten-assessment exact-reconstruction check, a passing revision/baseline check, ten guarded synthetic captures with 76,221\u2013197,004-byte inputs, and the earlier 76-test affected pass. Final review, complete verification and versioned package handoff are pending. No receiving-stack changes, provider calls or qualification.",
-      "Post-review candidate: confirmed and repaired two high findings (stable historical READ/replay and detached semantic proof propagation/Storage facade), plus duplicate parent reads. Expanded revision/recorded-execution/history test passed in 39.095s; proof-declaration isolation test passed in 1.563s. Prior full runs were interrupted, not passes. Final fix review, full verification and package handoff remain pending."
+      "Post-review candidate: confirmed and repaired two high findings (stable historical READ/replay and detached semantic proof propagation/Storage facade), plus duplicate parent reads. Expanded revision/recorded-execution/history test passed in 39.095s; proof-declaration isolation test passed in 1.563s. Prior full runs were interrupted, not passes. Final fix review, full verification and package handoff remain pending.",
+      "Second complete review covered 12 selected files in two rounds with no warnings; both medium findings were confirmed and repaired: query-view historical reads delegate through current READ/knowledge-cut guards, and changed indirect native context heads return E_DEPENDENCY_STALE on currentness rechecks. Expanded regression passed in 39.519s, including missing and pre-granted new-head policies. Final delta review and full verification remain pending."
     ]
   }
 }

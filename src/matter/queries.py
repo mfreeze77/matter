@@ -61,6 +61,11 @@ class _ReadView:
         record=self.get(ref)
         return self.raw.receipt_for(pin(record))
 
+    def get_historical(self,ref):
+        # Exact-pin get already enforces current READ, the query knowledge cut
+        # and present historical grants; never bypass those through raw storage.
+        return self.get(fragment(ref,'pinned_ref'))
+
     def lookup_identity(self,ref):return self.get(ref)
 
     def watchers(self,key):
