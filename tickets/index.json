@@ -14,8 +14,8 @@
   },
   "counts_by_status": {
     "blocked": 1,
-    "done": 50,
-    "in_progress": 4,
+    "done": 51,
+    "in_progress": 3,
     "planned": 36
   },
   "tickets": [
@@ -1822,7 +1822,7 @@
       "track": "operations",
       "phase": 4,
       "priority": "P0",
-      "status": "in_progress",
+      "status": "done",
       "owner_repo": "mfreeze77/matter",
       "depends_on": [
         "MAT-002",
@@ -1834,7 +1834,7 @@
       "requirements": [
         "OPS-03"
       ],
-      "readiness": "in_progress",
+      "readiness": "done",
       "path": "records/MAT-074.json"
     },
     {
@@ -1855,7 +1855,7 @@
       "requirements": [
         "OPS-04"
       ],
-      "readiness": "waiting",
+      "readiness": "ready",
       "path": "records/MAT-075.json"
     },
     {
@@ -1876,7 +1876,7 @@
       "requirements": [
         "OPS-05"
       ],
-      "readiness": "waiting",
+      "readiness": "ready",
       "path": "records/MAT-076.json"
     },
     {
@@ -1896,7 +1896,7 @@
       "requirements": [
         "OPS-06"
       ],
-      "readiness": "waiting",
+      "readiness": "ready",
       "path": "records/MAT-077.json"
     },
     {
