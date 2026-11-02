@@ -287,3 +287,13 @@ The final change is a causal-evidence/triage closeout, not a new storage repair
 or supported profiling product. Strict native regressions and current runtime
 are unchanged. Canonical completion now records this disposition; experiment
 source and negative controls remain available as retained evidence.
+
+Final closeout verification: all **18 repository-integrity tests passed in
+0.636s**; `render --check`, validation (91 tickets / 107 requirements / 110
+schemas / three walkthroughs) and `git diff --check` passed. The final two-round
+canonical review covered **2/2 selected JSON files**, **zero findings and zero
+warnings** (46.3s). Four Markdown files followed the existing exclusions and
+were manually checked against the actual receipts. Runtime, schemas and
+`pyproject.toml` are byte-unchanged from merged `7cba9cc`; the dev21 wheel's
+209-file/runtime equality and hash therefore remain valid. No new full-suite,
+provider, receiving-image or production claim is added by this docs-only closeout.
