@@ -389,12 +389,14 @@ class StageTests(unittest.TestCase):
         self.assertEqual(len(self.calls), 1)
         self.assertNotIn("PRIVATE-FETCH", canonical_bytes(run.value).decode())
 
-    def test_one_expired_member_does_not_abort_compatible_independent_member(self):
+    def _expired_member_run(self, *, exhaust_elapsed=False):
         shared = self.f.observe("shared-details", payload=b"SYNTHETIC common fetched detail.\n")
         self.targets.append(entity_ref(shared))
         self.token = self.f.controls.capture(actor=self.f.actor, authority=entity_ref(self.f.authority),
             capability="assessment", targets=self.targets)
         self.reserve()
+        elapsed = [0.0]
+        self.runner.monotonic = lambda: elapsed[0]
         edge_a = self.edge(stage="a_select")
         edge_a["bindings"] = []
         edge_x = {"stage": "x_support", "question": "support", "accepted": {"minimum": "0", "maximum": "1"},
@@ -409,12 +411,29 @@ class StageTests(unittest.TestCase):
             packet = self.packet(record=shared) if parents else self.packet(candidate=stage["id"] == "x_support")
             return self.material(stage, parents, packet=packet)
         def qualify(**kwargs):
-            return {"status": "expired", "certificate": None} if expired.is_set() and kwargs["question"]["id"] == "selection" else self.qualified()
-        run = self.execute(plan, prepare, qualify=qualify)
+            if expired.is_set() and kwargs["question"]["id"] == "selection":
+                if exhaust_elapsed:
+                    elapsed[0] = 11.0
+                return {"status": "expired", "certificate": None}
+            return self.qualified()
+        return self.execute(plan, prepare, qualify=qualify)
+
+    def test_one_expired_member_does_not_abort_compatible_independent_member(self):
+        run = self._expired_member_run()
         self.assertEqual(run.value["stages"]["b_recovery"]["error_code"], "E_DEPENDENCY_STALE")
         self.assertEqual(run.value["stages"]["c_contradiction"]["status"], "completed", run.value)
         self.assertEqual(len(self.calls), 3)
         self.assertEqual([item["id"] for item in self.calls[-1]["questions"]], ["contradiction"])
+
+    def test_elapsed_expiry_still_blocks_independent_work_after_prerequisite_expiry(self):
+        run = self._expired_member_run(exhaust_elapsed=True)
+        self.assertEqual(run.value["stages"]["b_recovery"]["error_code"], "E_DEPENDENCY_STALE")
+        independent = run.value["stages"]["c_contradiction"]
+        self.assertEqual(independent["status"], "blocked")
+        self.assertEqual(independent["error_code"], "E_BUDGET_EXHAUSTED")
+        self.assertEqual(independent["reason"], "elapsed_limit")
+        self.assertEqual(len(self.calls), 2)
+        self.assertNotIn("contradiction", [q["id"] for batch in self.calls for q in batch["questions"]])
 
     def test_unknown_or_mismatched_dispatch_retains_unique_request_before_next_batch(self):
         for mismatch in (False, True):

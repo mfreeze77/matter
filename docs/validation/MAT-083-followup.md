@@ -100,3 +100,47 @@ actual logs and referenced host records, not described as independently reviewed
 The raw result is `data/validation/MAT-083-current/review.json`. The subsequent
 closeout edit adds only this validation paragraph; reviewed Python/JSON did not
 change.
+
+
+## Controlled functional-test clocks, 2026-11-02
+
+Starting code was `447a55bec7669488108e7641cdc380982c862564` (dev20).
+A bounded probe now reproduces both retained semantic **symptoms** under
+controlled elapsed exhaustion, without a provider or production data:
+
+- Advancing the stage envelope's monotonic clock to 11s after the selection
+  prerequisite expires preserves `b_recovery=E_DEPENDENCY_STALE` but blocks
+  independent `c_contradiction` with `E_BUDGET_EXHAUSTED`, `elapsed_limit`.
+- Letting the replacement assessment's graph finish after its one-second
+  profile envelope (1.001s), while remaining inside the separate ten-second
+  publication request budget, retains an unusable timed-out attempt. The
+  replacement enqueue returns `withheld`, `insufficient_evidence`, matching
+  the retained failure's observable symptom. This is not a SQLite error.
+
+The original CI logs do not retain enough attempt diagnostics to establish that
+these were their actual causes. The clocks are a demonstrated test exposure,
+not retrospective proof. Initial probe drafts crossed the wrong budget or
+tried to replace a read-only evaluator method; those harness errors are retained
+and are not runtime defects or passing checks. The corrected probe uses the
+existing typed graph and evaluator with a bounded class-level test patch.
+
+The cancellation/withdrawal test now injects a fixed graph clock only for its
+replacement evidence attempt. The qualification-expiry stage fixture also uses
+an explicit monotonic clock. Assertions are unchanged: replacement must be
+ready, independent work must complete, and old work tokens remain unusable.
+A new counterpart exhausts the stage envelope deliberately and requires the
+independent branch to remain blocked with no contradiction-provider invocation.
+The existing late-graph diagnostic test and real SQLite lock-expiry tests pass.
+No production time limit, SQLite timeout, retry or error classification changed.
+
+Affected selection: full dispatch-race file, controlled contention pair, full
+stage file and late-graph deadline check: **38 tests passed in 81.125s**.
+Raw metadata and the probe stay under ignored `data/validation/MAT-083-clock/`:
+`clock_probe.py`, `diagnostic4.log`, `affected.log` and the earlier draft outputs.
+The original SQLite interleaving still lacks a reproduced cause, so MAT-083
+remains in progress. This test repair does not clear that separate requirement.
+
+The two-round independent review covered 4/4 selected files with zero findings
+and warnings. Documentation was checked manually against the retained probes
+and 38-test receipt. The trailing whitespace found by the first diff check was
+removed before closeout; runtime source and production limits are unchanged.

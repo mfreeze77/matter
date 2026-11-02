@@ -83,7 +83,7 @@
     "Treating all E_STORAGE_UNAVAILABLE as duplicate suppression hides genuine durable-outcome uncertainty.",
     "Blind retries, longer sleeps or a permissive assertion can hide a defect or bypass cancellation, budget and command identity.",
     "The two intermittent findings have no demonstrated common cause and have not been locally reproduced in the retained intake evidence.",
-    "The external wheel digest is only the prefix 3d19879b\u2026; the image and 219-test results are reported receiving evidence, not independent Matter verification or qualification."
+    "The external wheel digest is only the prefix 3d19879b…; the image and 219-test results are reported receiving evidence, not independent Matter verification or qualification."
   ],
   "reuse": [
     {
@@ -111,13 +111,14 @@
     "docs/validation/dashboard-matter-handoff.md",
     "docs/validation/MAT-083-intake.md",
     "Retained gitignored receipts: data/validation/sdk-handoff-20261030/race-reproduction.log, ci-pr26-py312.log and ci-pr27.log.",
-    "Owner-supplied StateCivics handoff, 2026-10-31: merged Matter stack, image ks-test-runner:matter-10a7d9a, 202 source-matching packaged files, both adapter interfaces, 219 historical-replay passes/no skips; statewide suite/review pending. External wheel SHA-256 supplied only as 3d19879b\u2026; Python 3.11 build is the reported explanation for differing wheel bytes."
+    "Owner-supplied StateCivics handoff, 2026-10-31: merged Matter stack, image ks-test-runner:matter-10a7d9a, 202 source-matching packaged files, both adapter interfaces, 219 historical-replay passes/no skips; statewide suite/review pending. External wheel SHA-256 supplied only as 3d19879b…; Python 3.11 build is the reported explanation for differing wheel bytes."
   ],
   "completion": {
     "state": "not_run",
     "evidence": [
       "2026-10-31 bounded investigation, not repair: docs/validation/MAT-083-followup.md retains two passing unchanged-dev16 race runs (one with transaction trace), a passing dev17 trace, a three-case candidate run and nine passing checks in three repeat trials. Writer lock time was 3.901s on the traced dev16 run and 0.552s on dev17; both produced exactly one ready winner and stale loser. No original failure or common cause for the two intermittents was reproduced. Keep MAT-083 open; no blind retries, assertion weakening, speculative storage fix or provider qualification. The named main dispatch-race failure is already this ticket; no duplicate ticket filed.",
-      "2026-11-02 controlled dev19 investigation: the three unchanged retained tests passed in 20.417s; two event-controlled real-handle schedules passed in 14.618s and again in a 24-test affected run (104.439s). Ordinary contention returned stale; deliberate test-only lock expiry stayed E_STORAGE_UNAVAILABLE, with no losing journal, then recovered the exact original command as stale, one send, one charged delivery and no held quota. An initial draft quota-lookup error was corrected before these passing runs. No runtime change or original-failure reproduction: MAT-083 remains in_progress/not_run; neither intermittent cause is established. Receipts: docs/validation/MAT-083-followup.md and ignored data/validation/MAT-083-current/."
+      "2026-11-02 controlled dev19 investigation: the three unchanged retained tests passed in 20.417s; two event-controlled real-handle schedules passed in 14.618s and again in a 24-test affected run (104.439s). Ordinary contention returned stale; deliberate test-only lock expiry stayed E_STORAGE_UNAVAILABLE, with no losing journal, then recovered the exact original command as stale, one send, one charged delivery and no held quota. An initial draft quota-lookup error was corrected before these passing runs. No runtime change or original-failure reproduction: MAT-083 remains in_progress/not_run; neither intermittent cause is established. Receipts: docs/validation/MAT-083-followup.md and ignored data/validation/MAT-083-current/.",
+      "2026-11-02 dev20 clock isolation: controlled elapsed exhaustion reproduces the two retained semantic symptoms (independent stage blocked; replacement withheld for insufficient_evidence), but does not prove historical CI causes. Functional expiry/withdrawal tests now use explicit clocks; separate actual-expiry controls remain. 38 affected checks passed in 81.125s. No runtime timeout/retry/classification change or original SQLite race repair. See docs/validation/MAT-083-followup.md and ignored data/validation/MAT-083-clock/. MAT-083 remains in_progress/not_run."
     ]
   }
 }
