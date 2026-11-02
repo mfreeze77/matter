@@ -222,6 +222,10 @@ class DispatchRaces(DeliveryFixture):
             supersedes=[cancellation["body"]["control"]], now=self.f.now), self.f.storage.scope_id)
         resume["actor"] = deepcopy(self.f.actor); resume["body"]["control"]["body"]["actor"] = deepcopy(self.f.actor)
         self.assertEqual(self.f.controls.apply(self.f.controls.prepare(resume))["status"], "success")
+        # This case exercises cancellation/withdrawal, not machine-speed expiry
+        # of the synthetic graph's one-second budget. Deadline behavior has its
+        # own controlled-clock tests; keep this new evidence attempt deterministic.
+        self.f.graph_monotonic = lambda: 0.0
         self.assessment, self.claim, self.source, self.occurrence = self.a.assess("same-material-after-resume",
             source=self.source, occurrence=self.occurrence)
         self.decision_value, self.decision, self.attention_command, _ = self.a.evaluate(self.assessment)

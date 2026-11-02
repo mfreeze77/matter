@@ -120,7 +120,8 @@ class AssessmentCommitTests(RuleTestCase):
                 evidence=[self.evidence()], coverage={"status": "complete", "snapshot": component("coverage")},
                 as_of=prepared.value["request"]["body"]["assessed_as_of"], subject=pin(self.subject), control_token=prepared.token,
                 context=[] if rule.value["qualification_requirement"]["kind"] == "deterministic" else [component("task-scope")])
-        return GraphExecutor(runner, clock=lambda: deepcopy(self.now)).execute(self.plan, prepare=build,
+        return GraphExecutor(runner, clock=lambda: deepcopy(self.now),
+            monotonic=getattr(self, "graph_monotonic", None)).execute(self.plan, prepare=build,
             run_id="graph-" + prepared.value["request"]["command_id"], max_workers=1,
             check_current=lambda material, as_of: self.service.check_current(prepared, material, as_of=as_of),
             check_control=self.controls.check)
