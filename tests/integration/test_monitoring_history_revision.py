@@ -152,6 +152,7 @@ class MonitoringHistoryRevision(unittest.TestCase):
         with h.f.storage.snapshot() as view:
             future_grant_context = h.access.capture(view, token=h.token, audience=h.a.audience_ref,
                 provider=h.provider, references=[baseline["assessment_reference"]])
+        h.access.policy = no_future_grant_policy
 
         # A later revision cannot rewrite either the 1.0 or 1.1 historical
         # selection, even when the latter retained an implicit head anchor.
