@@ -9,6 +9,17 @@ review implementation and checks remain in
 The [1.0 review contract](../contracts/assistant-review.md) is additive; frozen
 monitoring 1.0/1.1 and dev18 public helpers remain unchanged.
 
+## Latest receiving status
+
+StateCivics adopted dev20 at main `c99710b60`. Its saved-objective timeline
+accepts the post-edit baseline and bounded repeated-capture repairs; Matter
+verified the image and preserved receipt. The [dev20 receiving closeout](../validation/dev20-receiving.md)
+records 22 captures, one reuse and four refusals, with the closing assistant wake
+completed and outputs unsent. The timeline uses the recorded Matter executor,
+not live JEV; it has no quiet outcome. The broader production activation and
+non-admin form walk remain separate. Earlier sections below retain their named
+historical checkpoints and ownership boundaries.
+
 ## Existing host entry point
 
 Source inspected read-only at StateCivics

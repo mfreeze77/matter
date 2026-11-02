@@ -64,7 +64,8 @@
     "docs/validation/MAT-091.md",
     "src/matter/statecivics_monitoring.py",
     "src/matter/queries.py",
-    "src/matter/dependencies.py"
+    "src/matter/dependencies.py",
+    "docs/validation/dev20-receiving.md"
   ],
   "tests": [
     "Capture, revise objective, then new same-subject capture.",
@@ -93,7 +94,8 @@
     "evidence": [
       "docs/validation/MAT-091.md: code/test cf5578bd551cc5fd6a2248ee8783aebfc5356058 passed all 1,552 tests in 1,332.641s. Capture/revise/capture, historical READ/query cuts, stale/denied guards and ten guarded synthetic captures pass; prepared sizes are 76,221–197,004 bytes under unchanged 2 MiB. Exact journal/input recovery and legacy inline commands remain covered.",
       "Installed dev20 wheel: 5 key tests passed in 46.329s; all 207 runtime/schema files equal verified source. Wheel SHA-256 02fe8a8b1ad6f7881ee31751ac68a325147ed97f9737fe97900d347bc2d5a296. Runtime/schemas/pyproject.toml match 401f1a4839c3b170b3c43269d8b5de8d3afa6b73. Complete two-round 11-file, 12-file and final 4-file delta reviews reported no warnings; all confirmed findings were repaired and tested.",
-      "StateCivics handoff documents separate current evaluation roots and baseline-history roots, individually authorized source_access_provenance grants, exact old/current pins and AccessContext encoding 1.1. Monitoring 1.0/1.1 remains available. StateCivics owns its receiving update and fresh timeline rerun; no auth/stack/deployment change, live call or qualification is claimed. Existing oversized legacy history and dev19 downgrade remain unsupported limitations; MAT-083 stays separate."
+      "StateCivics handoff documents separate current evaluation roots and baseline-history roots, individually authorized source_access_provenance grants, exact old/current pins and AccessContext encoding 1.1. Monitoring 1.0/1.1 remains available. StateCivics owns its receiving update and fresh timeline rerun; no auth/stack/deployment change, live call or qualification is claimed. Existing oversized legacy history and dev19 downgrade remain unsupported limitations; MAT-083 stays separate.",
+      "Receiving closeout 2026-11-02: StateCivics implementation at c99710b60617acfdd05a31b75ddcb76bdb176c71 adopts dev20. docs/validation/dev20-receiving.md records verified preserved run-4 hashes, independent 207-file image comparison, receiving logs (6 MAT-091 checks; focused gate 24 passed), and recounted 27 dispatches: 22 new captures, 1 reuse, 4 refusals. Both capture-after-edit and repeated captures pass; largest preparation 99,898 / 2,097,152 bytes; 22 fenced probes plus 2 with no held version. No quiet outcome, live JEV call, qualification, form walk or production activation is claimed."
     ]
   }
 }

@@ -1,5 +1,9 @@
 # Dev19 assistant-review receiving evidence
 
+Historical checkpoint. The later [dev20 timeline receiving receipt](dev20-receiving.md)
+records the saved-objective timeline and MAT-091 host repairs. Statements below
+about unexecuted broader acceptance describe the dev19 checkpoint.
+
 StateCivics' retained run 5 demonstrates the narrow MAT-088/089 receiving path:
 live-origin dispatch in isolated rehearsal, Matter pressure/claim, the existing
 assistant review, and guarded completion. It does not complete KS-1126's broader
