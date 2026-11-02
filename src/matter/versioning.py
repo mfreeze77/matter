@@ -9,26 +9,35 @@ import re
 
 from .canonical import ENCODING_VERSION, CanonicalError, canonical_bytes, canonical_digest, loads
 from .contracts import ContractError
-from ._rule_values import bounded, checked, fragment
+from ._rule_values import checked, fragment
 
 MAX_ENVELOPE_BYTES = 2 * 1024 * 1024
+MAX_ENVELOPE_DEPTH = 128
 _FEATURE = re.compile(r"[a-z][a-z0-9]*(?:[._/-][a-z0-9]+)*", re.ASCII)
 _DIGEST = re.compile(r"[0-9a-f]{64}", re.ASCII)
 
 
 def _list(values, pattern):
-    if type(values) is not list or len(values) > 64:
+    if type(values) not in (list, tuple) or len(values) > 64:
         raise ContractError("E_SCHEMA_INVALID")
     if any(type(v) is not str or len(v) > 128 or pattern.fullmatch(v) is None for v in values):
         raise ContractError("E_SCHEMA_INVALID")
     if len(set(values)) != len(values):
         raise ContractError("E_SCHEMA_INVALID")
-    return values
+    return list(values)
 
 
 def _envelope(value):
     value = checked(value, required=("schema_version", "encoding", "required_features",
         "required_semantics", "payload", "extensions"))
+    pending = [(value, 0)]
+    while pending:
+        node, depth = pending.pop()
+        if type(node) in (dict, list):
+            depth += 1
+            if depth > MAX_ENVELOPE_DEPTH:
+                raise ContractError("E_SCHEMA_INVALID")
+            pending.extend((child, depth) for child in (node.values() if type(node) is dict else node))
     if value["schema_version"] != "1.0" or value["encoding"] != ENCODING_VERSION:
         raise ContractError("E_VERSION_UNSUPPORTED")
     _list(value["required_features"], _FEATURE)
@@ -48,9 +57,9 @@ def semantic_fingerprint(component):
 def make_envelope(payload, *, required_features=(), required_semantics=(), extensions=None):
     """Declare requirements explicitly; nothing is inferred from model output."""
     return _envelope({"schema_version": "1.0", "encoding": ENCODING_VERSION,
-        "required_features": bounded(required_features, 64, code="E_SCHEMA_INVALID"),
-        "required_semantics": bounded(required_semantics, 64, code="E_SCHEMA_INVALID"),
-        "payload": deepcopy(payload), "extensions": {} if extensions is None else deepcopy(extensions)})
+        "required_features": _list(required_features, _FEATURE),
+        "required_semantics": _list(required_semantics, _DIGEST),
+        "payload": payload, "extensions": {} if extensions is None else extensions})
 
 
 def read_envelope(source, *, supported_features=(), known_semantics=(), expected_semantics=None):
@@ -66,10 +75,9 @@ def read_envelope(source, *, supported_features=(), known_semantics=(), expected
         if size > MAX_ENVELOPE_BYTES:
             raise ContractError("E_BUDGET_EXHAUSTED")
         value = _envelope(loads(source))
-        features = _list(bounded(supported_features, 64, code="E_SCHEMA_INVALID"), _FEATURE)
-        semantics = _list(bounded(known_semantics, 64, code="E_SCHEMA_INVALID"), _DIGEST)
-        expected = None if expected_semantics is None else _list(
-            bounded(expected_semantics, 64, code="E_SCHEMA_INVALID"), _DIGEST)
+        features = _list(supported_features, _FEATURE)
+        semantics = _list(known_semantics, _DIGEST)
+        expected = None if expected_semantics is None else _list(expected_semantics, _DIGEST)
     except ContractError:
         raise
     except (CanonicalError, UnicodeError, TypeError, ValueError, RecursionError):

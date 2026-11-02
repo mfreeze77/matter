@@ -5,7 +5,9 @@ around an existing payload. It does not replace or modify frozen monitoring
 1.0/1.1, assistant-review 1.0, native commands/results or access contexts.
 Its [schema](compatibility-envelope.schema.json) specifies shape; strict
 [matter-json-v1](../docs/contracts/canonical.md) parsing and the 2 MiB raw and
-canonical byte limits apply before consuming the value.
+canonical byte limits apply before consuming the value. The portable maximum
+is 128 nested containers, counting the root object as one; excessive depth
+yields `E_SCHEMA_INVALID` in both readers.
 
 ## Structural versus semantic compatibility
 
@@ -51,7 +53,9 @@ upgrade. The migration fixture exercises a declared future version 2 through
 the existing registry seam. Interrupted upgrades roll back atomically. A committed
 upgrade is **one-way**: a reader that does not support the new version refuses.
 Rollback means restoring a verified pre-upgrade backup to a new destination
-before accepting new writes. It does not merge later writes or edit ledger rows.
+only when no writes have occurred since that backup. Hosts must quiesce writers
+and account for original external attempts; restoring a file cannot prove those
+workers stopped. Rollback does not merge later writes or edit ledger rows.
 The original upgraded database is preserved. The fixture proves exact application
 rows, source correction, unresolved proposal, command history and unknown-delivery
 receipt survival and uses the existing backup/restore port.

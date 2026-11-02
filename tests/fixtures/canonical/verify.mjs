@@ -1,7 +1,7 @@
 // Independent portable-vector verifier. No Matter runtime code or Python bridge.
 // MAT-074 adds the strict decoder; native record schemas remain separate.
 import assert from "node:assert/strict";
-import { canonical, sha256, strictParse } from "./codec.mjs";
+import { canonical, sha256, strictParse } from "../../../conformance/clients/canonical.mjs";
 import { readFile } from "node:fs/promises";
 
 const fixture = JSON.parse(await readFile(new URL("./golden.json", import.meta.url), "utf8"));

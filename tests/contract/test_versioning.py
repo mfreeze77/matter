@@ -43,7 +43,7 @@ class VersionCompatibility(unittest.TestCase):
         cases=self.cases()
         self.assertEqual(self.node(cases),[c['expected'] for c in cases])
 
-    def test_actual_native_result_with_extensions_survives_both_readers(self):
+    def native_case(self):
         with tempfile.TemporaryDirectory() as tmp:
             with SQLiteStore(Path(tmp)/'native.sqlite',scope_id='synthetic:compatibility') as store:
                 command=create_command('compatibility-create','matter',scope_id=store.scope_id)
@@ -53,21 +53,52 @@ class VersionCompatibility(unittest.TestCase):
                 self.assertEqual(store.execute(command,create),result)
                 envelope=make_envelope(result,required_features=['native.result/1'],extensions={'unknown:future':{'keep':None,'value':'0.001'}})
                 case={'source':canonical_bytes(envelope).decode(),'supported_features':['native.result/1'],'known_semantics':[]}
-                expected=self.inspect(case);self.assertEqual(self.node([case]),[expected])
-                decoded=read_envelope(expected['canonical'],supported_features=['native.result/1'])
-                self.assertEqual(decode_result(canonical_bytes(decoded['payload'])),result)
-                self.assertEqual(decoded['extensions'],envelope['extensions'])
-                decoded['extensions'].clear()
-                self.assertTrue(envelope['extensions'])
+                return result,envelope,case
+
+    def test_actual_native_result_with_extensions_survives_python_reader(self):
+        result,envelope,case=self.native_case()
+        expected=self.inspect(case)
+        decoded=read_envelope(expected['canonical'],supported_features=['native.result/1'])
+        self.assertEqual(decode_result(canonical_bytes(decoded['payload'])),result)
+        self.assertEqual(decoded['extensions'],envelope['extensions'])
+        decoded['extensions'].clear()
+        self.assertTrue(envelope['extensions'])
+
+    def test_actual_native_result_survives_javascript_reader(self):
+        _,_,case=self.native_case()
+        self.assertEqual(self.node([case]),[self.inspect(case)])
 
     def test_raw_and_encoded_bounds_and_invalid_configuration_are_refused(self):
         with self.assertRaises(ContractError) as large:read_envelope(' '* (2*1024*1024+1))
         self.assertEqual(large.exception.code,'E_BUDGET_EXHAUSTED')
-        case={'source':' '*(2*1024*1024+1),'supported_features':[],'known_semantics':[]}
-        self.assertEqual(self.node([case]),[{'status':'refused','code':'E_BUDGET_EXHAUSTED'}])
         for config in (None,'a',{'a':True}):
             with self.subTest(config=config),self.assertRaises(ContractError):make_envelope({},required_features=config)
         with self.assertRaises(ContractError):read_envelope(canonical_bytes(make_envelope({})),supported_features=None)
+
+    def test_javascript_raw_bound_is_refused(self):
+        case={'source':' '*(2*1024*1024+1),'supported_features':[],'known_semantics':[]}
+        self.assertEqual(self.node([case]),[{'status':'refused','code':'E_BUDGET_EXHAUSTED'}])
+
+    def test_producer_enforces_portable_container_depth(self):
+        payload=None
+        for _ in range(127):payload=[payload]
+        make_envelope(payload) # root plus 127 payload containers = 128
+        with self.assertRaises(ContractError) as refused:make_envelope([payload])
+        self.assertEqual(refused.exception.code,'E_SCHEMA_INVALID')
+        for _ in range(1500):payload=[payload]
+        with self.assertRaises(ContractError):make_envelope(payload)
+        cycle=[];cycle.append(cycle)
+        with self.assertRaises(ContractError):make_envelope(cycle)
+
+    def test_javascript_symlink_entry_and_unexpected_errors_are_not_silent(self):
+        if shutil.which('node') is None:self.skipTest('Node.js is required')
+        client=ROOT/'conformance/clients/javascript.mjs'
+        with tempfile.TemporaryDirectory() as tmp:
+            link=Path(tmp)/'client.mjs';link.symlink_to(client)
+            result=subprocess.run(['node',str(link)],input='{"cases":[]}',text=True,capture_output=True,timeout=15,check=True)
+            self.assertEqual(json.loads(result.stdout),[])
+        script='import assert from "node:assert/strict"; import {inspect} from '+json.dumps(client.as_uri())+'; assert.throws(()=>inspect({get source(){throw new ReferenceError("synthetic internal bug")}}),ReferenceError);'
+        subprocess.run(['node','--input-type=module','-e',script],check=True,capture_output=True,timeout=15)
 
     def test_migration_manifest_is_installed_registry_not_untrusted_sql(self):
         manifest=migration_manifest()

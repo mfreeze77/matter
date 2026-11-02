@@ -1,5 +1,5 @@
 // Shared conformance codec, extracted from the original MAT-002 verifier.
-import assert from "node:assert/strict";
+import assert, { AssertionError } from "node:assert/strict";
 import { createHash } from "node:crypto";
 
 function scalarCompare(left, right) {
@@ -44,10 +44,15 @@ export function sha256(bytes) {
 
 
 // Unlike JSON.parse alone, preserve duplicate-key and numeric-token checks.
-export function strictParse(source) {
+export class CanonicalInputError extends Error {
+  constructor() { super("invalid canonical input"); }
+}
+
+export function strictParse(source, maxDepth=Infinity) {
+  try {
   const text = typeof source === "string" ? source : new TextDecoder("utf-8", {fatal:true, ignoreBOM:true}).decode(source);
   let at = 0;
-  const bad = () => { throw new Error("invalid canonical input"); };
+  const bad = () => { throw new CanonicalInputError(); };
   const ws = () => { while (at < text.length && " \t\r\n".includes(text[at])) at++; };
   function quoted() {
     const start = at++;
@@ -58,26 +63,28 @@ export function strictParse(source) {
     }
     return bad();
   }
-  function value() {
+  function value(depth=0) {
     ws();
     const c = text[at];
     if (c === '"') return quoted();
     if (c === "{") {
+      if (depth>=maxDepth) return bad();
       at++; ws(); const result = Object.create(null); const seen = new Set();
       if (text[at] === "}") { at++; return result; }
       while (at < text.length) {
         ws(); if (text[at] !== '"') return bad();
         const key = quoted(); if (seen.has(key)) return bad(); seen.add(key);
-        ws(); if (text[at++] !== ":") return bad(); result[key] = value(); ws();
+        ws(); if (text[at++] !== ":") return bad(); result[key] = value(depth+1); ws();
         const end = text[at++]; if (end === "}") return result; if (end !== ",") return bad();
       }
       return bad();
     }
     if (c === "[") {
+      if (depth>=maxDepth) return bad();
       at++; ws(); const result = [];
       if (text[at] === "]") { at++; return result; }
       while (at < text.length) {
-        result.push(value()); ws(); const end = text[at++];
+        result.push(value(depth+1)); ws(); const end = text[at++];
         if (end === "]") return result; if (end !== ",") return bad();
       }
       return bad();
@@ -94,4 +101,12 @@ export function strictParse(source) {
   const result = value(); ws(); if (at !== text.length) return bad();
   canonical(result); // Reject non-scalar strings, including object names.
   return result;
+  } catch (error) {
+    if (error instanceof CanonicalInputError) throw error;
+    if (error instanceof SyntaxError || error instanceof AssertionError || error instanceof RangeError ||
+        (error instanceof TypeError && ["ERR_ENCODING_INVALID_ENCODED_DATA","ERR_INVALID_ARG_TYPE"].includes(error.code))) {
+      throw new CanonicalInputError();
+    }
+    throw error;
+  }
 }
