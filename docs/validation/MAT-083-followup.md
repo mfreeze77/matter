@@ -89,3 +89,14 @@ controlled ordinary contention and genuine timeout now have executable evidence,
 but the old failing interleaving and the two intermittent causes remain unknown.
 No speculative persistence repair, automatic retry or failure reclassification
 is justified by these results.
+
+Closeout: all **18 repository-integrity checks** passed in 0.677s;
+`render --check`, `validate` (90 tickets, 107 requirements, 109 schemas,
+three walkthroughs) and `git diff --check` passed. The independent subscription
+review completed its default **two rounds**, reviewing the new Python test and
+canonical ticket JSON: **zero findings, zero warnings**, 411.1s. The configured
+rules excluded four Markdown files; those were checked manually against the
+actual logs and referenced host records, not described as independently reviewed.
+The raw result is `data/validation/MAT-083-current/review.json`. The subsequent
+closeout edit adds only this validation paragraph; reviewed Python/JSON did not
+change.
