@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from matter.canonical import canonical_bytes, canonical_digest
 from matter.contracts import ContractError, decode_result
@@ -74,6 +75,10 @@ class VersionCompatibility(unittest.TestCase):
         for config in (None,'a',{'a':True}):
             with self.subTest(config=config),self.assertRaises(ContractError):make_envelope({},required_features=config)
         with self.assertRaises(ContractError):read_envelope(canonical_bytes(make_envelope({})),supported_features=None)
+        with self.assertRaises(ContractError) as oversized:read_envelope('\ud800'+' '*(2*1024*1024))
+        self.assertEqual(oversized.exception.code,'E_BUDGET_EXHAUSTED')
+        with self.assertRaises(ContractError) as invalid:read_envelope('\ud800')
+        self.assertEqual(invalid.exception.code,'E_SCHEMA_INVALID')
 
     def test_javascript_raw_bound_is_refused(self):
         case={'source':' '*(2*1024*1024+1),'supported_features':[],'known_semantics':[]}
@@ -85,6 +90,9 @@ class VersionCompatibility(unittest.TestCase):
         make_envelope(payload) # root plus 127 payload containers = 128
         with self.assertRaises(ContractError) as refused:make_envelope([payload])
         self.assertEqual(refused.exception.code,'E_SCHEMA_INVALID')
+        middle=None
+        for _ in range(600):middle=[middle]
+        with self.assertRaises(ContractError):make_envelope(middle)
         for _ in range(1500):payload=[payload]
         with self.assertRaises(ContractError):make_envelope(payload)
         cycle=[];cycle.append(cycle)
@@ -99,6 +107,22 @@ class VersionCompatibility(unittest.TestCase):
             self.assertEqual(json.loads(result.stdout),[])
         script='import assert from "node:assert/strict"; import {inspect} from '+json.dumps(client.as_uri())+'; assert.throws(()=>inspect({get source(){throw new ReferenceError("synthetic internal bug")}}),ReferenceError);'
         subprocess.run(['node','--input-type=module','-e',script],check=True,capture_output=True,timeout=15)
+
+    def test_javascript_import_modes_and_exported_reader_refusals(self):
+        if shutil.which('node') is None:self.skipTest('Node.js is required')
+        client=ROOT/'conformance/clients/javascript.mjs'
+        script='import assert from "node:assert/strict"; import {readEnvelope,CompatibilityError} from '+json.dumps(client.as_uri())+'; for (const value of ["{",Buffer.from([255])]) assert.throws(()=>readEnvelope(value),e=>e instanceof CompatibilityError && e.code==="E_SCHEMA_INVALID"); const large=String.fromCharCode(0xd800)+" ".repeat(2*1024*1024); assert.throws(()=>readEnvelope(large),e=>e.code==="E_BUDGET_EXHAUSTED"); console.log("reader-import-ok");'
+        with tempfile.TemporaryDirectory() as tmp:
+            for args,input_ in ((['--input-type=module','-'],script),(['--input-type=module','-e',script,'nonexistent-argument'],None)):
+                result=subprocess.run(['node',*args],input=input_,text=True,capture_output=True,cwd=tmp,timeout=15,check=True)
+                self.assertEqual(result.stdout.strip(),'reader-import-ok')
+
+    def test_internal_python_failures_are_not_relabelled_as_client_refusals(self):
+        with patch('matter.versioning.loads',side_effect=TypeError('synthetic internal decoder bug')):
+            with self.assertRaises(TypeError):read_envelope('{}')
+        with patch('matter.versioning.migration_manifest',side_effect=ValueError('synthetic internal registry bug')):
+            with self.assertRaises(ValueError) as internal:require_migration_manifest({})
+            self.assertIs(type(internal.exception),ValueError)
 
     def test_migration_manifest_is_installed_registry_not_untrusted_sql(self):
         manifest=migration_manifest()

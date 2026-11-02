@@ -27,17 +27,26 @@ def _list(values, pattern):
     return list(values)
 
 
-def _envelope(value):
-    value = checked(value, required=("schema_version", "encoding", "required_features",
-        "required_semantics", "payload", "extensions"))
+def _check_depth(value):
     pending = [(value, 0)]
+    nodes = 0
     while pending:
         node, depth = pending.pop()
+        nodes += 1
+        if nodes > MAX_ENVELOPE_BYTES:
+            raise ContractError("E_BUDGET_EXHAUSTED")
         if type(node) in (dict, list):
             depth += 1
             if depth > MAX_ENVELOPE_DEPTH:
                 raise ContractError("E_SCHEMA_INVALID")
             pending.extend((child, depth) for child in (node.values() if type(node) is dict else node))
+
+
+def _envelope(value):
+    # Check before canonical validation/deepcopy can consume interpreter stack.
+    _check_depth(value)
+    value = checked(value, required=("schema_version", "encoding", "required_features",
+        "required_semantics", "payload", "extensions"))
     if value["schema_version"] != "1.0" or value["encoding"] != ENCODING_VERSION:
         raise ContractError("E_VERSION_UNSUPPORTED")
     _list(value["required_features"], _FEATURE)
@@ -71,7 +80,9 @@ def read_envelope(source, *, supported_features=(), known_semantics=(), expected
     if type(source) not in (str, bytes):
         raise ContractError("E_SCHEMA_INVALID")
     try:
-        size = len(source.encode("utf-8")) if type(source) is str else len(source)
+        if len(source) > MAX_ENVELOPE_BYTES:
+            raise ContractError("E_BUDGET_EXHAUSTED")
+        size = len(source.encode("utf-8", "surrogatepass")) if type(source) is str else len(source)
         if size > MAX_ENVELOPE_BYTES:
             raise ContractError("E_BUDGET_EXHAUSTED")
         value = _envelope(loads(source))
@@ -80,7 +91,7 @@ def read_envelope(source, *, supported_features=(), known_semantics=(), expected
         expected = None if expected_semantics is None else _list(expected_semantics, _DIGEST)
     except ContractError:
         raise
-    except (CanonicalError, UnicodeError, TypeError, ValueError, RecursionError):
+    except (CanonicalError, RecursionError):
         raise ContractError("E_SCHEMA_INVALID") from None
     if not set(value["required_features"]) <= set(features) or not set(value["required_semantics"]) <= set(semantics):
         raise ContractError("E_VERSION_UNSUPPORTED")
@@ -109,7 +120,7 @@ def require_migration_manifest(value):
         same = canonical_bytes(value) == canonical_bytes(migration_manifest())
     except ContractError:
         raise
-    except (CanonicalError, TypeError, ValueError, RecursionError):
+    except (CanonicalError, RecursionError):
         raise ContractError("E_SCHEMA_INVALID") from None
     if not same:
         raise ContractError("E_VERSION_UNSUPPORTED")

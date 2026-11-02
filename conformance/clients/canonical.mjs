@@ -2,6 +2,8 @@
 import assert, { AssertionError } from "node:assert/strict";
 import { createHash } from "node:crypto";
 
+export const ENCODING_VERSION = "matter-json-v1";
+
 function scalarCompare(left, right) {
   const a = Array.from(left, (character) => character.codePointAt(0));
   const b = Array.from(right, (character) => character.codePointAt(0));
@@ -40,6 +42,13 @@ export function canonical(value) {
 
 export function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
+}
+
+export function canonicalDigest(value, kind) {
+  if (typeof kind!=="string" || kind.length>128 || /^[a-z][a-z0-9_]*(?:[.-][a-z0-9_]+)*/.exec(kind)?.[0]!==kind) {
+    throw new CanonicalInputError();
+  }
+  return sha256(Buffer.concat([Buffer.from(ENCODING_VERSION+"\0"+kind+"\0","ascii"),Buffer.from(canonical(value),"utf8")]));
 }
 
 
