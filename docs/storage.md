@@ -14,6 +14,17 @@ controls, assessment execution, and external delivery retain their own tickets.
 A storage receipt records a commit; it does not establish that the host's policy
 or authority was correct.
 
+## Planned permanent host storage
+
+[MAT-092](../tickets/MAT-092.md) plans a PostgreSQL `Storage` implementation and
+conformance for host-backed `PayloadStore` adapters. SQLite remains the shipped
+reference backend. [Decision 0003](decisions/0003-permanent-host-storage.md)
+requires both permanent ports before StateCivics production activation, with no
+interim production mount or temporary deployment/file-backup plumbing. Keep the
+existing SQLite rehearsal for comparison and verification. The decision records
+the corrected packet/payload digest mapping, coordination, recovery and SDK
+compatibility gates; PostgreSQL implementation and acceptance remain unrun.
+
 ## First transaction
 
 The package includes its schemas and migrations, so the storage API works

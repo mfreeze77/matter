@@ -188,6 +188,13 @@ See the [schema inventory](docs/contracts/schema-inventory.md), [compatibility m
 
 ## Use durable storage
 
+SQLite remains the shipped reference backend. [MAT-092](tickets/MAT-092.md)
+plans PostgreSQL ledger storage and host payload conformance. For StateCivics,
+[Decision 0003](docs/decisions/0003-permanent-host-storage.md) requires PostgreSQL
+ledger storage and host-backed payload persistence before production activation:
+no interim production mount or temporary deployment/file-backup plumbing. The
+existing SQLite rehearsal remains a comparison and verification reference.
+
 `matter.storage.SQLiteStore` accepts a host-authorized scope and a synchronous
 command handler. Each command atomically commits its checked record/projection
 writes, operation receipt, and exact result. An identical retry returns the
