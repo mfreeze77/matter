@@ -1,6 +1,6 @@
 # MAT-083 bounded follow-up, 2026-10-31
 
-Status: **closeout candidate, post-fix review pending on 2026-11-02**; see the final
+Status: **closed by evidenced disposition on 2026-11-02**; see the final
 section below. The earlier dated checkpoints remain historical. The observed
 SQLite timeout mechanism is repaired by the already-merged MAT-085 validation
 cache; PR #43 removes the demonstrated functional-clock exposure. This is not
@@ -151,7 +151,7 @@ removed before closeout; runtime source and production limits are unchanged.
 
 ## Final causal comparison and disposition, 2026-11-02
 
-The new [bounded diagnostic](../../conformance/sqlite_contention.py) reuses the
+The retained bounded experiment in `data/validation/MAT-083-profile/` reuses the
 **unchanged equivalent-intent race assertion**, real handles, native services,
 control/budget checks and injected synthetic transport. It traces transaction
 verbs, synthetic command IDs, numeric SQLite errors and durations, never SQL
@@ -170,7 +170,7 @@ unprofiled speedup benchmark or a production/throughput qualification.
 3. Causal control on that **same dev20 image**: disable only successful
    structural-validation caching (`ValidationCache(max_entries=0)`), leaving
    all validations and native checks enabled. The initial comparison failed in
-   32.274s with SQLITE_BUSY at 5.110s. The final committed diagnostic repeated
+   32.274s with SQLITE_BUSY at 5.110s. The final retained diagnostic repeated
    the failure in **30.128s**, writer lock **10.890s**, SQLITE_BUSY at **5.173s**.
 4. Restore normal caching in that same image; the final diagnostic passed
    **twice**, **9.147s and 9.002s**. Writer locks were **1.478s and 1.451s**.
@@ -181,8 +181,9 @@ The dev20 image is pinned to
 Both same-image conditions use the exact tests archived from `1f525c6`, isolated
 network-disabled read-only containers with a 64 MiB temporary filesystem.
 Only the in-process cache setting differs. No image, host stack or installed
-package was modified. The final comparisons used the committed diagnostic's
-logic; its subsequent interpreter guard does not change the Python 3.11 path.
+package was modified. The final comparisons used the experiment snapshot at `273ac33`; its
+interpreter guard does not change the Python 3.11 path. These are retained
+experiments, not a new supported SDK diagnostic or profiling API.
 
 This demonstrates an avoidable writer-lock pressure cause: repeated schema
 validation can make a normal bounded waiter expire. **MAT-085's existing cache
@@ -205,24 +206,25 @@ Those original failed receipts are not relabelled passes or attributed to SQLite
 The full suite against `892d030` passed **1,566 tests in 1,307.074s**, including
 those strict cases, controlled real lock expiry/recovery, validation-cache
 integrity/revocation tests and delivery-unknown controls. Runtime source is
-unchanged by the diagnostic/closeout. The final diagnostic also passed on the
+unchanged by the diagnostic/closeout. The final experiment also passed on the
 checkout **without profiling**, dev21 / Python 3.12.14 / SQLite 3.53.1, in
 **6.264s**, writer lock **0.449s**, ready/stale and one send.
 
 An initial checkout profiler run errored because Python 3.12 refused concurrent
 cProfile instances ("Another profiling tool is already active"). This was an
-instrumentation error, not a storage outcome. The diagnostic now refuses profiler
+instrumentation error, not a storage outcome. The experimental script refuses profiler
 mode outside the validated Python 3.11 interpreter before constructing a fixture;
 transaction tracing remains available on the supported SDK interpreters. No
 failed instrumented run is counted as a pass.
 
-Reproduce on a suitable checkout/interpreter:
+Reproduce from the retained experiment snapshot on a suitable checkout/interpreter
+(`PYTHONPATH=tests` supplies the existing native race fixtures):
 
 ```sh
-PYTHONPATH=tests python conformance/sqlite_contention.py
+PYTHONPATH=tests python data/validation/MAT-083-profile/experiment-snapshot/conformance/sqlite_contention.py
 # Python 3.11 only; deliberately instrumented comparison:
-PYTHONPATH=tests python conformance/sqlite_contention.py --profile
-PYTHONPATH=tests python conformance/sqlite_contention.py --profile --disable-validation-cache
+PYTHONPATH=tests python data/validation/MAT-083-profile/experiment-snapshot/conformance/sqlite_contention.py --profile
+PYTHONPATH=tests python data/validation/MAT-083-profile/experiment-snapshot/conformance/sqlite_contention.py --profile --disable-validation-cache
 ```
 
 The cache-disabled profiled comparison is expected to fail the original race
@@ -248,9 +250,11 @@ Its four confirmed findings were repaired: JSON now distinguishes assertion
 failures, errors and skips/missing execution with separate exit statuses;
 commit-time SQLite errors retain their numeric code/name and duration; the
 unsupported-interpreter test now fails if a patch stack or runner starts; and
-canonical completion stays in progress until closeout evidence is recorded.
+canonical completion was returned to in progress during those repairs. The
+final disposition below supersedes that checkpoint.
 
-**Four new diagnostic tests passed in 8.514s**. They include the unchanged real
+**Four local experiment checks passed in 8.514s** (retained snapshot, not new
+SDK unit tests). They include the unchanged real
 unprofiled race, deliberate setup error/assertion/skip classification, a real
 native transaction with an injected commit I/O fault (no transport, honest
 unavailable, explicit COMMIT error, no false commit exit), and the early guard.
@@ -261,5 +265,25 @@ The repaired script repeated the same-image profiled control: cache disabled
 **30.296s**, `assertion_failure`, one failure/zero errors/zero skips; cache
 normal **8.973s**, `passed`, zero failures/errors/skips. Logs:
 `review-fixed-cache-off.log`, `review-fixed-cache-on.log`,
-`diagnostic-tests-postfix.log`. Post-fix review is pending; no production source
-or frozen SDK wire changed.
+`diagnostic-tests-postfix.log`. No production source or frozen SDK wire changed. The subsequent two-round
+review covered 4/4 selected files without warnings. It found that early CLI
+setup/usage failures can still share an exit code with other outcomes. This
+experimental CLI is therefore not shipped as a supported tool. Interpret only
+retained complete reports with their stderr: the two final control runs have
+explicit one/zero assertion counts and **zero errors/skips**, plus the actual
+SQLite error events. Missing JSON, import failure or an unsupported-interpreter
+refusal is not a race reproduction. The source/experiment checks are retained
+with hashes under `experiment-snapshot/`; the final SDK diff contains no new
+Python diagnostic or test module. This removes the unnecessary tool from the
+release instead of extending the SDK surface for a one-off investigation.
+
+
+### Final release boundary
+
+MAT-083 closes the demonstrated current regression exposures through the existing
+MAT-085 cache and PR #43's deterministic functional fixtures. Historical failed
+logs remain failures and their exact uninstrumented schedules are not known.
+The final change is a causal-evidence/triage closeout, not a new storage repair
+or supported profiling product. Strict native regressions and current runtime
+are unchanged. Canonical completion now records this disposition; experiment
+source and negative controls remain available as retained evidence.
