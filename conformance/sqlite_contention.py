@@ -2,8 +2,9 @@
 
 Run with PYTHONPATH=tests. --profile deliberately adds measurement overhead;
 --disable-validation-cache restores repeated structural checks for comparison.
-Neither option belongs in a production process. Nonzero means the ORIGINAL
-race assertion failed; a busy result is never reclassified as suppression.
+Neither option belongs in a production process. Read the structured outcome
+and retained stderr: exit 1 is an assertion failure, 2 an error, 3 a skipped or
+missing test. A busy result is never reclassified as suppression.
 """
 import argparse
 from contextlib import ExitStack
@@ -65,7 +66,16 @@ def run(*, profile=False, disable_validation_cache=False):
             command = getattr(local, 'command', None)
             if command:
                 emit(command=command, event='commit_enter')
-            result = super().commit()
+            started = time.perf_counter()
+            try:
+                result = super().commit()
+            except sqlite3.Error as error:
+                if command:
+                    emit(command=command, event='sqlite_error', verb='COMMIT',
+                         code=getattr(error, 'sqlite_errorcode', None),
+                         name=getattr(error, 'sqlite_errorname', None),
+                         seconds=time.perf_counter() - started)
+                raise
             if command:
                 emit(command=command, event='commit_exit')
             return result
@@ -108,9 +118,17 @@ def run(*, profile=False, disable_validation_cache=False):
         stack.enter_context(patch.object(sqlite3, 'connect', connect))
         stack.enter_context(patch.object(SQLiteStore, 'execute', execute))
         result = unittest.TextTestRunner(verbosity=2).run(unittest.TestSuite([case]))
+    outcome = ('error' if result.errors else 'assertion_failure' if result.failures else
+               'not_executed' if result.skipped or result.testsRun != 1 else 'passed')
     return dict(python=platform.python_version(), sqlite=sqlite3.sqlite_version,
                 sdk=__version__, profiled=profile, validation_cache_disabled=disable_validation_cache,
-                success=result.wasSuccessful(), seconds=time.perf_counter() - started, events=events)
+                success=outcome == 'passed', outcome=outcome, tests_run=result.testsRun,
+                assertion_failures=len(result.failures), errors=len(result.errors), skipped=len(result.skipped),
+                seconds=time.perf_counter() - started, events=events)
+
+
+def exit_status(report):
+    return {'passed': 0, 'assertion_failure': 1, 'error': 2, 'not_executed': 3}[report['outcome']]
 
 
 def main():
@@ -123,7 +141,7 @@ def main():
     except ProfileUnavailable as error:
         parser.error(str(error))
     print(json.dumps(report, indent=2))
-    return int(not report['success'])
+    return exit_status(report)
 
 
 if __name__ == '__main__':

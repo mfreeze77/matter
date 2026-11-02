@@ -1,6 +1,6 @@
 # MAT-083 bounded follow-up, 2026-10-31
 
-Status: **closed by evidenced disposition on 2026-11-02**; see the final
+Status: **closeout candidate, post-fix review pending on 2026-11-02**; see the final
 section below. The earlier dated checkpoints remain historical. The observed
 SQLite timeout mechanism is repaired by the already-merged MAT-085 validation
 cache; PR #43 removes the demonstrated functional-clock exposure. This is not
@@ -239,3 +239,27 @@ Raw receipts and old test archive remain under ignored
 This closes the bounded neutral regression investigation; it establishes no
 new provider interpretation, qualification, physical power-loss guarantee,
 arbitrary-load concurrency SLA, receiving deployment or activation authority.
+
+
+### Diagnostic review corrections
+
+The initial two-round review completed **4/4 selected files**, no warnings.
+Its four confirmed findings were repaired: JSON now distinguishes assertion
+failures, errors and skips/missing execution with separate exit statuses;
+commit-time SQLite errors retain their numeric code/name and duration; the
+unsupported-interpreter test now fails if a patch stack or runner starts; and
+canonical completion stays in progress until closeout evidence is recorded.
+
+**Four new diagnostic tests passed in 8.514s**. They include the unchanged real
+unprofiled race, deliberate setup error/assertion/skip classification, a real
+native transaction with an injected commit I/O fault (no transport, honest
+unavailable, explicit COMMIT error, no false commit exit), and the early guard.
+Expected nested diagnostic failures in that log are negative controls, not
+passing runtime races; the enclosing four-test verdict is OK.
+
+The repaired script repeated the same-image profiled control: cache disabled
+**30.296s**, `assertion_failure`, one failure/zero errors/zero skips; cache
+normal **8.973s**, `passed`, zero failures/errors/skips. Logs:
+`review-fixed-cache-off.log`, `review-fixed-cache-on.log`,
+`diagnostic-tests-postfix.log`. Post-fix review is pending; no production source
+or frozen SDK wire changed.
