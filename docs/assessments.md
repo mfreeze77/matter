@@ -241,3 +241,20 @@ This implementation performs no retrieval, provider call, model training,
 native integration, audience transport or global transitive propagation. It
 qualifies synthetic local behavior, not provider accuracy or live usefulness.
 See the [validation receipt](validation/MAT-015.md) for executed evidence.
+
+## Bounded history representation (MAT-091, SDK dev20)
+
+New assessment records keep `body.input_artifact` and their creation receipt,
+while the original atomic command journal retains the full typed publication.
+They no longer duplicate that publication in a record extension, which caused
+each later captured input to embed its ancestors recursively. `input_artifact`
+still reconstructs the exact original canonical input and verifies against its
+stored digest. Legacy inline publications remain readable, committable and
+exactly replayable on the new SDK. Existing history is never rewritten.
+
+This prevents new recursive growth, not arbitrary unbounded history. Existing
+large legacy snapshots can still exhaust the unchanged byte budget; they are
+not silently compacted. The receiving regression uses a fresh isolated store.
+Do not downgrade a store containing dev20 access-context/proof encodings or new
+commands to dev19: backward reading by the new SDK does not imply forward
+reading by an older SDK. Monitoring 1.0/1.1 remain supported on the new SDK.

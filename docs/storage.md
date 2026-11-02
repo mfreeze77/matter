@@ -341,3 +341,14 @@ termination before receipt, before commit, and after commit; competing writer
 processes; lock contention; and interrupted migrations. All examples and
 handlers are synthetic. No downstream repository, provider, transport, or
 deployed system is part of this qualification.
+
+## Exact historical proof reads (MAT-091)
+
+`view.get_historical(pinned_ref)` reads one integrity-checked historical
+snapshot. Within a transaction it first requires the ordinary declared
+**current head** read (or the transaction's own checked write), then reads the
+old bytes under the same writer lock. An old pin alone cannot satisfy that
+current fence. Ordinary `tx.get` still reads current state and refuses old pins.
+Historical proof does not make an old result current or confer authorization.
+Alternative storage ports need this additive method for historical-context
+provenance; the shipped SQLite implementation supplies it.

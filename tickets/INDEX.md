@@ -96,3 +96,4 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-088: Implement the Matter trigger to personal-assistant review handoff](MAT-088.md) | civic | 4 | P1 | done | done | MAT-022, MAT-023, MAT-072, MAT-081, MAT-084 |
 | [MAT-089: Reference scoped host findings for subsequent JEV decisions](MAT-089.md) | civic | 4 | P1 | done | done | MAT-088, MAT-016, MAT-023, MAT-028, MAT-030, MAT-072 |
 | [MAT-090: Rehearse client briefing and personal-assistant review through existing tools](MAT-090.md) | civic | 4 | P1 | planned | ready | MAT-088, MAT-089, MAT-082, MAT-084 |
+| [MAT-091: Preserve captured baselines across objective edits and bound assessment history](MAT-091.md) | core | 4 | P1 | done | done | MAT-015, MAT-019, MAT-072, MAT-082, MAT-084 |

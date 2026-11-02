@@ -143,6 +143,9 @@ class _Snapshot:
         except sqlite3.Error:
             raise _unavailable() from None
 
+    def get_historical(self, reference: dict[str, Any]) -> dict[str, Any]:
+        return _Snapshot.get(self, _reference(reference, pinned=True))
+
     def lookup_identity(self, reference: dict[str, Any]) -> dict[str, Any]:
         ref = self._checked_identity_ref(reference)
         try:
@@ -331,6 +334,14 @@ class _Transaction(_Snapshot):
             if expected is None or not self._matches(expected, record):
                 raise StorageError("E_REVISION_CONFLICT", "A current dependency pin is required for this read.")
         return record
+
+    def get_historical(self, reference: dict[str, Any]) -> dict[str, Any]:
+        reference = _reference(reference, pinned=True)
+        # A historical read is never an undeclared route around the command's
+        # current-head fence. Both the head and immutable old bytes are checked
+        # under this same writer transaction.
+        self.get(entity_ref(reference))
+        return _Snapshot.get(self, reference)
 
     def watchers(self, watch_key: str) -> list[dict[str, Any]]:
         _validate_fragment(watch_key, "identifier")
@@ -526,6 +537,12 @@ class _SystemTransaction:
             tx._expected[_identity(ref)] = actual
         return deepcopy(record)
 
+    def get_historical(self, reference):
+        self._ensure_active()
+        reference = _reference(reference, pinned=True)
+        self.get(entity_ref(reference))
+        return _Snapshot.get(self._tx, reference)
+
     def lookup_identity(self, reference):
         self._ensure_active()
         ref = self._tx._checked_identity_ref(reference)
@@ -701,6 +718,10 @@ class SQLiteStore:
     def get(self, reference: dict[str, Any]) -> dict[str, Any]:
         with self.snapshot() as view:
             return view.get(reference)
+
+    def get_historical(self, reference: dict[str, Any]) -> dict[str, Any]:
+        with self.snapshot() as view:
+            return view.get_historical(reference)
 
     def lookup_identity(self, reference: dict[str, Any]) -> dict[str, Any]:
         with self.snapshot() as view:
