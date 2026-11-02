@@ -1,6 +1,4 @@
 // MAT-074 compatibility client. It does not execute the Matter core or grant authority.
-import { readFileSync, realpathSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { canonical, canonicalDigest, ENCODING_VERSION, strictParse, CanonicalInputError } from "./canonical.mjs";
 
 const MAX_BYTES = 2 * 1024 * 1024;
@@ -48,16 +46,4 @@ export function inspect(test) {
     if (error instanceof CompatibilityError) return {status:"refused",code:error.code};
     throw error;
   }
-}
-function isMain() {
-  if (!process.argv[1]) return false;
-  try { return realpathSync(fileURLToPath(import.meta.url))===realpathSync(process.argv[1]); }
-  catch(error) {
-    if (["ENOENT","ENOTDIR","EACCES","ELOOP"].includes(error.code)) return false;
-    throw error;
-  }
-}
-if (isMain()) {
-  const request=strictParse(readFileSync(0));
-  console.log(JSON.stringify(request.cases.map(inspect)));
 }

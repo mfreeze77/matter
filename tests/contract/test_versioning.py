@@ -37,7 +37,7 @@ class VersionCompatibility(unittest.TestCase):
 
     def node(self,cases):
         if shutil.which('node') is None:self.skipTest('Node.js is required for independent language conformance')
-        result=subprocess.run(['node',str(ROOT/'conformance/clients/javascript.mjs')],input=json.dumps({'cases':cases}),text=True,capture_output=True,timeout=15,check=True)
+        result=subprocess.run(['node',str(ROOT/'conformance/clients/inspect.mjs')],input=json.dumps({'cases':cases}),text=True,capture_output=True,timeout=15,check=True)
         return json.loads(result.stdout)
 
     def test_javascript_agrees_on_bytes_hashes_and_refusal_outcomes(self):
@@ -77,6 +77,9 @@ class VersionCompatibility(unittest.TestCase):
         with self.assertRaises(ContractError):read_envelope(canonical_bytes(make_envelope({})),supported_features=None)
         with self.assertRaises(ContractError) as oversized:read_envelope('\ud800'+' '*(2*1024*1024))
         self.assertEqual(oversized.exception.code,'E_BUDGET_EXHAUSTED')
+        boundary='\ud800'+' '*(2*1024*1024-1)
+        with self.assertRaises(ContractError) as byte_limit:read_envelope(boundary)
+        self.assertEqual(byte_limit.exception.code,'E_BUDGET_EXHAUSTED')
         with self.assertRaises(ContractError) as invalid:read_envelope('\ud800')
         self.assertEqual(invalid.exception.code,'E_SCHEMA_INVALID')
 
@@ -102,7 +105,7 @@ class VersionCompatibility(unittest.TestCase):
         if shutil.which('node') is None:self.skipTest('Node.js is required')
         client=ROOT/'conformance/clients/javascript.mjs'
         with tempfile.TemporaryDirectory() as tmp:
-            link=Path(tmp)/'client.mjs';link.symlink_to(client)
+            link=Path(tmp)/'client.mjs';link.symlink_to(ROOT/'conformance/clients/inspect.mjs')
             result=subprocess.run(['node',str(link)],input='{"cases":[]}',text=True,capture_output=True,timeout=15,check=True)
             self.assertEqual(json.loads(result.stdout),[])
         script='import assert from "node:assert/strict"; import {inspect} from '+json.dumps(client.as_uri())+'; assert.throws(()=>inspect({get source(){throw new ReferenceError("synthetic internal bug")}}),ReferenceError);'
@@ -111,9 +114,9 @@ class VersionCompatibility(unittest.TestCase):
     def test_javascript_import_modes_and_exported_reader_refusals(self):
         if shutil.which('node') is None:self.skipTest('Node.js is required')
         client=ROOT/'conformance/clients/javascript.mjs'
-        script='import assert from "node:assert/strict"; import {readEnvelope,CompatibilityError} from '+json.dumps(client.as_uri())+'; for (const value of ["{",Buffer.from([255])]) assert.throws(()=>readEnvelope(value),e=>e instanceof CompatibilityError && e.code==="E_SCHEMA_INVALID"); const large=String.fromCharCode(0xd800)+" ".repeat(2*1024*1024); assert.throws(()=>readEnvelope(large),e=>e.code==="E_BUDGET_EXHAUSTED"); console.log("reader-import-ok");'
+        script='import assert from "node:assert/strict"; import {readEnvelope,CompatibilityError} from '+json.dumps(client.as_uri())+'; for (const value of ["{",Buffer.from([255])]) assert.throws(()=>readEnvelope(value),e=>e instanceof CompatibilityError && e.code==="E_SCHEMA_INVALID"); const large=String.fromCharCode(0xd800)+" ".repeat(2*1024*1024-1); assert.throws(()=>readEnvelope(large),e=>e.code==="E_BUDGET_EXHAUSTED"); console.log("reader-import-ok");'
         with tempfile.TemporaryDirectory() as tmp:
-            for args,input_ in ((['--input-type=module','-'],script),(['--input-type=module','-e',script,'nonexistent-argument'],None)):
+            for args,input_ in ((['--input-type=module','-'],script),(['--input-type=module','-e',script,'nonexistent-argument'],None),(['--input-type=module','-e',script,'x'*512],None)):
                 result=subprocess.run(['node',*args],input=input_,text=True,capture_output=True,cwd=tmp,timeout=15,check=True)
                 self.assertEqual(result.stdout.strip(),'reader-import-ok')
 

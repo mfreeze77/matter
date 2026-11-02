@@ -54,6 +54,7 @@
     "schemas/compatibility-envelope.schema.json",
     "schemas/versioning.md",
     "conformance/clients/javascript.mjs",
+    "conformance/clients/inspect.mjs",
     "conformance/clients/canonical.mjs",
     "tests/fixtures/canonical/verify.mjs",
     "tests/fixtures/versioning/compatibility.json",

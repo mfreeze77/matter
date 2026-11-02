@@ -73,7 +73,8 @@ exercise accepted bytes/digests and explicit refusal outcomes. The
 [JavaScript client](../conformance/clients/javascript.mjs) uses the existing
 portable encoder extracted into a shared conformance codec, with a strict
 parser that retains duplicate-key and numeric-token checks. It uses only Node
-built-ins. Both clients round-trip an actual SQLite create result with exact
+built-ins. The importable reader performs no startup I/O; the small
+`conformance/clients/inspect.mjs` stdin CLI is separate. Both clients round-trip an actual SQLite create result with exact
 retry identity, references, extensions and observable outcome preserved.
 
 This is a compatibility reader/conformance client, not a second native Matter
