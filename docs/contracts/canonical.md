@@ -175,9 +175,10 @@ node tests/fixtures/canonical/verify.mjs
 ```
 
 The independent JavaScript verifier implements scalar sorting, canonical rendering,
-and digest framing without importing the Python code. It checks all positive byte
-and digest vectors. Its `JSON.parse` input path is deliberately used only on the
-declared valid fixtures: it is **not** a strict second-language decoder, because
-that parser discards duplicate names and numeric token spellings. This is portable
-encoding evidence, not completion of MAT-074's broader cross-language runtime
-conformance work.
+and digest framing without importing Python. MAT-074 now supplies its strict
+parser as well: all 26 positive vectors, 8 original-source vectors and 53
+malformed/duplicate/numeric/Unicode cases run through the same conformance
+codec. The [compatibility client](../../schemas/versioning.md) additionally
+checks required features, exact semantic declarations and actual native-result
+roundtrips. It remains a compatibility reader, not a second native runtime or
+proof of live-provider correctness.
