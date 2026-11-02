@@ -28,8 +28,38 @@ payload digest/length verification. `evidence_hash` is not the payload digest.
 
 Reviewed the core storage and assistant-review contracts, existing ownership
 and reuse maps, SQLite transaction/hook documentation and MAT-074/MAT-091
-compatibility context. This is source review by the editing agent, not an
-independent review or a new rehearsal-store inventory.
+compatibility context. This initial source review was by the editing agent;
+the independent review below is separate. Neither inspected a new rehearsal-store
+inventory.
+
+## Independent review and correction
+
+Reviewed PR #46 at `6e85c044aa62b7eabc715d087d16e14438586448` against
+`e568e5894e4e80d0d7199cd4bd58c2496f570ad2`:
+
+- The OpenCodeReview subscription bridge completed two rounds over both selected
+  JSON files (`tickets/records/MAT-092.json` and `tickets/index.json`), with no
+  findings or warnings. The receipt is retained locally at
+  `data/validation/MAT-092/review-6e85c04.json`.
+- OCR excluded the nine Markdown files by file selection. A separate reviewer
+  with a fresh context completed two passes over all nine, cross-checking the
+  canonical ticket, governing contracts and the pinned StateCivics handoff.
+  It found one P2 ownership error: new wording incorrectly assigned encryption
+  and production activation to KS-1158, which explicitly excludes both.
+- The editing agent verified that finding against pinned KS-1158's out-of-scope
+  list. Canonical MAT-092, Decision 0003 and the assistant-review plan now keep
+  storage integration/recovery acceptance under KS-1158, encryption under
+  KS-637/KS-1152, and the production dispatcher/activation under separate
+  StateCivics/owner work. The ticket Markdown was regenerated. The document
+  reviewer found no other actionable issue.
+- Post-correction review covered `6e85c04` plus the ownership fix: the document
+  reviewer completed two further passes over all nine Markdown files and
+  confirmed resolution with no additional findings. OCR completed two rounds
+  over the changed canonical JSON (1/1 selected file), with no findings or
+  warnings; its local receipt is
+  `data/validation/MAT-092/review-ownership-fix.json`. The generated JSON index
+  was unchanged from the original reviewed version. The results table below
+  was rechecked after the ownership correction; all 39 tests passed again.
 
 ## Executed checks
 

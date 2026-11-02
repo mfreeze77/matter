@@ -47,9 +47,10 @@ repository; use synthetic fixtures here and external artifact references.
 - **StateCivics / KS-1158:** supply connections, roles and place/schema mapping;
   implement its evidence and response-artifact payload adapter; wire backend and
   worker coordination; include ledger, payloads and required host/sweep receipts
-  in its permanent recovery arrangement; perform connected receiving acceptance
-  and separately authorized activation. Matter does not implement those host
-  changes through this ticket.
+  in its permanent recovery arrangement; perform associated storage receiving
+  and recovery acceptance. Encryption remains KS-637/KS-1152 work. The
+  production dispatcher (KS-1127) and activation remain separate StateCivics/owner
+  work. Matter does not implement those host changes through this ticket.
 
 The host supplies a synchronous psycopg connection factory or pool lease,
 matching Matter's synchronous handlers. Connection lifecycle and transaction
