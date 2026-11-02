@@ -200,7 +200,7 @@ Project JEV answers as `jev_judgment` with their actual unqualified/qualified
 status. The adapter accepts both for review; do not relabel a host rule as model
 interpretation or promote either to a source fact or delivery permission.
 
-## Receiving status after slice 2b
+## Receiving status after slice 2b (historical snapshot)
 
 StateCivics main `f1e6cb4256486aa57ff1ec6cb5c4f7c3183653f0` contains the wired
 adapter and receiving fixes. Run 5 provides narrow live-origin assistant-review
@@ -208,3 +208,56 @@ receiving evidence. The full UI/API/timeline contrasts of KS-1126, accumulation,
 operator reconciliation and production activation are separate; see the
 [receiving receipt](../validation/dev19-receiving.md). Matter made no new assistant/JEV application
 calls or shared-stack changes to inspect those records.
+
+## Next receiving acceptance: saved-objective dispatcher timeline
+
+StateCivics main `ddae0990016177c02c3f6a4652d0a702e1b364d0` now records
+slice 2c and its follow-up checks. Accumulation and operator reconciliation are
+no longer waiting for a Matter SDK implementation. See the updated
+[receiving receipt](../validation/dev19-receiving.md). The SDK stays dev19;
+there is no runtime, wire, wheel or image rebuild in this follow-up.
+
+Matter's engineering recommendation for KS-1126 is a **rehearsal-only ordinary
+API session plus a dispatcher-driven timeline**, reusing the host's existing
+KS-1105 admission guards and KS-1124 dispatcher. The authored-context console
+does not exercise the saved-objective path. StateCivics owns this implementation;
+this recommendation selects no production authentication, activation, backup or
+accumulation cadence. It also does not approve a real client or pilot budget.
+
+The receiving acceptance needs these specific boundaries:
+
+1. The rehearsal admission must fail closed outside its opted-in local stack:
+   development configuration, verified rehearsal database/cluster and instance
+   marker, loopback publication, origin/write protections and the ordinary
+   account/place/ownership checks. Use an ordinary pilot account for saving and
+   activating the objectives; do not reuse the temporary reconcile administrator
+   as proof of ordinary-user access. Read back the actual form/API revisions
+   and owned watchlist **and item** associations.
+2. Drive the actual dispatcher over an explicit released-evidence prefix.
+   Current authorization and resource clocks remain current; they do not license
+   future source material in a replay. Keep historical source times, the study's
+   commit/release times and the current-intent reconstruction policy distinct.
+   Native receipts cannot be backdated. If setup commits precede all study
+   releases, pace those releases after the commits while preserving the original
+   historical timestamps. Check both selected packet bytes and any tool reads
+   used by the run before/after release. The old console's 404 cannot satisfy
+   AC-2 for this new path. Normal present-day dashboard reads outside the replay
+   need not be globally restricted; unfenced readers must stay out of the replay
+   or its availability acceptance must remain explicitly incomplete.
+3. Separate capture/quiet from assistant wake/no-wake. An objective with no
+   position can still receive a digest. An objective-wide opponent trigger does
+   not prove event-specific adversity or relevance. Retain actual justified
+   audience decisions, exact retries, duplicate silence, handled feedback,
+   pause/resume, edits and supported correction/new-version contrasts. A missing
+   future-event-notice packet remains an unexecuted case, not a passing check.
+4. Replay does not automatically wake the assistant. Record any closing
+   live-origin assistant review separately, with actual calls and limits, and
+   keep all outputs unsent. Reconcile attempted, executed, withheld and skipped
+   steps, actual capture rows and reviewed/pending material. This is integration
+   acceptance, not JEV interpretation qualification.
+
+KS-1127's incoming-event trigger, production persistent store and SDK image,
+Workbench/state-intel readiness, backup choices and cadence remain host/owner
+work. Feature flags alone do not feed developments to the dispatcher. No
+production read, migration, scheduling, shared-stack change or activation was
+performed by Matter for this follow-up.
