@@ -1,0 +1,791 @@
+"""Shared relational command semantics for SQLite and PostgreSQL (MAT-092).
+
+Backends own connection acquisition, transaction start, locking and cleanup.
+The statements here use a private qmark adapter; no user SQL is accepted.
+Canonical bytes, checked reads, savepoints and receipts share one implementation.
+"""
+from __future__ import annotations
+
+from contextlib import contextmanager
+from copy import deepcopy
+from datetime import datetime, timezone
+from typing import Any, Iterator
+
+from ..canonical import canonical_bytes, canonical_digest, loads
+from ..contracts import (
+    ContractError, command_digest, decode_command, decode_record, decode_result,
+    error_result, validate_command, validate_record, validate_result,
+)
+from .base import (
+    MUTABLE_RECORD_TYPES, PROJECTION_TYPE, STORAGE_NAMESPACE, CommandHandler,
+    StorageError, _identity, _reference, _validate_fragment,
+    _validate_projection, entity_ref, pin, snapshot_digest,
+)
+
+
+def _unavailable() -> StorageError:
+    return StorageError("E_STORAGE_UNAVAILABLE", retriable=True)
+
+
+def _now() -> dict[str, str]:
+    return {
+        "state": "known",
+        "value": datetime.now(timezone.utc).isoformat(timespec="microseconds").replace("+00:00", "Z"),
+        "precision": "microsecond",
+    }
+
+
+class _Snapshot:
+    def __init__(self, store: Any, db: Any) -> None:
+        self._store, self._db = store, db
+        self._active = True
+
+    def _ensure_active(self) -> None:
+        if not self._active:
+            raise StorageError("E_STORAGE_UNAVAILABLE", "This storage view is closed.")
+
+    def _checked_ref(self, reference: dict[str, Any]) -> dict[str, Any]:
+        self._ensure_active()
+        pinned = type(reference) is dict and ("revision" in reference or "digest" in reference)
+        result = _reference(reference, pinned=pinned)
+        if result["scope_id"] != self._store.scope_id:
+            raise StorageError("E_SCOPE_FORBIDDEN")
+        return result
+
+    def _checked_identity_ref(self, reference: dict[str, Any]) -> dict[str, Any]:
+        self._ensure_active()
+        result = _reference(reference)  # This lookup accepts bare references only.
+        if result["scope_id"] != self._store.scope_id:
+            raise StorageError("E_SCOPE_FORBIDDEN")
+        return result
+
+    def _row(self, reference: dict[str, Any], *, current: bool = False) -> Any:
+        ref = self._checked_ref(reference)
+        args: tuple[Any, ...] = _identity(ref)
+        if not current and "revision" in ref:
+            row = self._db.execute(
+                "SELECT * FROM versions WHERE scope_id=? AND namespace=? AND id=? AND version=?",
+                (*args, ref["revision"]),
+            ).fetchone()
+        elif not current and "digest" in ref:
+            row = self._db.execute(
+                "SELECT * FROM versions WHERE scope_id=? AND namespace=? AND id=? AND digest=?",
+                (*args, ref["digest"]),
+            ).fetchone()
+        else:
+            row = self._db.execute(
+                "SELECT v.* FROM heads h JOIN versions v USING(scope_id,namespace,id,version) "
+                "WHERE h.scope_id=? AND h.namespace=? AND h.id=?",
+                args,
+            ).fetchone()
+        if row is None or row["record_type"] != ref["record_type"]:
+            raise StorageError("E_NOT_FOUND")
+        return row
+
+    @staticmethod
+    def _decode(row: Any) -> dict[str, Any]:
+        try:
+            value = (
+                _validate_projection(loads(row["content"]))
+                if row["record_type"] == PROJECTION_TYPE else decode_record(row["content"])
+            )
+            if (
+                _identity(value) != (row["scope_id"], row["namespace"], row["id"])
+                or value["record_type"] != row["record_type"]
+                or value.get("revision", 1) != row["version"]
+                or snapshot_digest(value) != row["digest"]
+                or canonical_bytes(value) != row["content"]
+            ):
+                raise ValueError
+        except (ValueError, TypeError, KeyError, RecursionError):
+            raise StorageError("E_STORAGE_UNAVAILABLE", "Stored snapshot integrity could not be established.") from None
+        return value
+
+    def get(self, reference: dict[str, Any]) -> dict[str, Any]:
+        try:
+            return self._decode(self._row(reference))
+        except self._store._database_errors:
+            raise _unavailable() from None
+
+    def get_historical(self, reference: dict[str, Any]) -> dict[str, Any]:
+        return _Snapshot.get(self, _reference(reference, pinned=True))
+
+    def lookup_identity(self, reference: dict[str, Any]) -> dict[str, Any]:
+        ref = self._checked_identity_ref(reference)
+        try:
+            row = self._db.execute(
+                "SELECT v.* FROM heads h JOIN versions v USING(scope_id,namespace,id,version) "
+                "WHERE h.scope_id=? AND h.namespace=? AND h.id=?",
+                _identity(ref),
+            ).fetchone()
+            if row is None:
+                raise StorageError("E_NOT_FOUND")
+            return self._decode(row)
+        except self._store._database_errors:
+            raise _unavailable() from None
+
+    def history(self, reference: dict[str, Any]) -> list[dict[str, Any]]:
+        ref = self._checked_ref(reference)
+        try:
+            # Fail explicitly on an unknown or mistyped identity, including empty DBs.
+            self._row(entity_ref(ref), current=True)
+            rows = self._db.execute(
+                "SELECT * FROM versions WHERE scope_id=? AND namespace=? AND id=? ORDER BY version",
+                _identity(ref),
+            ).fetchall()
+            return [self._decode(row) for row in rows]
+        except self._store._database_errors:
+            raise _unavailable() from None
+
+    def watchers(self, watch_key: str) -> list[dict[str, Any]]:
+        self._ensure_active()
+        _validate_fragment(watch_key, "identifier")
+        try:
+            rows = self._db.execute(
+                "SELECT namespace,id FROM watches WHERE scope_id=? AND watch_key=? ORDER BY namespace,id",
+                (self._store.scope_id, watch_key),
+            ).fetchall()
+            return [self.get({
+                "scope_id": self._store.scope_id, "namespace": row["namespace"],
+                "id": row["id"], "record_type": PROJECTION_TYPE,
+            }) for row in rows]
+        except self._store._database_errors:
+            raise _unavailable() from None
+
+    def _journal(self, row: Any) -> dict[str, Any]:
+        try:
+            command = decode_command(row["command_json"])
+            result = decode_result(row["result_json"])
+            receipt_ref = {
+                "scope_id": row["scope_id"], "namespace": row["receipt_namespace"],
+                "record_type": "receipt", "id": row["receipt_id"],
+            }
+            # Bypass a transaction's declared-read wrapper for this internal read.
+            receipt = self._decode(self._row(receipt_ref))
+            if (
+                command["scope_id"] != row["scope_id"]
+                or command["command_id"] != row["command_id"]
+                or command["idempotency_key"] != row["idempotency_key"]
+                or command_digest(command) != row["digest"]
+                or canonical_bytes(command) != row["command_json"]
+                or canonical_bytes(result) != row["result_json"]
+                or result["operation"] != command["operation"]
+                or result["operation_id"] != command["command_id"]
+                or receipt["body"]["operation_id"] != command["command_id"]
+                or receipt["body"]["stage"] != "operation"
+                or receipt["creation_receipt"] != receipt_ref
+                or receipt["body"]["details"]["value"]["command_digest"] != row["digest"]
+                or receipt["body"]["details"]["value"]["result_digest"]
+                != canonical_digest(result, f"result.{command['operation']}.v1")
+                or (result["status"] == "success" and result["receipt"] != receipt_ref)
+            ):
+                raise ValueError
+        except (ValueError, TypeError, KeyError, RecursionError):
+            raise StorageError("E_STORAGE_UNAVAILABLE", "Stored command integrity could not be established.") from None
+        return {"command": command, "command_digest": row["digest"], "result": result, "receipt": receipt}
+
+    def command_receipt(self, idempotency_key: str) -> dict[str, Any]:
+        self._ensure_active()
+        _validate_fragment(idempotency_key, "identifier")
+        try:
+            row = self._db.execute(
+                "SELECT * FROM commands WHERE scope_id=? AND idempotency_key=?",
+                (self._store.scope_id, idempotency_key),
+            ).fetchone()
+            if row is None:
+                raise StorageError("E_NOT_FOUND")
+            return self._journal(row)
+        except self._store._database_errors:
+            raise _unavailable() from None
+
+    def receipt_for(self, reference: dict[str, Any]) -> dict[str, Any]:
+        try:
+            row = self._row(reference)
+            self._decode(row)
+            journal = self._db.execute(
+                "SELECT * FROM commands WHERE scope_id=? AND command_id=?",
+                (self._store.scope_id, row["command_id"]),
+            ).fetchone()
+            if journal is None:
+                raise _unavailable()
+            return self._journal(journal)["receipt"]
+        except self._store._database_errors:
+            raise _unavailable() from None
+
+
+class _Transaction(_Snapshot):
+    def __init__(self, store: Any, db: Any, command: dict[str, Any], digest: str) -> None:
+        super().__init__(store, db)
+        self._command = command
+        self._digest = digest
+        self._receipt_ref = {
+            "scope_id": store.scope_id, "namespace": STORAGE_NAMESPACE,
+            "record_type": "receipt", "id": "command-" + digest,
+        }
+        self._expected: dict[tuple[str, str, str], dict[str, Any]] = {}
+        self._writes: dict[tuple[str, str, str], dict[str, Any]] = {}
+        self._before_pins: dict[tuple[str, str, str], dict[str, Any] | None] = {}
+        self._verified_reads: list[dict[str, Any]] = []
+        self._absent_reads: dict[tuple[str, str, str], dict[str, Any]] = {}
+        self._watch_queries: list[str] = []
+
+    @property
+    def command(self) -> dict[str, Any]:
+        self._ensure_active()
+        return deepcopy(self._command)
+
+    @property
+    def receipt_ref(self) -> dict[str, Any]:
+        self._ensure_active()
+        return deepcopy(self._receipt_ref)
+
+    @staticmethod
+    def _matches(reference: dict[str, Any], record: dict[str, Any]) -> bool:
+        if entity_ref(reference) != entity_ref(record):
+            return False
+        if "revision" in reference:
+            return reference["revision"] == record.get("revision")
+        return reference.get("digest") == snapshot_digest(record)
+
+    def _check_reads(self, *, conflict_code: str = "E_REVISION_CONFLICT") -> None:
+        for reference in self._command["expected_revisions"]:
+            self._checked_ref(reference)
+            identity = _identity(reference)
+            if identity in self._expected:
+                raise StorageError("E_SCHEMA_INVALID", "Expected revisions contain a duplicate identity.")
+            self._expected[identity] = reference
+        for reference in self._expected.values():
+            try:
+                record = self._decode(self._row(reference, current=True))
+            except StorageError as exc:
+                if exc.code != "E_NOT_FOUND":
+                    raise
+                raise StorageError(conflict_code) from None
+            if not self._matches(reference, record):
+                raise StorageError(conflict_code)
+            self._verified_reads.append(reference)
+
+    def get(self, reference: dict[str, Any]) -> dict[str, Any]:
+        ref = self._checked_ref(reference)
+        identity = _identity(ref)
+        try:
+            record = self._decode(self._row(ref, current=True))
+        except StorageError as exc:
+            if exc.code == "E_NOT_FOUND":
+                self._absent_reads[identity] = entity_ref(ref)
+            raise
+        except self._store._database_errors:
+            raise _unavailable() from None
+        if identity not in self._writes:
+            expected = self._expected.get(identity)
+            if expected is None or not self._matches(expected, record):
+                raise StorageError("E_REVISION_CONFLICT", "A current dependency pin is required for this read.")
+        if ("revision" in ref or "digest" in ref) and not self._matches(ref, record):
+            raise StorageError("E_REVISION_CONFLICT")
+        return record
+
+    def lookup_identity(self, reference: dict[str, Any]) -> dict[str, Any]:
+        ref = self._checked_identity_ref(reference)
+        identity = _identity(ref)
+        try:
+            record = super().lookup_identity(ref)
+        except StorageError as exc:
+            if exc.code == "E_NOT_FOUND":
+                self._absent_reads[identity] = ref
+            raise
+        if identity not in self._writes:
+            expected = self._expected.get(identity)
+            if expected is None or not self._matches(expected, record):
+                raise StorageError("E_REVISION_CONFLICT", "A current dependency pin is required for this read.")
+        return record
+
+    def get_historical(self, reference: dict[str, Any]) -> dict[str, Any]:
+        reference = _reference(reference, pinned=True)
+        # A historical read is never an undeclared route around the command's
+        # current-head fence. Both the head and immutable old bytes are checked
+        # under this same writer transaction.
+        self.get(entity_ref(reference))
+        return _Snapshot.get(self, reference)
+
+    def watchers(self, watch_key: str) -> list[dict[str, Any]]:
+        _validate_fragment(watch_key, "identifier")
+        self._watch_queries.append(watch_key)
+        return super().watchers(watch_key)
+
+    # The shared internal reader must not accidentally expose an untracked
+    # read route through its public Snapshot-only methods.
+    def history(self, reference: dict[str, Any]) -> list[dict[str, Any]]:
+        raise StorageError("E_SCHEMA_INVALID", "Historical queries require a snapshot context.")
+
+    def command_receipt(self, idempotency_key: str) -> dict[str, Any]:
+        raise StorageError("E_SCHEMA_INVALID", "Journal queries require a snapshot context.")
+
+    def receipt_for(self, reference: dict[str, Any]) -> dict[str, Any]:
+        raise StorageError("E_SCHEMA_INVALID", "Historical receipt queries require a snapshot context.")
+
+    def _writable_ref(self, reference: dict[str, Any]) -> None:
+        self._checked_ref(reference)
+        if reference["namespace"] == STORAGE_NAMESPACE:
+            raise StorageError("E_SCOPE_FORBIDDEN", "The operation-receipt namespace is reserved.")
+        if _identity(reference) in self._writes:
+            raise StorageError("E_SCHEMA_INVALID", "A command may write an identity only once.")
+
+    def _write(self, record: dict[str, Any], previous_version: int | None) -> None:
+        identity = _identity(record)
+        if identity not in self._before_pins:
+            self._before_pins[identity] = (
+                {**entity_ref(record), "revision": previous_version}
+                if previous_version is not None else None
+            )
+        version = record.get("revision", 1)
+        self._db.execute(
+            "INSERT INTO versions(scope_id,namespace,id,record_type,version,digest,content,command_id) "
+            "VALUES(?,?,?,?,?,?,?,?)",
+            (*identity, record["record_type"], version, snapshot_digest(record),
+             canonical_bytes(record), self._command["command_id"]),
+        )
+        if previous_version is None:
+            self._db.execute(
+                "INSERT INTO heads(scope_id,namespace,id,record_type,version) VALUES(?,?,?,?,?)",
+                (*identity, record["record_type"], version),
+            )
+        else:
+            updated = self._db.execute(
+                "UPDATE heads SET version=? WHERE scope_id=? AND namespace=? AND id=? AND version=? AND record_type=?",
+                (version, *identity, previous_version, record["record_type"]),
+            )
+            if updated.rowcount != 1:
+                raise StorageError("E_REVISION_CONFLICT")
+        self._writes[identity] = deepcopy(record)
+
+    def insert(self, record_input: dict[str, Any]) -> dict[str, Any]:
+        self._ensure_active()
+        if type(record_input) is not dict or {"creation_receipt", "revision"} & record_input.keys():
+            raise StorageError("E_SCHEMA_INVALID", "Creation receipt and initial revision are assigned by storage.")
+        record = {**deepcopy(record_input), "creation_receipt": self.receipt_ref}
+        if record.get("record_type") in MUTABLE_RECORD_TYPES:
+            record["revision"] = 1
+        record = validate_record(record)
+        if (record["namespace"] == "matter.controls"
+                or (record["namespace"].startswith("matter.controls.")
+                    and not (record["namespace"] == "matter.controls.hooks" and record["record_type"] == "receipt"))):
+            raise StorageError("E_SCOPE_FORBIDDEN", "Control state namespaces are reserved for internal projections and hook receipts.")
+        reference = entity_ref(record)
+        self._writable_ref(reference)
+        if self._db.execute("SELECT 1 FROM heads WHERE scope_id=? AND namespace=? AND id=?", _identity(record)).fetchone():
+            raise StorageError("E_SOURCE_IDENTITY_CONFLICT")
+        self._write(record, None)
+        return deepcopy(record)
+
+    def replace(self, record: dict[str, Any]) -> dict[str, Any]:
+        self._ensure_active()
+        record = validate_record(record)
+        if record["record_type"] not in MUTABLE_RECORD_TYPES:
+            raise StorageError("E_REVISION_CONFLICT", "Immutable records cannot be replaced.")
+        reference = entity_ref(record)
+        self._writable_ref(reference)
+        previous = self.get(reference)
+        if record["revision"] != previous["revision"] + 1:
+            raise StorageError("E_REVISION_CONFLICT", "Replacement must use the next revision.")
+        if record["creation_receipt"] != previous["creation_receipt"]:
+            raise StorageError("E_SCHEMA_INVALID", "Replacement must preserve the original creation receipt.")
+        self._write(record, previous["revision"])
+        return deepcopy(record)
+
+    def put_projection(
+        self, reference: dict[str, Any], value: dict[str, Any],
+        *, watch_keys: tuple[str, ...] = (),
+    ) -> dict[str, Any]:
+        if type(watch_keys) not in (list, tuple):
+            raise StorageError("E_SCHEMA_INVALID")
+        ref = _reference(reference)
+        self._writable_ref(ref)
+        if ref["record_type"] != PROJECTION_TYPE:
+            raise StorageError("E_SCHEMA_INVALID")
+        old_head = self._db.execute(
+            "SELECT record_type FROM heads WHERE scope_id=? AND namespace=? AND id=?", _identity(ref),
+        ).fetchone()
+        if old_head is not None and old_head["record_type"] != PROJECTION_TYPE:
+            raise StorageError("E_SOURCE_IDENTITY_CONFLICT")
+        previous = self.get(ref) if old_head is not None else None
+        record = _validate_projection({
+            "schema_version": "1.0", **ref,
+            "revision": previous["revision"] + 1 if previous else 1,
+            "creation_receipt": previous["creation_receipt"] if previous else self.receipt_ref,
+            "value": value, "watch_keys": list(watch_keys),
+        })
+        self._write(record, previous["revision"] if previous else None)
+        self._db.execute("DELETE FROM watches WHERE scope_id=? AND namespace=? AND id=?", _identity(ref))
+        self._db.executemany(
+            "INSERT INTO watches(scope_id,watch_key,namespace,id) VALUES(?,?,?,?)",
+            [(ref["scope_id"], key, ref["namespace"], ref["id"]) for key in record["watch_keys"]],
+        )
+        return deepcopy(record)
+
+    def success(self, outcome: str, body: dict[str, Any]) -> dict[str, Any]:
+        self._ensure_active()
+        return validate_result({
+            "schema_version": "1.0", "operation": self._command["operation"],
+            "operation_id": self._command["command_id"], "status": "success",
+            "outcome": outcome, "receipt": self.receipt_ref, "body": body,
+        })
+
+    def _receipt(self, result: dict[str, Any]) -> dict[str, Any]:
+        producer, details_schema = self._store._components()
+        recorded_at = _now()
+        written = [pin(record) for record in self._writes.values()]
+        evidence = {canonical_bytes(ref): ref for ref in [*self._verified_reads, *written]}
+        return validate_record({
+            "schema_version": "1.0", **self.receipt_ref,
+            "creation_receipt": self.receipt_ref,
+            "provenance": {"origin": "system", "producer": producer, "recorded_at": recorded_at, "parents": []},
+            "body": {
+                "stage": "operation", "operation_id": self._command["command_id"],
+                "recorded_at": recorded_at,
+                "outcome": "matter:" + (result["outcome"] if result["status"] == "success" else result["error"]["code"]),
+                "evidence": list(evidence.values()),
+                "details": {"schema": details_schema, "value": {
+                    "command_digest": self._digest,
+                    "result_digest": canonical_digest(result, f"result.{self._command['operation']}.v1"),
+                    "read_set": self._command["expected_revisions"],
+                    "absent_reads": list(self._absent_reads.values()),
+                    "watch_queries": self._watch_queries,
+                    "writes": written,
+                }},
+            },
+        })
+
+
+class _SystemTransaction:
+    """Scoped, phase-limited port for a constructor-installed host hook.
+
+    The caller's handler never receives this port. Reads are current and
+    recorded as operation evidence; they do not alter the caller's manifest.
+    Only projections may be written, using the same checked writer.
+    """
+
+    def __init__(self, transaction):
+        self._tx = transaction
+        self._active = True
+
+    def _ensure_active(self):
+        if not self._active:
+            raise StorageError("E_STORAGE_UNAVAILABLE", "This system transaction is closed.")
+        self._tx._ensure_active()
+
+    @property
+    def command(self):
+        self._ensure_active()
+        return self._tx.command
+
+    @property
+    def receipt_ref(self):
+        self._ensure_active()
+        return self._tx.receipt_ref
+
+    def get(self, reference):
+        self._ensure_active()
+        tx = self._tx
+        ref = tx._checked_ref(reference)
+        try:
+            record = tx._decode(tx._row(ref, current=True))
+        except StorageError as error:
+            if error.code == "E_NOT_FOUND":
+                tx._absent_reads[_identity(ref)] = entity_ref(ref)
+            raise
+        if ("revision" in ref or "digest" in ref) and not tx._matches(ref, record):
+            raise StorageError("E_REVISION_CONFLICT")
+        actual = pin(record)
+        tx._verified_reads.append(actual)
+        if _identity(ref) not in tx._writes:
+            tx._expected[_identity(ref)] = actual
+        return deepcopy(record)
+
+    def get_historical(self, reference):
+        self._ensure_active()
+        reference = _reference(reference, pinned=True)
+        self.get(entity_ref(reference))
+        return _Snapshot.get(self._tx, reference)
+
+    def lookup_identity(self, reference):
+        self._ensure_active()
+        ref = self._tx._checked_identity_ref(reference)
+        # Identity-only lookup must preserve a collision's actual kind.
+        try:
+            record = _Snapshot.lookup_identity(self._tx, ref)
+        except StorageError as error:
+            if error.code == "E_NOT_FOUND":
+                self._tx._absent_reads[_identity(ref)] = ref
+            raise
+        return self.get(pin(record))
+
+    def watchers(self, watch_key, *, limit=512):
+        self._ensure_active()
+        _validate_fragment(watch_key, "identifier")
+        if type(limit) is not int or not 1 <= limit <= 4096:
+            raise StorageError("E_SCHEMA_INVALID", "A bounded system watch limit is required.")
+        self._tx._watch_queries.append(watch_key)
+        rows = self._tx._db.execute(
+            "SELECT namespace,id FROM watches WHERE scope_id=? AND watch_key=? ORDER BY namespace,id LIMIT ?",
+            (self._tx._store.scope_id, watch_key, limit + 1),
+        ).fetchall()
+        if len(rows) > limit:
+            raise StorageError("E_BUDGET_EXHAUSTED", "The system watch cohort exceeds its read budget.")
+        return [self.get({"scope_id": self._tx._store.scope_id, "namespace": row["namespace"],
+                          "id": row["id"], "record_type": PROJECTION_TYPE}) for row in rows]
+
+    def put_projection(self, reference, value, *, watch_keys=()):
+        self._ensure_active()
+        ref = self._tx._checked_ref(reference)
+        try:
+            self.get(ref)
+        except StorageError as error:
+            if error.code != "E_NOT_FOUND":
+                raise
+        return self._tx.put_projection(ref, value, watch_keys=watch_keys)
+
+
+class RelationalStore:
+    """Internal common behavior; concrete backends supply connection seams."""
+
+    @property
+    def scope_id(self) -> str:
+        return self._scope_id
+
+
+    def __enter__(self) -> RelationalStore:
+        if self._closed:
+            raise StorageError("E_STORAGE_UNAVAILABLE", "This storage handle is closed.")
+        return self
+
+
+    def __exit__(self, *_: Any) -> None:
+        self.close()
+
+
+    def close(self) -> None:
+        self._closed = True
+
+
+    def _fault(self, stage: str) -> None:
+        if self._fault_hook is not None:
+            self._fault_hook(stage)
+
+
+    @contextmanager
+    def _operation(self) -> Iterator[None]:
+        if self._closed:
+            raise StorageError("E_STORAGE_UNAVAILABLE", "This storage handle is closed.")
+        if getattr(self._local, "active", False):
+            raise StorageError("E_STORAGE_UNAVAILABLE", "Nested operations on one storage handle are not supported.")
+        self._local.active = True
+        try:
+            yield
+        finally:
+            self._local.active = False
+
+
+    @contextmanager
+    def snapshot(self) -> Iterator[_Snapshot]:
+        """Hold one consistent backend read snapshot."""
+        try:
+            with self._operation():
+                db = self._open()
+                view = _Snapshot(self, db)
+                try:
+                    self._begin(db, write=False)
+                    # Establish the snapshot on entry, including an empty scope.
+                    db.execute("SELECT version FROM heads WHERE scope_id=? LIMIT 1", (self.scope_id,)).fetchone()
+                    yield view
+                finally:
+                    view._active = False
+                    self._rollback(db)
+                    db.close()
+        except self._database_errors:
+            raise _unavailable() from None
+
+
+    def get(self, reference: dict[str, Any]) -> dict[str, Any]:
+        with self.snapshot() as view:
+            return view.get(reference)
+
+
+    def get_historical(self, reference: dict[str, Any]) -> dict[str, Any]:
+        with self.snapshot() as view:
+            return view.get_historical(reference)
+
+
+    def lookup_identity(self, reference: dict[str, Any]) -> dict[str, Any]:
+        with self.snapshot() as view:
+            return view.lookup_identity(reference)
+
+
+    def history(self, reference: dict[str, Any]) -> list[dict[str, Any]]:
+        with self.snapshot() as view:
+            return view.history(reference)
+
+
+    def watchers(self, watch_key: str) -> list[dict[str, Any]]:
+        with self.snapshot() as view:
+            return view.watchers(watch_key)
+
+
+    def command_receipt(self, idempotency_key: str) -> dict[str, Any]:
+        with self.snapshot() as view:
+            return view.command_receipt(idempotency_key)
+
+
+    def receipt_for(self, reference: dict[str, Any]) -> dict[str, Any]:
+        with self.snapshot() as view:
+            return view.receipt_for(reference)
+
+
+    @staticmethod
+    def _failure(command: dict[str, Any], exc: ContractError) -> dict[str, Any]:
+        # A trusted handler may supply affected refs, but a scoped handle never
+        # publishes refs to other scopes through the public failure envelope.
+        references = tuple(
+            reference for reference in getattr(exc, "affected_references", ())
+            if type(reference) is dict and reference.get("scope_id") == command["scope_id"]
+        )
+        return error_result(
+            command["operation"], command["command_id"], exc.code,
+            retriable=getattr(exc, "retriable", False),
+            affected_references=references, detail=exc.detail,
+        )
+
+
+    def execute(self, command: dict[str, Any], handler: CommandHandler, *, replay_guard=None,
+                dependency_error_code: str = "E_REVISION_CONFLICT") -> dict[str, Any]:
+        """Atomically execute or replay a command; never retry the handler here.
+
+        A handled semantic refusal is durable with no child writes. Unexpected
+        Python exceptions propagate after rollback. Any persistence failure
+        returns E_STORAGE_UNAVAILABLE; after a lost commit acknowledgement the
+        caller must retry the original command to discover its durable outcome.
+        """
+        command = validate_command(command)
+        if type(dependency_error_code) is not str or dependency_error_code not in (
+            "E_REVISION_CONFLICT", "E_DEPENDENCY_STALE"
+        ):
+            raise ContractError("E_POLICY_INVALID", "An admitted dependency conflict classification is required.")
+        digest = command_digest(command)
+        if not callable(handler):
+            raise TypeError("A synchronous command handler is required.")
+        if replay_guard is not None and not callable(replay_guard):
+            raise TypeError("A synchronous replay guard is required.")
+        if (
+            command["scope_id"] != self.scope_id
+            or command["actor"]["scope_id"] != self.scope_id
+            or command["authority"]["scope_id"] != self.scope_id
+        ):
+            return self._failure(command, StorageError("E_SCOPE_FORBIDDEN"))
+        try:
+            with self._operation():
+                db = self._open()
+                transaction = _Transaction(self, db, command, digest)
+                try:
+                    self._begin(db, write=True)
+                    prior = db.execute(
+                        "SELECT * FROM commands WHERE scope_id=? AND (idempotency_key=? OR command_id=?)",
+                        (self.scope_id, command["idempotency_key"], command["command_id"]),
+                    ).fetchall()
+                    if prior:
+                        if len(prior) != 1:
+                            return self._failure(command, StorageError("E_IDEMPOTENCY_CONFLICT"))
+                        journal = transaction._journal(prior[0])
+                        if journal["command_digest"] != digest or canonical_bytes(journal["command"]) != canonical_bytes(command):
+                            return self._failure(command, StorageError("E_IDEMPOTENCY_CONFLICT"))
+                        if replay_guard is not None:
+                            replay_view = _Snapshot(self, db)
+                            try:
+                                decision = replay_guard(replay_view)
+                                if decision is not None:
+                                    # An async guard or a false return value
+                                    # cannot silently authorize disclosure.
+                                    if hasattr(decision, "close"):
+                                        decision.close()
+                                    raise StorageError("E_POLICY_INVALID", "A replay guard must synchronously return None or raise a refusal.")
+                            except ContractError as error:
+                                return self._failure(command, error)
+                            finally:
+                                replay_view._active = False
+                        return journal["result"]
+
+                    db.execute("SAVEPOINT command_mutation")
+                    try:
+                        transaction._check_reads(conflict_code=dependency_error_code)
+                        result = validate_result(handler(transaction))
+                        if (
+                            result["operation"] != command["operation"]
+                            or result["operation_id"] != command["command_id"]
+                            or (result["status"] == "success" and result["receipt"] != transaction.receipt_ref)
+                        ):
+                            raise StorageError("E_SCHEMA_INVALID", "Handler result identities must match the command.")
+                        if result["status"] == "success" and self._transaction_hook is not None:
+                            changes = [{"cause": "write", "before": [before] if before else [],
+                                        "after": [pin(record)]}
+                                       for identity, record in transaction._writes.items()
+                                       for before in [transaction._before_pins[identity]]]
+                            for change in result.get("body", {}).get("changes", []):
+                                if type(change) is not dict or set(change) != {"cause", "before", "after"}:
+                                    raise StorageError("E_SCHEMA_INVALID")
+                                _validate_fragment(change["cause"], "change_cause")
+                                for references in (change["before"], change["after"]):
+                                    if type(references) is not list:
+                                        raise StorageError("E_SCHEMA_INVALID")
+                                    for reference in references:
+                                        transaction._checked_ref(_reference(reference, pinned=True))
+                                changes.append(deepcopy(change))
+                            system = _SystemTransaction(transaction)
+                            try:
+                                decision = self._transaction_hook(system, deepcopy(changes))
+                                if decision is not None:
+                                    if hasattr(decision, "close"):
+                                        decision.close()
+                                    raise StorageError("E_POLICY_INVALID", "A transaction hook must synchronously return None.")
+                            finally:
+                                system._active = False
+                    except ContractError as exc:
+                        if exc.code == "E_STORAGE_UNAVAILABLE":
+                            raise
+                        result = self._failure(command, exc)
+                    if result["status"] == "failure":
+                        if result["error"]["code"] == "E_STORAGE_UNAVAILABLE":
+                            raise _unavailable()
+                        failure = result["error"]
+                        result["error"] = self._failure(command, StorageError(
+                            failure["code"], failure["detail"],
+                            retriable=failure["retriable"],
+                            affected_references=tuple(failure["affected_references"]),
+                        ))["error"]
+                        rolled_back = {canonical_bytes(pin(record)) for record in transaction._writes.values()}
+                        db.execute("ROLLBACK TO command_mutation")
+                        transaction._verified_reads = [reference for reference in transaction._verified_reads
+                            if canonical_bytes(reference) not in rolled_back]
+                        transaction._writes.clear()
+                    db.execute("RELEASE command_mutation")
+
+                    self._fault("before_receipt")
+                    receipt = transaction._receipt(result)
+                    transaction._write(receipt, None)
+                    db.execute(
+                        "INSERT INTO commands(scope_id,idempotency_key,command_id,digest,command_json,result_json,"
+                        "receipt_namespace,receipt_id,receipt_version) VALUES(?,?,?,?,?,?,?,?,1)",
+                        (self.scope_id, command["idempotency_key"], command["command_id"], digest,
+                         canonical_bytes(command), canonical_bytes(result), receipt["namespace"], receipt["id"]),
+                    )
+                    self._fault("before_commit")
+                    db.commit()
+                    self._fault("after_commit")
+                    return deepcopy(result)
+                finally:
+                    transaction._active = False
+                    self._rollback(db)
+                    db.close()
+        except ContractError as exc:
+            return self._failure(command, exc)
+        except self._database_errors:
+            return self._failure(command, _unavailable())
+
+

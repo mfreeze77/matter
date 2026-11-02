@@ -4,7 +4,7 @@
   "track": "operations",
   "phase": 4,
   "priority": "P1",
-  "status": "planned",
+  "status": "in_progress",
   "type": "implementation",
   "owner_repo": "mfreeze77/matter",
   "component": "storage/postgresql-host-payloads",
@@ -104,7 +104,14 @@
     "docs/storage.md",
     "docs/adapters/statecivics-assistant-review.md",
     "docs/decisions/0003-permanent-host-storage.md",
-    "docs/validation/MAT-092.md"
+    "docs/validation/MAT-092.md",
+    "src/matter/storage/_relational.py",
+    "tests/integration/test_postgresql_recovery.py",
+    "tests/integration/postgres_helpers.py",
+    "tests/integration/host_payload_fixture.py",
+    "tests/payload_contract.py",
+    "docs/postgresql.md",
+    "requirements-postgres-test.txt"
   ],
   "tests": [
     "Exact retry after restart or lost commit acknowledgment versus changed command content under the same key.",
