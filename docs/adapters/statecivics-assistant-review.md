@@ -1,7 +1,11 @@
 # StateCivics slice 2: receiving the Matter assistant-review SDK
 
-SDK package: `matter-foundation==0.1.0.dev19`. The runtime/wheel hashes and
-actual checks are recorded in [MAT-088/089 validation](../validation/MAT-088-089.md).
+Latest SDK package: `matter-foundation==0.1.0.dev20`. The
+[MAT-091 history-repair handoff](../validation/MAT-091.md) records its package
+identity, exact receiving-host grant/root changes and actual checks. It does not
+change the review request/result or monitoring 1.0/1.1 wires. The original dev19
+review implementation and checks remain in
+[MAT-088/089 validation](../validation/MAT-088-089.md).
 The [1.0 review contract](../contracts/assistant-review.md) is additive; frozen
 monitoring 1.0/1.1 and dev18 public helpers remain unchanged.
 
@@ -214,8 +218,11 @@ calls or shared-stack changes to inspect those records.
 StateCivics main `ddae0990016177c02c3f6a4652d0a702e1b364d0` now records
 slice 2c and its follow-up checks. Accumulation and operator reconciliation are
 no longer waiting for a Matter SDK implementation. See the updated
-[receiving receipt](../validation/dev19-receiving.md). The SDK stays dev19;
-there is no runtime, wire, wheel or image rebuild in this follow-up.
+[receiving receipt](../validation/dev19-receiving.md). At that documentation-only
+checkpoint the SDK stayed dev19;
+no runtime, wire, wheel or image rebuild occurred in that follow-up. The
+subsequent MAT-091 dev20 repair above requires an SDK update for the next
+receiving timeline and keeps historical receiving evidence separate.
 
 Matter's engineering recommendation for KS-1126 is a **rehearsal-only ordinary
 API session plus a dispatcher-driven timeline**, reusing the host's existing
