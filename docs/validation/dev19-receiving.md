@@ -84,7 +84,7 @@ The current dispatch hook wakes only on live-origin captures; replay wakes
 nothing. Its immediate opponent rule is objective-wide, not a demonstrated
 event-specific adversity judgment. Do not report full StateCivics readiness.
 
-Slice 2c remains StateCivics-owned: construct a bounded accumulated request from
+At the run-5 snapshot, slice 2c remained StateCivics-owned: construct a bounded accumulated request from
 actual pending material, preserve provenance/correlation and actual reviewed-set
 coverage, and wire explicit operator reconciliation to the SDK with a real
 no-inflight witness and present correction authority. Failed/unknown never means
@@ -97,8 +97,57 @@ and joint activation stay with StateCivics and the owner. The reported
 implementation for Matter. KS-1155's commit-based pacing fix and its reported
 207 checks remain StateCivics evidence; Matter did not rerun its paid civic path.
 
-The SDK [release validation](MAT-088-089.md), separate installed walkthrough-schema
-gap, MAT-083 concurrency work and formal qualification retain their own scopes.
+The SDK [release validation](MAT-088-089.md), MAT-083 concurrency work and formal
+qualification retain their own scopes. The old installed walkthrough-schema
+lookup failure was already reported non-recurring by the installed dev16 checks
+in [MAT-084 validation](MAT-084.md); do not carry it forward as a confirmed current
+failure without new evidence. Broader package hardening retains its own scope.
+
+## Slice 2c and follow-up receiving update, 2026-11-02
+
+StateCivics main inspected read-only:
+`ddae0990016177c02c3f6a4652d0a702e1b364d0`. Its KS-1150 log records
+accumulation, explicit unknown-wake reconciliation and two additional tests:
+
+- Runs 6–9: two unopposed captures first remain pending; model-client
+  construction failure leaves an unknown wake; an operator's no-inflight
+  witness reconciles it without clearing pressure; a new accumulated review
+  completes over the two pending contributions and clears them. The induced
+  client-construction failure is not a tested provider timeout.
+- Two subjects under one lens: the pending threshold counts across subjects,
+  while each review receives only its own subject's material. Both are cleared
+  after their respective completed reviews. A changed lens ledger leaves one
+  older host row `recorded`, superseded in meaning but not in its database status;
+  it was never claimed, is not reconcilable, and its material was reviewed under
+  the newer basis. This is a documented host-status follow-up, not proof of lost
+  material or a reason to retry an unknown review.
+- Oversized newest material: the corrected multi-hunk test shows a genuine
+  partial excerpt while carrying the older packet whole. Only the older exact
+  material is reported reviewed; the newest remains pending.
+
+The host records **29 passed** on final source `20412a6d3` for its two review
+files. Matter read the ticket and verified that the following external receipts
+exist with these SHA-256 digests; it did **not** rerun the host tests, assistant,
+operator action or shared rehearsal. Bodies remain in StateCivics:
+
+- `.release/ks1126-wired/run6-unopposed.txt`:
+  `513d864350f7275647fa39bebf7086c1309dec4d2c7f03686a883a5b54612cf9`.
+- `.release/ks1126-wired/run7-unknown.txt`:
+  `d293ef110f24781a829b7e228312ce8b2e26fa1df4b77bccc5b4703359af4eef`.
+- `.release/ks1126-wired/run8-reconcile.txt`:
+  `63b392319493b4ac4da3f2013fe691ba83aaca6b1211dce00242d980f6adb325`.
+- `.release/ks1126-wired/run9-accumulation.txt`:
+  `dff9cd75ba1c25f167938d03faf27c696b0490fa3cde54a92b05339a3df2e20b`.
+- `.release/ks1136-gate/fu-t9.txt`:
+  `bb592cb85177ca0a4f954b2dd1f3434128442841e8ad3e1cd3f322be380f8078`.
+
+These are receiving reports with pinned artifacts, not independently repeated
+Matter runtime runs. KS-1126's own UI/API and dispatcher-timeline acceptance
+remains unexecuted. Its tightened design needs its **own** availability proof,
+and no-wake cannot stand in for quiet/no-capture. The
+[next receiving handoff](../adapters/statecivics-assistant-review.md#next-receiving-acceptance-saved-objective-dispatcher-timeline)
+specifies those boundaries. No numerical threshold, cadence, backup choice,
+pilot client/budget or production activation is selected here.
 
 ## Checks for this Matter record
 
