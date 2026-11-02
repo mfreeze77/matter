@@ -412,6 +412,13 @@ Matter owns the neutral contracts and reusable implementation. Oil is the first 
 
 Creating a domain ticket here records planned work and its target owner; it does not modify another repository or change a deployed system. The [ownership decision](docs/decisions/0001-core-ownership.md) resolves the older notes' alternative implementation sequences.
 
+## Check explicit compatibility
+
+MAT-074 adds an opt-in [compatibility and migration contract](schemas/versioning.md):
+required feature/semantic admission, preserved optional extensions, an independent
+strict JavaScript reader and installed SQLite migration manifests. Existing native
+readers and authority checks remain required; no SQL format upgrade is introduced.
+
 ## Work from a ticket
 
 Canonical tickets live in `tickets/records/MAT-NNN.json`. Each declares dependencies, requirements, scope, implementation steps, acceptance criteria, evidence, tests, risks, and reuse sources. Human-readable ticket pages and the index are generated:

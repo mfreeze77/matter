@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mfreeze77/matter/schemas/compatibility-envelope.schema.json",
+  "description": "Opt-in structural compatibility envelope. Readers also enforce strict canonical parsing, 2 MiB raw/canonical byte limits and 128 nested containers. Native payload schemas, present authority and qualification remain separate checks.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "encoding",
+    "required_features",
+    "required_semantics",
+    "payload",
+    "extensions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "encoding": {
+      "const": "matter-json-v1"
+    },
+    "required_features": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "maxLength": 128,
+        "pattern": "^[a-z][a-z0-9]*(?:[._/-][a-z0-9]+)*(?![\\s\\S])"
+      }
+    },
+    "required_semantics": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 64,
+        "maxLength": 64,
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "payload": {},
+    "extensions": {
+      "type": "object"
+    }
+  }
+}

@@ -79,10 +79,10 @@ Future work in another repository remains owned by that repository. This scaffol
 | [MAT-071: Qualify chronological and live Oil matter behavior against retained value](MAT-071.md) | oil | 5 | P0 | planned | waiting | MAT-001, MAT-024, MAT-025, MAT-036, MAT-037, MAT-038, MAT-039, MAT-040, MAT-041, MAT-042, MAT-043, MAT-044, MAT-045, MAT-066, MAT-067, MAT-068, MAT-069, MAT-070 |
 | [MAT-072: Enforce host scope, access and provider egress contracts](MAT-072.md) | operations | 2 | P0 | done | done | MAT-002, MAT-003, MAT-007, MAT-011, MAT-028 |
 | [MAT-073: Implement retention, revocation and auditable archival](MAT-073.md) | operations | 3 | P1 | planned | ready | MAT-003, MAT-007, MAT-016, MAT-021, MAT-072 |
-| [MAT-074: Version schemas, migrations and cross-language conformance](MAT-074.md) | operations | 4 | P0 | planned | ready | MAT-002, MAT-003, MAT-012, MAT-013, MAT-024 |
-| [MAT-075: Expose neutral inspection and client operations](MAT-075.md) | operations | 4 | P1 | planned | waiting | MAT-015, MAT-018, MAT-023, MAT-072, MAT-074 |
-| [MAT-076: Validate and distribute immutable policy bundles](MAT-076.md) | operations | 4 | P1 | planned | waiting | MAT-012, MAT-013, MAT-014, MAT-031, MAT-074 |
-| [MAT-077: Harden package distribution, CI and reuse provenance](MAT-077.md) | operations | 5 | P1 | planned | waiting | MAT-025, MAT-032, MAT-038, MAT-074 |
+| [MAT-074: Version schemas, migrations and cross-language conformance](MAT-074.md) | operations | 4 | P0 | done | done | MAT-002, MAT-003, MAT-012, MAT-013, MAT-024 |
+| [MAT-075: Expose neutral inspection and client operations](MAT-075.md) | operations | 4 | P1 | planned | ready | MAT-015, MAT-018, MAT-023, MAT-072, MAT-074 |
+| [MAT-076: Validate and distribute immutable policy bundles](MAT-076.md) | operations | 4 | P1 | planned | ready | MAT-012, MAT-013, MAT-014, MAT-031, MAT-074 |
+| [MAT-077: Harden package distribution, CI and reuse provenance](MAT-077.md) | operations | 5 | P1 | planned | ready | MAT-025, MAT-032, MAT-038, MAT-074 |
 | [MAT-078: Instrument lifecycle outcomes and bounded audit reports](MAT-078.md) | operations | 4 | P1 | planned | waiting | MAT-021, MAT-023, MAT-042, MAT-044, MAT-072 |
 | [MAT-079: Define scoped rollout, rollback and recovery procedures](MAT-079.md) | operations | 5 | P1 | planned | waiting | MAT-003, MAT-021, MAT-071, MAT-073, MAT-076 |
 | [MAT-080: Qualify the integrated Matter release across profiles](MAT-080.md) | operations | 5 | P1 | planned | waiting | MAT-025, MAT-045, MAT-050, MAT-071, MAT-074, MAT-077, MAT-078, MAT-079 |

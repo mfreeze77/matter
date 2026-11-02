@@ -1,0 +1,484 @@
+{
+  "description": "Synthetic optional-envelope compatibility cases; no source authority or qualification.",
+  "cases": [
+    {
+      "name": "extension_decimal_null_unicode",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "accepted",
+        "canonical": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}",
+        "sha256": "31653b41631e0b9ea0e0e49c17f68261b1e80db1e5832bd95d08eaf3aa93ee59"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "offset_as_opaque_string",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "accepted",
+        "canonical": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"at\":\"2026-11-02T06:00:00-06:00\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}",
+        "sha256": "75c77388af60ff3709183f44a75867395a22dbb392308a6ccee2e2119367f68d"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"at\":\"2026-11-02T06:00:00-06:00\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "utc_as_opaque_string",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "accepted",
+        "canonical": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"at\":\"2026-11-02T12:00:00Z\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}",
+        "sha256": "5583460ca4b863591bf1ac3b921e40fe28b0edb797100822eec816d0ec441e54"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"at\":\"2026-11-02T12:00:00Z\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "scalar_key_order",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "accepted",
+        "canonical": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"10\":4,\"2\":3,\"negative_zero_string\":\"-0.0\",\"\":1,\"𐀀\":2},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}",
+        "sha256": "8aca65150154f44c7e82a6290e42856188ca4b34ff6c5c463c2f8a6b1eaeaf13"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"10\":4,\"2\":3,\"negative_zero_string\":\"-0.0\",\"\":1,\"𐀀\":2},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "integer_negative_zero",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "accepted",
+        "canonical": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"integer\":0},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}",
+        "sha256": "8466ebceec91d4d58dcb3c78be0c1ae198cbebfe34bfc74a43ea6c52136cda93"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"integer\":-0},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "unknown_required_feature",
+      "supported_features": [],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_VERSION_UNSUPPORTED"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "same_shape_changed_rule_meaning",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_VERSION_UNSUPPORTED"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"f2e98e4a2eea3a7d64f2716a7ffb8a2c8f6712876b953460d158378bd2d6e89c\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "unsupported_schema_version",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_VERSION_UNSUPPORTED"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"2.0\"}"
+    },
+    {
+      "name": "unsupported_encoding",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_VERSION_UNSUPPORTED"
+      },
+      "source": "{\"encoding\":\"unknown-v2\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "duplicate_features",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\",\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "invalid_feature_newline",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\\n\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "invalid_semantics",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"bad\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "extensions_array",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":[],\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "unknown_root_field",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\",\"unrecognized\":true}"
+    },
+    {
+      "name": "duplicate_root",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\",\"payload\":null}"
+    },
+    {
+      "name": "escaped_duplicate",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\",\"paylo\\u0061d\":null}"
+    },
+    {
+      "name": "fraction",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":1.0,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "exponent",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":1e0,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "unsafe_integer",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":9007199254740992,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "lone_surrogate",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":\"\\ud800\",\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "bom",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "﻿{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "trailing",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"} true"
+    },
+    {
+      "name": "invalid_utf8",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source_hex": "ff"
+    },
+    {
+      "name": "required_semantics_removed",
+      "source": "{\"encoding\": \"matter-json-v1\", \"extensions\": {\"consumer:opaque\": {\"label\": \"\\u00e9/\\ud800\\udc00\", \"unrecognized\": true}}, \"payload\": {\"cost\": \"0.10\", \"optional\": null, \"outcome\": \"quiet\"}, \"required_features\": [\"native.result/1\"], \"required_semantics\": [], \"schema_version\": \"1.0\"}",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_VERSION_UNSUPPORTED"
+      }
+    },
+    {
+      "name": "null_feature_inventory",
+      "supported_features": null,
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "string_feature_inventory",
+      "supported_features": "native.result/1",
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "null_semantic_inventory",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": null,
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "missing_expected_context",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_VERSION_UNSUPPORTED"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}",
+      "expected_semantics": []
+    },
+    {
+      "name": "unsupported_feature_and_bad_expected",
+      "supported_features": [],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}",
+      "expected_semantics": [
+        "bad"
+      ]
+    },
+    {
+      "name": "unknown_semantic_and_bad_expected",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}",
+      "expected_semantics": "bad"
+    },
+    {
+      "name": "container_depth_128",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "accepted",
+        "canonical": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[null]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]],\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}",
+        "sha256": "44321b761d0f81f4c7c1a0e2a60c666fb6040032323aa4edec8e0510387474b3"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[null]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]],\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "container_depth_129",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[null]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]],\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "container_depth_1500",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "refused",
+        "code": "E_SCHEMA_INVALID"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"consumer:opaque\":{\"label\":\"é/𐀀\",\"unrecognized\":true}},\"payload\":[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[null]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]],\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    },
+    {
+      "name": "prototype_names_are_opaque",
+      "supported_features": [
+        "native.result/1"
+      ],
+      "known_semantics": [
+        "6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94"
+      ],
+      "expected": {
+        "status": "accepted",
+        "canonical": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"__proto__\":{\"polluted\":true},\"constructor\":null},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}",
+        "sha256": "91d265a549ebb8123a95bf66825aca612d713eb89eb77105150ec43c2414d28e"
+      },
+      "source": "{\"encoding\":\"matter-json-v1\",\"extensions\":{\"__proto__\":{\"polluted\":true},\"constructor\":null},\"payload\":{\"cost\":\"0.10\",\"optional\":null,\"outcome\":\"quiet\"},\"required_features\":[\"native.result/1\"],\"required_semantics\":[\"6b1ca6e4f1d2d527b715570453fc3acbbc408f6486a6a0b8cbd0783ace851b94\"],\"schema_version\":\"1.0\"}"
+    }
+  ]
+}
