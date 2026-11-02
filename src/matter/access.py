@@ -228,6 +228,8 @@ class AccessService:
             if key in active or len(visited) + len(active) >= MAX_SOURCES:
                 _fail("unavailable", "E_EVIDENCE_UNAVAILABLE")
             grant = grants.get(key)
+            if grant is None and ref["record_type"] == PROJECTION_TYPE:
+                _fail()
             if grant is not None and (audience not in grant["audiences"] or (provider is not None and provider not in grant["providers"])):
                 _fail()
             # Verify READ before retrieving a possibly protected body.
@@ -261,6 +263,9 @@ class AccessService:
             # happened to visit this same pin as historical provenance.
             for ref in references:
                 if _public(ref) and ref["record_type"] == PROJECTION_TYPE:
+                    grant = grants.get(_key(ref))
+                    if grant is None or audience not in grant["audiences"] or (provider is not None and provider not in grant["providers"]):
+                        _fail()
                     self.controls._audit(view, {"actor": token["actor"], "authority": entity_ref(token["authority"])}, [entity_ref(ref)])
                     _provenance_record(view, ref)
         for ref in references:

@@ -165,7 +165,7 @@ class FrozenAssessmentView:
         fragment(reference, "pinned_ref")
         self.get(entity_ref(reference))  # Require the captured current head too.
         for record in self._data.get("historical_records", []) + self._data["records"]:
-            if pin(record) == reference:
+            if matches(record, reference):
                 return deepcopy(record)
         _fail("The historical proof was not captured by the original snapshot.", "E_EVIDENCE_UNAVAILABLE")
 

@@ -92,13 +92,23 @@ class MonitoringHistoryRevision(unittest.TestCase):
         self.assertIn(old_context, h.access_context.value["dependencies"])
         self.assertIn(pin(revised), h.access_context.value["dependencies"])
         saved_policy = h.access.policy
+        class DeniedRootReadCanary:
+            def __init__(self, view):
+                self.view = view
+            def __getattr__(self, name):
+                return getattr(self.view, name)
+            def get(self, ref):
+                if entity_ref(ref) == entity_ref(revised):
+                    raise AssertionError("An ungranted root was read before denial.")
+                return self.view.get(ref)
         for forbidden in (old_context, pin(revised)):
             policy = saved_policy.value
             h.access.policy = HostAccessPolicy(scope_id=h.f.storage.scope_id,
                 audiences=policy["audiences"], providers=policy["providers"],
                 grants=[g for g in policy["grants"] if g["reference"] != forbidden])
             with h.f.storage.snapshot() as view, self.assertRaises(ContractError) as denied:
-                h.access.capture(view, token=h.token, audience=h.a.audience_ref,
+                guarded = DeniedRootReadCanary(view) if forbidden == pin(revised) else view
+                h.access.capture(guarded, token=h.token, audience=h.a.audience_ref,
                     provider=h.provider, references=h.references)
             self.assertEqual(denied.exception.code, "E_AUTHORITY_REQUIRED")
         h.access.policy = saved_policy
