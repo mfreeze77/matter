@@ -72,17 +72,21 @@ def _context_metadata(record):
 
 
 def _provenance_record(view, ref, *, parent=False, historical=False):
-    if parent:
-        head = view.get(entity_ref(ref))
-        if pin(head) != ref and _context_metadata(head):
-            original = view.get_historical(ref)
-            if not _context_metadata(original):
-                _fail("unavailable", "E_EVIDENCE_UNAVAILABLE")
-            return original, head
-    record = view.get(ref if historical else entity_ref(ref))
-    if pin(record) != ref:
-        _fail("stale_source_context", "E_DEPENDENCY_STALE")
-    return record, None
+    if historical:
+        # READ history binds recorded pins, never today's metadata head.
+        record = view.get_historical(ref)
+        if pin(record) != ref:
+            _fail("stale_source_context", "E_DEPENDENCY_STALE")
+        return record, None
+    head = view.get(entity_ref(ref))
+    if pin(head) == ref:
+        return head, None
+    if parent and _context_metadata(head):
+        original = view.get_historical(ref)
+        if not _context_metadata(original):
+            _fail("unavailable", "E_EVIDENCE_UNAVAILABLE")
+        return original, head
+    _fail("stale_source_context", "E_DEPENDENCY_STALE")
 
 
 def source_access_provenance(view, roots):
@@ -210,7 +214,7 @@ class AccessService:
         self.policy, self.controls, self.scope_id = policy, controls, controls.scope_id
         self.current_read = current_read
 
-    def _closure(self, view, references, audience, provider, token, *, historical=False):
+    def _closure(self, view, references, audience, provider, token, *, historical=False, historical_dependencies=()):
         definition = self.policy.value
         if audience not in definition["audiences"] or (provider is not None and provider not in [item["reference"] for item in definition["providers"]]):
             _fail()
@@ -269,6 +273,21 @@ class AccessService:
                     self.controls._audit(view, {"actor": token["actor"], "authority": entity_ref(token["authority"])}, [entity_ref(ref)])
                     _provenance_record(view, ref)
         for ref in references:
+            visit(ref)
+        for ref in historical_dependencies:
+            if _key(ref) in visited:
+                continue
+            # Encoding 1.1 may retain a captured metadata head as an access
+            # proof even when it wasn't a provenance edge or selected root.
+            # Replay precisely those authorized anchors, not today's head.
+            if not historical or ref["scope_id"] != self.scope_id or ref["record_type"] != PROJECTION_TYPE:
+                _fail()
+            grant = grants.get(_key(ref))
+            if grant is None or audience not in grant["audiences"] or (provider is not None and provider not in grant["providers"]):
+                _fail()
+            self.controls._audit(view, {"actor": token["actor"], "authority": entity_ref(token["authority"])}, [entity_ref(ref)])
+            if not _context_metadata(view.get_historical(ref)):
+                _fail()
             visit(ref)
         return sorted(visited.values(), key=_key)
 
@@ -348,7 +367,8 @@ class AccessService:
             _fail()
         try:
             dependencies = self._closure(view, data["references"], data["audience"], data["provider"],
-                data["token"], historical=True)
+                data["token"], historical=True,
+                historical_dependencies=data["dependencies"] if data["schema_version"] == "1.1" else ())
         except StorageError as error:
             if error.code in {"E_STORAGE_UNAVAILABLE", "E_DEPENDENCY_STALE", "E_BUDGET_EXHAUSTED"}:
                 _fail("history_unavailable", error.code)

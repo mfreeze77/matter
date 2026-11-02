@@ -719,6 +719,10 @@ class SQLiteStore:
         with self.snapshot() as view:
             return view.get(reference)
 
+    def get_historical(self, reference: dict[str, Any]) -> dict[str, Any]:
+        with self.snapshot() as view:
+            return view.get_historical(reference)
+
     def lookup_identity(self, reference: dict[str, Any]) -> dict[str, Any]:
         with self.snapshot() as view:
             return view.lookup_identity(reference)

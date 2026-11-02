@@ -9,6 +9,7 @@ from matter.access import HostAccessPolicy, is_source_access_target, source_acce
 from matter.canonical import canonical_bytes, canonical_digest
 from matter.contexts import ContextDefinition, _binding
 from matter.contracts import ContractError
+from matter.attention import RESULT_EXTENSION
 from matter.storage import pin, entity_ref
 from integration.test_monitoring_handoff import MonitoringFixture, HOST_FIELDS
 from rule_helpers import component
@@ -54,6 +55,7 @@ class MonitoringHistoryRevision(unittest.TestCase):
     def test_capture_revision_then_new_same_subject_capture_preserves_history(self):
         h = MonitoringFixture(self)
         first = h.publish_attention()
+        first_journal = h.f.storage.command_receipt("attention-key-" + str(h.a.sequence))
         self.assertEqual(h.admit().project(**first)["treatment"], "digest")
         material = self.record_capture(h, first)
         baseline = deepcopy(h.req["baseline"])
@@ -119,11 +121,38 @@ class MonitoringHistoryRevision(unittest.TestCase):
         self.refresh_packet(h)
         self.assertEqual(h.admit().audience_packet().state["monitoring"]["observed_baseline"], material["material"])
         self.assertEqual(h.req["baseline"], baseline)
+        with h.f.storage.snapshot() as view:
+            minimal_history = h.access.capture(view, token=h.token, audience=h.a.audience_ref,
+                provider=h.provider, references=[baseline["assessment_reference"]])
+        self.assertEqual(minimal_history.value["schema_version"], "1.1")
+        h.renew_allocation()
+        execution = h.execute()
+        self.assertTrue(execution["result"].primitive_valid)
+        self.assertEqual(len(h.calls), 1)
+        h.execute()
+        self.assertEqual(len(h.calls), 1)
         second = h.publish_attention(status="supported")
+        second_journal = h.f.storage.command_receipt("attention-key-" + str(h.a.sequence))
         self.assertNotEqual(h.admit().project(**second)["treatment"], "quiet")
         self.record_capture(h, second)
         self.assertEqual(h.req["baseline"]["intent_revision_id"], "intent-a-v2")
         self.assertNotEqual(h.req["baseline"]["receipt"], baseline["receipt"])
+
+        # A later revision cannot rewrite either the 1.0 or 1.1 historical
+        # selection, even when the latter retained an implicit head anchor.
+        definition["semantic_version"] = "3.0"
+        third, _, _ = h.a.contexts.publish(ContextDefinition(definition), previous=pin(revised))
+        for journal, arguments in ((first_journal, first), (second_journal, second)):
+            decision_ref = journal["result"]["extensions"][RESULT_EXTENSION]["value"]["decision"]
+            read_token = h.f.controls.capture(actor=h.f.actor, authority=entity_ref(h.f.authority),
+                capability="read", targets=arguments["read_token"]["targets"])
+            historical = h.a.service.read(read_token, decision_ref, access_context=arguments["access_context"])
+            self.assertEqual(pin(historical), decision_ref)
+            self.assertEqual(h.a.service.evaluate(journal["command"]), journal["result"])
+        with h.f.storage.snapshot() as view:
+            h.access.require_history(view, minimal_history, references=[baseline["assessment_reference"]])
+        with self.assertRaises(ContractError):
+            h.admit()  # The unrefreshed current context remains stale.
 
     def test_ten_successive_developments_capture_with_bounded_prepared_inputs(self):
         h = MonitoringFixture(self)

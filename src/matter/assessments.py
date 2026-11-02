@@ -130,7 +130,9 @@ class _Tracked:
 
     def get_historical(self, reference):
         fragment(reference, "pinned_ref")
-        self.get(entity_ref(reference))
+        head = self.get(entity_ref(reference))
+        if matches(head, reference):
+            return head
         record = self.view.get_historical(reference)
         if record["scope_id"] != self.scope:
             _fail(code="E_SCOPE_FORBIDDEN")
@@ -299,6 +301,15 @@ class AssessmentService:
         history = data.get("historical_records", [])
         if type(history) is not list or len(history) > 256:
             _fail(code="E_EVIDENCE_INVALID")
+        if history:
+            from .access import AccessContext, _context_metadata
+            try:
+                history_context = AccessContext(data.get("access_context", {})).value
+            except (ContractError, TypeError, ValueError):
+                _fail("Historical context proof requires its original access context.", "E_AUTHORITY_REQUIRED")
+            if (history_context["token"] != token or history_context["scope_id"] != self.scope_id
+                    or history_context["audience"] != request["body"].get("audience")):
+                _fail("Historical context proof changed its original principal.", "E_AUTHORITY_REQUIRED")
         historical_pins = set()
         for raw in history:
             if type(raw) is not dict:
@@ -310,6 +321,11 @@ class AssessmentService:
             historical_pins.add(key)
             if not any(entity_ref(head) == entity_ref(record) for head in records):
                 _fail("A historical proof needs its captured current head.", "E_EVIDENCE_INVALID")
+            head = next(head for head in records if entity_ref(head) == entity_ref(record))
+            if (not _context_metadata(record)
+                    or pin(record) not in history_context["dependencies"]
+                    or pin(head) not in history_context["dependencies"]):
+                _fail("Historical context proof is outside its original access boundary.", "E_AUTHORITY_REQUIRED")
         reads = _unique_refs([*[pin(record) for record in records], *([data["previous"]] if data["previous"] is not None else [])])
         if reads != data["reads"]:
             _fail("Retained snapshots do not bind the complete original read set.", "E_EVIDENCE_INVALID")
@@ -846,9 +862,6 @@ class AssessmentService:
 
     def _guards(self, view, preparation, graph, now):
         body = preparation["request"]["body"]
-        for historical in preparation.get("historical_records", []):
-            if canonical_bytes(view.get_historical(pin(historical))) != canonical_bytes(historical):
-                _fail("A retained historical proof differs from its stored snapshot.", "E_EVIDENCE_INVALID")
         if self.access is not None:
             if "access_context" not in preparation:
                 _fail("The installed access boundary requires its original context.", "E_AUTHORITY_REQUIRED")
@@ -859,6 +872,11 @@ class AssessmentService:
             self.access.require_current(view, preparation["access_context"], audience=body.get("audience"), references=access_reads)
         elif "access_context" in preparation:
             _fail("The original access boundary is not installed.", "E_AUTHORITY_REQUIRED")
+        elif preparation.get("historical_records"):
+            _fail("Historical context proof requires its installed access boundary.", "E_AUTHORITY_REQUIRED")
+        for historical in preparation.get("historical_records", []):
+            if canonical_bytes(view.get_historical(pin(historical))) != canonical_bytes(historical):
+                _fail("A retained historical proof differs from its stored snapshot.", "E_EVIDENCE_INVALID")
         self.controls._audit(view, preparation["request"], self._read_targets(preparation, graph))
         self.controls.require_current(view, preparation["token"], capability="assessment", targets=self._read_targets(preparation, graph), as_of=now)
         for ref in preparation["current_dependencies"]["positive"]:

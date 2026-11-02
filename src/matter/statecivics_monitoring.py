@@ -692,4 +692,5 @@ def packet_state_view(view, packet, *, access, context):
     for ref in packet.value["dependencies"]:
         reads.get(ref)
     return FrozenAssessmentView({"records": list(reads.records.values()),
+        "historical_records": list(reads.historical_records.values()),
                                  "absent": list(reads.absent.values()), "watch_queries": reads.queries})

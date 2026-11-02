@@ -1,15 +1,37 @@
 """MAT-091 bounded immutable history; full input stays in its original journal."""
 import json
+from copy import deepcopy
 import unittest
 
 from matter.assessments import PUBLICATION_EXTENSION
 from matter.canonical import canonical_bytes, source_digest
 from matter.storage import pin
+from matter.contracts import ContractError
 from integration.helpers import create_command
 from integration import test_assessment_commit as fixtures
+from integration.test_monitoring_handoff import MonitoringFixture
 
 
 class AssessmentHistoryGrowth(unittest.TestCase):
+    def test_historical_proof_cannot_extend_the_original_access_context(self):
+        h = MonitoringFixture(self)
+        request = h.f.request(evidence=[pin(h.claim), pin(h.occurrence)])
+        request["body"].update(purpose=h.a.purpose_ref, audience=h.a.audience_ref,
+            control_epoch=h.token["control_epoch"])
+        prepared = h.f.service.prepare(request, token=h.token, plan=h.f.plan,
+            extra_dependencies=h.references, access_context=h.access_context)
+        data = prepared.value
+        data["historical_records"] = [h.f.storage.get(h.contexts["purpose"])]
+        self.assertEqual(h.f.service._preparation(data), data)
+        foreign = h.f.storage.get(h.other_contexts["purpose"])
+        attacked = deepcopy(data)
+        attacked["historical_records"] = [foreign]
+        attacked["records"].append(foreign)
+        attacked["reads"] = sorted([*attacked["reads"], pin(foreign)], key=canonical_bytes)
+        with self.assertRaises(ContractError) as denied:
+            h.f.service._preparation(attacked)
+        self.assertEqual(denied.exception.code, "E_AUTHORITY_REQUIRED")
+
     def test_legacy_inline_publication_still_commits_replays_and_reconstructs(self):
         f = fixtures.AssessmentCommitTests("runTest")
         f.setUp()

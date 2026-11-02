@@ -192,8 +192,9 @@ Frozen monitoring 1.0/1.1 wires and HostMonitoringState are unchanged.
 ## Historical context provenance (MAT-091, SDK dev20)
 
 A captured assessment can remain readable history after its purpose changes.
-An indirect native `context-current` provenance parent may retain its exact old
-snapshot **only with exact present grants for both it and the current head**.
+For current evaluation/egress, an indirect native `context-current` provenance
+parent may retain its exact old snapshot **only with exact present grants for
+both it and the current head**.
 Present READ, audience/provider eligibility and control fences still apply.
 Other stale source parents remain refused. Selecting an old context as a
 current root still fails; this does not admit the old assessment as current
@@ -207,6 +208,12 @@ inventory separate from the **current roots** passed to `access.capture` and
 from semantic inputs passed to assessment preparation. The host's deterministic
 rule consumes current intent and source fields, not earlier assessments.
 Use a separate context for historical baseline access when needed.
+
+`require_history` is a separate READ-only operation: it keeps the exact recorded
+snapshots and any captured 1.1 metadata-head anchors, without adding today's
+head. Later benign context revisions do not rewrite the selection. Present
+READ and exact grants for those recorded versions remain mandatory; this does
+not authorize current work or renew its original action token.
 
 AccessContext encoding `1.1` retains both metadata versions when necessary;
 ordinary single-version contexts remain `1.0`. This is an SDK access-context
