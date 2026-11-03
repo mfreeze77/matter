@@ -50,6 +50,57 @@ class PostgreSQLTests(PostgresCase):
         self.assertEqual(result["status"], "failure", result)
         self.assertEqual(result["error"]["code"], code, result)
 
+    def test_database_guards_refuse_history_changes_and_retyped_or_skipped_versions(self):
+        from psycopg import sql
+        from psycopg.errors import CheckViolation
+
+        self.assertEqual(self.s.execute(create_command("guard-seed", "subject"), create_matter)["status"], "success")
+        def statement(query):
+            return sql.SQL(query).format(schema=sql.Identifier(self.schema))
+        def rows():
+            with connect() as conn:
+                return tuple(tuple(conn.execute(sql.SQL("SELECT * FROM {}.{} ORDER BY 1, 3, 5").format(
+                    sql.Identifier(self.schema), sql.Identifier(table))).fetchall())
+                    for table in ("commands", "versions", "heads", "watches"))
+        before = rows()
+        cases = []
+        for table in ("commands", "versions"):
+            field = "command_json" if table == "commands" else "content"
+            cases.extend((
+                ((), "UPDATE {schema}." + table + " SET " + field + "=%s", (b"{}",)),
+                ((), "DELETE FROM {schema}." + table, ()),
+            ))
+            other = "versions" if table == "commands" else "commands"
+            # CASCADE reaches both history tables. Disable only the other guard
+            # inside this rolled-back transaction so it cannot mask this one.
+            cases.append((("ALTER TABLE {schema}." + other + " DISABLE TRIGGER " + other + "_immutable",),
+                          "TRUNCATE {schema}." + table + " CASCADE", ()))
+        insert = ("INSERT INTO {schema}.versions(scope_id,namespace,id,record_type,version,digest,content,command_id) "
+                  "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)")
+        for kind, revision in (("claim", 2), ("matter", 3)):
+            cases.append(((), insert, (SCOPE, "example", "subject", kind, revision, "b" * 64, b"{}", "guard-seed")))
+        for revision in (0, 9007199254740992):
+            # Isolate the numeric constraint from the consecutive-version trigger.
+            cases.append((("ALTER TABLE {schema}.versions DISABLE TRIGGER versions_identity",), insert,
+                          (SCOPE, "example", "new", "matter", revision, "b" * 64, b"{}", "guard-seed")))
+        cases.extend((
+            ((), "UPDATE {schema}.heads SET record_type='claim' WHERE namespace='example' AND id='subject'", ()),
+            (("DELETE FROM {schema}.heads WHERE namespace='example' AND id='subject'",),
+             "INSERT INTO {schema}.heads(scope_id,namespace,id,record_type,version) VALUES (%s,%s,%s,%s,%s)",
+             (SCOPE, "example", "subject", "claim", 1)),
+        ))
+        for preparation, query, parameters in cases:
+            with self.subTest(query=query, parameters=parameters):
+                with self.assertRaises(CheckViolation) as error:
+                    with connect() as conn:
+                        self.assertEqual(conn.execute("SHOW session_replication_role").fetchone(), ("origin",))
+                        for prepare in preparation:
+                            conn.execute(statement(prepare))
+                        conn.execute(statement(query), parameters or None)
+                self.assertEqual(error.exception.sqlstate, "23514")
+                self.assertEqual(rows(), before)
+        self.assertEqual(self.s.verify()["commands"], 1)
+
     def test_sqlite_and_postgresql_return_identical_public_results_and_domain_bytes(self):
         with tempfile.TemporaryDirectory() as directory, SQLiteStore(Path(directory) / "baseline.sqlite", scope_id=SCOPE) as sqlite:
             command = create_command("parity", "subject")

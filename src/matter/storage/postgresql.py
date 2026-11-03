@@ -126,8 +126,10 @@ class PostgreSQLStore(RelationalStore):
         if (type(schema) is not str or not re.fullmatch(r"[a-z_][a-z0-9_]{0,62}", schema)
                 or schema in ("public", "information_schema") or schema.startswith("pg_")):
             raise StorageError("E_SCHEMA_INVALID", "Select a private lowercase PostgreSQL schema identifier.")
-        if type(timeout) not in (int, float) or not 0 <= timeout <= 60 or type(initialize) is not bool:
+        if type(timeout) not in (int, float) or not 0 <= timeout <= 60:
             raise StorageError("E_SCHEMA_INVALID", "Lock timeout must be between zero and sixty seconds.")
+        if type(initialize) is not bool:
+            raise StorageError("E_SCHEMA_INVALID", "initialize must be a boolean.")
         if not callable(connection_factory) or any(x is not None and not callable(x)
                 for x in (release, fault_hook, transaction_hook)):
             raise StorageError("E_SCHEMA_INVALID")
