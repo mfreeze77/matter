@@ -1,6 +1,8 @@
 # StateCivics slice 2: receiving the Matter assistant-review SDK
 
-Latest SDK package: `matter-foundation==0.1.0.dev20`. The
+Documented StateCivics receiving baseline: `matter-foundation==0.1.0.dev20`.
+MAT-092 supplies dev22 for [permanent storage integration](../postgresql.md);
+adopting that SDK remains host receiving work. The
 [MAT-091 history-repair handoff](../validation/MAT-091.md) records its package
 identity, exact receiving-host grant/root changes and actual checks. It does not
 change the review request/result or monitoring 1.0/1.1 wires. The original dev19

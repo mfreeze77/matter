@@ -184,8 +184,10 @@ production DSN. The tests create and remove random `mat_test_*` schemas. The rec
 cases also create and drops a separate random `mat_test_restore_*` database
 inside the explicitly named test container (the schema-name case creates
 short/quoted schema names only inside that disposable database); its synthetic test role needs
-create/drop-database privileges. These privileges are for the test harness,
-not a production runtime-role recommendation.
+create/drop-database privileges. The full fault suite also disables internal
+constraint triggers and changes replication-role settings, so it uses a
+**disposable superuser test role** in these isolated synthetic databases.
+Those privileges are not a production runtime-role requirement or recommendation.
 
 ```bash
 python -m pip install -r requirements-postgres-test.txt

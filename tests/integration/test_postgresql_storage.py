@@ -494,6 +494,123 @@ class PostgreSQLTests(PostgresCase):
         self.assertEqual(error.exception.code, "E_STORAGE_UNAVAILABLE")
 
 
+class PostgreSQLClaimRaceTests(PostgresCase):
+    """Both host snapshots are admitted; the durable logical lens must exclude
+    concurrent callbacks even across revision IDs and native matter IDs.
+    """
+    def setUp(self):
+        super().setUp()
+        from integration import test_assessment_commit, test_assistant_review_memory as reviews
+        from integration.postgres_helpers import install_backend
+        install_backend(self)
+        self.first = reviews.ReviewTests("runTest")
+        self.first.setUp()
+        self.addCleanup(self.first.doCleanups)
+        self.assertIsInstance(self.first.f.storage, PostgreSQLStore)
+
+    def _race(self, variant):
+        from concurrent.futures import wait, FIRST_COMPLETED
+        from copy import copy, deepcopy
+        from threading import Barrier, Event, Lock
+        from matter.access import AccessService, HostAccessPolicy
+        from matter.assistant_review import ReviewHost, pressure_ref
+        from matter.contracts import ContractError
+        from matter.controls import ControlService
+        from matter.storage import pin
+        first = self.first
+        second = copy(first)
+        second.f = copy(first.f)
+        second.artifacts = dict(first.artifacts)
+        second.serial = 1000  # distinct pressure command identities in one ledger
+        second.lens = deepcopy(first.lens)
+        if variant == "revision":
+            second.lens["revision_id"] = "approved-2"
+            second.source = second.artifact("evidence", "rev2-source", "source_fact", {"text": "synthetic new material"})
+            second.assessment = second.artifact("judgment", "rev2-assessment", "jev_judgment", {}, citations=[second.source])
+            second.control = second.artifact("control", "rev2-control", "host_control", {"current": "approved-2"})
+        else:
+            created = first.f.storage.execute(create_command("other-matter", "other-matter", scope_id=first.f.storage.scope_id), create_matter)
+            self.assertEqual(created["status"], "success", created)
+            second.f.subject = first.f.storage.get(created["body"]["matter"])
+        store = PostgreSQLStore(connect, schema=first.f.storage.schema, scope_id=first.f.storage.scope_id, initialize=False)
+        self.addCleanup(store.close)
+        second.f.storage = store
+        second.f.controls = ControlService(store, policy=first.f.controls.policy, clock=lambda: deepcopy(first.f.now))
+        second.native = [pin(second.f.subject), pin(second.f.source)]
+        second.access = AccessService(policy=HostAccessPolicy(scope_id=store.scope_id,
+            audiences=[second.audience], providers=[{"reference": second.provider, "provider": "synthetic", "transport": "fixture"}],
+            grants=[{"reference": r, "audiences": [second.audience], "providers": [second.provider]} for r in second.native]),
+            controls=second.f.controls, current_read=store.snapshot)
+        second.token = second.f.controls.capture(actor=second.f.actor, authority=entity_ref(second.f.authority),
+            capability="assessment", targets=[entity_ref(r) for r in second.native])
+        with store.snapshot() as view:
+            second.access_context = second.access.capture(view, token=second.token, audience=second.audience,
+                provider=second.provider, references=second.native)
+        second.host = ReviewHost(binding=second.lens["host"], require_current=second.current,
+            require_read=second.read, resolve=second.read_artifact)
+        second.service = second.make_service(store, second.f.controls, second.access)
+        second.request = second.req()
+        first.add(); second.add()
+        self.assertNotEqual(first.request.wake_id, second.request.wake_id)
+        self.assertNotEqual(pressure_ref(store.scope_id, first.request), pressure_ref(store.scope_id, second.request))
+        barrier, entered, release, guard = Barrier(2), Event(), Event(), Lock()
+        calls = []
+        original_actions = []
+        for fixture in (first, second):
+            original = fixture.service._action
+            original_actions.append(original)
+            def gated(action, request, _original=original, **kwargs):
+                if action == "start":
+                    barrier.wait(timeout=10)
+                return _original(action, request, **kwargs)
+            fixture.service._action = gated
+        def run(fixture):
+            def reviewer(value, wake_id):
+                with guard:
+                    calls.append(wake_id)
+                entered.set()
+                if not release.wait(10):
+                    raise AssertionError("Synthetic callback gate timed out.")
+                return fixture.result(fixture.request, status="unknown")
+            try:
+                return fixture.execute(reviewer=reviewer)
+            except ContractError as error:
+                return error.code
+        with ThreadPoolExecutor(2) as pool:
+            futures = [pool.submit(run, fixture) for fixture in (first, second)]
+            try:
+                self.assertTrue(entered.wait(10), "Neither request acquired a review claim.")
+                done, _ = wait(futures, timeout=5, return_when=FIRST_COMPLETED)
+                self.assertEqual(len(done), 1, "The losing request did not refuse while the winning callback was in flight.")
+                self.assertEqual(len(calls), 1, "Both logical-lens callbacks ran concurrently.")
+                # A global control-sequence conflict can mask a broken lens key.
+                # Retry with fresh pins while the first callback is still held:
+                # only the shared durable logical-lens lock can refuse this start.
+                index = futures.index(next(iter(done)))
+                loser = (first, second)[index]
+                loser.service._action = original_actions[index]
+                with self.assertRaises(ContractError) as blocked:
+                    loser.service.claim(loser.request, token=loser.token, access_context=loser.access_context)
+                self.assertEqual(blocked.exception.code, "E_DELIVERY_UNKNOWN")
+            finally:
+                release.set()
+            outcomes = [future.result(timeout=10) for future in futures]
+        self.assertEqual(len(calls), 1, outcomes)
+        self.assertEqual(sum(isinstance(row, dict) and row["value"]["value"]["phase"] == "unknown" for row in outcomes), 1, outcomes)
+        for row in outcomes:
+            if isinstance(row, str):
+                self.assertIn(row, ("E_REVISION_CONFLICT", "E_DELIVERY_UNKNOWN", "E_IDEMPOTENCY_CONFLICT"))
+        for fixture in (first, second):
+            self.assertEqual(fixture.pending(), fixture.request.value["contributions"])
+        store.verify()
+
+    def test_concurrent_review_claims_across_lens_revisions_allow_one_callback(self):
+        self._race("revision")
+
+    def test_concurrent_review_claims_across_native_matters_allow_one_callback(self):
+        self._race("matter")
+
+
 def load_tests(loader, standard, pattern):
     from integration import (test_storage_transactions as transactions, test_storage_boundaries as boundaries,
                             test_storage_identity_lookup as identities, test_transaction_hook as hooks,
@@ -513,6 +630,7 @@ def load_tests(loader, standard, pattern):
                          (conflicts, "DependencyConflictCodeTests"), (controls, "ControlStorageTests")):
         suite.addTest(reuse_cases(loader, module, name))
     suite.addTest(reuse_cases(loader, reviews, "ReviewTests", include=(
+        "test_two_real_sqlite_handles_cannot_launch_the_same_wake_twice",
         "test_duplicate_routes_time_and_limits_do_not_rerun_after_restart",
         "test_claimed_crash_and_provider_exception_remain_unknown_never_retried",
         "test_exact_completion_and_pressure_retries_do_not_touch_new_arrivals",
