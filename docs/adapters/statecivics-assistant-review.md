@@ -1,6 +1,8 @@
 # StateCivics slice 2: receiving the Matter assistant-review SDK
 
-Latest SDK package: `matter-foundation==0.1.0.dev20`. The
+Documented StateCivics receiving baseline: `matter-foundation==0.1.0.dev20`.
+MAT-092 supplies dev22 for [permanent storage integration](../postgresql.md);
+adopting that SDK remains host receiving work. The
 [MAT-091 history-repair handoff](../validation/MAT-091.md) records its package
 identity, exact receiving-host grant/root changes and actual checks. It does not
 change the review request/result or monitoring 1.0/1.1 wires. The original dev19
@@ -24,19 +26,23 @@ historical checkpoints and ownership boundaries.
 
 The owner adopted [Decision 0003](../decisions/0003-permanent-host-storage.md)
 on 2026-11-02; the StateCivics storage handoff is merged at `5b38eab72`.
-[MAT-092](../../tickets/MAT-092.md) now owns the planned Matter PostgreSQL
-backend and host payload conformance work. Production activation requires both
+[MAT-092](../../tickets/MAT-092.md) supplies the Matter PostgreSQL backend and
+host payload conformance work; the [integration guide](../postgresql.md) documents
+its connection/lease API and [validation](../validation/MAT-092.md) records actual checks. Production activation requires both
 PostgreSQL ledger storage and host-backed payload persistence, plus connected
 receiving/recovery acceptance. There is no interim production mount or temporary
 deployment/file-backup work. Retain the existing SQLite rehearsal for comparison.
 
-StateCivics KS-1158 owns its payload adapter and deployment/recovery integration.
+StateCivics KS-1158 owns storage integration, its payload adapter, coordination
+and associated storage receiving/recovery acceptance. Encryption remains
+KS-637/KS-1152 work; the dispatcher (KS-1127) and production activation remain
+separate StateCivics/owner work.
 The host resolves a packet by `packet_hash`, reconstructs `exact_material` using
 Matter's `canonical_bytes`, and derives/verifies `source_digest` and byte length
 against the content reference. `evidence_hash` hashes the packet identity object,
 not the payload bytes. Raw model responses need host-owned exact-byte artifact
 persistence. The decision also preserves database coordination, unknown-wake
-reconciliation and compatible SDK/ledger/payload recovery pins. This intake
+reconciliation and compatible SDK/ledger/payload recovery pins. This implementation
 does not change StateCivics' reported dev20 pin at `401f1a4`.
 
 ## Existing host entry point

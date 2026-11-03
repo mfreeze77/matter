@@ -4,18 +4,21 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "matter-foundation"
-version = "0.1.0.dev21"
+version = "0.1.0.dev22"
 description = "Portable evidence, staged assessments and typed semantic execution for Matter"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = ["jsonschema>=4.23,<5", "referencing>=0.35,<1"]
 
+[project.optional-dependencies]
+postgres = ["psycopg>=3.2,<4"]
+
 [project.scripts]
 matter = "matter.__main__:main"
 
 [tool.setuptools]
-packages = ["matter", "matter._schemas", "matter.storage", "matter.storage.migrations", "matter.evaluators", "matter.semantic", "matter.semantic.providers", "matter.semantic.families", "matter.evaluation"]
+packages = ["matter", "matter._schemas", "matter.storage", "matter.storage.migrations", "matter.storage.postgresql_migrations", "matter.evaluators", "matter.semantic", "matter.semantic.providers", "matter.semantic.families", "matter.evaluation"]
 
 [tool.setuptools.package-dir]
 "" = "src"
@@ -24,3 +27,4 @@ packages = ["matter", "matter._schemas", "matter.storage", "matter.storage.migra
 [tool.setuptools.package-data]
 "matter._schemas" = ["*.schema.json"]
 "matter.storage.migrations" = ["*.sql"]
+"matter.storage.postgresql_migrations" = ["*.sql", "*.json"]

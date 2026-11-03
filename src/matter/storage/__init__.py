@@ -5,8 +5,9 @@ from .base import (
     Transaction, entity_ref, pin, snapshot_digest,
 )
 from .sqlite import SQLiteStore
+from .postgresql import PostgreSQLStore
 
 __all__ = [
-    "CommandHandler", "PROJECTION_TYPE", "SQLiteStore", "Snapshot", "Storage",
+    "CommandHandler", "PROJECTION_TYPE", "SQLiteStore", "PostgreSQLStore", "Snapshot", "Storage",
     "StorageError", "Transaction", "entity_ref", "pin", "snapshot_digest",
 ]

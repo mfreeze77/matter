@@ -172,7 +172,7 @@ class AttentionFamiliesTests(unittest.TestCase):
         packet = self.packet(original, [source])
         future_time = {'state': 'known', 'value': '2080-01-01T00:00:00Z', 'precision': 'second'}
         # Even backdated host content cannot precede its actual committed snapshot.
-        with patch('matter.storage.sqlite._now', return_value=future_time):
+        with patch('matter.storage._relational._now', return_value=future_time):
             unpublished_at_cut, _, _ = self.a.contexts.publish(self.a.contexts.definition('audience', 'future-receipt'))
         with self.assertRaises(ContractError) as error:
             self.compare(packet, original, assessment, audience=pin(unpublished_at_cut))

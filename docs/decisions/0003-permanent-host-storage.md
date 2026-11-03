@@ -1,6 +1,6 @@
 # Decision 0003: permanent host storage before StateCivics production activation
 
-**Status:** adopted by the owner, 2026-11-02. Backend implementation is planned
+**Status:** adopted by the owner, 2026-11-02. Backend implementation is tracked
 in [MAT-092](../../tickets/MAT-092.md); this decision does not activate production.
 
 ## Context and authority
@@ -117,10 +117,11 @@ receiving observations, not newly measured inventories or sizing guarantees.
   meanings. Refuse unsupported versions and document one-way boundaries;
   rollback requires a compatible recovery set, not just an older image.
 
-MAT-092 remains `planned` with completion `not_run`. Matter acceptance requires
-real PostgreSQL concurrency/recovery evidence and comparison with SQLite.
-StateCivics connected receiving evidence is an additional activation prerequisite.
-The [planning validation receipt](../validation/MAT-092-planning.md) records the
-checks on these documents and ticket projections. This planning change does not
-modify runtime code, frozen monitoring/review wires, provider qualification or
-any downstream repository. It does not claim production readiness.
+[MAT-092 implementation evidence](../validation/MAT-092.md) records the current
+backend matrix, recovery and review status. StateCivics connected receiving
+remains an additional activation prerequisite. The [integration guide](../postgresql.md)
+defines the connection/lease API and host acceptance boundary. The earlier
+[planning validation receipt](../validation/MAT-092-planning.md) remains a record
+of the decision/ticket checks before implementation. Neither milestone changes
+the frozen monitoring/review wires, provider qualification or any downstream
+repository, and neither alone establishes production readiness.

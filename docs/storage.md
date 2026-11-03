@@ -14,16 +14,18 @@ controls, assessment execution, and external delivery retain their own tickets.
 A storage receipt records a commit; it does not establish that the host's policy
 or authority was correct.
 
-## Planned permanent host storage
+## Permanent host storage
 
-[MAT-092](../tickets/MAT-092.md) plans a PostgreSQL `Storage` implementation and
-conformance for host-backed `PayloadStore` adapters. SQLite remains the shipped
-reference backend. [Decision 0003](decisions/0003-permanent-host-storage.md)
+[MAT-092](../tickets/MAT-092.md) adds optional `PostgreSQLStore` and conformance
+for host-backed `PayloadStore` adapters. Both backends share the command engine;
+SQLite retains its file format and backup APIs. The [PostgreSQL guide](postgresql.md)
+specifies connection ownership, scope locks, migrations and recovery verification. [Decision 0003](decisions/0003-permanent-host-storage.md)
 requires both permanent ports before StateCivics production activation, with no
 interim production mount or temporary deployment/file-backup plumbing. Keep the
 existing SQLite rehearsal for comparison and verification. The decision records
 the corrected packet/payload digest mapping, coordination, recovery and SDK
-compatibility gates; PostgreSQL implementation and acceptance remain unrun.
+compatibility gates. [MAT-092 validation](validation/MAT-092.md) distinguishes
+executed Matter checks from still-required StateCivics connected acceptance.
 
 ## First transaction
 
@@ -362,4 +364,4 @@ old bytes under the same writer lock. An old pin alone cannot satisfy that
 current fence. Ordinary `tx.get` still reads current state and refuses old pins.
 Historical proof does not make an old result current or confer authorization.
 Alternative storage ports need this additive method for historical-context
-provenance; the shipped SQLite implementation supplies it.
+provenance; both SQLite and PostgreSQL supply it through the shared command engine.
